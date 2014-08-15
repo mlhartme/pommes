@@ -50,7 +50,7 @@ public class Find extends SearchBase<Document> {
 
         result = new ArrayList<>();
         database = updatedDatabase();
-        for (Document document : new Searcher(database).query(substring)) {
+        for (Document document : new Searcher(database).substring(substring)) {
             line = toLine(document);
             if (line.contains(substring)) {
                 result.add(document);

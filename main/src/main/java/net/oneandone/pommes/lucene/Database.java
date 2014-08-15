@@ -138,11 +138,11 @@ public class Database {
         gav = new GroupArtifactVersion(mavenProject);
 
         // basic stuff
+        doc.add(new StringField(GROUP, gav.getGroupId(), Field.Store.YES));
+        doc.add(new StringField(ARTIFACT, gav.getArtifactId(), Field.Store.YES));
+        doc.add(new StringField(VERSION, gav.getVersion(), Field.Store.YES));
         doc.add(new StringField(GA, gav.toGaString(), Field.Store.YES));
         doc.add(new StringField(GAV, gav.toGavString(), Field.Store.YES));
-        doc.add(new StringField(GROUP, gav.getGroupId(), Field.Store.NO));
-        doc.add(new StringField(ARTIFACT, gav.getArtifactId(), Field.Store.NO));
-        doc.add(new StringField(VERSION, gav.getVersion(), Field.Store.NO));
         doc.add(new StringField(SCM, scm(mavenProject), Field.Store.YES));
 
         // dependencies

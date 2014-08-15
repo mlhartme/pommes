@@ -386,7 +386,7 @@ public class Searcher {
 
     //--
 
-    public List<Document> query(String substring) throws IOException {
+    public List<Document> substring(String substring) throws IOException {
         Term gav;
         Query query;
         TopDocs search;
