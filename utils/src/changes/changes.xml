@@ -2,7 +2,7 @@
   <body>
     <release date="2014-08-14" version="3.8.0">
       <action date="2014-03-26" dev="mhm" type="update">
-        Moved to github. Changed groupId to net.oneondone.pommes.
+        Moved to github. Changed coordinates to net.oneondone.pommes:maven and package accordingly.
       </action>
     </release>
     <release date="2014-04-01" version="3.7.0">

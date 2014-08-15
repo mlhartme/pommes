@@ -12,7 +12,7 @@
   <description>Maven Utilities. Useful to learn about aether: https://github.com/eclipse/aether-demo</description>
 
   <groupId>net.oneandone.pommes</groupId>
-  <artifactId>utils</artifactId>
+  <artifactId>maven</artifactId>
   <version>3.8.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
