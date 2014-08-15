@@ -21,6 +21,7 @@
   <properties>
     <wsd.ypid>20084</wsd.ypid>
 
+    <guava.version>10.0.1</guava.version>
     <oneandone.java.source>1.7</oneandone.java.source>
     <oneandone.java.target>1.7</oneandone.java.target>
 

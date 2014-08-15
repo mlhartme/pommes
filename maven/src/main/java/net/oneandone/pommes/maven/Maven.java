@@ -504,7 +504,7 @@ public class Maven {
      * You'll usually pass one jar artifact and the corresponding pom artifact.
      * @param pluginName null if you deploy normal artifacts; none-null for Maven Plugins, that you wish to add a plugin mapping for;
      *                   specifies the plugin name in this case.
-     *                   See http://svn.apache.org/viewvc/maven/plugin-tools/tags/maven-plugin-tools-3.2/maven-plugin-plugin/src/main/java/org/apache/maven/plugin/plugin/metadata/AddPluginArtifactMetadataMojo.java?revision=1406624&view=markup
+     *                   See http://svn.apache.org/viewvc/maven/plugin-tools/tags/maven-plugin-tools-3.2/maven-plugin-plugin/src/main/java/org/apache/maven/plugin/plugin/metadata/AddPluginArtifactMetadataMojo.java?revision=1406624&amp;view=markup
      */
     // CHECKSTYLE:ON
     public void deploy(RemoteRepository target, String pluginName, List<Artifact> artifacts) throws DeploymentException {
