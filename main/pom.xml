@@ -13,7 +13,7 @@
   <description>Database for pom files. You can search it and perform bulk-svn operations.</description>
 
   <groupId>net.oneandone.pommes</groupId>
-  <artifactId>pommes</artifactId>
+  <artifactId>main</artifactId>
   <version>2.1.1-SNAPSHOT</version>
 
   <packaging>jar</packaging>
@@ -51,9 +51,15 @@
 
   <developers>
     <developer>
-      <id>mhm</id>
       <name>Michael Hartmeier</name>
-      <roles><role>lead</role></roles>
+      <id>mlhartme</id>
+      <url>http://github.com/mlhartme/</url>
+      <organization>1 &amp; 1 Internet AG</organization>
+      <organizationUrl>https://github.com/1and1</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
     </developer>
   </developers>
 
@@ -91,7 +97,7 @@
     </dependency>
     <dependency>
       <groupId>net.oneandone.pommes</groupId>
-      <artifactId>utils</artifactId>
+      <artifactId>maven</artifactId>
       <version>3.8.0-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -114,7 +120,7 @@
         <version>1.5.1</version>
         <configuration>
           <name>pommes</name>
-          <main>com.oneandone.sales.tools.pommes.Main</main>
+          <main>net.oneandone.sales.tools.pommes.Main</main>
           <remove>META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
           <overwrite>META-INF/sisu/javax.inject.Named</overwrite>
           <equal>com/jcraft/jsch/agentproxy/**.*</equal>

@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oneandone.sales.tools.pommes;
+package net.oneandone.sales.tools.pommes;
 
-import com.oneandone.sales.tools.maven.Maven;
-import com.oneandone.sales.tools.pommes.lucene.GroupArtifactVersion;
-import com.oneandone.sales.tools.pommes.lucene.Reference;
-import com.oneandone.sales.tools.pommes.lucene.Searcher;
-import com.oneandone.sales.tools.pommes.lucene.Database;
-import com.oneandone.sales.tools.pommes.lucene.Searcher.Includes;
+import net.oneandone.pommes.maven.Maven;
+import net.oneandone.sales.tools.pommes.lucene.GroupArtifactVersion;
+import net.oneandone.sales.tools.pommes.lucene.Reference;
+import net.oneandone.sales.tools.pommes.lucene.Searcher;
+import net.oneandone.sales.tools.pommes.lucene.Database;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
@@ -61,7 +60,7 @@ public class Users extends SearchBase<Reference> {
     }
 
     @Option("include")
-    protected Includes includes = Includes.MAJOR;
+    protected Searcher.Includes includes = Searcher.Includes.MAJOR;
 
     @Option("format")
     protected OutputFormat format = OutputFormat.COMPACT;
@@ -104,7 +103,7 @@ public class Users extends SearchBase<Reference> {
         }
 
         // extract artifacts using the exact version (or within a range) of the artifact of interest
-        List<Reference> exactDeps = searcher.filterByReferencedArtifacts(allDeps, gav.getVersion(), Includes.NONE, Includes.NONE);
+        List<Reference> exactDeps = searcher.filterByReferencedArtifacts(allDeps, gav.getVersion(), Searcher.Includes.NONE, Searcher.Includes.NONE);
         // for the compact output format we need to aggregate the using artifacts separately for each group
         if (format == OutputFormat.AGGREGATED) {
             exactDeps = searcher.aggregateArtifacts(exactDeps);
@@ -112,7 +111,7 @@ public class Users extends SearchBase<Reference> {
         result.addAll(exactDeps);
 
         // extract artifacts using an older version of the artifact of interest
-        List<Reference> olderDeps = searcher.filterByReferencedArtifacts(allDeps, gav.getVersion(), includes, Includes.NONE);
+        List<Reference> olderDeps = searcher.filterByReferencedArtifacts(allDeps, gav.getVersion(), includes, Searcher.Includes.NONE);
         if (format == OutputFormat.AGGREGATED) {
             olderDeps = searcher.aggregateArtifacts(olderDeps);
         }
@@ -120,7 +119,7 @@ public class Users extends SearchBase<Reference> {
         result.addAll(olderDeps);
 
         // extract artifacts using an newer version of the artifact of interest
-        List<Reference> newerDeps = searcher.filterByReferencedArtifacts(allDeps, gav.getVersion(), Includes.NONE,
+        List<Reference> newerDeps = searcher.filterByReferencedArtifacts(allDeps, gav.getVersion(), Searcher.Includes.NONE,
                 includes);
         if (format == OutputFormat.AGGREGATED) {
             newerDeps = searcher.aggregateArtifacts(newerDeps);
@@ -140,7 +139,7 @@ public class Users extends SearchBase<Reference> {
         }
 
         // extract artifacts using the exact version (or within a range) of the artifact of interest
-        List<Reference> exactChildren = searcher.filterByReferencedArtifacts(allChildren, gav.getVersion(), Includes.NONE, Includes.NONE);
+        List<Reference> exactChildren = searcher.filterByReferencedArtifacts(allChildren, gav.getVersion(), Searcher.Includes.NONE, Searcher.Includes.NONE);
         // for the compact output format we need to aggregate the using artifacts separately for each group
         if (format == OutputFormat.AGGREGATED) {
             exactChildren = searcher.aggregateArtifacts(exactChildren);
@@ -148,7 +147,7 @@ public class Users extends SearchBase<Reference> {
         result.addAll(exactChildren);
 
         // extract artifacts using an older version of the artifact of interest
-        List<Reference> olderChildren = searcher.filterByReferencedArtifacts(allChildren, gav.getVersion(), includes, Includes.NONE);
+        List<Reference> olderChildren = searcher.filterByReferencedArtifacts(allChildren, gav.getVersion(), includes, Searcher.Includes.NONE);
         if (format == OutputFormat.AGGREGATED) {
             olderChildren = searcher.aggregateArtifacts(olderChildren);
         }
@@ -156,7 +155,7 @@ public class Users extends SearchBase<Reference> {
         result.addAll(olderChildren);
 
         // extract artifacts using an newer version of the artifact of interest
-        List<Reference> newerChildren = searcher.filterByReferencedArtifacts(allChildren, gav.getVersion(), Includes.NONE, includes);
+        List<Reference> newerChildren = searcher.filterByReferencedArtifacts(allChildren, gav.getVersion(), Searcher.Includes.NONE, includes);
         if (format == OutputFormat.AGGREGATED) {
             newerChildren = searcher.aggregateArtifacts(newerChildren);
         }

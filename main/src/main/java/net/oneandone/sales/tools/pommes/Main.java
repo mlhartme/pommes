@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oneandone.sales.tools.pommes;
+package net.oneandone.sales.tools.pommes;
 
-import com.oneandone.sales.tools.maven.Maven;
+import net.oneandone.pommes.maven.Maven;
 import net.oneandone.sushi.cli.Child;
 import net.oneandone.sushi.cli.Cli;
 import net.oneandone.sushi.cli.Command;

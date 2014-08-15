@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oneandone.sales.tools.pommes.lucene;
+package net.oneandone.sales.tools.pommes.lucene;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;

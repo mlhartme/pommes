@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oneandone.sales.tools.pommes;
+package net.oneandone.sales.tools.pommes;
 
-import com.oneandone.sales.tools.maven.Maven;
+import net.oneandone.pommes.maven.Maven;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.launcher.Launcher;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class Update extends Base {
+public class Umount extends Base {
     private String baseDirectoryString;
 
     @Remaining
@@ -36,28 +37,36 @@ public class Update extends Base {
         }
     }
 
-    public Update(Console console, Maven maven) {
+    public Umount(Console console, Maven maven) {
         super(console, maven);
     }
 
     @Override
     public void invoke() throws Exception {
         FileNode baseDirectory;
+        FileMap mounts;
         FileMap checkouts;
-        List<FileNode> directories;
-        Launcher svn;
+        Map<FileNode, String> mountRemoves;
+        Map<FileNode, String> checkoutRemoves;
+        String url;
 
         baseDirectory = baseDirectoryString == null ? (FileNode) console.world.getWorking() : console.world.file(baseDirectoryString);
+        mounts = FileMap.loadMounts(console.world);
         checkouts = FileMap.loadCheckouts(console.world);
-        directories = checkouts.under(baseDirectory);
-        for (FileNode directory : directories) {
-            svn = svn(directory, "up");
-            if (console.getVerbose()) {
-                console.verbose.println(svn.toString());
-            } else {
-                console.info.println("[svn up " + directory + "]");
+        mountRemoves = new LinkedHashMap<>();
+        checkoutRemoves = new LinkedHashMap<>();
+        for (FileNode mount : mounts.under(baseDirectory)) {
+            url = mounts.lookupUrl(mount);
+            mountRemoves.put(mount, url);
+            for (FileNode checkout : checkouts.under(mount)) {
+                checkoutRemoves.put(checkout, checkouts.lookupUrl(checkout));
             }
-            svn.exec(console.info);
+        }
+        if (mountRemoves.size() == 0) {
+            throw new ArgumentException("nothing to unmount under " + baseDirectory);
+        } else {
+            performUpdate(mounts, Collections.<FileNode, String>emptyMap(), mountRemoves,
+                    checkouts, Collections.<FileNode, String>emptyMap(), checkoutRemoves);
         }
     }
 }
