@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
+  <body>
+    <release date="2014-08-15" version="2.1.0">
+      <action date="2014-08-15" dev="mhm" type="update">
+        Renamed softreg to pommes. Adjust existing configuration files by renaming them accordingly.
+      </action>
+    </release>
+    <release date="2014-07-31" version="2.0.0">
+      <action date="2014-07-21" dev="mhm" type="update">
+        Rename Index command to Create.
+      </action>
+      <action date="2014-07-18" dev="mhm" type="add">
+        Added -local option to map search results (find and users) to local directories.
+      </action>
+      <action date="2014-07-16" dev="mhm" type="update">
+        Updated Lucene 3.0.1 to 4.9.0.
+      </action>
+      <action date="2014-07-15" dev="mhm" type="add">
+        Added 'find' command.
+      </action>
+      <action date="2014-07-15" dev="mhm" type="update">
+        Dumped ypcache; persistent state is stored in Lucense instead.
+      </action>
+      <action date="2014-07-15" dev="mhm" type="add">
+        Added 'users' command by merging usedby plugin. Includes default to major now.
+      </action>
+      <action date="2014-07-15" dev="mhm" type="add">
+        Created softreg from ypwatcher, but dumpted svn- and yp import
+      </action>
+    </release>
+  </body>
+</document>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.oneandone.sales.tools.maven.poms</groupId>
+    <artifactId>standard-parent</artifactId>
+    <version>3.1.4</version>
+  </parent>
+
+  <name>Pommes</name>
+  <description>Database for pom files. You can search it and perform bulk-svn operations.</description>
+
+  <groupId>com.oneandone.sales.tools</groupId>
+  <artifactId>pommes</artifactId>
+  <version>2.1.1-SNAPSHOT</version>
+
+  <packaging>jar</packaging>
+
+  <properties>
+    <wsd.ypid>20084</wsd.ypid>
+  </properties>
+
+  <url>https://wiki.1and1.org/UE/PommesHome</url>
+
+  <scm>
+    <url>https://svn.1and1.org/svn/sales/tools/pommes/trunk</url>
+    <connection>scm:svn:https://svn.1and1.org/svn/sales/tools/pommes/trunk</connection>
+    <developerConnection>scm:svn:https://svn.1and1.org/svn/sales/tools/pommes/trunk</developerConnection>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>mhm</id>
+      <name>Michael Hartmeier</name>
+      <roles><role>lead</role></roles>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.oneandone</groupId>
+      <artifactId>sushi</artifactId>
+      <version>2.8.17</version>
+    </dependency>
+    <dependency>
+      <groupId>org.tmatesoft.svnkit</groupId>
+      <artifactId>svnkit</artifactId>
+      <version>1.8.5</version>
+      <exclusions>
+        <!-- exclude jna, because it's speeds up local checkouts - which we don't have -->
+        <exclusion>
+          <groupId>net.java.dev.jna</groupId>
+          <artifactId>jna</artifactId>
+        </exclusion>
+
+        <!-- exclude ssh because we access svn via https -->
+        <exclusion>
+          <groupId>com.trilead</groupId>
+          <artifactId>trilead-ssh2</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.jcraft</groupId>
+          <artifactId>jsch.agentproxy.svnkit-trilead-ssh2</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.jcraft</groupId>
+          <artifactId>jsch.agentproxy.connector-factory</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.oneandone.sales.tools.maven</groupId>
+      <artifactId>utils</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>4.9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analyzers-common</artifactId>
+      <version>4.9.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.oneandone.sales.tools.maven.plugins</groupId>
+        <artifactId>linkcheck</artifactId>
+        <configuration>
+          <ignores>net.java.dev.jna:platform</ignores>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>net.oneandone.maven.plugins</groupId>
+        <artifactId>application</artifactId>
+        <version>1.5.1</version>
+        <configuration>
+          <name>pommes</name>
+          <main>com.oneandone.sales.tools.pommes.Main</main>
+          <remove>META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
+          <overwrite>META-INF/sisu/javax.inject.Named</overwrite>
+          <equal>com/jcraft/jsch/agentproxy/**.*</equal>
+
+          <!-- for upload -->
+          <symlink>${env.WSDTOOLS_HOME}/bin/pommes</symlink>
+          <target>${env.WSDTOOLS_HOME}/pommes</target>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+     </plugin>
+    </plugins>
+  </build>
+</project>

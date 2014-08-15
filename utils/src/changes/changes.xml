@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
+  <body>
+    <release date="2014-04-01" version="3.7.0">
+      <action date="2014-03-26" dev="mhm" type="fix">
+        Detect resolution problems when loading a pom.
+      </action>
+      <action date="2014-03-26" dev="mhm" type="remove">
+        Removed explicit proxy selector - loaded from settings instead.
+      </action>
+    </release>
+    <release date="2014-03-17" version="3.6.0">
+      <action date="2014-03-14" dev="mhm" type="update">
+        Switch from Sonatype Aether to Eclipse Aether.
+      </action>
+    </release>
+    <release date="2014-01-27" version="3.5.1">
+      <action date="2014-01-27" dev="mhm" type="update">
+        Cleanup api
+      </action>
+    </release>
+    <release date="2014-01-27" version="3.5.0">
+      <action date="2014-01-27" dev="mhm" type="update">
+        Configurable user settings.
+      </action>
+      <action date="2014-01-27" dev="mhm" type="update">
+        Configureable settings file.
+      </action>
+    </release>
+    <release date="2014-01-22" version="3.4.0">
+      <action date="2014-01-22" dev="mhm" type="update">
+        Update wagon 1.0 to 2.6, plexus utils 2.0.7 to 3.0.8, and maven 3.0.4 to 3.0.5.
+      </action>
+    </release>
+    <release date="2014-01-11" version="3.3.1">
+      <action date="2014-01-11" dev="mhm" type="removed">
+        Align packages with groupId. Removed 3.3.0 release from Artifactory.
+      </action>
+    </release>
+    <release date="2014-01-11" version="3.3.0">
+      <action date="2014-01-11" dev="mhm" type="removed">
+        Maven object is always created from settings now; creation from defaults for urls has been removed because it's
+        problematic for the artifactory switch.
+      </action>
+      <action date="2014-01-11" dev="mhm" type="update">
+        Bumped version to 3.3.0 and changed groupId and packages to com.oneandone.sales.tools.maven (to comply with new naming scheme).
+      </action>
+      <action date="2014-01-11" dev="mhm" type="update">
+        Update sushi 2.8.8 to 2.8.12.
+      </action>
+      <action date="2014-01-11" dev="mhm" type="fix">
+        Maven.withSettings did not configure authentication.
+      </action>
+    </release>
+    <release date="2013-04-17" version="3.2.4">
+      <action date="2013-04-17" dev="mhm" type="update">
+        configurable profiles and properties in loadPom
+      </action>
+    </release>
+    <release date="2013-01-30" version="3.2.3">
+      <action date="2013-01-30" dev="mhm" type="update">
+        Getter for Repository System and Session.
+      </action>
+    </release>
+    <release date="2012-12-06" version="3.2.2">
+      <action date="2012-12-06" dev="mhm" type="fix">
+        Fix deployment for files that do not fit into memory.
+      </action>
+    </release>
+    <release date="2012-10-23" version="3.2.1">
+      <action date="2012-10-16" dev="mhm" type="update">
+        Update sushi 2.7.0 to 2.8.1.
+      </action>
+    </release>
+    <release date="2012-10-02" version="3.2.0">
+      <action date="2012-10-02" dev="mhm" type="update">
+        Update parent to switch to java 7.
+      </action>
+      <action date="2012-10-02" dev="mhm" type="add">
+        Add localRepository override parameter.
+      </action>
+    </release>
+    <release date="2012-09-26" version="3.1.1">
+      <action date="2012-09-26" dev="mhm" type="fix">
+        Fix repository policy when loading from settings.xml.
+      </action>
+    </release>
+    <release date="2012-08-14" version="3.1.0">
+      <action date="2012-08-14" dev="mhm" type="update">
+        Update Sushi 2.6.1 to 2.7.0.
+      </action>
+      <action date="2012-08-14" dev="mhm" type="add">
+        Support plugin metadata deployment.
+      </action>
+    </release>
+    <release date="2012-05-04" version="3.0.4">
+      <action date="2011-05-04" dev="mhm" type="fix">
+        Fix Maven.withSettings to respect MAVEN_OPTS with -Dmaven.repo.local.
+      </action>
+    </release>
+    <release date="2011-12-12" version="3.0.3">
+      <action date="2011-12-12" dev="mhm" type="add">
+        Provides access to repositories.
+      </action>
+    </release>
+    <release date="2011-10-25" version="3.0.2">
+      <action date="2011-10-25" dev="mhm" type="fix">
+        Fix repository type when loading maven settings.
+      </action>
+    </release>
+    <release date="2011-10-20" version="3.0.1">
+      <action date="2011-10-19" dev="mhm" type="add">
+        Instantiate Maven from settings.
+      </action>
+      <action date="2011-10-19" dev="mhm" type="fix">
+        Fix proxy configuration for repositories passed to Maven constructor.
+      </action>
+      <action date="2011-10-18" dev="mhm" type="update">
+        Update Aether 1.12 to 1.13.
+      </action>
+    </release>
+    <release date="2011-09-01" version="3.0.0">
+      <action dev="mhm" type="update">
+        Dump all old code, which was Maven 2. Start new version based on pucwar resolver.
+      </action>
+    </release>
+    <release date="2010-08-18" version="2.0.4">
+      <action dev="mhm" type="update">
+        Maven.findWriteRepository generalized for arbitrary repository list and moved to Repository class.
+      </action>
+      <action dev="mhm" type="update">
+        Update dependencies.
+      </action>
+    </release>
+    <release date="2010-06-18" version="2.0.3">
+      <action dev="mhm" type="fix">
+        Resolve parent poms when loading a pom.
+      </action>
+    </release>
+    <release date="2010-04-26" version="2.0.2">
+      <action dev="mhm" type="update">
+        Add pom interpolation.
+      </action>
+      <action dev="mhm" type="update">
+        Update Maven libraries to 2.2.1.
+      </action>
+    </release>
+    <release date="2010-04-13" version="2.0.1">
+      <action dev="mhm" type="update">
+        Switch to Sushi 2.0.2.
+      </action>
+    </release>
+    <release date="2010-03-29" version="2.0.0">
+      <action dev="mhm" type="update">
+        Moved protocol package to protocol plugin.
+      </action>
+      <action dev="mhm" type="update">
+        Simplify and updated dependencies.
+      </action>
+      <action dev="mhm" type="remove">
+        Removed linkcheck code and the dependency to Mork.
+      </action>
+      <action dev="mhm" type="fix">
+        Fix standard repo url from ext-central to ext-releases without snapshots.
+      </action>
+      <action dev="mhm" type="update">
+        Changed special value for billy.remote from "modern" to standard".
+      </action>
+    </release>
+    <release date="2010-03-12" version="1.4.4">
+      <action dev="mhm" type="update">
+        Resolve Task: do no access billy unless the linkcheck is used.
+      </action>
+    </release>
+    <release date="2010-02-26" version="1.4.3">
+      <action dev="mhm" type="update">
+        Distinguish modern and legacy repository configuration.
+      </action>
+    </release>
+    <release date="2010-02-05" version="1.4.2">
+      <action dev="mhm" type="fix">
+        Fix Svn Node creation during protocol generation
+      </action>
+      <action dev="mhm" type="fix">
+        Dump obsolete Pustemanager class
+      </action>
+    </release>
+    <release date="2010-02-02" version="1.4.1">
+      <action dev="mhm" type="fix">
+        Turn io.node("resource:foo") info io.resource("foo")
+      </action>
+    </release>
+    <release date="2010-02-02" version="1.4.0">
+      <action dev="mhm" type="fix">
+        Switch to Sushi 2.0.0 and Mork 0.6.0.
+      </action>
+    </release>
+  </body>
+</document>

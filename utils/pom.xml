@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.oneandone.sales.tools.maven.poms</groupId>
+    <artifactId>standard-parent</artifactId>
+    <version>3.0.11</version>
+  </parent>
+
+  <name>Maven Utilities</name>
+  <description>Maven Utilities. Useful to learn about aether: https://github.com/eclipse/aether-demo</description>
+
+  <groupId>com.oneandone.sales.tools.maven</groupId>
+  <artifactId>utils</artifactId>
+  <version>3.7.1-SNAPSHOT</version>
+
+  <packaging>jar</packaging>
+
+  <issueManagement>
+    <system>JIRA</system>
+    <url>https://issue.tool.1and1.com/browse/WSDI</url>
+  </issueManagement>
+
+  <scm>
+    <url>https://svn.1and1.org/svn/sales/tools/maven/utils/trunk</url>
+    <connection>scm:svn:https://svn.1and1.org/svn/sales/tools/maven/utils/trunk</connection>
+    <developerConnection>scm:svn:https://svn.1and1.org/svn/sales/tools/maven/utils/trunk</developerConnection>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>mhm</id>
+      <name>Michael Hartmeier</name>
+      <roles><role>lead</role></roles>
+    </developer>
+  </developers>
+
+  <properties>
+    <aetherVersion>0.9.0.M2</aetherVersion>
+    <mavenVersion>3.1.1</mavenVersion>
+    <wagonVersion>2.6</wagonVersion>
+    <wsd.ypid>19936</wsd.ypid>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.oneandone</groupId>
+      <artifactId>sushi</artifactId>
+      <version>2.8.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-classworlds</artifactId>
+      <version>2.5.1</version>
+    </dependency>
+    <dependency>
+      <!-- not used directly, but I want to force using the latest version in the dependency tree:-->
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.0.15</version>
+    </dependency>
+
+
+    <!-- maven dependencies to load poms and fetch the site id -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-aether-provider</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+
+    <!-- repository access: aether -->
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>${aetherVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>${aetherVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-connector-wagon</artifactId>
+      <version>${aetherVersion}</version>
+    </dependency>
+    <dependency>
+      <!-- not used directly, but I want to force using the latest version in the dependency tree:-->
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>${wagonVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
+      <version>${wagonVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <!-- CAUTION: wagon-http-lightweight only tranfers files that fit into memory (see the known limitation on
+           http://maven.apache.org/wagon/wagon-providers/wagon-http-lightweight/)! -->
+      <artifactId>wagon-http</artifactId>
+      <version>${wagonVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
