@@ -42,8 +42,8 @@ public class Searcher {
     private final IndexReader reader;
     private final IndexSearcher searcher;
 
-    public Searcher(Database directory) throws IOException {
-        this.reader = DirectoryReader.open(directory.getIndexLuceneDirectory());
+    public Searcher(Database database) throws IOException {
+        this.reader = DirectoryReader.open(database.getIndexLuceneDirectory());
         this.searcher = new IndexSearcher(reader);
     }
 

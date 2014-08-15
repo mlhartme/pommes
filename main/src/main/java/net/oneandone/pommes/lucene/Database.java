@@ -18,7 +18,6 @@ package net.oneandone.pommes.lucene;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -121,8 +120,8 @@ public class Database {
         IndexWriter writer;
 
         wipe();
-        writer = new IndexWriter(getIndexLuceneDirectory(),
-                new IndexWriterConfig(Version.LUCENE_4_9, new StandardAnalyzer(Version.LUCENE_4_9)));
+        // no analyzer, I have String fields only 
+        writer = new IndexWriter(getIndexLuceneDirectory(), new IndexWriterConfig(Version.LUCENE_4_9, null));
         while (iterator.hasNext()) {
             writer.addDocument(iterator.next());
         }
