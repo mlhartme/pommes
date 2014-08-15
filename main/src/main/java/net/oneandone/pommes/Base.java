@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.sales.tools.pommes;
+package net.oneandone.pommes;
 
 import net.oneandone.pommes.maven.Maven;
-import net.oneandone.sales.tools.pommes.lucene.Database;
+import net.oneandone.pommes.lucene.Database;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;

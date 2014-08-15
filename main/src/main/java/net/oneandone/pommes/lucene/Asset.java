@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.sales.tools.pommes.lucene;
+package net.oneandone.pommes.lucene;
 
 public class Asset {
     public final String groupId;

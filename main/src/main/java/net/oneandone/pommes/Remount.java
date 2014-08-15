@@ -13,51 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.sales.tools.pommes;
+package net.oneandone.pommes;
 
 import net.oneandone.pommes.maven.Maven;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.launcher.Launcher;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class Update extends Base {
-    private String baseDirectoryString;
+public class Remount extends Base {
+    private String dirString;
 
     @Remaining
     public void remaining(String str) {
-        if (baseDirectoryString == null) {
-            baseDirectoryString = str;
+        if (dirString == null) {
+            dirString = str;
         } else {
             throw new ArgumentException("too many arguments");
         }
     }
 
-    public Update(Console console, Maven maven) {
+    public Remount(Console console, Maven maven) {
         super(console, maven);
     }
 
     @Override
     public void invoke() throws Exception {
-        FileNode baseDirectory;
+        FileNode root;
+        FileMap mounts;
         FileMap checkouts;
-        List<FileNode> directories;
-        Launcher svn;
+        Map<FileNode, String> adds;
+        Map<FileNode, String> removes;
 
-        baseDirectory = baseDirectoryString == null ? (FileNode) console.world.getWorking() : console.world.file(baseDirectoryString);
+        root = dirString == null ? (FileNode) console.world.getWorking() : console.world.file(dirString);
+        mounts = FileMap.loadMounts(console.world);
         checkouts = FileMap.loadCheckouts(console.world);
-        directories = checkouts.under(baseDirectory);
-        for (FileNode directory : directories) {
-            svn = svn(directory, "up");
-            if (console.getVerbose()) {
-                console.verbose.println(svn.toString());
-            } else {
-                console.info.println("[svn up " + directory + "]");
-            }
-            svn.exec(console.info);
+        adds = new LinkedHashMap<>();
+        removes = new LinkedHashMap<>();
+        for (FileNode mount : mounts.under(root)) {
+            scanUpdate(checkouts, mounts.lookupUrl(mount), mount, adds, removes);
         }
+        performUpdate(mounts, Collections.<FileNode, String>emptyMap(), Collections.<FileNode, String>emptyMap(),
+                checkouts, adds, removes);
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.sales.tools.pommes;
+package net.oneandone.pommes;
 
 import net.oneandone.sushi.fs.LineFormat;
 import net.oneandone.sushi.fs.LineReader;
