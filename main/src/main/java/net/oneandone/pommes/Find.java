@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes;
 
+import net.oneandone.pommes.lucene.Searcher;
 import net.oneandone.pommes.maven.Maven;
 import net.oneandone.pommes.lucene.GroupArtifactVersion;
 import net.oneandone.pommes.lucene.Database;
@@ -23,8 +24,6 @@ import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,22 +45,17 @@ public class Find extends SearchBase<Document> {
 
     public List<Document> search() throws IOException {
         List<Document> result;
-        Document document;
         Database database;
         String line;
 
         result = new ArrayList<>();
         database = updatedDatabase();
-        IndexReader reader = DirectoryReader.open(database.getIndexLuceneDirectory());
-        int numDocs = reader.numDocs();
-        for (int i = 0; i < numDocs; i++) {
-            document = reader.document(i);
+        for (Document document : new Searcher(database).query(substring)) {
             line = toLine(document);
             if (line.contains(substring)) {
                 result.add(document);
             }
         }
-        reader.close();
         return result;
     }
 

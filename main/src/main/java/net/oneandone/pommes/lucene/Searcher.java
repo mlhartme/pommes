@@ -25,6 +25,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.WildcardQuery;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -382,4 +383,23 @@ public class Searcher {
             return super.toString();
         }
     }
+
+    //--
+
+    public List<Document> query(String substring) throws IOException {
+        Term gav;
+        Query query;
+        TopDocs search;
+        List<Document> list;
+
+        gav = new Term(Database.GAV, "*" + substring + "*");
+        query = new WildcardQuery(gav);
+        search = searcher.search(query, 100000);
+        list = new ArrayList<>();
+        for (ScoreDoc scoreDoc : search.scoreDocs) {
+            list.add(reader.document(scoreDoc.doc));
+        }
+        return list;
+    }
+
 }
