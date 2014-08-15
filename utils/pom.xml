@@ -11,9 +11,9 @@
   <name>Maven Utilities</name>
   <description>Maven Utilities. Useful to learn about aether: https://github.com/eclipse/aether-demo</description>
 
-  <groupId>com.oneandone.sales.tools.maven</groupId>
+  <groupId>net.oneandone.pommes</groupId>
   <artifactId>utils</artifactId>
-  <version>3.7.1-SNAPSHOT</version>
+  <version>3.8.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
