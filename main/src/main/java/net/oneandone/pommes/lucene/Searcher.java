@@ -20,6 +20,9 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.queryparser.flexible.standard.builders.StandardQueryBuilder;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -296,7 +299,6 @@ public class Searcher {
      * @param newerIncludes
      *            newer version range to include
      * @return the list of extracted artifacts
-     * @throws org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
      */
     public List<Reference> filterByReferencedArtifacts(List<Reference> artifacts, String version,
             Includes olderIncludes, Includes newerIncludes) throws InvalidVersionSpecificationException {
@@ -387,13 +389,17 @@ public class Searcher {
     //--
 
     public List<Document> substring(String substring) throws IOException {
-        Term gav;
-        Query query;
+        return query(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")));
+    }
+
+    public List<Document> query(String queryString) throws IOException, QueryNodeException {
+        return query(new StandardQueryParser().parse(queryString, Database.GAV));
+    }
+
+    public List<Document> query(Query query) throws IOException {
         TopDocs search;
         List<Document> list;
 
-        gav = new Term(Database.GAV, "*" + substring + "*");
-        query = new WildcardQuery(gav);
         search = searcher.search(query, 100000);
         list = new ArrayList<>();
         for (ScoreDoc scoreDoc : search.scoreDocs) {

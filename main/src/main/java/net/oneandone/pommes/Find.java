@@ -24,9 +24,9 @@ import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,28 +35,22 @@ import java.util.List;
 public class Find extends SearchBase<Document> {
     private final FileMap checkouts;
 
-    public Find(Console console, Maven maven) throws IOException {
+    private final boolean query;
+
+    public Find(boolean query, Console console, Maven maven) throws IOException {
         super(console, maven);
-        checkouts = FileMap.loadCheckouts(console.world);
+        this.query = query;
+        this.checkouts = FileMap.loadCheckouts(console.world);
     }
 
     @Value(name = "substring", position = 1)
     private String substring;
 
-    public List<Document> search() throws IOException {
-        List<Document> result;
+    public List<Document> search() throws IOException, QueryNodeException {
         Database database;
-        String line;
 
-        result = new ArrayList<>();
         database = updatedDatabase();
-        for (Document document : new Searcher(database).substring(substring)) {
-            line = toLine(document);
-            if (line.contains(substring)) {
-                result.add(document);
-            }
-        }
-        return result;
+        return query ? new Searcher(database).query(substring) : new Searcher(database).substring(substring);
     }
 
     @Override

@@ -43,7 +43,12 @@ public class Main extends Cli implements Command {
 
     @Child("find")
     public Find find() throws IOException {
-        return new Find(console, maven());
+        return new Find(false, console, maven());
+    }
+
+    @Child("query")
+    public Find query() throws IOException {
+        return new Find(true, console, maven());
     }
 
     @Child("users")
@@ -89,6 +94,7 @@ public class Main extends Cli implements Command {
         console.info.println("  'pommes' ['-v'|'-e'] command args*");
         console.info.println("search commands");
         console.info.println("  'find' substring      prints projects who's coordinates or scm url contains substring");
+        console.info.println("  'query' query         prints projects matching the specified lucene query");
         console.info.println("  'users' gav?          prints projects that use the specified artifact (gav defaults to current project)");
         console.info.println("mount commands");
         console.info.println("  'mount' ('-match' str)? url dir? ");

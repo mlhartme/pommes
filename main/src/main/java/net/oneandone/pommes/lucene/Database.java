@@ -120,7 +120,7 @@ public class Database {
         IndexWriter writer;
 
         wipe();
-        // no analyzer, I have String fields only 
+        // no analyzer, I have String fields only
         writer = new IndexWriter(getIndexLuceneDirectory(), new IndexWriterConfig(Version.LUCENE_4_9, null));
         while (iterator.hasNext()) {
             writer.addDocument(iterator.next());
