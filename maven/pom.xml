@@ -18,7 +18,7 @@
 
   <properties>
     <aetherVersion>0.9.0.M2</aetherVersion>
-    <mavenVersion>3.1.1</mavenVersion>
+    <mavenVersion>3.2.2</mavenVersion>
     <wagonVersion>2.6</wagonVersion>
     <wsd.ypid>19936</wsd.ypid>
 
@@ -76,7 +76,7 @@
       <!-- not used directly, but I want to force using the latest version in the dependency tree:-->
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.0.15</version>
+      <version>3.0.17</version>
     </dependency>
 
 
@@ -150,4 +150,35 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>java8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:syntax</additionalparam>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <plugins>
+          <plugin>
+            <!-- javadoc 8 is way too picky ... -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:syntax</additionalparam>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+  </profiles>
 </project>
