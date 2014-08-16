@@ -79,10 +79,8 @@ public class Searcher {
     private List<Reference> query(String searchField, String searchValue, String refField, String refValue) throws IOException {
         Term term = new Term(searchField, searchValue);
         Query query = new TermQuery(term);
-        TopDocs search = searcher.search(query, 100000);
         List<Reference> list = new ArrayList<>();
-        for (ScoreDoc scoreDoc : search.scoreDocs) {
-            Document doc = reader.document(scoreDoc.doc);
+        for (Document doc : query(query)) {
             GroupArtifactVersion artifact = new GroupArtifactVersion(doc.get(Database.GAV));
             GroupArtifactVersion reference = getReference(doc, refField, refValue);
             list.add(new Reference(doc, artifact, reference));
