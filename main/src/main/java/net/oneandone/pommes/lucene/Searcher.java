@@ -63,57 +63,10 @@ public class Searcher {
         return Collections.max(list).from;
     }
 
-    public GroupArtifactVersion findArtifactByExactVersion(GroupArtifactVersion gav) throws IOException {
-        List<Reference> result = query(Database.GAV, gav.toGavString(), null, null);
-        if (result.isEmpty()) {
-            return null;
-        }
-        if (result.size() > 1) {
-            throw new IllegalStateException("Multiple artifacts found with coordinates " + gav.toGavString());
-        }
-        return result.get(0).from;
-    }
-
-    public List<Reference> findDependeesByExactVersion(String groupId, String artifactId, String version)
-            throws IOException {
-        GroupArtifactVersion gav = new GroupArtifactVersion(groupId, artifactId, version);
-        List<Reference> dependees = query(Database.DEP_GAV, gav.toGavString(), Database.DEP_GAV,
-                gav.toGaString());
-        return dependees;
-    }
-
-    public List<Reference> findDependeesByVersionRange(String groupId, String artifactId, String version)
-            throws IOException, InvalidVersionSpecificationException {
-        GroupArtifactVersion gav = new GroupArtifactVersion(groupId, artifactId, version);
-        List<Reference> dependees = query(Database.DEP_GA_RANGE, gav.toGaString(),
-                Database.DEP_GAV, gav.toGaString());
-
-        // filter dependees with dependency version range doesn't match the version
-        Iterator<Reference> it = dependees.iterator();
-        ArtifactVersion av = new DefaultArtifactVersion(gav.getVersion());
-        while (it.hasNext()) {
-            Reference next = it.next();
-            VersionRange range = VersionRange.createFromVersionSpec(next.to.getVersion());
-            if (!range.containsVersion(av)) {
-                it.remove();
-            }
-        }
-
-        return dependees;
-    }
-
     public List<Reference> findDependeesIgnoringVersion(String groupId, String artifactId) throws IOException {
         GroupArtifactVersion gav = new GroupArtifactVersion(groupId, artifactId, "");
         List<Reference> dependees = query(Database.DEP_GA, gav.toGaString(), Database.DEP_GAV, gav.toGaString());
         return dependees;
-    }
-
-    public List<Reference> findChildrenByExactVersion(String groupId, String artifactId, String version)
-            throws IOException {
-        GroupArtifactVersion gav = new GroupArtifactVersion(groupId, artifactId, version);
-        List<Reference> children = query(Database.PAR_GAV, gav.toGavString(), Database.PAR_GAV,
-                gav.toGaString());
-        return children;
     }
 
     public List<Reference> findChildrenIgnoringVersion(String groupId, String artifactId) throws IOException {
