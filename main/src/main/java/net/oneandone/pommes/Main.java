@@ -36,10 +36,14 @@ public class Main extends Cli implements Command {
         return Maven.withSettings(console.world);
     }
 
-    @Child("create")
-    public Create create() throws IOException {
-        return new Create(console, maven());
+    //--
+
+    @Child("add")
+    public Add add() throws IOException {
+        return new Add(console, maven());
     }
+
+    //--
 
     @Child("find")
     public Find find() throws IOException {
@@ -110,8 +114,8 @@ public class Main extends Cli implements Command {
         console.info.println("  'status' dir?         check checkouts under the specified directory against svn.");
         console.info.println("  'update' dir?         updates checkouts under the specified directory form svn");
         console.info.println("admin commands");
-        console.info.println("  'create' '-global'? url*");
-        console.info.println("                        creates a new registry containing the projects found under the specified urls;");
+        console.info.println("  'add' '-create'? '-global'? url*");
+        console.info.println("                        adds projects found under the specified urls to the database;");
         console.info.println("                        use '-' pattern to exclude from the url before;");
         console.info.println("                        (urls default to all ciso urls if not specified)");
         console.info.println();

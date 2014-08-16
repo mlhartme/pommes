@@ -26,6 +26,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
@@ -140,13 +141,15 @@ public class Database implements AutoCloseable {
 
     //-- create an index
 
-    public void index(Iterator<Document> iterator) throws IOException {
+    public void index(boolean create, Iterator<Document> iterator) throws IOException {
         IndexWriter writer;
+        IndexWriterConfig config;
 
         close();
-        wipe();
         // no analyzer, I have String fields only
-        writer = new IndexWriter(getIndexLuceneDirectory(), new IndexWriterConfig(Version.LUCENE_4_9, null));
+        config =  new IndexWriterConfig(Version.LUCENE_4_9, null);
+        config.setOpenMode(create ? IndexWriterConfig.OpenMode.CREATE : IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             writer.addDocument(iterator.next());
         }
