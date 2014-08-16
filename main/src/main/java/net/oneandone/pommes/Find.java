@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes;
 
-import net.oneandone.pommes.lucene.Searcher;
 import net.oneandone.pommes.maven.Maven;
 import net.oneandone.pommes.lucene.GroupArtifactVersion;
 import net.oneandone.pommes.lucene.Database;
@@ -50,7 +49,7 @@ public class Find extends SearchBase<Document> {
         Database database;
 
         database = updatedDatabase();
-        return query ? new Searcher(database).query(substring) : new Searcher(database).substring(substring);
+        return query ? database.query(substring) : database.substring(substring);
     }
 
     @Override
