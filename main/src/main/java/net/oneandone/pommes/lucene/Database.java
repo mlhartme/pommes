@@ -26,7 +26,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
@@ -58,6 +57,8 @@ public class Database implements AutoCloseable {
     public static final String SCM_SVN = "scm:svn:";
 
     //-- field names
+
+    public static final String ID = "id";
 
     public static final String GROUP = "g";
     public static final String ARTIFACT = "a";
@@ -144,6 +145,7 @@ public class Database implements AutoCloseable {
     public void index(boolean create, Iterator<Document> iterator) throws IOException {
         IndexWriter writer;
         IndexWriterConfig config;
+        Document doc;
 
         close();
         // no analyzer, I have String fields only
@@ -151,18 +153,21 @@ public class Database implements AutoCloseable {
         config.setOpenMode(create ? IndexWriterConfig.OpenMode.CREATE : IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
-            writer.addDocument(iterator.next());
+            doc = iterator.next();
+            writer.updateDocument(new Term(ID, doc.get(ID)), doc);
         }
         writer.close();
     }
 
-    public static Document document(MavenProject mavenProject) throws InvalidVersionSpecificationException {
+    public static Document document(String id, MavenProject mavenProject) throws InvalidVersionSpecificationException {
         Document doc;
         GroupArtifactVersion gav;
         MavenProject parent;
 
         doc = new Document();
         gav = new GroupArtifactVersion(mavenProject);
+
+        doc.add(new StringField(ID, id, Field.Store.YES));
 
         // basic stuff
         doc.add(new StringField(GROUP, gav.getGroupId(), Field.Store.YES));
