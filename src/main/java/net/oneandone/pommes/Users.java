@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes;
 
-import net.oneandone.pommes.maven.Maven;
+import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.lucene.GroupArtifactVersion;
 import net.oneandone.pommes.lucene.Reference;
 import net.oneandone.pommes.lucene.Database;

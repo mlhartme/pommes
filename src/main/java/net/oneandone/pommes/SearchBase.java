@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes;
 
-import net.oneandone.pommes.maven.Maven;
+import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.lucene.Database;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
