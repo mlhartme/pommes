@@ -80,7 +80,7 @@ public class MavenTest {
         MavenProject pom;
 
         pom = maven.loadPom(maven.getWorld().guessProjectHome(getClass()).join("pom.xml"));
-        assertEquals("utils", pom.getArtifactId());
+        assertEquals("maven", pom.getArtifactId());
     }
 
     @Test
