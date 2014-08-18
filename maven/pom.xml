@@ -58,9 +58,9 @@
   </developers>
 
   <scm>
-    <url>https://svn.1and1.org/svn/sales/tools/maven/utils/trunk</url>
-    <connection>scm:svn:https://svn.1and1.org/svn/sales/tools/maven/utils/trunk</connection>
-    <developerConnection>scm:svn:https://svn.1and1.org/svn/sales/tools/maven/utils/trunk</developerConnection>
+    <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git</developerConnection>
+    <url>https://github.com/mlhartme/pommes</url>
   </scm>
 
   <dependencies>
