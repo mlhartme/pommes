@@ -44,28 +44,6 @@ public abstract class Base implements Command {
         this.maven = maven;
     }
 
-    protected Database pommes() throws NodeInstantiationException {
-        String global;
-
-        global = System.getenv("POMMES_GLOBAL");
-        try {
-            return new Database(maven.getLocalRepositoryDir().getParent().join("pommes"),
-                    global == null ? null : console.world.node(global));
-        } catch (URISyntaxException e) {
-            throw new ArgumentException("invalid url for global pommes database file: " + global, e);
-        }
-    }
-
-    protected Database updatedDatabase() throws IOException {
-        Database result;
-
-        result = pommes();
-        result.downloadOpt();
-        return result;
-    }
-
-    //--
-
     protected void scanUpdate(FileMap checkouts, String baseUrl, FileNode baseDirectory,
                         Map<FileNode, String> adds, Map<FileNode, String> removes) throws IOException {
         List<String> urls;
@@ -73,7 +51,7 @@ public abstract class Base implements Command {
         FileNode workspace;
         String existingUrl;
 
-        urls = updatedDatabase().list(baseUrl);
+        urls = Database.loadUpdated(console.world, maven).list(baseUrl);
         for (String url : urls) {
             path = Strings.removeLeft(url, baseUrl);
             path = Strings.removeRight(path, "/trunk/");

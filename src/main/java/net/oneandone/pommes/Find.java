@@ -48,7 +48,7 @@ public class Find extends SearchBase<Document> {
     public List<Document> search() throws IOException, QueryNodeException {
         Database database;
 
-        database = updatedDatabase();
+        database = Database.loadUpdated(console.world, maven);
         return query ? database.query(substring) : database.substring(substring);
     }
 

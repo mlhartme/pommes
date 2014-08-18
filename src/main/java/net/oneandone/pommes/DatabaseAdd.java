@@ -95,7 +95,7 @@ public class DatabaseAdd extends Base {
         trunks = trunks();
         console.info.println("indexing ...");
         iterator = new ProjectIterator(console, maven, trunks.iterator());
-        database = pommes();
+        database = Database.load(console.world, maven);
         database.index(iterator);
         database.close();
         iterator.summary();

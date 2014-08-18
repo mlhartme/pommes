@@ -75,7 +75,7 @@ public class Users extends SearchBase<Reference> {
         MavenProject project;
 
         result = new ArrayList<>();
-        database = updatedDatabase();
+        database = Database.loadUpdated(console.world, maven);
         if (gavString == null) {
             project = maven.loadPom(console.world.file("pom.xml"));
             gav = new GroupArtifactVersion(project.getGroupId(), project.getArtifactId(), project.getVersion());

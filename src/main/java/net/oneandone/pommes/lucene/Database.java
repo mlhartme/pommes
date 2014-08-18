@@ -15,7 +15,11 @@
  */
 package net.oneandone.pommes.lucene;
 
+import net.oneandone.maven.embedded.Maven;
+import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
@@ -48,12 +52,35 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 public class Database implements AutoCloseable {
+    public static Database load(World world, Maven maven) throws NodeInstantiationException {
+        String global;
+
+        global = System.getenv("POMMES_GLOBAL");
+        try {
+            return new Database(maven.getLocalRepositoryDir().getParent().join("pommes"),
+                    global == null ? null : world.node(global));
+        } catch (URISyntaxException e) {
+            throw new ArgumentException("invalid url for global pommes database file: " + global, e);
+        }
+    }
+
+    public static Database loadUpdated(World world, Maven maven) throws IOException {
+        Database result;
+
+        result = load(world, maven);
+        result.updateOpt();
+        return result;
+    }
+
+    //--
+
     public static final String SCM_SVN = "scm:svn:";
 
     //-- field names
@@ -114,7 +141,7 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public void downloadOpt() throws IOException {
+    public void updateOpt() throws IOException {
         FileNode zip;
 
         if (global != null) {
