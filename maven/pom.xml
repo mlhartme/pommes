@@ -58,8 +58,8 @@
   </developers>
 
   <scm>
-    <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git/maven</connection>
-    <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git/maven</developerConnection>
+    <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git</developerConnection>
     <url>https://github.com/mlhartme/pommes/maven</url>
     <tag>maven-3.8.0</tag>
   </scm>
