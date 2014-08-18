@@ -40,7 +40,7 @@ public class Main extends Cli implements Command {
 
     @Child("add")
     public Add add() throws IOException {
-        return new Add(console, maven());
+        return new Add(true, console, maven());
     }
 
     //--
