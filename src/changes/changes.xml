@@ -2,7 +2,7 @@
   <body>
     <release date="2014-08-15" version="2.2.0">
       <action date="2014-08-16" dev="mhm" type="update">
-        Renamed 'create' command to 'add' and added a '-create' option.
+        'create' command is called 'database-add' now, and it updates document. To wipe the database, use the new 'database-clear'.
       </action>
       <action date="2014-08-15" dev="mhm" type="update">
         Moved to github. Changed groupId to net.oneandone.pommes.

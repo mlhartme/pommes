@@ -38,13 +38,6 @@ public class Main extends Cli implements Command {
 
     //--
 
-    @Child("add")
-    public Add add() throws IOException {
-        return new Add(true, console, maven());
-    }
-
-    //--
-
     @Child("find")
     public Find find() throws IOException {
         return new Find(false, console, maven());
@@ -85,6 +78,20 @@ public class Main extends Cli implements Command {
         return new Update(console, maven());
     }
 
+    //--
+
+    @Child("database-clear")
+    public DatabaseClear clear() throws IOException {
+        return new DatabaseClear(console, maven());
+    }
+
+    @Child("database-add")
+    public DatabaseAdd add() throws IOException {
+        return new DatabaseAdd(console, maven());
+    }
+
+    //--
+
     @Override
     public void invoke() throws Exception {
         printHelp();
@@ -114,7 +121,9 @@ public class Main extends Cli implements Command {
         console.info.println("  'status' dir?         check checkouts under the specified directory against svn.");
         console.info.println("  'update' dir?         updates checkouts under the specified directory form svn");
         console.info.println("admin commands");
-        console.info.println("  'add' '-create'? '-global'? url*");
+        console.info.println("  'database-clear' '-global'?");
+        console.info.println("                        creates a new empty database");
+        console.info.println("  'database-add' '-global'? url*");
         console.info.println("                        adds projects found under the specified urls to the database;");
         console.info.println("                        use '-' pattern to exclude from the url before;");
         console.info.println("                        (urls default to all ciso urls if not specified)");

@@ -121,7 +121,7 @@ public class Database implements AutoCloseable {
             if (!directory.exists() || directory.getLastModified() - System.currentTimeMillis() > 1000L * 60 * 60 * 24) {
                 zip = directory.getWorld().getTemp().createTempFile();
                 global.copyFile(zip);
-                wipe();
+                clear();
                 zip.unzip(directory);
                 zip.deleteFile();
             }
@@ -140,9 +140,15 @@ public class Database implements AutoCloseable {
         return global;
     }
 
-    //-- create an index
+    //-- change the index
 
-    public void index(boolean create, Iterator<Document> iterator) throws IOException {
+    public void clear() throws IOException {
+        close();
+        directory.deleteTreeOpt();
+        directory.mkdir();
+    }
+
+    public void index(Iterator<Document> iterator) throws IOException {
         IndexWriter writer;
         IndexWriterConfig config;
         Document doc;
@@ -150,7 +156,7 @@ public class Database implements AutoCloseable {
         close();
         // no analyzer, I have String fields only
         config =  new IndexWriterConfig(Version.LUCENE_4_9, null);
-        config.setOpenMode(create ? IndexWriterConfig.OpenMode.CREATE : IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
@@ -204,8 +210,6 @@ public class Database implements AutoCloseable {
         return doc;
     }
 
-    //--
-
     private static String scm(MavenProject project) {
         Scm scm;
         String connection;
@@ -218,11 +222,6 @@ public class Database implements AutoCloseable {
             }
         }
         return "";
-    }
-
-    private void wipe() throws IOException {
-        directory.deleteTreeOpt();
-        directory.mkdir();
     }
 
     //--

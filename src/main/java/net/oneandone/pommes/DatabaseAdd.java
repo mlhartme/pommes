@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class Add extends Base {
+public class DatabaseAdd extends Base {
     @Option("global")
     private boolean global;
 
@@ -79,12 +79,8 @@ public class Add extends Base {
         }
     }
 
-    private final boolean create;
-
-    public Add(boolean create, Console console, Maven maven) {
+    public DatabaseAdd(Console console, Maven maven) {
         super(console, maven);
-
-        this.create = create;
     }
 
     public void invoke() throws IOException {
@@ -100,7 +96,7 @@ public class Add extends Base {
         console.info.println("indexing ...");
         iterator = new ProjectIterator(console, maven, trunks.iterator());
         database = pommes();
-        database.index(create, iterator);
+        database.index(iterator);
         database.close();
         iterator.summary();
         if (global) {
