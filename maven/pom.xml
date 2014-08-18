@@ -58,9 +58,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git</developerConnection>
-    <url>https://github.com/mlhartme/pommes</url>
+    <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git/maven</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git/maven</developerConnection>
+    <url>https://github.com/mlhartme/pommes/maven</url>
   </scm>
 
   <dependencies>
