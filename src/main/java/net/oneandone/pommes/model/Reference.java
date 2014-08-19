@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.lucene;
+package net.oneandone.pommes.model;
 
 import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.versioning.ArtifactVersion;

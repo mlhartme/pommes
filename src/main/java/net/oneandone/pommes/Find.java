@@ -16,8 +16,8 @@
 package net.oneandone.pommes;
 
 import net.oneandone.maven.embedded.Maven;
-import net.oneandone.pommes.lucene.GroupArtifactVersion;
-import net.oneandone.pommes.lucene.Database;
+import net.oneandone.pommes.model.GroupArtifactVersion;
+import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
