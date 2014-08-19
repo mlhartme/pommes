@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
     <release date="2014-08-15" version="2.2.0">
+      <action date="2014-08-15" dev="mhm" type="update">
+        Moved to github. Changed groupId:artifactId to net.oneandone:pommes.
+      </action>
       <action date="2014-08-16" dev="mhm" type="update">
         'create' command is called 'database-add' now, and it updates document. To wipe the database, use the new 'database-clear'.
-      </action>
-      <action date="2014-08-15" dev="mhm" type="update">
-        Moved to github. Changed groupId to net.oneandone.pommes.
       </action>
       <action date="2014-08-15" dev="mhm" type="add">
         Added query command so perform arbitrary lucene queries.

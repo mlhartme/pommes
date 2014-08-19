@@ -12,9 +12,9 @@
   <name>Pommes</name>
   <description>Database for pom files. You can search it and perform bulk-svn operations.</description>
 
-  <groupId>net.oneandone.pommes</groupId>
-  <artifactId>main</artifactId>
-  <version>2.1.1-SNAPSHOT</version>
+  <groupId>net.oneandone</groupId>
+  <artifactId>pommes</artifactId>
+  <version>2.2.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
@@ -99,7 +99,7 @@
     <dependency>
       <groupId>net.oneandone.maven</groupId>
       <artifactId>embedded</artifactId>
-      <version>3.8.0-SNAPSHOT</version>
+      <version>3.8.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>

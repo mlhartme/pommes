@@ -15,12 +15,12 @@
  */
 package net.oneandone.pommes.lucene;
 
-import net.oneandone.maven.embedded.Maven;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.io.OS;
 import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -59,22 +59,34 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Database implements AutoCloseable {
-    public static Database load(World world, Maven maven) throws NodeInstantiationException {
+    public static Database load(World world) throws NodeInstantiationException {
         String global;
+        String localStr;
+        FileNode local;
 
         global = System.getenv("POMMES_GLOBAL");
+        localStr = System.getenv("POMMES_LOCAL");
+        if (localStr == null) {
+            local = world.file(localStr);
+        } else {
+            if (OS.CURRENT == OS.MAC) {
+                // see https://developer.apple.com/library/mac/qa/qa1170/_index.html
+                local = (FileNode) world.getHome().join("Library/Caches/pommes");
+            } else {
+                local = world.getTemp().join("pommes-" + System.getProperty("user.name"));
+            }
+        }
         try {
-            return new Database(maven.getLocalRepositoryDir().getParent().join("pommes"),
-                    global == null ? null : world.node(global));
+            return new Database(local, global == null ? null : world.node(global));
         } catch (URISyntaxException e) {
             throw new ArgumentException("invalid url for global pommes database file: " + global, e);
         }
     }
 
-    public static Database loadUpdated(World world, Maven maven) throws IOException {
+    public static Database loadUpdated(World world) throws IOException {
         Database result;
 
-        result = load(world, maven);
+        result = load(world);
         result.updateOpt();
         return result;
     }
@@ -292,9 +304,10 @@ public class Database implements AutoCloseable {
         List<Asset> result;
         Document document;
         Asset asset;
+        IndexReader reader;
 
         result = new ArrayList<>();
-        IndexReader reader = DirectoryReader.open(getIndexLuceneDirectory());
+        reader = DirectoryReader.open(getIndexLuceneDirectory());
         int numDocs = reader.numDocs();
         for (int i = 0; i < numDocs; i++) {
             document = reader.document(i);

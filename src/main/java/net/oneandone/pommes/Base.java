@@ -17,12 +17,10 @@ package net.oneandone.pommes;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.lucene.Database;
-import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.fs.DeleteException;
 import net.oneandone.sushi.fs.MkdirException;
-import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.NodeNotFoundException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -31,7 +29,6 @@ import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +48,9 @@ public abstract class Base implements Command {
         FileNode workspace;
         String existingUrl;
 
-        urls = Database.loadUpdated(console.world, maven).list(baseUrl);
+        try (Database database = Database.loadUpdated(console.world)) {
+            urls = database.list(baseUrl);
+        }
         for (String url : urls) {
             path = Strings.removeLeft(url, baseUrl);
             path = Strings.removeRight(path, "/trunk/");

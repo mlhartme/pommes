@@ -86,7 +86,6 @@ public class DatabaseAdd extends Base {
     public void invoke() throws IOException {
         List<Node> trunks;
         ProjectIterator iterator;
-        Database database;
 
         if (nodes.size() == 0) {
             throw new ArgumentException("missing urls");
@@ -95,12 +94,12 @@ public class DatabaseAdd extends Base {
         trunks = trunks();
         console.info.println("indexing ...");
         iterator = new ProjectIterator(console, maven, trunks.iterator());
-        database = Database.load(console.world, maven);
-        database.index(iterator);
-        database.close();
-        iterator.summary();
-        if (global) {
-            console.info.println("uploaded global pommes database: " + database.upload().getURI());
+        try (Database database = Database.load(console.world)) {
+            database.index(iterator);
+            iterator.summary();
+            if (global) {
+                console.info.println("uploaded global pommes database: " + database.upload().getURI());
+            }
         }
     }
 

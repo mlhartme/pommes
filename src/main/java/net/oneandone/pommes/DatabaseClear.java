@@ -31,12 +31,11 @@ public class DatabaseClear extends Base {
     }
 
     public void invoke() throws IOException {
-        Database database;
-
-        database = Database.load(console.world, maven);
-        database.clear();
-        if (global) {
-            console.info.println("uploaded global pommes database: " + database.upload().getURI());
+        try (Database database = Database.load(console.world)) {
+            database.clear();
+            if (global) {
+                console.info.println("uploaded global pommes database: " + database.upload().getURI());
+            }
         }
     }
 }
