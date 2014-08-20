@@ -170,28 +170,7 @@ public class GroupArtifactVersion {
         return toGavString();
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((artifactId == null) ? 0 : artifactId.hashCode());
-        result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
-        result = prime * result + ((version == null) ? 0 : version.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        GroupArtifactVersion other = (GroupArtifactVersion) obj;
+    public boolean gavEquals(GroupArtifactVersion other) {
         if (artifactId == null) {
             if (other.artifactId != null) {
                 return false;

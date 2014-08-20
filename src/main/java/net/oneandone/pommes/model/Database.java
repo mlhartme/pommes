@@ -427,7 +427,7 @@ public class Database implements AutoCloseable {
             Reference ubi = iterator.next();
             GroupArtifactVersion gav = ubi.from;
             GroupArtifactVersion latest = findLatestVersion(gav);
-            if (!gav.equals(latest)) {
+            if (!gav.gavEquals(latest)) {
                 iterator.remove();
             }
         }
