@@ -16,7 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
-import net.oneandone.pommes.model.Asset;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.GroupArtifactVersion;
 import net.oneandone.pommes.model.Reference;
 import net.oneandone.pommes.model.Database;
@@ -25,7 +25,6 @@ import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.util.Strings;
-import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -163,8 +162,8 @@ public class Users extends SearchBase<Reference> {
     }
 
     @Override
-    public Asset toAsset(Reference reference) {
-        return Database.toAsset(reference.document);
+    public Pom toPom(Reference reference) {
+        return Database.toPom(reference.document);
     }
 
     @Override

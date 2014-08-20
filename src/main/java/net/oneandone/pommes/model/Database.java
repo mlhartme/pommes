@@ -300,10 +300,10 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public List<Asset> search(String substring) throws IOException {
-        List<Asset> result;
+    public List<Pom> search(String substring) throws IOException {
+        List<Pom> result;
         Document document;
-        Asset asset;
+        Pom pom;
         IndexReader reader;
 
         result = new ArrayList<>();
@@ -311,22 +311,22 @@ public class Database implements AutoCloseable {
         int numDocs = reader.numDocs();
         for (int i = 0; i < numDocs; i++) {
             document = reader.document(i);
-            asset = toAsset(document);
-            if (asset.toLine().contains(substring)) {
-                result.add(asset);
+            pom = toPom(document);
+            if (pom.toLine().contains(substring)) {
+                result.add(pom);
             }
         }
         reader.close();
         return result;
     }
 
-    public static Asset toAsset(Document document) {
+    public static Pom toPom(Document document) {
         GroupArtifactVersion artifact;
         String url;
 
         artifact = new GroupArtifactVersion(document.get(Database.GAV));
         url = document.get(Database.SCM);
-        return new Asset(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), url);
+        return new Pom(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), url);
     }
 
     //-- searching
@@ -616,22 +616,22 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public List<Asset> substring(String substring) throws IOException {
+    public List<Pom> substring(String substring) throws IOException {
         return query(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")));
     }
 
     //--
 
-    public List<Asset> query(String queryString) throws IOException, QueryNodeException {
+    public List<Pom> query(String queryString) throws IOException, QueryNodeException {
         return query(new StandardQueryParser().parse(queryString, Database.GAV));
     }
 
-    public List<Asset> query(Query query) throws IOException {
-        List<Asset> result;
+    public List<Pom> query(Query query) throws IOException {
+        List<Pom> result;
 
         result = new ArrayList<>();
         for (Document document : doQuery(query)) {
-            result.add(toAsset(document));
+            result.add(toPom(document));
         }
         return result;
     }

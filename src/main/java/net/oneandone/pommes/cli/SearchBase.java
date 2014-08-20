@@ -16,13 +16,12 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
-import net.oneandone.pommes.model.Asset;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
-import org.apache.lucene.document.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,12 +63,12 @@ public abstract class SearchBase<T> extends Base {
     }
 
     public abstract List<T> search() throws Exception;
-    public abstract Asset toAsset(T t);
+    public abstract Pom toPom(T t);
     public abstract String toLine(T t);
 
     private List<FileNode> extractLocal(List<T> matches) throws IOException {
         List<FileNode> result;
-        Asset asset;
+        Pom pom;
         FileMap checkouts;
         Iterator<T> iter;
         String url;
@@ -79,8 +78,8 @@ public abstract class SearchBase<T> extends Base {
         checkouts = FileMap.loadCheckouts(console.world);
         iter = matches.iterator();
         while (iter.hasNext()) {
-            asset = toAsset(iter.next());
-            url = asset.scm; // TODO
+            pom = toPom(iter.next());
+            url = pom.scm; // TODO
             url = Database.withSlash(Strings.removeLeft(url, Database.SCM_SVN));
             directories = checkouts.lookupDirectories(url);
             if (!directories.isEmpty()) {

@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
-public class Asset {
+public class Pom {
     public final String groupId;
 
     public final String artifactId;
@@ -24,7 +24,7 @@ public class Asset {
 
     public final String scm;
 
-    public Asset(String groupId, String artifactId, String version, String scm) {
+    public Pom(String groupId, String artifactId, String version, String scm) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
