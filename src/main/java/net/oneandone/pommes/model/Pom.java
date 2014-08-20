@@ -32,6 +32,6 @@ public class Pom {
     }
 
     public String toLine() {
-        return groupId + ":" + artifactId + " @ " + scm;
+        return groupId + ":" + artifactId + ":" + version + " @ " + scm;
     }
 }

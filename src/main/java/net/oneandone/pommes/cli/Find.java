@@ -58,16 +58,13 @@ public class Find extends SearchBase<Pom> {
 
     @Override
     public String toLine(Pom pom) {
-        GroupArtifactVersion artifact;
         StringBuilder result;
         String url;
         List<FileNode> directories;
 
-        artifact = new GroupArtifactVersion(pom.groupId, pom.artifactId, pom.version);
-        url = pom.scm; // TODO
-        result = new StringBuilder(artifact.toGavString()).append(" @ ").append(url);
-        if (url.startsWith(Database.SCM_SVN)) {
-            url = Database.withSlash(Strings.removeLeft(url, Database.SCM_SVN));
+        result = new StringBuilder(pom.toLine());
+        if (pom.scm != null && pom.scm.startsWith(Database.SCM_SVN)) {
+            url = Database.withSlash(Strings.removeLeft(pom.scm, Database.SCM_SVN));
             directories = checkouts.lookupDirectories(url);
             for (FileNode directory : directories) {
                 result.append(' ').append(directory.getAbsolute());
