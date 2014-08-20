@@ -66,7 +66,7 @@ public class Database implements AutoCloseable {
 
         global = System.getenv("POMMES_GLOBAL");
         localStr = System.getenv("POMMES_LOCAL");
-        if (localStr == null) {
+        if (localStr != null) {
             local = world.file(localStr);
         } else {
             if (OS.CURRENT == OS.MAC) {
