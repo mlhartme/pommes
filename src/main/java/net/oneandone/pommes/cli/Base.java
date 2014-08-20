@@ -48,7 +48,7 @@ public abstract class Base implements Command {
         FileNode workspace;
         String existingUrl;
 
-        try (Database database = Database.loadUpdated(console.world)) {
+        try (Database database = Database.load(console.world).updateOpt()) {
             urls = database.list(baseUrl);
         }
         for (String url : urls) {

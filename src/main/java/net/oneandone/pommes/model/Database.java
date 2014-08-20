@@ -83,14 +83,6 @@ public class Database implements AutoCloseable {
         }
     }
 
-    public static Database loadUpdated(World world) throws IOException {
-        Database result;
-
-        result = load(world);
-        result.updateOpt();
-        return result;
-    }
-
     //--
 
     public static final String SCM_SVN = "scm:svn:";
@@ -153,17 +145,25 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public void updateOpt() throws IOException {
+    public Database updateOpt() throws IOException {
+        if (global != null) {
+            update();
+        }
+        return this;
+    }
+
+    public void update() throws IOException {
         FileNode zip;
 
-        if (global != null) {
-            if (!directory.exists() || directory.getLastModified() - System.currentTimeMillis() > 1000L * 60 * 60 * 24) {
-                zip = directory.getWorld().getTemp().createTempFile();
-                global.copyFile(zip);
-                clear();
-                zip.unzip(directory);
-                zip.deleteFile();
-            }
+        if (global == null) {
+            throw new IllegalStateException();
+        }
+        if (!directory.exists() || directory.getLastModified() - System.currentTimeMillis() > 1000L * 60 * 60 * 24) {
+            zip = directory.getWorld().getTemp().createTempFile();
+            global.copyFile(zip);
+            clear();
+            zip.unzip(directory);
+            zip.deleteFile();
         }
     }
 

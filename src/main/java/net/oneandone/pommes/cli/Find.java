@@ -46,7 +46,7 @@ public class Find extends SearchBase<Document> {
     private String substring;
 
     public List<Document> search() throws IOException, QueryNodeException {
-        try (Database database = Database.loadUpdated(console.world)) {
+        try (Database database = Database.load(console.world).updateOpt()) {
             return query ? database.query(substring) : database.substring(substring);
         }
     }
