@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Asset;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
@@ -63,12 +64,12 @@ public abstract class SearchBase<T> extends Base {
     }
 
     public abstract List<T> search() throws Exception;
-    public abstract Document toDocument(T t);
+    public abstract Asset toAsset(T t);
     public abstract String toLine(T t);
 
     private List<FileNode> extractLocal(List<T> matches) throws IOException {
         List<FileNode> result;
-        Document document;
+        Asset asset;
         FileMap checkouts;
         Iterator<T> iter;
         String url;
@@ -78,8 +79,8 @@ public abstract class SearchBase<T> extends Base {
         checkouts = FileMap.loadCheckouts(console.world);
         iter = matches.iterator();
         while (iter.hasNext()) {
-            document = toDocument(iter.next());
-            url = document.get(Database.SCM);
+            asset = toAsset(iter.next());
+            url = asset.scm; // TODO
             url = Database.withSlash(Strings.removeLeft(url, Database.SCM_SVN));
             directories = checkouts.lookupDirectories(url);
             if (!directories.isEmpty()) {

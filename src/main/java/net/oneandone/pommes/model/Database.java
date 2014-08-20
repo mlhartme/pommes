@@ -326,7 +326,7 @@ public class Database implements AutoCloseable {
 
         artifact = new GroupArtifactVersion(document.get(Database.GAV));
         url = document.get(Database.SCM);
-        return new Asset(artifact.getGroupId(), artifact.getArtifactId(), url);
+        return new Asset(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), url);
     }
 
     //-- searching
@@ -357,7 +357,7 @@ public class Database implements AutoCloseable {
         Term term = new Term(searchField, searchValue);
         Query query = new TermQuery(term);
         List<Reference> list = new ArrayList<>();
-        for (Document doc : query(query)) {
+        for (Document doc : doQuery(query)) {
             GroupArtifactVersion artifact = new GroupArtifactVersion(doc.get(Database.GAV));
             GroupArtifactVersion reference = getReference(doc, refField, refValue);
             list.add(new Reference(doc, artifact, reference));
@@ -575,7 +575,7 @@ public class Database implements AutoCloseable {
         VersionRange restrictionRange = VersionRange.createFromVersionSpec(restriction.toString());
 
         // filter the list
-        List<Reference> results = new ArrayList<Reference>();
+        List<Reference> results = new ArrayList<>();
         for (Reference artifact : artifacts) {
             VersionRange subjectVersionRange = VersionRange.createFromVersionSpec(artifact.to.getVersion());
             VersionRange intersectionVersionRange = subjectVersionRange.restrict(restrictionRange);
@@ -616,15 +616,27 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public List<Document> substring(String substring) throws IOException {
+    public List<Asset> substring(String substring) throws IOException {
         return query(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")));
     }
 
-    public List<Document> query(String queryString) throws IOException, QueryNodeException {
+    //--
+
+    public List<Asset> query(String queryString) throws IOException, QueryNodeException {
         return query(new StandardQueryParser().parse(queryString, Database.GAV));
     }
 
-    public List<Document> query(Query query) throws IOException {
+    public List<Asset> query(Query query) throws IOException {
+        List<Asset> result;
+
+        result = new ArrayList<>();
+        for (Document document : doQuery(query)) {
+            result.add(toAsset(document));
+        }
+        return result;
+    }
+
+    private List<Document> doQuery(Query query) throws IOException {
         TopDocs search;
         List<Document> list;
 

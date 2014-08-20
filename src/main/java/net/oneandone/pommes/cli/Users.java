@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Asset;
 import net.oneandone.pommes.model.GroupArtifactVersion;
 import net.oneandone.pommes.model.Reference;
 import net.oneandone.pommes.model.Database;
@@ -162,8 +163,8 @@ public class Users extends SearchBase<Reference> {
     }
 
     @Override
-    public Document toDocument(Reference reference) {
-        return reference.document;
+    public Asset toAsset(Reference reference) {
+        return Database.toAsset(reference.document);
     }
 
     @Override

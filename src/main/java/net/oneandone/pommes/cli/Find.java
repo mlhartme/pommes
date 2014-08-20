@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Asset;
 import net.oneandone.pommes.model.GroupArtifactVersion;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
@@ -31,7 +32,7 @@ import java.util.List;
 /**
  * Lists all indexed POMs in index *without* updating from the server. Warning: this will be a long list, only useful with grep.
  */
-public class Find extends SearchBase<Document> {
+public class Find extends SearchBase<Asset> {
     private final FileMap checkouts;
 
     private final boolean query;
@@ -45,27 +46,27 @@ public class Find extends SearchBase<Document> {
     @Value(name = "substring", position = 1)
     private String substring;
 
-    public List<Document> search() throws IOException, QueryNodeException {
+    public List<Asset> search() throws IOException, QueryNodeException {
         try (Database database = Database.load(console.world).updateOpt()) {
             return query ? database.query(substring) : database.substring(substring);
         }
     }
 
     @Override
-    public Document toDocument(Document document) {
-        return document;
+    public Asset toAsset(Asset asset) {
+        return asset;
     }
 
     @Override
-    public String toLine(Document document) {
+    public String toLine(Asset asset) {
         GroupArtifactVersion artifact;
         StringBuilder result;
         String url;
         List<FileNode> directories;
 
-        artifact = new GroupArtifactVersion(document.get(Database.GAV));
-        result = new StringBuilder(artifact.toGavString()).append(" @ ").append(document.get(Database.SCM));
-        url = document.get(Database.SCM);
+        artifact = new GroupArtifactVersion(asset.groupId, asset.artifactId, asset.version);
+        url = asset.scm; // TODO
+        result = new StringBuilder(artifact.toGavString()).append(" @ ").append(url);
         if (url.startsWith(Database.SCM_SVN)) {
             url = Database.withSlash(Strings.removeLeft(url, Database.SCM_SVN));
             directories = checkouts.lookupDirectories(url);

@@ -20,11 +20,14 @@ public class Asset {
 
     public final String artifactId;
 
+    public final String version;
+
     public final String scm;
 
-    public Asset(String groupId, String artifactId, String scm) {
+    public Asset(String groupId, String artifactId, String version, String scm) {
         this.groupId = groupId;
         this.artifactId = artifactId;
+        this.version = version;
         this.scm = scm;
     }
 
