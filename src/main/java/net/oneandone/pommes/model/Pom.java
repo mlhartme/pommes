@@ -15,7 +15,25 @@
  */
 package net.oneandone.pommes.model;
 
+import org.apache.maven.model.Dependency;
+
 public class Pom {
+    public static Pom forGav(String gav) {
+        String[] splitted;
+
+        splitted = gav.split(":", 3);
+        if (splitted.length < 3) {
+            throw new IllegalArgumentException("groupId and artifactId reqiried");
+        }
+        return new Pom(splitted[0], splitted[1], splitted[2], null);
+    }
+
+    public static Pom forDependency(Dependency dependency) {
+        return new Pom(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), null);
+    }
+
+    //--
+
     public final String groupId;
 
     public final String artifactId;
@@ -31,7 +49,24 @@ public class Pom {
         this.scm = scm;
     }
 
+    public String toGaString() {
+        return groupId + ":" + artifactId;
+    }
+
+    public String toGavString() {
+        return toGaString() + ":" + version;
+    }
+
     public String toLine() {
         return groupId + ":" + artifactId + ":" + version + " @ " + scm;
+    }
+
+    @Override
+    public String toString() {
+        return toLine();
+    }
+
+    public boolean gavEquals(Pom other) {
+        return artifactId.equals(other.artifactId) && groupId.equals(other.groupId) && version.equals(other.version);
     }
 }
