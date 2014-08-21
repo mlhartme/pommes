@@ -206,61 +206,47 @@ public class Database implements AutoCloseable {
 
     public static Document document(String id, MavenProject mavenProject) throws InvalidVersionSpecificationException {
         Document doc;
-        GroupArtifactVersion gav;
+        Pom pom;
         MavenProject parent;
 
         doc = new Document();
-        gav = new GroupArtifactVersion(mavenProject);
+        pom = Pom.forProject(mavenProject);
 
         doc.add(new StringField(ID, id, Field.Store.YES));
 
         // basic stuff
-        doc.add(new StringField(GROUP, gav.getGroupId(), Field.Store.YES));
-        doc.add(new StringField(ARTIFACT, gav.getArtifactId(), Field.Store.YES));
-        doc.add(new StringField(VERSION, gav.getVersion(), Field.Store.YES));
-        doc.add(new StringField(GA, gav.toGaString(), Field.Store.YES));
-        doc.add(new StringField(GAV, gav.toGavString(), Field.Store.YES));
-        doc.add(new StringField(SCM, scm(mavenProject), Field.Store.YES));
+        doc.add(new StringField(GROUP, pom.groupId, Field.Store.YES));
+        doc.add(new StringField(ARTIFACT, pom.artifactId, Field.Store.YES));
+        doc.add(new StringField(VERSION, pom.version, Field.Store.YES));
+        doc.add(new StringField(GA, pom.toGaString(), Field.Store.YES));
+        doc.add(new StringField(GAV, pom.toGavString(), Field.Store.YES));
+        doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
 
         // dependencies
         List<Dependency> dependencies = mavenProject.getDependencies();
         for (Dependency dependency : dependencies) {
-            GroupArtifactVersion depGav = new GroupArtifactVersion(dependency);
+            Pom dep = Pom.forDependency(dependency);
 
             // index groupId:artifactId for non-version searches
-            doc.add(new StringField(DEP_GA, depGav.toGaString(), Field.Store.YES));
+            doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
             // index groupId:artifactId:version for exact-version searches
-            doc.add(new StringField(DEP_GAV, depGav.toGavString(), Field.Store.YES));
+            doc.add(new StringField(DEP_GAV, dep.toGavString(), Field.Store.YES));
             // index groupId:artifactId for searches that need to evaluate the range
             VersionRange vr = VersionRange.createFromVersionSpec(dependency.getVersion());
             if (vr.hasRestrictions()) {
-                doc.add(new StringField(DEP_GA_RANGE, depGav.toGaString(), Field.Store.YES));
+                doc.add(new StringField(DEP_GA_RANGE, dep.toGaString(), Field.Store.YES));
             }
         }
 
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
-            GroupArtifactVersion parGav = new GroupArtifactVersion(parent);
+            Pom parPom = Pom.forProject(parent);
 
-            doc.add(new StringField(PAR_GA, parGav.toGaString(), Field.Store.YES));
-            doc.add(new StringField(PAR_GAV, parGav.toGavString(), Field.Store.YES));
+            doc.add(new StringField(PAR_GA, parPom.toGaString(), Field.Store.YES));
+            doc.add(new StringField(PAR_GAV, parPom.toGavString(), Field.Store.YES));
         }
         return doc;
-    }
-
-    private static String scm(MavenProject project) {
-        Scm scm;
-        String connection;
-
-        scm = project.getScm();
-        if (scm != null) {
-            connection = scm.getConnection();
-            if (connection != null) {
-                return connection;
-            }
-        }
-        return "";
     }
 
     //--
@@ -321,36 +307,33 @@ public class Database implements AutoCloseable {
     }
 
     public static Pom toPom(Document document) {
-        GroupArtifactVersion artifact;
-        String url;
-
-        artifact = new GroupArtifactVersion(document.get(Database.GAV));
-        url = document.get(Database.SCM);
-        return new Pom(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), url);
+        return Pom.forGav(document.get(Database.GAV), document.get(Database.SCM));
     }
 
     //-- searching
 
-    public GroupArtifactVersion findLatestVersion(GroupArtifactVersion gav) throws IOException {
+    public Pom findLatestVersion(Pom gav) throws IOException {
+        List<Reference> list;
 
-        List<Reference> list = query(Database.GA, gav.toGaString(), null, null);
+        list = query(Database.GA, gav.toGaString(), null, null);
         if (list.isEmpty()) {
-            throw new IllegalStateException("Artifact " + gav.toGavString() + " not found in index.");
+            throw new IllegalStateException("Artifact " + gav.toGavString() + " not found.");
         }
         return Collections.max(list).from;
     }
 
     public List<Reference> findDependeesIgnoringVersion(String groupId, String artifactId) throws IOException {
-        GroupArtifactVersion gav = new GroupArtifactVersion(groupId, artifactId, "");
-        List<Reference> dependees = query(Database.DEP_GA, gav.toGaString(), Database.DEP_GAV, gav.toGaString());
-        return dependees;
+        Pom gav;
+
+        gav = new Pom(groupId, artifactId, "", null);
+        return query(Database.DEP_GA, gav.toGaString(), Database.DEP_GAV, gav.toGaString());
     }
 
     public List<Reference> findChildrenIgnoringVersion(String groupId, String artifactId) throws IOException {
-        GroupArtifactVersion gav = new GroupArtifactVersion(groupId, artifactId, "");
-        List<Reference> children = query(Database.PAR_GA, gav.toGaString(), Database.PAR_GAV,
-                gav.toGaString());
-        return children;
+        Pom pom;
+
+        pom = new Pom(groupId, artifactId, "", null);
+        return query(Database.PAR_GA, pom.toGaString(), Database.PAR_GAV, pom.toGaString());
     }
 
     private List<Reference> query(String searchField, String searchValue, String refField, String refValue) throws IOException {
@@ -358,17 +341,17 @@ public class Database implements AutoCloseable {
         Query query = new TermQuery(term);
         List<Reference> list = new ArrayList<>();
         for (Document doc : doQuery(query)) {
-            GroupArtifactVersion artifact = new GroupArtifactVersion(doc.get(Database.GAV));
-            GroupArtifactVersion reference = getReference(doc, refField, refValue);
+            Pom artifact = toPom(doc);
+            Pom reference = getReference(doc, refField, refValue);
             list.add(new Reference(doc, artifact, reference));
         }
         return list;
     }
 
-    private GroupArtifactVersion getReference(Document doc, String fieldName, String ga) {
+    private Pom getReference(Document doc, String fieldName, String ga) {
         if (fieldName != null && ga != null) {
             for (IndexableField field : doc.getFields(fieldName)) {
-                GroupArtifactVersion reference = new GroupArtifactVersion(field.stringValue());
+                Pom reference = Pom.forGa(field.stringValue(), null, null);
                 if (reference.toGaString().equals(ga)) {
                     return reference;
                 }
@@ -425,8 +408,8 @@ public class Database implements AutoCloseable {
         iterator = results.iterator();
         while (iterator.hasNext()) {
             Reference ubi = iterator.next();
-            GroupArtifactVersion gav = ubi.from;
-            GroupArtifactVersion latest = findLatestVersion(gav);
+            Pom gav = ubi.from;
+            Pom latest = findLatestVersion(gav);
             if (!gav.gavEquals(latest)) {
                 iterator.remove();
             }
@@ -467,7 +450,7 @@ public class Database implements AutoCloseable {
         }
 
         Reference previous = artifacts.get(0);
-        String lowerVersion = artifacts.get(0).from.getVersion();
+        String lowerVersion = artifacts.get(0).from.version;
         String upperVersion = lowerVersion;
 
         Iterator<Reference> iterator = artifacts.iterator();
@@ -478,7 +461,7 @@ public class Database implements AutoCloseable {
             if (ubi.from.toGaString().equals(previous.from.toGaString())
                     && ubi.to.toGavString().equals(previous.to.toGavString())) {
                 // as long as artifact.ga is equal and reference.gav is equal
-                upperVersion = ubi.from.getVersion();
+                upperVersion = ubi.from.version;
             } else {
                 addPrevious = true;
             }
@@ -487,12 +470,12 @@ public class Database implements AutoCloseable {
                 addAggregated(results, previous, lowerVersion, upperVersion);
 
                 // reset versions
-                lowerVersion = ubi.from.getVersion();
+                lowerVersion = ubi.from.version;
                 upperVersion = lowerVersion;
             }
 
             if (!iterator.hasNext()) {
-                addAggregated(results, ubi, lowerVersion, ubi.from.getVersion());
+                addAggregated(results, ubi, lowerVersion, ubi.from.version);
             }
 
             previous = ubi;
@@ -502,16 +485,16 @@ public class Database implements AutoCloseable {
     }
 
     private void addAggregated(List<Reference> results, Reference ubi, String lowerVersion, String upperVersion) {
-        GroupArtifactVersion previous;
+        Pom previous;
         String version;
-        GroupArtifactVersion aggregated;
+        Pom aggregated;
 
         previous = ubi.from;
         version = lowerVersion;
         if (!lowerVersion.equals(upperVersion)) {
             version = "[" + lowerVersion + "," + upperVersion + "]";
         }
-        aggregated = new GroupArtifactVersion(previous.getGroupId(), previous.getArtifactId(), version);
+        aggregated = new Pom(previous.groupId, previous.artifactId, version, previous.scm);
         results.add(new Reference(ubi.document, aggregated, ubi.to));
     }
 
@@ -577,7 +560,7 @@ public class Database implements AutoCloseable {
         // filter the list
         List<Reference> results = new ArrayList<>();
         for (Reference artifact : artifacts) {
-            VersionRange subjectVersionRange = VersionRange.createFromVersionSpec(artifact.to.getVersion());
+            VersionRange subjectVersionRange = VersionRange.createFromVersionSpec(artifact.to.version);
             VersionRange intersectionVersionRange = subjectVersionRange.restrict(restrictionRange);
 
             boolean isIncluded = false;

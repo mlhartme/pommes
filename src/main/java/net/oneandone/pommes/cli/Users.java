@@ -17,7 +17,6 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.model.GroupArtifactVersion;
 import net.oneandone.pommes.model.Reference;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.ArgumentException;
@@ -70,19 +69,25 @@ public class Users extends SearchBase<Reference> {
 
     public List<Reference> search() throws IOException, InvalidVersionSpecificationException, ProjectBuildingException {
         List<Reference> result;
-        GroupArtifactVersion gav;
+        Pom gav;
         MavenProject project;
 
         result = new ArrayList<>();
         try (Database database = Database.load(console.world).updateOpt()) {
             if (gavString == null) {
                 project = maven.loadPom(console.world.file("pom.xml"));
-                gav = new GroupArtifactVersion(project.getGroupId(), project.getArtifactId(), project.getVersion());
+                gav = Pom.forProject(project);
             } else {
-                if (Strings.count(gavString, ":") == 2) {
-                    gavString = gavString + ":0";
+                switch (Strings.count(gavString, ":")) {
+                    case 2:
+                        gav = Pom.forGa(gavString, "0", null);
+                        break;
+                    case 3:
+                        gav = Pom.forGav(gavString, null);
+                        break;
+                    default:
+                        throw new ArgumentException(gavString);
                 }
-                gav = new GroupArtifactVersion(gavString);
             }
 
             console.verbose.println("Analyzing " + gav + ", including " + includes + " versions.");
@@ -90,7 +95,7 @@ public class Users extends SearchBase<Reference> {
             //
             //
             // dependencies
-            List<Reference> allDeps = database.findDependeesIgnoringVersion(gav.getGroupId(), gav.getArtifactId());
+            List<Reference> allDeps = database.findDependeesIgnoringVersion(gav.groupId, gav.artifactId);
             Collections.sort(allDeps);
 
             // if only the latest using artifacts should be shown we can remove any older versions from the full list
@@ -99,7 +104,7 @@ public class Users extends SearchBase<Reference> {
             }
 
             // extract artifacts using the exact version (or within a range) of the artifact of interest
-            List<Reference> exactDeps = database.filterByReferencedArtifacts(allDeps, gav.getVersion(), Database.Includes.NONE, Database.Includes.NONE);
+            List<Reference> exactDeps = database.filterByReferencedArtifacts(allDeps, gav.version, Database.Includes.NONE, Database.Includes.NONE);
             // for the compact output format we need to aggregate the using artifacts separately for each group
             if (format == OutputFormat.AGGREGATED) {
                 exactDeps = database.aggregateArtifacts(exactDeps);
@@ -107,7 +112,7 @@ public class Users extends SearchBase<Reference> {
             result.addAll(exactDeps);
 
             // extract artifacts using an older version of the artifact of interest
-            List<Reference> olderDeps = database.filterByReferencedArtifacts(allDeps, gav.getVersion(), includes, Database.Includes.NONE);
+            List<Reference> olderDeps = database.filterByReferencedArtifacts(allDeps, gav.version, includes, Database.Includes.NONE);
             if (format == OutputFormat.AGGREGATED) {
                 olderDeps = database.aggregateArtifacts(olderDeps);
             }
@@ -115,7 +120,7 @@ public class Users extends SearchBase<Reference> {
             result.addAll(olderDeps);
 
             // extract artifacts using an newer version of the artifact of interest
-            List<Reference> newerDeps = database.filterByReferencedArtifacts(allDeps, gav.getVersion(), Database.Includes.NONE,
+            List<Reference> newerDeps = database.filterByReferencedArtifacts(allDeps, gav.version, Database.Includes.NONE,
                     includes);
             if (format == OutputFormat.AGGREGATED) {
                 newerDeps = database.aggregateArtifacts(newerDeps);
@@ -126,7 +131,7 @@ public class Users extends SearchBase<Reference> {
             //
             //
             // parent-child relationship
-            List<Reference> allChildren = database.findChildrenIgnoringVersion(gav.getGroupId(), gav.getArtifactId());
+            List<Reference> allChildren = database.findChildrenIgnoringVersion(gav.groupId, gav.artifactId);
             Collections.sort(allChildren);
 
             // if only the latest using artifacts should be shown we can remove any older versions from the full list
@@ -135,7 +140,7 @@ public class Users extends SearchBase<Reference> {
             }
 
             // extract artifacts using the exact version (or within a range) of the artifact of interest
-            List<Reference> exactChildren = database.filterByReferencedArtifacts(allChildren, gav.getVersion(), Database.Includes.NONE, Database.Includes.NONE);
+            List<Reference> exactChildren = database.filterByReferencedArtifacts(allChildren, gav.version, Database.Includes.NONE, Database.Includes.NONE);
             // for the compact output format we need to aggregate the using artifacts separately for each group
             if (format == OutputFormat.AGGREGATED) {
                 exactChildren = database.aggregateArtifacts(exactChildren);
@@ -143,7 +148,7 @@ public class Users extends SearchBase<Reference> {
             result.addAll(exactChildren);
 
             // extract artifacts using an older version of the artifact of interest
-            List<Reference> olderChildren = database.filterByReferencedArtifacts(allChildren, gav.getVersion(), includes, Database.Includes.NONE);
+            List<Reference> olderChildren = database.filterByReferencedArtifacts(allChildren, gav.version, includes, Database.Includes.NONE);
             if (format == OutputFormat.AGGREGATED) {
                 olderChildren = database.aggregateArtifacts(olderChildren);
             }
@@ -151,7 +156,7 @@ public class Users extends SearchBase<Reference> {
             result.addAll(olderChildren);
 
             // extract artifacts using an newer version of the artifact of interest
-            List<Reference> newerChildren = database.filterByReferencedArtifacts(allChildren, gav.getVersion(), Database.Includes.NONE, includes);
+            List<Reference> newerChildren = database.filterByReferencedArtifacts(allChildren, gav.version, Database.Includes.NONE, includes);
             if (format == OutputFormat.AGGREGATED) {
                 newerChildren = database.aggregateArtifacts(newerChildren);
             }

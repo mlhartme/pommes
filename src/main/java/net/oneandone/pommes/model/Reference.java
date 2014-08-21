@@ -24,10 +24,10 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
  */
 public class Reference implements Comparable<Reference> {
     public final Document document;
-    public final GroupArtifactVersion from;
-    public final GroupArtifactVersion to;
+    public final Pom from;
+    public final Pom to;
 
-    public Reference(Document document, GroupArtifactVersion from, GroupArtifactVersion to) {
+    public Reference(Document document, Pom from, Pom to) {
         this.document = document;
         this.from = from;
         this.to = to;
@@ -49,17 +49,22 @@ public class Reference implements Comparable<Reference> {
     }
 
     public int compareTo(Reference other) {
+        int result;
+        ArtifactVersion left;
+        ArtifactVersion right;
 
-        if (!from.getGroupId().equals(other.from.getGroupId())) {
-            return from.getGroupId().compareTo(other.from.getGroupId());
+        result = from.groupId.compareTo(other.from.groupId);
+        if (result != 0) {
+            return result;
         }
-        if (!from.getArtifactId().equals(other.from.getArtifactId())) {
-            return from.getArtifactId().compareTo(other.from.getArtifactId());
+        result = from.artifactId.compareTo(other.from.artifactId);
+        if (result != 0) {
+            return result;
         }
 
-        ArtifactVersion v1 = new DefaultArtifactVersion(from.getVersion());
-        ArtifactVersion v2 = new DefaultArtifactVersion(other.from.getVersion());
-        return v1.compareTo(v2);
+        left = new DefaultArtifactVersion(from.version);
+        right = new DefaultArtifactVersion(other.from.version);
+        return left.compareTo(right);
     }
 
     @Override
