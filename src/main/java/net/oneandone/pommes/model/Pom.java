@@ -23,9 +23,9 @@ public class Pom {
     public static Pom forGav(String gav, String scm) {
         String[] splitted;
 
-        splitted = gav.split(":", 3);
+        splitted = gav.split(":");
         if (splitted.length != 3) {
-            throw new IllegalArgumentException("groupId and artifactId reqiried");
+            throw new IllegalArgumentException("expected groupId:artifactId:version, got " + gav);
         }
         return new Pom(splitted[0], splitted[1], splitted[2], scm);
     }
@@ -33,9 +33,9 @@ public class Pom {
     public static Pom forGa(String ga, String v, String scm) {
         String[] splitted;
 
-        splitted = ga.split(":", 3);
-        if (splitted.length != 2) {
-            throw new IllegalArgumentException("groupId and artifactId reqiried");
+        splitted = ga.split(":");
+        if (splitted.length < 2) {
+            throw new IllegalArgumentException("expected groupId:artifactId, got " + ga);
         }
         return new Pom(splitted[0], splitted[1], v, scm);
     }

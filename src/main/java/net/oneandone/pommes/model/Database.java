@@ -48,7 +48,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.Restriction;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
@@ -315,7 +314,7 @@ public class Database implements AutoCloseable {
     public Pom findLatestVersion(Pom gav) throws IOException {
         List<Reference> list;
 
-        list = query(Database.GA, gav.toGaString(), null, null);
+        list = queryGa(Database.GA, gav.toGaString(), null);
         if (list.isEmpty()) {
             throw new IllegalStateException("Artifact " + gav.toGavString() + " not found.");
         }
@@ -326,38 +325,48 @@ public class Database implements AutoCloseable {
         Pom gav;
 
         gav = new Pom(groupId, artifactId, "", null);
-        return query(Database.DEP_GA, gav.toGaString(), Database.DEP_GAV, gav.toGaString());
+        return queryGa(Database.DEP_GA, gav.toGaString(), Database.DEP_GAV);
     }
 
     public List<Reference> findChildrenIgnoringVersion(String groupId, String artifactId) throws IOException {
         Pom pom;
 
         pom = new Pom(groupId, artifactId, "", null);
-        return query(Database.PAR_GA, pom.toGaString(), Database.PAR_GAV, pom.toGaString());
+        return queryGa(Database.PAR_GA, pom.toGaString(), Database.PAR_GAV);
     }
 
-    private List<Reference> query(String searchField, String searchValue, String refField, String refValue) throws IOException {
-        Term term = new Term(searchField, searchValue);
-        Query query = new TermQuery(term);
-        List<Reference> list = new ArrayList<>();
-        for (Document doc : doQuery(query)) {
-            Pom artifact = toPom(doc);
-            Pom reference = getReference(doc, refField, refValue);
-            list.add(new Reference(doc, artifact, reference));
+    private List<Reference> queryGa(String gaField, String gaValue, String gavField) throws IOException {
+        List<Reference> list;
+        Pom from;
+        Pom to;
+
+        list = new ArrayList<>();
+        for (Document doc : doQuery(new TermQuery(new Term(gaField, gaValue)))) {
+            from = toPom(doc);
+            to = gavField == null ? null : getReference(doc, gavField, gaValue);
+            list.add(new Reference(doc, from, to));
         }
         return list;
     }
 
-    private Pom getReference(Document doc, String fieldName, String ga) {
-        if (fieldName != null && ga != null) {
-            for (IndexableField field : doc.getFields(fieldName)) {
-                Pom reference = Pom.forGa(field.stringValue(), null, null);
-                if (reference.toGaString().equals(ga)) {
-                    return reference;
+    private Pom getReference(Document doc, String gavField, String gaValue) {
+        Pom result;
+        Pom gav;
+
+        result = null;
+        for (IndexableField field : doc.getFields(gavField)) {
+            gav = Pom.forGav(field.stringValue(), null);
+            if (gav.toGaString().equals(gaValue)) {
+                if (result != null) {
+                    throw new IllegalStateException("ambiguous: " + result + " vs " + gav);
                 }
+                result = gav;
             }
         }
-        return null;
+        if (result == null) {
+            throw new IllegalStateException();
+        }
+        return result;
     }
 
     /**
