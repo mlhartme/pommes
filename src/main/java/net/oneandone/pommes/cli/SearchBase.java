@@ -79,12 +79,13 @@ public abstract class SearchBase<T> extends Base {
         iter = matches.iterator();
         while (iter.hasNext()) {
             pom = toPom(iter.next());
-            url = pom.scm; // TODO
-            url = Database.withSlash(Strings.removeLeft(url, Database.SCM_SVN));
-            directories = checkouts.lookupDirectories(url);
-            if (!directories.isEmpty()) {
-                result.addAll(directories);
-                iter.remove();
+            url = pom.svnUrl();
+            if (url != null) {
+                directories = checkouts.lookupDirectories(url);
+                if (!directories.isEmpty()) {
+                    result.addAll(directories);
+                    iter.remove();
+                }
             }
         }
         return result;

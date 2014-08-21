@@ -95,7 +95,7 @@ public class Database implements AutoCloseable {
     public static final String VERSION = "v";
     public static final String GA = "ga";
     public static final String GAV = "gav";
-    public static final String SCM = "scm";
+    public static final String SCM = "scm"; // scm url as found project/scm/connection
 
     public static final String DEP_GA = "dep-ga";
     public static final String DEP_GAV = "dep-gav";

@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
+import net.oneandone.sushi.util.Strings;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
@@ -70,6 +71,7 @@ public class Pom {
 
     public final String version;
 
+    /** may be null */
     public final String scm;
 
     public Pom(String groupId, String artifactId, String version, String scm) {
@@ -89,6 +91,15 @@ public class Pom {
 
     public String toLine() {
         return groupId + ":" + artifactId + ":" + version + " @ " + scm;
+    }
+
+    /** @return null if not specified or not svn; otherwise always with tailing slash */
+    public String svnUrl() {
+        if (scm != null && scm.startsWith(Database.SCM_SVN)) {
+            return Database.withSlash(Strings.removeLeft(scm, Database.SCM_SVN));
+        } else {
+            return null;
+        }
     }
 
     @Override

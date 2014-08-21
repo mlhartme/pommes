@@ -62,8 +62,8 @@ public class Find extends SearchBase<Pom> {
         List<FileNode> directories;
 
         result = new StringBuilder(pom.toLine());
-        if (pom.scm != null && pom.scm.startsWith(Database.SCM_SVN)) {
-            url = Database.withSlash(Strings.removeLeft(pom.scm, Database.SCM_SVN));
+        url = pom.svnUrl();
+        if (url != null) {
             directories = checkouts.lookupDirectories(url);
             for (FileNode directory : directories) {
                 result.append(' ').append(directory.getAbsolute());
