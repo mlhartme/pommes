@@ -90,6 +90,15 @@
       <artifactId>lucene-queryparser</artifactId>
       <version>4.9.0</version>
     </dependency>
+
+    <!-- TODO: because dependencyManagement excludes it from httpcomponent!? And sets to to provided!? -->
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.3</version>
+      <!-- TODO: override 'provided' from dependency management -->
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 
   <build>

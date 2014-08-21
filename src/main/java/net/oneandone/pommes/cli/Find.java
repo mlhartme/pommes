@@ -16,12 +16,11 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
-import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
