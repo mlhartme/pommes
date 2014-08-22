@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * Lists all indexed POMs in index *without* updating from the server. Warning: this will be a long list, only useful with grep.
  */
-public abstract class SearchBase<T> extends Base {
+public abstract class SearchBase<T> extends DatabaseBase {
     public SearchBase(Console console, Maven maven) {
         super(console, maven);
     }
@@ -37,11 +38,11 @@ public abstract class SearchBase<T> extends Base {
     @Option("local")
     private boolean local;
 
-    public void invoke() throws Exception {
+    public void invoke(Database database) throws Exception {
         List<T> matches;
         List<FileNode> directories;
 
-        matches = search();
+        matches = search(database);
         if (local) {
             directories = extractLocal(matches);
             for (FileNode directory : directories) {
@@ -60,7 +61,7 @@ public abstract class SearchBase<T> extends Base {
         }
     }
 
-    public abstract List<T> search() throws Exception;
+    public abstract List<T> search(Database database) throws Exception;
     public abstract Pom toPom(T t);
     public abstract String toLine(T t);
 

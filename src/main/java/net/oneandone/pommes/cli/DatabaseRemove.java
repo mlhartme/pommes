@@ -17,31 +17,13 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
-import net.oneandone.sushi.fs.Node;
-import net.oneandone.sushi.fs.NodeInstantiationException;
-import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.fs.filter.Action;
-import net.oneandone.sushi.fs.filter.Filter;
-import net.oneandone.sushi.fs.filter.Predicate;
-import org.apache.lucene.document.Document;
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-public class DatabaseRemove extends Base {
-    @Option("global")
-    private boolean global;
-
+public class DatabaseRemove extends DatabaseBase {
     private List<String> removes = new ArrayList<>();
 
     @Remaining
@@ -53,12 +35,7 @@ public class DatabaseRemove extends Base {
         super(console, maven);
     }
 
-    public void invoke() throws IOException {
-        try (Database database = Database.load(console.world)) {
-            database.remove(removes);
-            if (global) {
-                console.info.println("uploaded global pommes database: " + database.upload().getURI());
-            }
-        }
+    public void invoke(Database database) throws Exception {
+        database.remove(removes);
     }
 }

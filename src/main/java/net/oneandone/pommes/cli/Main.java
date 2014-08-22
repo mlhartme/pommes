@@ -126,14 +126,20 @@ public class Main extends Cli implements Command {
         console.info.println("  'status' dir?         check checkouts under the specified directory against svn.");
         console.info.println("  'update' dir?         updates checkouts under the specified directory form svn");
         console.info.println("database commands");
-        console.info.println("  'database-clear' '-global'?");
+        console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");
-        console.info.println("  'database-add' '-global'? url*");
+        console.info.println("  'database-add' url*");
         console.info.println("                        adds projects found under the specified urls to the database;");
         console.info.println("                        use '-' pattern to exclude from the url before;");
         console.info.println("                        (urls default to all ciso urls if not specified)");
-        console.info.println("  'database-remove' '-global'? url*");
+        console.info.println("  'database-remove' url*");
         console.info.println("                        removes all documents prefixed with one of the specified urls");
+        console.info.println();
+        console.info.println("update options (for all aearch and database commands:");
+        console.info.println("  default behavior      one read update from global database per day, "
+                + "no write updates to the global database");
+        console.info.println("  '-global'             perform read/write update from/to global database");
+        console.info.println("  '-local'              neither read- nor write updates from/to global database");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database file.");

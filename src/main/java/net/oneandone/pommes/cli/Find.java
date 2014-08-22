@@ -43,10 +43,8 @@ public class Find extends SearchBase<Pom> {
     @Value(name = "substring", position = 1)
     private String substring;
 
-    public List<Pom> search() throws IOException, QueryNodeException {
-        try (Database database = Database.load(console.world).updateOpt()) {
-            return query ? database.query(substring) : database.substring(substring);
-        }
+    public List<Pom> search(Database database) throws IOException, QueryNodeException {
+        return query ? database.query(substring) : database.substring(substring);
     }
 
     @Override

@@ -19,7 +19,6 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -38,10 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class DatabaseAdd extends Base {
-    @Option("global")
-    private boolean global;
-
+public class DatabaseAdd extends DatabaseBase {
     private List<Node> nodes = new ArrayList<>();
     private List<Filter> filters = new ArrayList<>();
 
@@ -83,7 +79,7 @@ public class DatabaseAdd extends Base {
         super(console, maven);
     }
 
-    public void invoke() throws IOException {
+    public void invoke(Database database) throws Exception {
         List<Node> trunks;
         ProjectIterator iterator;
 
@@ -94,13 +90,8 @@ public class DatabaseAdd extends Base {
         trunks = trunks();
         console.info.println("indexing ...");
         iterator = new ProjectIterator(console, maven, trunks.iterator());
-        try (Database database = Database.load(console.world)) {
-            database.index(iterator);
-            iterator.summary();
-            if (global) {
-                console.info.println("uploaded global pommes database: " + database.upload().getURI());
-            }
-        }
+        database.index(iterator);
+        iterator.summary();
     }
 
     public static class ProjectIterator implements Iterator<Document> {

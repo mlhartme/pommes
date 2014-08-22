@@ -18,24 +18,13 @@ package net.oneandone.pommes.cli;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
 
-import java.io.IOException;
-
-public class DatabaseClear extends Base {
-    @Option("global")
-    private boolean global;
-
+public class DatabaseClear extends DatabaseBase {
     public DatabaseClear(Console console, Maven maven) {
         super(console, maven);
     }
 
-    public void invoke() throws IOException {
-        try (Database database = Database.load(console.world)) {
-            database.clear();
-            if (global) {
-                console.info.println("uploaded global pommes database: " + database.upload().getURI());
-            }
-        }
+    public void invoke(Database database) throws Exception {
+        database.clear();
     }
 }
