@@ -5,10 +5,13 @@
         Moved to github. Changed groupId:artifactId to net.oneandone:pommes.
       </action>
       <action date="2014-08-16" dev="mhm" type="update">
-        'create' command is called 'database-add' now, and it updates document. To wipe the database, use the new 'database-clear'.
+        'create' command is called 'database-add' now, and it updates documents. To wipe the database, use the new 'database-clear' command.
+      </action>
+      <action date="2014-08-22" dev="mhm" type="add">
+        Added 'database-clear' and 'database-remove' commands.
       </action>
       <action date="2014-08-15" dev="mhm" type="add">
-        Added query command so perform arbitrary lucene queries.
+        Added 'query' command so perform arbitrary lucene queries.
       </action>
     </release>
     <release date="2014-08-15" version="2.1.0">

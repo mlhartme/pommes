@@ -34,6 +34,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
@@ -188,6 +189,20 @@ public class Database implements AutoCloseable {
         close();
         directory.deleteTreeOpt();
         directory.mkdir();
+    }
+
+    public void remove(List<String> prefixes) throws IOException {
+        IndexWriter writer;
+        IndexWriterConfig config;
+
+        close();
+        config =  new IndexWriterConfig(Version.LUCENE_4_9, null);
+        config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
+        writer = new IndexWriter(getIndexLuceneDirectory(), config);
+        for (String prefix : prefixes) {
+            writer.deleteDocuments(new PrefixQuery(new Term(ID, prefix)));
+        }
+        writer.close();
     }
 
     public void index(Iterator<Document> iterator) throws IOException {

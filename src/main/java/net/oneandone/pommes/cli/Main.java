@@ -90,6 +90,11 @@ public class Main extends Cli implements Command {
         return new DatabaseAdd(console, maven());
     }
 
+    @Child("database-remove")
+    public DatabaseRemove remove() throws IOException {
+        return new DatabaseRemove(console, maven());
+    }
+
     //--
 
     @Override
@@ -120,13 +125,15 @@ public class Main extends Cli implements Command {
         console.info.println("svn commands");
         console.info.println("  'status' dir?         check checkouts under the specified directory against svn.");
         console.info.println("  'update' dir?         updates checkouts under the specified directory form svn");
-        console.info.println("admin commands");
+        console.info.println("database commands");
         console.info.println("  'database-clear' '-global'?");
         console.info.println("                        creates a new empty database");
         console.info.println("  'database-add' '-global'? url*");
         console.info.println("                        adds projects found under the specified urls to the database;");
         console.info.println("                        use '-' pattern to exclude from the url before;");
         console.info.println("                        (urls default to all ciso urls if not specified)");
+        console.info.println("  'database-remove' '-global'? url*");
+        console.info.println("                        removes all documents prefixed with one of the specified urls");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database file.");
