@@ -49,7 +49,16 @@ public class DatabaseAdd extends Base {
     public void remaining(String str) {
         Filter filter;
 
-        if (!str.startsWith("-")) {
+        if (str.startsWith("-")) {
+            if (filters.isEmpty()) {
+                throw new ArgumentException("missing url before exclude " + str);
+            }
+            if (str.startsWith("/") || str.endsWith("/")) {
+                throw new ArgumentException("do not use '/' before or after excludes: " + str);
+            }
+            filter = filters.get(filters.size() - 1);
+            filter.exclude("**/" + str.substring(1) + "/**/*");
+        } else {
             try {
                 nodes.add(console.world.node("svn:" + str));
             } catch (URISyntaxException e) {
@@ -67,15 +76,6 @@ public class DatabaseAdd extends Base {
             filter.exclude("**/src/**/*");
             filter.predicate(Predicate.DIRECTORY);
             filters.add(filter);
-        } else {
-            if (filters.isEmpty()) {
-                throw new ArgumentException("missing url before exclude " + str);
-            }
-            if (str.startsWith("/") || str.endsWith("/")) {
-                throw new ArgumentException("do not use '/' before or after excludes: " + str);
-            }
-            filter = filters.get(filters.size() - 1);
-            filter.exclude("**/" + str.substring(1) + "/**/*");
         }
     }
 
@@ -166,7 +166,12 @@ public class DatabaseAdd extends Base {
                             pom.copyFile(local);
                             console.info.println(pom.getURI().toString());
                             project = maven.loadPom(local);
-                            checkScm(project, pom);
+                            try {
+                                checkScm(project, pom);
+                            } catch (IOException e) {
+                                console.error.println("WARNING: " + e.getMessage());
+                                e.printStackTrace(console.verbose);
+                            }
                             return Database.document(trunk.getURI().toString(), project);
                         } finally {
                             local.deleteFile();
