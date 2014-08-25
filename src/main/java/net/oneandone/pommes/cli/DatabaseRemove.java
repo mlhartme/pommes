@@ -28,7 +28,7 @@ public class DatabaseRemove extends DatabaseBase {
 
     @Remaining
     public void remaining(String prefix) {
-        removes.add(Database.withSlash(prefix));
+        removes.add(prefix);
     }
 
     public DatabaseRemove(Console console, Maven maven) {

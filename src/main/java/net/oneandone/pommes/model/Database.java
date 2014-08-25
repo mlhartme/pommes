@@ -90,8 +90,9 @@ public class Database implements AutoCloseable {
     //-- field names
 
     /**
-     * The uri used to load the pom for indexing. It might differ from the SCM field, typically because
-     * the scm tags where not adjust after creating a branch.
+     * The uri full used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch.
+     * SCM tags cannot be use instead because you often forget to adjust them when creating branches. And they only point to the
+     * directory containing the pom.
      */
     public static final String ID = "id";
 

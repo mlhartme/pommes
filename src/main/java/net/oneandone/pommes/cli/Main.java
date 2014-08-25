@@ -144,6 +144,6 @@ public class Main extends Cli implements Command {
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database file.");
         console.info.println();
-        console.info.println("Documentation: https://wiki.1and1.org/UE/PommesHome");
+        console.info.println("Home: https://github.com/mlhartme/pommes");
     }
 }

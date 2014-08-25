@@ -163,7 +163,7 @@ public class DatabaseAdd extends DatabaseBase {
                                 console.error.println("WARNING: " + e.getMessage());
                                 e.printStackTrace(console.verbose);
                             }
-                            return Database.document(trunk.getURI().toString(), project);
+                            return Database.document(pom.getURI().toString(), project);
                         } finally {
                             local.deleteFile();
                         }

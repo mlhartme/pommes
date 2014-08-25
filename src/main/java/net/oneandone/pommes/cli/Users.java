@@ -79,10 +79,10 @@ public class Users extends SearchBase<Reference> {
             gav = Pom.forProject(project);
         } else {
             switch (Strings.count(gavString, ":")) {
-                case 2:
+                case 1:
                     gav = Pom.forGa(gavString, "0", null);
                     break;
-                case 3:
+                case 2:
                     gav = Pom.forGav(gavString, null);
                     break;
                 default:
