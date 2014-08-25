@@ -91,6 +91,12 @@
       <artifactId>lucene-queryparser</artifactId>
       <version>4.9.0</version>
     </dependency>
+    <!-- this is used by lucense-sandbox, but the dependency is not fetched transitivly ... -->
+    <dependency>
+      <groupId>jakarta-regexp</groupId>
+      <artifactId>jakarta-regexp</artifactId>
+      <version>1.4</version>
+    </dependency>
 
     <!-- TODO: because dependencyManagement excludes it from httpcomponent!? And sets to to provided!? -->
     <dependency>
