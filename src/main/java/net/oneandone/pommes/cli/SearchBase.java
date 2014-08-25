@@ -35,15 +35,15 @@ public abstract class SearchBase<T> extends DatabaseBase {
         super(console, maven);
     }
 
-    @Option("local")
-    private boolean local;
+    @Option("checkout")
+    private boolean checkout;
 
     public void invoke(Database database) throws Exception {
         List<T> matches;
         List<FileNode> directories;
 
         matches = search(database);
-        if (local) {
+        if (checkout) {
             directories = extractLocal(matches);
             for (FileNode directory : directories) {
                 console.info.println(directory);
