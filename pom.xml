@@ -42,12 +42,12 @@
   </properties>
 
 
-  <url>https://wiki.1and1.org/UE/PommesHome</url>
+  <url>https://github.com/mlhartme/pommes</url>
 
   <scm>
-    <url>https://svn.1and1.org/svn/sales/tools/pommes/trunk</url>
-    <connection>scm:svn:https://svn.1and1.org/svn/sales/tools/pommes/trunk</connection>
-    <developerConnection>scm:svn:https://svn.1and1.org/svn/sales/tools/pommes/trunk</developerConnection>
+    <url>https://github.com/mlhartme/pommes</url>
+    <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git</developerConnection>
   </scm>
 
   <developers>
