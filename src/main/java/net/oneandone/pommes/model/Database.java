@@ -223,27 +223,27 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public static Document document(String id, MavenProject mavenProject) throws InvalidVersionSpecificationException {
+    public static Document document(String id, Pom pom) throws InvalidVersionSpecificationException {
         Document doc;
-        Pom pom;
-        MavenProject parent;
 
         doc = new Document();
-        pom = Pom.forProject(mavenProject);
-
         doc.add(new StringField(ID, id, Field.Store.YES));
-
-        // basic stuff
         doc.add(new StringField(GROUP, pom.groupId, Field.Store.YES));
         doc.add(new StringField(ARTIFACT, pom.artifactId, Field.Store.YES));
         doc.add(new StringField(VERSION, pom.version, Field.Store.YES));
         doc.add(new StringField(GA, pom.toGaString(), Field.Store.YES));
         doc.add(new StringField(GAV, pom.toGavString(), Field.Store.YES));
         doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
+        return doc;
+    }
 
-        // dependencies
-        List<Dependency> dependencies = mavenProject.getDependencies();
-        for (Dependency dependency : dependencies) {
+    public static Document document(String id, MavenProject mavenProject) throws InvalidVersionSpecificationException {
+        Document doc;
+        MavenProject parent;
+        Pom parPom;
+
+        doc = document(id, Pom.forProject(mavenProject));
+        for (Dependency dependency : mavenProject.getDependencies()) {
             Pom dep = Pom.forDependency(dependency);
 
             // index groupId:artifactId for non-version searches
@@ -260,8 +260,7 @@ public class Database implements AutoCloseable {
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
-            Pom parPom = Pom.forProject(parent);
-
+            parPom = Pom.forProject(parent);
             doc.add(new StringField(PAR_GA, parPom.toGaString(), Field.Store.YES));
             doc.add(new StringField(PAR_GAV, parPom.toGavString(), Field.Store.YES));
         }

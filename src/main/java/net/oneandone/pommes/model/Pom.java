@@ -15,12 +15,20 @@
  */
 package net.oneandone.pommes.model;
 
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 
 public class Pom {
+    public static Pom forComposer(Node composer) {
+        Node trunk;
+
+        trunk = composer.getParent();
+        return new Pom("1and1-sales", trunk.getParent().getName(), "0", "scm:" + trunk.getURI().toString());
+    }
+
     public static Pom forGav(String gav, String scm) {
         String[] splitted;
 

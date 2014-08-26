@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Remaining;
@@ -143,6 +144,7 @@ public class DatabaseAdd extends DatabaseBase {
         private Document iterUnchecked() throws IOException {
             Node trunk;
             Node pom;
+            Node composer;
             FileNode local;
             MavenProject project;
 
@@ -166,6 +168,12 @@ public class DatabaseAdd extends DatabaseBase {
                             return Database.document(pom.getURI().toString(), project);
                         } finally {
                             local.deleteFile();
+                        }
+                    } else {
+                        composer = trunk.join("composer.json");
+                        if (composer.exists()) {
+                            count++;
+                            return Database.document(composer.getURI().toString(), Pom.forComposer(composer));
                         }
                     }
                 } catch (RuntimeException e) {
