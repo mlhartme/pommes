@@ -58,7 +58,7 @@ public class Fstab {
         return result;
     }
 
-    private static class Line {
+    public static class Line {
         public static Line parse(World world, String str) throws ExistsException, DirectoryNotFoundException {
             List<String> parts;
             String uri;
@@ -103,6 +103,15 @@ public class Fstab {
 
     public void add(Line line) {
         lines.add(line);
+    }
+
+    public Line lookup(String prefix) {
+        for (Line line : lines) {
+            if (prefix.equals(line)) {
+                return line;
+            }
+        }
+        return null;
     }
 
     public FileNode locate(String url) {
