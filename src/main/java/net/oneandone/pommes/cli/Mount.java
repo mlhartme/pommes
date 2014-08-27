@@ -20,10 +20,10 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Value;
-import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.launcher.Failure;
-import net.oneandone.sushi.launcher.Launcher;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Mount extends Base {
     @Value(name = "pattern", position = 1)
@@ -37,26 +37,18 @@ public class Mount extends Base {
     public void invoke() throws Exception {
         Fstab fstab;
         String svnurl;
+        Map<FileNode, String> adds;
 
         fstab = Fstab.load(console.world);
+        adds = new HashMap<>();
         try (Database database = Database.load(console.world)) {
             for (Pom pom : database.substring(substring)) {
                 svnurl = pom.svnUrl();
-                checkout(svnurl, fstab.locate(svnurl));
+                if (svnurl != null) {
+                    adds.put(fstab.locate(svnurl), svnurl);
+                }
             }
         }
+        updateCheckouts(adds, new HashMap<FileNode, String>());
     }
-    private void checkout(String svnurl, FileNode checkout) throws MkdirException, Failure {
-        Launcher svn;
-
-        checkout.getParent().mkdirsOpt();
-        svn = svn(checkout.getParent(), "co", svnurl, checkout.getName());
-        if (console.getVerbose()) {
-            console.verbose.println(svn.toString());
-        } else {
-            console.info.println("[svn co " + svnurl + " " + checkout.getAbsolute() + "]");
-        }
-        svn.exec(console.verbose);
-    }
-
 }
