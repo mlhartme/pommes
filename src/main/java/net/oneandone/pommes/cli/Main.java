@@ -53,9 +53,16 @@ public class Main extends Cli implements Command {
         return new Users(console, maven());
     }
 
+    //--
+
     @Child("mount")
     public Mount mount() throws IOException {
         return new Mount(console, maven());
+    }
+
+    @Child("status")
+    public Status status() throws IOException {
+        return new Status(console, maven());
     }
 
     //--
@@ -95,6 +102,7 @@ public class Main extends Cli implements Command {
         console.info.println("mount commands");
         console.info.println("  'mount' substring     mounts all projects matching the specified substring;");
         console.info.println("                        asks before changing anything on your disk");
+        console.info.println("  'status' directory    lists all checkouts under the specified directory, along C or ? markers");
         console.info.println("database commands");
         console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");

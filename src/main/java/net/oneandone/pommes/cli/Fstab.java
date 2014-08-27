@@ -107,15 +107,23 @@ public class Fstab {
 
     public FileNode locate(String url) {
         String path;
-        FileNode result;
+        int idx;
+        int beforeName;
 
         for (Line line : lines) {
             if (url.startsWith(line.uri)) {
-                result = line.directory;
                 path = url.substring(line.uri.length());
-                path = Strings.removeRightOpt(path, "/trunk/");
-                result = result.join(path);
-                return result;
+                idx = path.indexOf("/branches/");
+                if (idx != -1) {
+                    beforeName = path.lastIndexOf('/', idx - 1);
+                    if (beforeName == -1) {
+                        throw new IllegalStateException(path);
+                    }
+                    path = path.substring(0, beforeName + 1) + path.substring(idx + 10);
+                } else {
+                    path = Strings.removeRightOpt(path, "/trunk/");
+                }
+                return line.directory.join(path);
             }
         }
         throw new ArgumentException("no mount point for url " + url);

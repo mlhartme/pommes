@@ -19,8 +19,6 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.fs.DeleteException;
-import net.oneandone.sushi.fs.NodeNotFoundException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
