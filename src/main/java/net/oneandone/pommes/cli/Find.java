@@ -30,14 +30,14 @@ import java.util.List;
  * Lists all indexed POMs in index *without* updating from the server. Warning: this will be a long list, only useful with grep.
  */
 public class Find extends SearchBase<Pom> {
-    private final FileMap checkouts;
+    private final Fstab fstab;
 
     private final boolean query;
 
     public Find(boolean query, Console console, Maven maven) throws IOException {
         super(console, maven);
         this.query = query;
-        this.checkouts = FileMap.loadCheckouts(console.world);
+        this.fstab = Fstab.load(console.world);
     }
 
     @Value(name = "substring", position = 1)
@@ -56,13 +56,13 @@ public class Find extends SearchBase<Pom> {
     public String toLine(Pom pom) {
         StringBuilder result;
         String url;
-        List<FileNode> directories;
+        FileNode directory;
 
         result = new StringBuilder(pom.toLine());
         url = pom.svnUrl();
         if (url != null) {
-            directories = checkouts.lookupDirectories(url);
-            for (FileNode directory : directories) {
+            directory = fstab.locate(url);
+            if (directory.exists()) {
                 result.append(' ').append(directory.getAbsolute());
             }
         } else {

@@ -68,21 +68,21 @@ public abstract class SearchBase<T> extends DatabaseBase {
     private List<FileNode> extractLocal(List<T> matches) throws IOException {
         List<FileNode> result;
         Pom pom;
-        FileMap checkouts;
+        Fstab fstab;
         Iterator<T> iter;
         String url;
-        List<FileNode> directories;
+        FileNode directory;
 
         result = new ArrayList<>();
-        checkouts = FileMap.loadCheckouts(console.world);
+        fstab = Fstab.load(console.world);
         iter = matches.iterator();
         while (iter.hasNext()) {
             pom = toPom(iter.next());
             url = pom.svnUrl();
             if (url != null) {
-                directories = checkouts.lookupDirectories(url);
-                if (!directories.isEmpty()) {
-                    result.addAll(directories);
+                directory = fstab.locate(url);
+                if (directory.exists()) {
+                    result.add(directory);
                     iter.remove();
                 }
             }

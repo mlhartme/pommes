@@ -58,26 +58,6 @@ public class Main extends Cli implements Command {
         return new Mount(console, maven());
     }
 
-    @Child("umount")
-    public Umount umount() throws IOException {
-        return new Umount(console, maven());
-    }
-
-    @Child("remount")
-    public Remount remout() throws IOException {
-        return new Remount(console, maven());
-    }
-
-    @Child("status")
-    public Status status() throws IOException {
-        return new Status(console, maven());
-    }
-
-    @Child("update")
-    public Update update() throws IOException {
-        return new Update(console, maven());
-    }
-
     //--
 
     @Child("database-clear")
