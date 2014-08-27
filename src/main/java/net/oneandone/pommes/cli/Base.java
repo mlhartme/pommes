@@ -19,6 +19,7 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
+import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
@@ -48,7 +49,6 @@ public abstract class Base implements Command {
         String scannedUrl;
         int problems;
         Iterator<FileNode> iterator;
-        Launcher svn;
 
         problems = 0;
         directories = new ArrayList<>(adds.keySet());
@@ -103,15 +103,8 @@ public abstract class Base implements Command {
             directory = d;
             svnurl = adds.get(directory);
             if (svnurl != null) {
-                directory.getParent().mkdirsOpt();
-                svn = svn(directory.getParent(), "co", svnurl, directory.getName());
-                if (console.getVerbose()) {
-                    console.verbose.println(svn.toString());
-                } else {
-                    console.info.println("[svn co " + svnurl + " " + directory.getName() + "]");
-                }
                 try {
-                    svn.exec(console.verbose);
+                    doCheckout(directory, svnurl);
                 } catch (Failure e) {
                     console.error.println(e.getMessage());
                     problems++;
@@ -127,6 +120,19 @@ public abstract class Base implements Command {
         if (problems > 0) {
             throw new IOException(problems + " checkouts failed");
         }
+    }
+
+    protected void doCheckout(FileNode directory, String svnurl) throws MkdirException, Failure {
+        Launcher svn;
+
+        directory.getParent().mkdirsOpt();
+        svn = svn(directory.getParent(), "co", svnurl, directory.getName());
+        if (console.getVerbose()) {
+            console.verbose.println(svn.toString());
+        } else {
+            console.info.println("[svn co " + svnurl + " " + directory.getName() + "]");
+        }
+        svn.exec(console.verbose);
     }
 
     //--
@@ -166,5 +172,22 @@ public abstract class Base implements Command {
         url = directory.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
         return Database.withSlash(url.substring(idx, url.indexOf("\n", idx)));
+    }
+
+    //--
+
+    public void scanCheckouts(FileNode directory, List<FileNode> result) throws IOException {
+        List<FileNode> children;
+
+        if (directory.join(".svn").isDirectory()) {
+            result.add(directory);
+        } else {
+            children = directory.list();
+            if (children != null) {
+                for (FileNode child : children) {
+                    scanCheckouts(child, result);
+                }
+            }
+        }
     }
 }

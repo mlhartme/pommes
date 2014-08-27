@@ -633,6 +633,20 @@ public class Database implements AutoCloseable {
 
     //--
 
+    public Pom lookup(String id) throws IOException {
+        List<Pom> result;
+
+        result = query(new TermQuery(new Term(Database.ID, id)));
+        switch (result.size()) {
+            case 0:
+                return null;
+            case 1:
+                return result.get(0);
+            default:
+                throw new IllegalStateException("ambiguous id: " + id);
+        }
+    }
+
     public List<Pom> query(String queryString) throws IOException, QueryNodeException {
         return query(new StandardQueryParser().parse(queryString, Database.GAV));
     }

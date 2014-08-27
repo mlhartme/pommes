@@ -16,18 +16,27 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
+import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-public class Status extends Base {
+public class Umount extends Base {
     private FileNode root;
+
+    @Option("stale")
+    private boolean stale;
 
     @Remaining
     public void add(String str) {
@@ -37,7 +46,7 @@ public class Status extends Base {
         root = console.world.file(str);
     }
 
-    public Status(Console console, Maven maven) {
+    public Umount(Console console, Maven maven) {
         super(console, maven);
     }
 
@@ -46,6 +55,8 @@ public class Status extends Base {
         Fstab fstab;
         List<FileNode> checkouts;
         String scannedUrl;
+        Map<FileNode, String> removes;
+        String id;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
@@ -56,62 +67,26 @@ public class Status extends Base {
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }
+        removes = new HashMap<>();
         for (FileNode directory : checkouts) {
             scannedUrl = scanUrl(directory);
             if (directory.equals(fstab.locate(scannedUrl))) {
-                console.info.println("  " + directory + " (" + scannedUrl + ")");
+                removes.put(directory, scannedUrl);
             } else {
                 console.info.println("C " + directory + " (" + scannedUrl + ")");
                 console.info.println("  expected in directory " + fstab.locate(scannedUrl));
             }
         }
-        for (FileNode directory : unknown(root, checkouts)) {
-            console.info.println("? " + directory);
-        }
-    }
-
-    private static List<FileNode> unknown(FileNode root, List<FileNode> directories) throws ListException, DirectoryNotFoundException {
-        List<FileNode> lst;
-        List<FileNode> result;
-
-        result = new ArrayList<>();
-        lst = new ArrayList<>();
-        for (FileNode directory: directories) {
-            candicates(root, directory, lst);
-        }
-        for (FileNode directory : lst) {
-            for (FileNode node : directory.list()) {
-                if (node.isFile()) {
-                    // ignore
-                } else if (hasAnchestor(directories, node)) {
-                    // required sub-directory
-                } else {
-                    result.add(node);
+        if (stale) {
+            try (Database database = Database.load(console.world)) {
+                for (FileNode directory : new HashSet<>(removes.keySet())) {
+                    id = "svn:" + Database.withSlash(removes.get(directory)) + "pom.xml";
+                    if (database.lookup(id) != null) {
+                        removes.remove(directory);
+                    }
                 }
             }
         }
-        return result;
+        updateCheckouts(new HashMap<FileNode, String>(), removes);
     }
-
-    private static boolean hasAnchestor(List<FileNode> directories, FileNode node) {
-        for (FileNode directory : directories) {
-            if (directory.hasAnchestor(node)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static void candicates(FileNode root, FileNode directory, List<FileNode> result) {
-        FileNode parent;
-
-        if (directory.hasDifferentAnchestor(root)) {
-            parent = directory.getParent();
-            if (!result.contains(parent)) {
-                result.add(parent);
-                candicates(root, parent, result);
-            }
-        }
-    }
-
 }

@@ -60,9 +60,19 @@ public class Main extends Cli implements Command {
         return new Mount(console, maven());
     }
 
+    @Child("umount")
+    public Umount umount() throws IOException {
+        return new Umount(console, maven());
+    }
+
     @Child("status")
     public Status status() throws IOException {
         return new Status(console, maven());
+    }
+
+    @Child("goto")
+    public Goto goto_() throws IOException {
+        return new Goto(console, maven());
     }
 
     //--
@@ -104,7 +114,13 @@ public class Main extends Cli implements Command {
         console.info.println("                        mounts all project matches located under the specified root directory;");
         console.info.println("                        directory defaults to the current directory;");
         console.info.println("                        asks before changing anything on your disk");
+        console.info.println("  'umount' '-stale'? root?");
+        console.info.println("                        removes all or stale checkouts under the specified root directory;");
+        console.info.println("                        fails for checkouts with uncommitted changed;");
+        console.info.println("                        a checkout is stale if the project has been removed from the database;");
+        console.info.println("                        asks before changing anything on your disk");
         console.info.println("  'status' root?        all checkouts under the specified root directory, along C or ? markers");
+        console.info.println("  'goto' substring      prompts to select a matching probject and checks it out when necessary");
         console.info.println("database commands");
         console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");
