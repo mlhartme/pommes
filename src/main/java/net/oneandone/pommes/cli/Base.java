@@ -20,7 +20,6 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.fs.DeleteException;
-import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.NodeNotFoundException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -28,7 +27,11 @@ import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Separator;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Base implements Command {
@@ -40,82 +43,97 @@ public abstract class Base implements Command {
         this.maven = maven;
     }
 
-    protected void updateCheckouts(Map<FileNode, String> originalAdds, Map<FileNode, String> originalRemoves) throws IOException {
-        Map<FileNode, String> adds;
-        Map<FileNode, String> removes;
+    protected void updateCheckouts(Map<FileNode, String> adds, Map<FileNode, String> removes) throws IOException {
+        List<FileNode> directories;
         FileNode directory;
         String svnurl;
         String scannedUrl;
-        boolean problems;
-
-        adds = new LinkedHashMap<>(originalAdds);
-        removes = new LinkedHashMap<>(originalRemoves);
-        problems = false;
-        for (Map.Entry<FileNode, String> entry : originalAdds.entrySet()) {
-            directory = entry.getKey();
-            svnurl = entry.getValue();
-            if (directory.exists()) {
-                scannedUrl = scanUrl(directory);
-                if (svnurl.equals(scannedUrl)) {
-                    console.info.println("  " + directory + " (" + svnurl + ")");
-                    adds.remove(directory);
-                } else {
-                    console.error.println("C " + directory + " (" + svnurl + " vs " + scannedUrl + ")");
-                    problems = true;
-                }
-            } else {
-                console.info.println("A " + entry.getKey() + " (" + entry.getValue() + ")");
-            }
-        }
-        for (Map.Entry<FileNode, String> entry : removes.entrySet()) {
-            console.info.println("D " + entry.getKey() + " (" + entry.getValue() + ")");
-            if (modified(entry.getKey())) {
-                console.error.println("  ERROR: checkout has modifications");
-                problems = true;
-            }
-        }
-        if (problems) {
-            throw new IOException("aborted - fix the above error(s) first");
-        }
-        if (adds.isEmpty() && removes.isEmpty()) {
-            console.info.println("no changes");
-        } else {
-            console.pressReturn();
-            checkoutRemoves(removes);
-            checkoutAdds(adds);
-        }
-    }
-
-    private void checkoutRemoves(Map<FileNode, String> removes) throws DeleteException, NodeNotFoundException {
-        FileNode directory;
-
-        for (Map.Entry<FileNode, String> entry : removes.entrySet()) {
-            directory = entry.getKey();
-            console.info.println("rm -rf " + entry.getKey());
-            directory.deleteTree();
-        }
-    }
-
-    private void checkoutAdds(Map<FileNode, String> adds) throws MkdirException, Failure {
-        FileNode directory;
+        int problems;
+        Iterator<FileNode> iterator;
         Launcher svn;
 
-        for (Map.Entry<FileNode, String> entry : adds.entrySet()) {
-            directory = entry.getKey();
-            directory.getParent().mkdirsOpt();
-            svn = svn(directory.getParent(), "co", entry.getValue(), directory.getAbsolute());
-            if (console.getVerbose()) {
-                console.verbose.println(svn.toString());
-            } else {
-                console.info.println("[svn co " + entry.getValue() + " " + directory + "]");
+        problems = 0;
+        directories = new ArrayList<>(adds.keySet());
+        directories.addAll(removes.keySet());
+        Collections.sort(directories, new Comparator<FileNode>() {
+            @Override
+            public int compare(FileNode left, FileNode right) {
+                return left.getAbsolute().compareTo(right.getAbsolute());
             }
-            svn.exec(console.verbose);
+        });
+        iterator = directories.iterator();
+        while (iterator.hasNext()) {
+            directory = iterator.next();
+            svnurl = adds.get(directory);
+            if (svnurl != null) {
+                if (directory.exists()) {
+                    scannedUrl = scanUrl(directory);
+                    if (svnurl.equals(scannedUrl)) {
+                        console.info.println("  " + directory + " (" + svnurl + ")");
+                        iterator.remove();
+                    } else {
+                        console.error.println("C " + directory + " (" + svnurl + " vs " + scannedUrl + ")");
+                        problems++;
+                    }
+                } else {
+                    console.info.println("A " + directory + " (" + svnurl + ")");
+                }
+            } else {
+                svnurl = removes.get(directory);
+                if (svnurl == null) {
+                    throw new IllegalStateException();
+                }
+                console.info.println("D " + directory + " (" + svnurl + ")");
+                if (modified(directory)) {
+                    console.error.println("  ERROR: checkout has modifications");
+                    problems++;
+                }
+            }
+        }
+        if (problems > 0) {
+            throw new IOException("aborted - fix the above " + problems + " error(s) first");
+        }
+        if (directories.isEmpty()) {
+            console.info.println("no changes");
+            return;
+        }
+
+        console.pressReturn();
+
+        problems = 0;
+        for (FileNode d : directories) {
+            directory = d;
+            svnurl = adds.get(directory);
+            if (svnurl != null) {
+                directory.getParent().mkdirsOpt();
+                svn = svn(directory.getParent(), "co", svnurl, directory.getName());
+                if (console.getVerbose()) {
+                    console.verbose.println(svn.toString());
+                } else {
+                    console.info.println("[svn co " + svnurl + " " + directory.getName() + "]");
+                }
+                try {
+                    svn.exec(console.verbose);
+                } catch (Failure e) {
+                    console.error.println(e.getMessage());
+                    problems++;
+                }
+            } else {
+                if (removes.get(directory) == null) {
+                    throw new IllegalStateException();
+                }
+                console.info.println("rm -rf " + directory);
+                directory.deleteTree();
+            }
+        }
+        if (problems > 0) {
+            throw new IOException(problems + " checkouts failed");
         }
     }
 
     //--
 
-    protected Launcher svn(FileNode dir, String ... args) throws Failure {
+    protected Launcher svn(FileNode dir, String ... args) {
         Launcher launcher;
 
         launcher = new Launcher(dir);

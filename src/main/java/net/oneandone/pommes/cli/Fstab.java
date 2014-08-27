@@ -23,6 +23,7 @@ import net.oneandone.sushi.fs.LineReader;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -112,9 +113,8 @@ public class Fstab {
             if (url.startsWith(line.uri)) {
                 result = line.directory;
                 path = url.substring(line.uri.length());
-                if (!path.isEmpty()) {
-                    result = result.join(path);
-                }
+                path = Strings.removeRightOpt(path, "/trunk/");
+                result = result.join(path);
                 return result;
             }
         }
