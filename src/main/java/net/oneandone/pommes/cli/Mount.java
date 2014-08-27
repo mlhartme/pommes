@@ -18,7 +18,9 @@ package net.oneandone.pommes.cli;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
+import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -29,6 +31,16 @@ public class Mount extends Base {
     @Value(name = "pattern", position = 1)
     private String substring;
 
+    private FileNode root;
+
+    @Remaining
+    public void add(String str) {
+        if (root != null) {
+            throw new ArgumentException("too many root arguments");
+        }
+        root = console.world.file(str);
+    }
+
     public Mount(Console console, Maven maven) {
         super(console, maven);
     }
@@ -38,14 +50,21 @@ public class Mount extends Base {
         Fstab fstab;
         String svnurl;
         Map<FileNode, String> adds;
+        FileNode directory;
 
+        if (root == null) {
+            root = (FileNode) console.world.getWorking();
+        }
         fstab = Fstab.load(console.world);
         adds = new HashMap<>();
         try (Database database = Database.load(console.world)) {
             for (Pom pom : database.substring(substring)) {
                 svnurl = pom.svnUrl();
                 if (svnurl != null) {
-                    adds.put(fstab.locate(svnurl), svnurl);
+                    directory = fstab.locate(svnurl);
+                    if (directory.hasAnchestor(root)) {
+                        adds.put(directory, svnurl);
+                    }
                 }
             }
         }

@@ -100,9 +100,11 @@ public class Main extends Cli implements Command {
         console.info.println("  'query' query         prints projects matching the specified lucene query");
         console.info.println("  'users' gav?          prints projects that use the specified artifact (gav defaults to current project)");
         console.info.println("mount commands");
-        console.info.println("  'mount' substring     mounts all projects matching the specified substring;");
+        console.info.println("  'mount' substring root?");
+        console.info.println("                        mounts all project matches located under the specified root directory;");
+        console.info.println("                        directory defaults to the current directory;");
         console.info.println("                        asks before changing anything on your disk");
-        console.info.println("  'status' directory    lists all checkouts under the specified directory, along C or ? markers");
+        console.info.println("  'status' root?        all checkouts under the specified root directory, along C or ? markers");
         console.info.println("database commands");
         console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");

@@ -18,7 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Value;
+import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -28,8 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Status extends Base {
-    @Value(name = "directory", position = 1)
     private FileNode root;
+
+    @Remaining
+    public void add(String str) {
+        if (root != null) {
+            throw new ArgumentException("too many root arguments");
+        }
+        root = console.world.file(str);
+    }
 
     public Status(Console console, Maven maven) {
         super(console, maven);
@@ -41,6 +48,9 @@ public class Status extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
 
+        if (root == null) {
+            root = (FileNode) console.world.getWorking();
+        }
         fstab = Fstab.load(console.world);
         checkouts = new ArrayList<>();
         scanCheckouts(root, checkouts);
@@ -87,7 +97,11 @@ public class Status extends Base {
         }
         for (FileNode directory : lst) {
             for (FileNode node : directory.list()) {
-                if (node.isFile() || !hasAnchestor(directories, node)) {
+                if (node.isFile()) {
+                    // ignore
+                } else if (hasAnchestor(directories, node)) {
+                    // required sub-directory
+                } else {
                     result.add(node);
                 }
             }
