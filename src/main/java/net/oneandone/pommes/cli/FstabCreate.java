@@ -36,6 +36,7 @@ public class FstabCreate extends Base {
 
     @Override
     public void invoke() throws Exception {
+        /*
         Fstab fstab;
         String prefix;
         FileNode directory;
@@ -49,12 +50,13 @@ public class FstabCreate extends Base {
                     addPrefix(pom.svnUrl(), prefixes);
                 }
             }
-        }
+        }*/
     }
 
+    /*
     private static String addPrefix(String svnurl) {
     }
-
+*/
     private static String name(String prefix) {
         int idx;
 
