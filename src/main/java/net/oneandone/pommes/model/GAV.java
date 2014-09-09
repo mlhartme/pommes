@@ -17,29 +17,29 @@ package net.oneandone.pommes.model;
 
 import org.apache.maven.model.Dependency;
 
-public class Coordinates {
-    public static Coordinates forGav(String gav) {
+public class GAV {
+    public static GAV forGav(String gav) {
         String[] splitted;
 
         splitted = gav.split(":");
         if (splitted.length != 3) {
             throw new IllegalArgumentException("expected groupId:artifactId:version, got " + gav);
         }
-        return new Coordinates(splitted[0], splitted[1], splitted[2]);
+        return new GAV(splitted[0], splitted[1], splitted[2]);
     }
 
-    public static Coordinates forGa(String ga, String v) {
+    public static GAV forGa(String ga, String v) {
         String[] splitted;
 
         splitted = ga.split(":");
         if (splitted.length < 2) {
             throw new IllegalArgumentException("expected groupId:artifactId, got " + ga);
         }
-        return new Coordinates(splitted[0], splitted[1], v);
+        return new GAV(splitted[0], splitted[1], v);
     }
 
-    public static Coordinates forDependency(Dependency dependency) {
-        return new Coordinates(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+    public static GAV forDependency(Dependency dependency) {
+        return new GAV(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
     }
 
     //--
@@ -50,7 +50,7 @@ public class Coordinates {
 
     public final String version;
 
-    public Coordinates(String groupId, String artifactId, String version) {
+    public GAV(String groupId, String artifactId, String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
@@ -69,7 +69,7 @@ public class Coordinates {
         return toGavString();
     }
 
-    public boolean gavEquals(Coordinates other) {
+    public boolean gavEquals(GAV other) {
         return artifactId.equals(other.artifactId) && groupId.equals(other.groupId) && version.equals(other.version);
     }
 }
