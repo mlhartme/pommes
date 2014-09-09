@@ -59,12 +59,10 @@ public class Mount extends Base {
         adds = new HashMap<>();
         try (Database database = Database.load(console.world)) {
             for (Pom pom : database.substring(substring)) {
-                svnurl = pom.svnUrl();
-                if (svnurl != null) {
-                    directory = fstab.locateOpt(svnurl);
-                    if (directory != null && directory.hasAnchestor(root)) {
-                        adds.put(directory, svnurl);
-                    }
+                svnurl = pom.projectUrl();
+                directory = fstab.locateOpt(svnurl);
+                if (directory != null && directory.hasAnchestor(root)) {
+                    adds.put(directory, svnurl);
                 }
             }
         }

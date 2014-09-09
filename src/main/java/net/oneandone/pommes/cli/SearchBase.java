@@ -78,13 +78,11 @@ public abstract class SearchBase<T> extends DatabaseBase {
         iter = matches.iterator();
         while (iter.hasNext()) {
             pom = toPom(iter.next());
-            url = pom.svnUrl();
-            if (url != null) {
-                directory = fstab.locateOpt(url);
-                if (directory != null && directory.exists()) {
-                    result.add(directory);
-                    iter.remove();
-                }
+            url = pom.projectUrl();
+            directory = fstab.locateOpt(url);
+            if (directory != null && directory.exists()) {
+                result.add(directory);
+                iter.remove();
             }
         }
         return result;

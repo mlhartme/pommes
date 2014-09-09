@@ -23,6 +23,7 @@ import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.project.MavenProject;
@@ -68,6 +69,7 @@ public class Users extends SearchBase<Reference> {
     }
 
     public List<Reference> search(Database database) throws IOException, InvalidVersionSpecificationException, ProjectBuildingException {
+        FileNode origin;
         List<Reference> result;
         Pom gav;
         MavenProject project;
@@ -75,8 +77,9 @@ public class Users extends SearchBase<Reference> {
         result = new ArrayList<>();
 
         if (gavString == null) {
-            project = maven.loadPom(console.world.file("pom.xml"));
-            gav = Pom.forProject(project);
+            origin = console.world.file("pom.xml");
+            project = maven.loadPom(origin);
+            gav = Pom.forProject(project, origin.getURI().toString());
         } else {
             switch (Strings.count(gavString, ":")) {
                 case 1:

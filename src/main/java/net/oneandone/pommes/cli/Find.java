@@ -59,14 +59,10 @@ public class Find extends SearchBase<Pom> {
         FileNode directory;
 
         result = new StringBuilder(pom.toLine());
-        url = pom.svnUrl();
-        if (url != null) {
-            directory = fstab.locateOpt(url);
-            if (directory != null && directory.exists()) {
-                result.append(' ').append(directory.getAbsolute());
-            }
-        } else {
-            // TODO: git support
+        url = pom.projectUrl();
+        directory = fstab.locateOpt(url);
+        if (directory != null && directory.exists()) {
+            result.append(' ').append(directory.getAbsolute());
         }
         return result.toString();
     }

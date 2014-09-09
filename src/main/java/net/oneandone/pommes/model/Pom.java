@@ -16,9 +16,7 @@
 package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.fs.Node;
-import net.oneandone.sushi.util.Strings;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 
 public class Pom {
@@ -50,28 +48,16 @@ public class Pom {
     }
 
     public static Pom forDependency(Dependency dependency) {
-        return new Pom(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), null);
+        return new Pom(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "depdendency/pom.xml");
     }
 
-    public static Pom forProject(MavenProject project) {
-        return new Pom(project.getGroupId(), project.getArtifactId(), project.getVersion(), scm(project));
-    }
-
-    private static String scm(MavenProject project) {
-        Scm scm;
-        String connection;
-
-        scm = project.getScm();
-        if (scm != null) {
-            connection = scm.getConnection();
-            if (connection != null) {
-                return connection;
-            }
-        }
-        return "";
+    public static Pom forProject(MavenProject project, String origin) {
+        return new Pom(project.getGroupId(), project.getArtifactId(), project.getVersion(), origin);
     }
 
     //--
+
+    public final String origin;
 
     public final String groupId;
 
@@ -79,14 +65,14 @@ public class Pom {
 
     public final String version;
 
-    /** may be null */
-    public final String scm;
-
-    public Pom(String groupId, String artifactId, String version, String scm) {
+    public Pom(String groupId, String artifactId, String version, String origin) {
+        if (origin == null || origin.endsWith("/")) {
+            throw new IllegalArgumentException(origin);
+        }
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
-        this.scm = scm;
+        this.origin = origin;
     }
 
     public String toGaString() {
@@ -98,16 +84,15 @@ public class Pom {
     }
 
     public String toLine() {
-        return groupId + ":" + artifactId + ":" + version + " @ " + scm;
+        return groupId + ":" + artifactId + ":" + version + " @ " + origin;
     }
 
-    /** @return null if not specified or not svn; otherwise always with tailing slash */
-    public String svnUrl() {
-        if (scm != null && scm.startsWith(Database.SCM_SVN)) {
-            return Database.withSlash(Strings.removeLeft(scm, Database.SCM_SVN));
-        } else {
-            return null;
-        }
+    /**
+     * URL to checkout whole project.
+     * @return always with tailing slash
+     */
+    public String projectUrl() {
+        return origin.substring(0, origin.lastIndexOf('/') + 1);
     }
 
     @Override

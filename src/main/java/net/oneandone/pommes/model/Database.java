@@ -21,7 +21,6 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.io.OS;
-import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -90,18 +89,17 @@ public class Database implements AutoCloseable {
     //-- field names
 
     /**
-     * The uri full used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch.
-     * SCM tags cannot be use instead because you often forget to adjust them when creating branches. And they only point to the
-     * directory containing the pom.
+     * The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch.
+     * SCM tags cannot be use instead because they are not always specified and you often forget to adjust them when creating
+     * branches. And they only point to the directory containing the pom.
      */
-    public static final String ID = "id";
+    public static final String ORIGIN = "origin";
 
     public static final String GROUP = "g";
     public static final String ARTIFACT = "a";
     public static final String VERSION = "v";
     public static final String GA = "ga";
     public static final String GAV = "gav";
-    public static final String SCM = "scm"; // scm url as found project/scm/connection
 
     public static final String DEP_GA = "dep-ga";
     public static final String DEP_GAV = "dep-gav";
@@ -205,7 +203,7 @@ public class Database implements AutoCloseable {
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         for (String prefix : prefixes) {
-            writer.deleteDocuments(new PrefixQuery(new Term(ID, prefix)));
+            writer.deleteDocuments(new PrefixQuery(new Term(ORIGIN, prefix)));
         }
         writer.close();
     }
@@ -222,31 +220,30 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(new Term(ID, doc.get(ID)), doc);
+            writer.updateDocument(new Term(ORIGIN, doc.get(ORIGIN)), doc);
         }
         writer.close();
     }
 
-    public static Document document(String id, Pom pom) throws InvalidVersionSpecificationException {
+    public static Document document(String origin, Pom pom) throws InvalidVersionSpecificationException {
         Document doc;
 
         doc = new Document();
-        doc.add(new StringField(ID, id, Field.Store.YES));
+        doc.add(new StringField(ORIGIN, origin, Field.Store.YES));
         doc.add(new StringField(GROUP, pom.groupId, Field.Store.YES));
         doc.add(new StringField(ARTIFACT, pom.artifactId, Field.Store.YES));
         doc.add(new StringField(VERSION, pom.version, Field.Store.YES));
         doc.add(new StringField(GA, pom.toGaString(), Field.Store.YES));
         doc.add(new StringField(GAV, pom.toGavString(), Field.Store.YES));
-        doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
         return doc;
     }
 
-    public static Document document(String id, MavenProject mavenProject) throws InvalidVersionSpecificationException {
+    public static Document document(String origin, MavenProject mavenProject) throws InvalidVersionSpecificationException {
         Document doc;
         MavenProject parent;
         Pom parPom;
 
-        doc = document(id, Pom.forProject(mavenProject));
+        doc = document(origin, Pom.forProject(mavenProject, origin));
         for (Dependency dependency : mavenProject.getDependencies()) {
             Pom dep = Pom.forDependency(dependency);
 
@@ -264,7 +261,7 @@ public class Database implements AutoCloseable {
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
-            parPom = Pom.forProject(parent);
+            parPom = Pom.forProject(parent, origin);
             doc.add(new StringField(PAR_GA, parPom.toGaString(), Field.Store.YES));
             doc.add(new StringField(PAR_GAV, parPom.toGavString(), Field.Store.YES));
         }
@@ -279,7 +276,7 @@ public class Database implements AutoCloseable {
      */
     public List<String> list(String urlPrefix) throws IOException {
         List<String> result;
-        String url;
+        String origin;
         String prefix;
         Document doc;
 
@@ -289,10 +286,9 @@ public class Database implements AutoCloseable {
             int numDocs = reader.numDocs();
             for (int i = 0; i < numDocs; i++) {
                 doc = reader.document(i);
-                url = doc.get(Database.SCM);
-                url = withSlash(url);
-                if (url.startsWith(prefix)) {
-                    result.add(Strings.removeLeft(url, Database.SCM_SVN));
+                origin = doc.get(Database.ORIGIN);
+                if (origin.startsWith(prefix)) {
+                    result.add(origin);
                 }
             }
         }
@@ -329,7 +325,7 @@ public class Database implements AutoCloseable {
     }
 
     public static Pom toPom(Document document) {
-        return Pom.forGav(document.get(Database.GAV), document.get(Database.SCM));
+        return Pom.forGav(document.get(Database.GAV), document.get(Database.ORIGIN));
     }
 
     //-- searching
@@ -526,7 +522,7 @@ public class Database implements AutoCloseable {
         if (!lowerVersion.equals(upperVersion)) {
             version = "[" + lowerVersion + "," + upperVersion + "]";
         }
-        aggregated = new Pom(previous.groupId, previous.artifactId, version, previous.scm);
+        aggregated = new Pom(previous.groupId, previous.artifactId, version, previous.origin);
         results.add(new Reference(ubi.document, aggregated, ubi.to));
     }
 
@@ -637,17 +633,17 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public Pom lookup(String id) throws IOException {
+    public Pom lookup(String origin) throws IOException {
         List<Pom> result;
 
-        result = query(new TermQuery(new Term(Database.ID, id)));
+        result = query(new TermQuery(new Term(Database.ORIGIN, origin)));
         switch (result.size()) {
             case 0:
                 return null;
             case 1:
                 return result.get(0);
             default:
-                throw new IllegalStateException("ambiguous id: " + id);
+                throw new IllegalStateException("ambiguous origin: " + origin);
         }
     }
 

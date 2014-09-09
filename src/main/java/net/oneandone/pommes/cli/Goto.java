@@ -66,10 +66,7 @@ public class Goto extends Base {
             throw new IOException("not found: " + substring);
         }
         pom = select(selection);
-        svnurl = pom.svnUrl();
-        if (svnurl == null) {
-            throw new IOException("scm url not supported: " + pom.scm);
-        }
+        svnurl = pom.projectUrl();
         directory = fstab.locateOpt(svnurl);
         if (directory == null) {
             throw new ArgumentException("no mount point for " + svnurl);

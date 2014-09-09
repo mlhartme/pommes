@@ -56,7 +56,7 @@ public class Umount extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         Map<FileNode, String> removes;
-        String id;
+        String origin;
         FileNode located;
 
         if (root == null) {
@@ -84,8 +84,8 @@ public class Umount extends Base {
         if (stale) {
             try (Database database = Database.load(console.world)) {
                 for (FileNode directory : new HashSet<>(removes.keySet())) {
-                    id = "svn:" + Database.withSlash(removes.get(directory)) + "pom.xml";
-                    if (database.lookup(id) != null) {
+                    origin = Database.withSlash(removes.get(directory)) + "pom.xml";
+                    if (database.lookup(origin) != null) {
                         removes.remove(directory);
                     }
                 }
