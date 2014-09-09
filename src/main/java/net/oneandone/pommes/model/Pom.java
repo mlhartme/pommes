@@ -16,39 +16,14 @@
 package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.fs.Node;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
-public class Pom {
+public class Pom extends Coordinates {
     public static Pom forComposer(Node composer) {
         Node trunk;
 
         trunk = composer.getParent();
         return new Pom("1and1-sales", trunk.getParent().getName(), "0", "scm:" + trunk.getURI().toString());
-    }
-
-    public static Pom forGav(String gav, String scm) {
-        String[] splitted;
-
-        splitted = gav.split(":");
-        if (splitted.length != 3) {
-            throw new IllegalArgumentException("expected groupId:artifactId:version, got " + gav);
-        }
-        return new Pom(splitted[0], splitted[1], splitted[2], scm);
-    }
-
-    public static Pom forGa(String ga, String v, String scm) {
-        String[] splitted;
-
-        splitted = ga.split(":");
-        if (splitted.length < 2) {
-            throw new IllegalArgumentException("expected groupId:artifactId, got " + ga);
-        }
-        return new Pom(splitted[0], splitted[1], v, scm);
-    }
-
-    public static Pom forDependency(Dependency dependency) {
-        return new Pom(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), "depdendency/pom.xml");
     }
 
     public static Pom forProject(MavenProject project, String origin) {
@@ -59,28 +34,12 @@ public class Pom {
 
     public final String origin;
 
-    public final String groupId;
-
-    public final String artifactId;
-
-    public final String version;
-
     public Pom(String groupId, String artifactId, String version, String origin) {
+        super(groupId, artifactId, version);
         if (origin == null || origin.endsWith("/")) {
             throw new IllegalArgumentException(origin);
         }
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
         this.origin = origin;
-    }
-
-    public String toGaString() {
-        return groupId + ":" + artifactId;
-    }
-
-    public String toGavString() {
-        return toGaString() + ":" + version;
     }
 
     public String toLine() {
@@ -98,9 +57,5 @@ public class Pom {
     @Override
     public String toString() {
         return toLine();
-    }
-
-    public boolean gavEquals(Pom other) {
-        return artifactId.equals(other.artifactId) && groupId.equals(other.groupId) && version.equals(other.version);
     }
 }

@@ -24,10 +24,10 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
  */
 public class Reference implements Comparable<Reference> {
     public final Document document;
-    public final Pom from;
-    public final Pom to;
+    public final Coordinates from;
+    public final Coordinates to;
 
-    public Reference(Document document, Pom from, Pom to) {
+    public Reference(Document document, Coordinates from, Coordinates to) {
         this.document = document;
         this.from = from;
         this.to = to;

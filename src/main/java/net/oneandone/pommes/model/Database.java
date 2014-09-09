@@ -245,7 +245,7 @@ public class Database implements AutoCloseable {
 
         doc = document(origin, Pom.forProject(mavenProject, origin));
         for (Dependency dependency : mavenProject.getDependencies()) {
-            Pom dep = Pom.forDependency(dependency);
+            Coordinates dep = Coordinates.forDependency(dependency);
 
             // index groupId:artifactId for non-version searches
             doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
@@ -325,12 +325,15 @@ public class Database implements AutoCloseable {
     }
 
     public static Pom toPom(Document document) {
-        return Pom.forGav(document.get(Database.GAV), document.get(Database.ORIGIN));
+        Coordinates c;
+
+        c = Coordinates.forGav(document.get(Database.GAV));
+        return new Pom(c.groupId, c.artifactId, c.version, document.get(Database.ORIGIN));
     }
 
     //-- searching
 
-    public Pom findLatestVersion(Pom gav) throws IOException {
+    public Coordinates findLatestVersion(Coordinates gav) throws IOException {
         List<Reference> list;
 
         list = queryGa(Database.GA, gav.toGaString(), null);
@@ -357,7 +360,7 @@ public class Database implements AutoCloseable {
     private List<Reference> queryGa(String gaField, String gaValue, String gavField) throws IOException {
         List<Reference> list;
         Pom from;
-        Pom to;
+        Coordinates to;
 
         list = new ArrayList<>();
         for (Document doc : doQuery(new TermQuery(new Term(gaField, gaValue)))) {
@@ -368,13 +371,13 @@ public class Database implements AutoCloseable {
         return list;
     }
 
-    private Pom getReference(Document doc, String gavField, String gaValue) {
-        Pom result;
-        Pom gav;
+    private Coordinates getReference(Document doc, String gavField, String gaValue) {
+        Coordinates result;
+        Coordinates gav;
 
         result = null;
         for (IndexableField field : doc.getFields(gavField)) {
-            gav = Pom.forGav(field.stringValue(), null);
+            gav = Coordinates.forGav(field.stringValue());
             if (gav.toGaString().equals(gaValue)) {
                 if (result != null) {
                     throw new IllegalStateException("ambiguous: " + result + " vs " + gav);
@@ -436,8 +439,8 @@ public class Database implements AutoCloseable {
         iterator = results.iterator();
         while (iterator.hasNext()) {
             Reference ubi = iterator.next();
-            Pom gav = ubi.from;
-            Pom latest = findLatestVersion(gav);
+            Coordinates gav = ubi.from;
+            Coordinates latest = findLatestVersion(gav);
             if (!gav.gavEquals(latest)) {
                 iterator.remove();
             }
@@ -513,16 +516,16 @@ public class Database implements AutoCloseable {
     }
 
     private void addAggregated(List<Reference> results, Reference ubi, String lowerVersion, String upperVersion) {
-        Pom previous;
+        Coordinates previous;
         String version;
-        Pom aggregated;
+        Coordinates aggregated;
 
         previous = ubi.from;
         version = lowerVersion;
         if (!lowerVersion.equals(upperVersion)) {
             version = "[" + lowerVersion + "," + upperVersion + "]";
         }
-        aggregated = new Pom(previous.groupId, previous.artifactId, version, previous.origin);
+        aggregated = new Coordinates(previous.groupId, previous.artifactId, version);
         results.add(new Reference(ubi.document, aggregated, ubi.to));
     }
 

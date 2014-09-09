@@ -27,7 +27,6 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import org.apache.lucene.document.Document;
-import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
@@ -157,11 +156,6 @@ public class DatabaseAdd extends DatabaseBase {
                             pom.copyFile(local);
                             console.info.println(pom.getURI().toString());
                             project = maven.loadPom(local);
-                            try {
-                                checkScm(project, pom);
-                            } catch (IOException e) {
-                                console.error.println("WARNING: " + e.getMessage());
-                            }
                             return Database.document(pom.getURI().toString(), project);
                         } finally {
                             local.deleteFile();
@@ -187,26 +181,6 @@ public class DatabaseAdd extends DatabaseBase {
     }
 
     //--
-
-    private static void checkScm(MavenProject project, Node node) throws IOException {
-        Scm scm;
-        String devel;
-        String origin;
-
-        scm = project.getScm();
-        if (scm != null) {
-            devel = scm.getDeveloperConnection();
-            if (devel != null) {
-                if (devel.startsWith(Database.SCM_SVN)) {
-                    devel = Database.withSlash(devel);
-                    origin = "scm:" + Database.withSlash(node.getParent().getURI().toString());
-                    if (!devel.equals(origin)) {
-                        throw new IOException("scm uri mismatch: expected " + origin + ", got " + devel);
-                    }
-                }
-            }
-        }
-    }
 
     public List<Node> projects() throws IOException {
         List<Node> result;
