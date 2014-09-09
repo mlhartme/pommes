@@ -16,7 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
-import net.oneandone.pommes.model.Coordinates;
+import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Reference;
@@ -72,7 +72,7 @@ public class Users extends SearchBase<Reference> {
     public List<Reference> search(Database database) throws IOException, InvalidVersionSpecificationException, ProjectBuildingException {
         FileNode origin;
         List<Reference> result;
-        Coordinates gav;
+        GAV gav;
         MavenProject project;
 
         result = new ArrayList<>();
@@ -80,14 +80,14 @@ public class Users extends SearchBase<Reference> {
         if (gavString == null) {
             origin = console.world.file("pom.xml");
             project = maven.loadPom(origin);
-            gav = Pom.forProject(project, origin.getURI().toString());
+            gav = Pom.forProject(project, origin.getURI().toString()).coordinates;
         } else {
             switch (Strings.count(gavString, ":")) {
                 case 1:
-                    gav = Pom.forGa(gavString, "0");
+                    gav = GAV.forGa(gavString, "0");
                     break;
                 case 2:
-                    gav = Pom.forGav(gavString);
+                    gav = GAV.forGav(gavString);
                     break;
                 default:
                     throw new ArgumentException(gavString);

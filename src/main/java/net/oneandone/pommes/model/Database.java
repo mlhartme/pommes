@@ -230,11 +230,11 @@ public class Database implements AutoCloseable {
 
         doc = new Document();
         doc.add(new StringField(ORIGIN, origin, Field.Store.YES));
-        doc.add(new StringField(GROUP, pom.groupId, Field.Store.YES));
-        doc.add(new StringField(ARTIFACT, pom.artifactId, Field.Store.YES));
-        doc.add(new StringField(VERSION, pom.version, Field.Store.YES));
-        doc.add(new StringField(GA, pom.toGaString(), Field.Store.YES));
-        doc.add(new StringField(GAV, pom.toGavString(), Field.Store.YES));
+        doc.add(new StringField(GROUP, pom.coordinates.groupId, Field.Store.YES));
+        doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
+        doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
+        doc.add(new StringField(GA, pom.coordinates.toGaString(), Field.Store.YES));
+        doc.add(new StringField(GAV, pom.coordinates.toGavString(), Field.Store.YES));
         return doc;
     }
 
@@ -245,7 +245,7 @@ public class Database implements AutoCloseable {
 
         doc = document(origin, Pom.forProject(mavenProject, origin));
         for (Dependency dependency : mavenProject.getDependencies()) {
-            Coordinates dep = Coordinates.forDependency(dependency);
+            net.oneandone.pommes.model.GAV dep = net.oneandone.pommes.model.GAV.forDependency(dependency);
 
             // index groupId:artifactId for non-version searches
             doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
@@ -262,8 +262,8 @@ public class Database implements AutoCloseable {
         parent = mavenProject.getParent();
         if (parent != null) {
             parPom = Pom.forProject(parent, origin);
-            doc.add(new StringField(PAR_GA, parPom.toGaString(), Field.Store.YES));
-            doc.add(new StringField(PAR_GAV, parPom.toGavString(), Field.Store.YES));
+            doc.add(new StringField(PAR_GA, parPom.coordinates.toGaString(), Field.Store.YES));
+            doc.add(new StringField(PAR_GAV, parPom.coordinates.toGavString(), Field.Store.YES));
         }
         return doc;
     }
@@ -325,15 +325,15 @@ public class Database implements AutoCloseable {
     }
 
     public static Pom toPom(Document document) {
-        Coordinates c;
+        net.oneandone.pommes.model.GAV c;
 
-        c = Coordinates.forGav(document.get(Database.GAV));
-        return new Pom(c.groupId, c.artifactId, c.version, document.get(Database.ORIGIN));
+        c = net.oneandone.pommes.model.GAV.forGav(document.get(Database.GAV));
+        return new Pom(document.get(Database.ORIGIN), new GAV(c.groupId, c.artifactId, c.version));
     }
 
     //-- searching
 
-    public Coordinates findLatestVersion(Coordinates gav) throws IOException {
+    public net.oneandone.pommes.model.GAV findLatestVersion(net.oneandone.pommes.model.GAV gav) throws IOException {
         List<Reference> list;
 
         list = queryGa(Database.GA, gav.toGaString(), null);
@@ -344,40 +344,40 @@ public class Database implements AutoCloseable {
     }
 
     public List<Reference> findDependeesIgnoringVersion(String groupId, String artifactId) throws IOException {
-        Pom gav;
+        GAV gav;
 
-        gav = new Pom(groupId, artifactId, "", null);
+        gav = new GAV(groupId, artifactId, "");
         return queryGa(Database.DEP_GA, gav.toGaString(), Database.DEP_GAV);
     }
 
     public List<Reference> findChildrenIgnoringVersion(String groupId, String artifactId) throws IOException {
-        Pom pom;
+        GAV gav;
 
-        pom = new Pom(groupId, artifactId, "", null);
-        return queryGa(Database.PAR_GA, pom.toGaString(), Database.PAR_GAV);
+        gav = new GAV(groupId, artifactId, "");
+        return queryGa(Database.PAR_GA, gav.toGaString(), Database.PAR_GAV);
     }
 
     private List<Reference> queryGa(String gaField, String gaValue, String gavField) throws IOException {
         List<Reference> list;
-        Pom from;
-        Coordinates to;
+        GAV from;
+        GAV to;
 
         list = new ArrayList<>();
         for (Document doc : doQuery(new TermQuery(new Term(gaField, gaValue)))) {
-            from = toPom(doc);
+            from = toPom(doc).coordinates;
             to = gavField == null ? null : getReference(doc, gavField, gaValue);
             list.add(new Reference(doc, from, to));
         }
         return list;
     }
 
-    private Coordinates getReference(Document doc, String gavField, String gaValue) {
-        Coordinates result;
-        Coordinates gav;
+    private net.oneandone.pommes.model.GAV getReference(Document doc, String gavField, String gaValue) {
+        net.oneandone.pommes.model.GAV result;
+        net.oneandone.pommes.model.GAV gav;
 
         result = null;
         for (IndexableField field : doc.getFields(gavField)) {
-            gav = Coordinates.forGav(field.stringValue());
+            gav = net.oneandone.pommes.model.GAV.forGav(field.stringValue());
             if (gav.toGaString().equals(gaValue)) {
                 if (result != null) {
                     throw new IllegalStateException("ambiguous: " + result + " vs " + gav);
@@ -439,8 +439,8 @@ public class Database implements AutoCloseable {
         iterator = results.iterator();
         while (iterator.hasNext()) {
             Reference ubi = iterator.next();
-            Coordinates gav = ubi.from;
-            Coordinates latest = findLatestVersion(gav);
+            net.oneandone.pommes.model.GAV gav = ubi.from;
+            net.oneandone.pommes.model.GAV latest = findLatestVersion(gav);
             if (!gav.gavEquals(latest)) {
                 iterator.remove();
             }
@@ -516,16 +516,16 @@ public class Database implements AutoCloseable {
     }
 
     private void addAggregated(List<Reference> results, Reference ubi, String lowerVersion, String upperVersion) {
-        Coordinates previous;
+        net.oneandone.pommes.model.GAV previous;
         String version;
-        Coordinates aggregated;
+        net.oneandone.pommes.model.GAV aggregated;
 
         previous = ubi.from;
         version = lowerVersion;
         if (!lowerVersion.equals(upperVersion)) {
             version = "[" + lowerVersion + "," + upperVersion + "]";
         }
-        aggregated = new Coordinates(previous.groupId, previous.artifactId, version);
+        aggregated = new net.oneandone.pommes.model.GAV(previous.groupId, previous.artifactId, version);
         results.add(new Reference(ubi.document, aggregated, ubi.to));
     }
 

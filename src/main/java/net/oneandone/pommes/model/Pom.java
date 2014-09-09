@@ -18,32 +18,31 @@ package net.oneandone.pommes.model;
 import net.oneandone.sushi.fs.Node;
 import org.apache.maven.project.MavenProject;
 
-public class Pom extends Coordinates {
+public class Pom {
     public static Pom forComposer(Node composer) {
-        Node trunk;
-
-        trunk = composer.getParent();
-        return new Pom("1and1-sales", trunk.getParent().getName(), "0", "scm:" + trunk.getURI().toString());
+        return new Pom(composer.getURI().toString(), new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"));
     }
 
     public static Pom forProject(MavenProject project, String origin) {
-        return new Pom(project.getGroupId(), project.getArtifactId(), project.getVersion(), origin);
+        return new Pom(origin, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
     }
 
     //--
 
+    public final GAV coordinates;
+
     public final String origin;
 
-    public Pom(String groupId, String artifactId, String version, String origin) {
-        super(groupId, artifactId, version);
+    public Pom(String origin, GAV coordinates) {
         if (origin == null || origin.endsWith("/")) {
             throw new IllegalArgumentException(origin);
         }
         this.origin = origin;
+        this.coordinates = coordinates;
     }
 
     public String toLine() {
-        return groupId + ":" + artifactId + ":" + version + " @ " + origin;
+        return coordinates.toGavString() + " @ " + origin;
     }
 
     /**
