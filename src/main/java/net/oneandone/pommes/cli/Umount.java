@@ -57,6 +57,7 @@ public class Umount extends Base {
         String scannedUrl;
         Map<FileNode, String> removes;
         String id;
+        FileNode located;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
@@ -70,11 +71,14 @@ public class Umount extends Base {
         removes = new HashMap<>();
         for (FileNode directory : checkouts) {
             scannedUrl = scanUrl(directory);
-            if (directory.equals(fstab.locate(scannedUrl))) {
+            located = fstab.locateOpt(scannedUrl);
+            if (located == null) {
+                console.info.println("? " + directory + " (" + scannedUrl + ")");
+            } else if (directory.equals(located)) {
                 removes.put(directory, scannedUrl);
             } else {
                 console.info.println("C " + directory + " (" + scannedUrl + ")");
-                console.info.println("  expected in directory " + fstab.locate(scannedUrl));
+                console.info.println("  expected in directory " + located);
             }
         }
         if (stale) {

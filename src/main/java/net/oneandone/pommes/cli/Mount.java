@@ -61,8 +61,8 @@ public class Mount extends Base {
             for (Pom pom : database.substring(substring)) {
                 svnurl = pom.svnUrl();
                 if (svnurl != null) {
-                    directory = fstab.locate(svnurl);
-                    if (directory.hasAnchestor(root)) {
+                    directory = fstab.locateOpt(svnurl);
+                    if (directory != null && directory.hasAnchestor(root)) {
                         adds.put(directory, svnurl);
                     }
                 }

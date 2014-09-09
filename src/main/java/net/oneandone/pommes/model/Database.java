@@ -124,6 +124,10 @@ public class Database implements AutoCloseable {
     /** created on demand */
     private IndexSearcher searcher;
 
+    /**
+     * @param directory valid lucene directory or none-existing directory
+     * @param global zip file or null
+     */
     public Database(FileNode directory, Node global) {
         this.directory = directory;
         this.global = global;

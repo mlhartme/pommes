@@ -61,8 +61,8 @@ public class Find extends SearchBase<Pom> {
         result = new StringBuilder(pom.toLine());
         url = pom.svnUrl();
         if (url != null) {
-            directory = fstab.locate(url);
-            if (directory.exists()) {
+            directory = fstab.locateOpt(url);
+            if (directory != null && directory.exists()) {
                 result.append(' ').append(directory.getAbsolute());
             }
         } else {

@@ -70,10 +70,13 @@ public class Goto extends Base {
         if (svnurl == null) {
             throw new IOException("scm url not supported: " + pom.scm);
         }
-        directory = fstab.locate(svnurl);
+        directory = fstab.locateOpt(svnurl);
+        if (directory == null) {
+            throw new ArgumentException("no mount point for " + svnurl);
+        }
         if (directory.exists()) {
             if (!scanUrl(directory).equals(svnurl)) {
-                throw new IOException("directory already exists with a diffenrent checkout: " + directory);
+                throw new IOException("directory already exists with a different checkout: " + directory);
             }
         } else {
             doCheckout(directory, svnurl);

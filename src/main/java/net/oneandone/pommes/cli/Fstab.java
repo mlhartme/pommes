@@ -114,7 +114,7 @@ public class Fstab {
         return null;
     }
 
-    public FileNode locate(String url) {
+    public FileNode locateOpt(String url) {
         String path;
         int idx;
         int beforeName;
@@ -135,6 +135,6 @@ public class Fstab {
                 return line.directory.join(path);
             }
         }
-        throw new ArgumentException("no mount point for url " + url);
+        return null;
     }
 }

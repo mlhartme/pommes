@@ -132,7 +132,12 @@ public abstract class Base implements Command {
         } else {
             console.info.println("[svn co " + svnurl + " " + directory.getName() + "]");
         }
-        svn.exec(console.verbose);
+        if (console.getVerbose()) {
+            svn.exec(console.verbose);
+        } else {
+            // exec into string (and ignore it) - otherwise, Failure Exceptions cannot contains the output
+            svn.exec();
+        }
     }
 
     //--
