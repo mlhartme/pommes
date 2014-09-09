@@ -125,7 +125,7 @@ public class Main extends Cli implements Command {
         console.info.println("database commands");
         console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");
-        console.info.println("  'database-add' url*");
+        console.info.println("  'database-add' url* '-withBranches'?");
         console.info.println("                        adds projects found under the specified urls to the database;");
         console.info.println("                        use '-' pattern to exclude from the url before;");
         console.info.println("                        (urls default to all ciso urls if not specified)");

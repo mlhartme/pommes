@@ -20,13 +20,12 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
+import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.fs.filter.Action;
 import net.oneandone.sushi.fs.filter.Filter;
-import net.oneandone.sushi.fs.filter.Predicate;
 import org.apache.lucene.document.Document;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
@@ -39,22 +38,30 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class DatabaseAdd extends DatabaseBase {
+    @Option("withBranches")
+    private boolean withBranches;
+
     private List<Node> nodes = new ArrayList<>();
-    private List<Filter> filters = new ArrayList<>();
+    private List<Filter> excludes = new ArrayList<>();
 
     @Remaining
     public void remaining(String str) {
-        Filter filter;
+        Filter exclude;
 
         if (str.startsWith("-")) {
-            if (filters.isEmpty()) {
+            if (excludes.isEmpty()) {
                 throw new ArgumentException("missing url before exclude " + str);
             }
             if (str.startsWith("/") || str.endsWith("/")) {
                 throw new ArgumentException("do not use '/' before or after excludes: " + str);
             }
-            filter = filters.get(filters.size() - 1);
-            filter.exclude("**/" + str.substring(1) + "/**/*");
+            exclude = excludes.get(excludes.size() - 1);
+            if (exclude == null) {
+                exclude = new Filter();
+                excludes.set(excludes.size() - 1, exclude);
+            }
+            // TODO: sushi bug? .exclude didn't work ...
+            exclude.include("**/" + str.substring(1));
         } else {
             try {
                 nodes.add(console.world.node("svn:" + str));
@@ -63,16 +70,7 @@ public class DatabaseAdd extends DatabaseBase {
             } catch (NodeInstantiationException e) {
                 throw new ArgumentException(str + ": access failed", e);
             }
-            filter = new Filter();
-            filter.include("**/trunk");
-            filter.exclude("**/trunk/*");
-            filter.exclude("**/trunk/**/*");
-            filter.exclude("**/branches/**/*");
-            filter.exclude("**/tags/**/*");
-            filter.exclude("**/old/**/*");
-            filter.exclude("**/src/**/*");
-            filter.predicate(Predicate.DIRECTORY);
-            filters.add(filter);
+            excludes.add(null);
         }
     }
 
@@ -81,16 +79,16 @@ public class DatabaseAdd extends DatabaseBase {
     }
 
     public void invoke(Database database) throws Exception {
-        List<Node> trunks;
+        List<Node> projects;
         ProjectIterator iterator;
 
         if (nodes.size() == 0) {
             throw new ArgumentException("missing urls");
         }
         console.info.println("scanning svn ...");
-        trunks = trunks();
+        projects = projects();
         console.info.println("indexing ...");
-        iterator = new ProjectIterator(console, maven, trunks.iterator());
+        iterator = new ProjectIterator(console, maven, projects.iterator());
         database.index(iterator);
         iterator.summary();
     }
@@ -98,16 +96,16 @@ public class DatabaseAdd extends DatabaseBase {
     public static class ProjectIterator implements Iterator<Document> {
         private final Console console;
         private final Maven maven;
-        private final Iterator<Node> trunks;
+        private final Iterator<Node> projects;
 
         private Document current;
         private int count;
         private int errors;
 
-        public ProjectIterator(Console console, Maven maven, Iterator<Node> trunks) {
+        public ProjectIterator(Console console, Maven maven, Iterator<Node> projects) {
             this.console = console;
             this.maven = maven;
-            this.trunks = trunks;
+            this.projects = projects;
             this.current = iter();
         }
 
@@ -142,17 +140,17 @@ public class DatabaseAdd extends DatabaseBase {
         }
 
         private Document iterUnchecked() throws IOException {
-            Node trunk;
             Node pom;
-            Node composer;
             FileNode local;
             MavenProject project;
 
-            while (trunks.hasNext()) {
-                trunk = trunks.next();
-                pom = trunk.join("pom.xml");
+            while (projects.hasNext()) {
+                pom = projects.next();
                 try {
-                    if (pom.exists()) {
+                    if (pom.getName().equals("composer.json")) {
+                        count++;
+                        return Database.document(pom.getURI().toString(), Pom.forComposer(pom));
+                    } else {
                         count++;
                         local = console.world.getTemp().createTempFile();
                         try {
@@ -163,17 +161,10 @@ public class DatabaseAdd extends DatabaseBase {
                                 checkScm(project, pom);
                             } catch (IOException e) {
                                 console.error.println("WARNING: " + e.getMessage());
-                                e.printStackTrace(console.verbose);
                             }
                             return Database.document(pom.getURI().toString(), project);
                         } finally {
                             local.deleteFile();
-                        }
-                    } else {
-                        composer = trunk.join("composer.json");
-                        if (composer.exists()) {
-                            count++;
-                            return Database.document(composer.getURI().toString(), Pom.forComposer(composer));
                         }
                     }
                 } catch (RuntimeException e) {
@@ -217,36 +208,77 @@ public class DatabaseAdd extends DatabaseBase {
         }
     }
 
-    public List<Node> trunks() throws IOException {
+    public List<Node> projects() throws IOException {
         List<Node> result;
 
         result = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
-            scan(nodes.get(i), filters.get(i), result);
+            scan(nodes.get(i), excludes.get(i), true, result);
         }
         return result;
     }
 
-    public void scan(Node root, Filter filter, final List<Node> result) throws IOException {
-        filter.invoke(root, new Action() {
-            @Override
-            public void enter(Node node, boolean b) {
-                console.verbose.println("scanning ... " + node.getURI());
-            }
+    public void scan(Node root, Filter excludes, boolean recurse, final List<Node> result) throws IOException {
+        List<? extends Node> children;
+        Node project;
+        Node trunk;
+        Node branches;
+        List<? extends Node> grandChildren;
 
-            @Override
-            public void enterFailed(Node node, boolean b, IOException e) throws IOException {
-                throw e;
+        if (excludes != null && excludes.matches(root.getPath())) {
+            return;
+        }
+        console.verbose.println("scanning ... " + root.getURI());
+        children = root.list();
+        if (children == null) {
+            return;
+        }
+        project = child(children, "pom.xml");
+        if (project != null) {
+            result.add(project);
+            return;
+        }
+        project = child(children, "composer.json");
+        if (project != null) {
+            result.add(project);
+            return;
+        }
+        trunk = child(children, "trunk");
+        if (trunk != null) {
+            scan(trunk, excludes, false, result);
+        }
+        branches = child(children, "branches");
+        if (branches != null && withBranches) {
+            grandChildren = branches.list();
+            if (grandChildren != null) {
+                for (Node grandChild : grandChildren) {
+                    scan(grandChild, excludes, false, result);
+                }
             }
+        }
+        if (trunk != null || branches != null) {
+            return;
+        }
 
-            @Override
-            public void leave(Node node, boolean b) {
-            }
+        if (child(children, "src") != null) {
+            // probably an old ant build
+            return;
+        }
 
-            @Override
-            public void select(Node node, boolean b) {
-                result.add(node);
+        if (recurse) {
+            // recurse
+            for (Node node : children) {
+                scan(node, excludes, true, result);
             }
-        });
+        }
+    }
+
+    private static Node child(List<? extends Node> childen, String name) {
+        for (Node node : childen) {
+            if (node.getName().equals(name)) {
+                return node;
+            }
+        }
+        return null;
     }
 }
