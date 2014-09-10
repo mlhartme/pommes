@@ -632,10 +632,24 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public List<Pom> substring(String substring) throws IOException {
+    public List<Pom> substring(Origin origin, String substring) throws IOException {
         BooleanQuery q;
 
         q = new BooleanQuery();
+        q.setMinimumNumberShouldMatch(1);
+        switch (origin) {
+            case ANY:
+                // do nothing
+                break;
+            case TRUNC:
+                q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/trunk/*")), BooleanClause.Occur.MUST);
+                break;
+            case BRANCH:
+                q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/branches/*")), BooleanClause.Occur.MUST);
+                break;
+            default:
+                throw new IllegalStateException(origin.toString());
+        }
         q.add(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")), BooleanClause.Occur.SHOULD);
         q.add(new WildcardQuery(new Term(Database.ORIGIN, "*" + substring + "*")), BooleanClause.Occur.SHOULD);
         return query(q);

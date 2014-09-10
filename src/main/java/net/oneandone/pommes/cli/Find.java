@@ -44,7 +44,7 @@ public class Find extends SearchBase<Pom> {
     private String substring;
 
     public List<Pom> search(Database database) throws IOException, QueryNodeException {
-        return query ? database.query(substring) : database.substring(substring);
+        return query ? database.query(substring) : database.substring(origin(), substring);
     }
 
     @Override
