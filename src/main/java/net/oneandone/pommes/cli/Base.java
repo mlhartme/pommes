@@ -17,10 +17,8 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Origin;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -39,25 +37,9 @@ public abstract class Base implements Command {
     protected final Console console;
     protected final Maven maven;
 
-    @Option("any")
-    private boolean originAny;
-
-    @Option("branch")
-    private boolean originBranch;
-
     public Base(Console console, Maven maven) {
         this.console = console;
         this.maven = maven;
-    }
-
-    protected Origin origin() {
-        if (originAny) {
-            return Origin.ANY;
-        } else if (originBranch) {
-            return Origin.BRANCH;
-        } else {
-            return Origin.TRUNK;
-        }
     }
 
     protected void updateCheckouts(Map<FileNode, String> adds, Map<FileNode, String> removes) throws IOException {

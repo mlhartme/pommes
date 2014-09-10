@@ -18,7 +18,6 @@ package net.oneandone.pommes.cli;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Origin;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Reference;
 import net.oneandone.sushi.cli.ArgumentException;
@@ -60,6 +59,12 @@ public class Users extends SearchBase<Reference> {
         }
         gavString = str;
     }
+
+    @Option("all")
+    private boolean all;
+
+    @Option("branch")
+    private boolean branch;
 
     @Option("include")
     protected Database.Includes includes = Database.Includes.MAJOR;
@@ -174,29 +179,22 @@ public class Users extends SearchBase<Reference> {
     }
 
     private void filterOrigin(List<Reference> references) {
-        Origin o;
         Iterator<Reference> iter;
         Reference reference;
 
-        o = origin();
         iter = references.iterator();
         while (iter.hasNext()) {
             reference = iter.next();
-            switch (o) {
-                case ANY:
-                    break;
-                case TRUNK:
-                    if (!reference.from.origin.contains("/trunk/")) {
-                        iter.remove();
-                    }
-                    break;
-                case BRANCH:
-                    if (!reference.from.origin.contains("/branches/")) {
-                        iter.remove();
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException();
+            if (all) {
+                // do nothing
+            } else if (branch) {
+                if (!reference.from.origin.contains("/branches/")) {
+                    iter.remove();
+                }
+            } else {
+                if (!reference.from.origin.contains("/trunk/")) {
+                    iter.remove();
+                }
             }
         }
     }

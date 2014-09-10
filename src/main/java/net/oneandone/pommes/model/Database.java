@@ -632,27 +632,28 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public List<Pom> substring(Origin origin, String substring) throws IOException {
+    public List<Pom> substring(String queryString) throws IOException, QueryNodeException {
         BooleanQuery q;
+        Query query;
 
-        q = new BooleanQuery();
-        q.setMinimumNumberShouldMatch(1);
-        switch (origin) {
-            case ANY:
-                // do nothing
-                break;
-            case TRUNK:
-                q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/trunk/*")), BooleanClause.Occur.MUST);
-                break;
-            case BRANCH:
-                q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/branches/*")), BooleanClause.Occur.MUST);
-                break;
-            default:
-                throw new IllegalStateException(origin.toString());
+        if (queryString.startsWith("%")) {
+            query = new StandardQueryParser().parse(queryString.substring(1), Database.GAV);
+        } else if (queryString.startsWith("@")) {
+            query = new WildcardQuery(new Term(Database.ORIGIN, "*" + queryString.substring(1) + "*"));
+        } else if (queryString.endsWith("%a")) {
+            query = new WildcardQuery(new Term(Database.GAV, "*" + queryString.substring(0, queryString.length() - 2) + "*"));
+        } else if (queryString.endsWith("%b")) {
+            q = new BooleanQuery();
+            q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/branches/*")), BooleanClause.Occur.MUST);
+            q.add(new WildcardQuery(new Term(Database.GAV, "*" + queryString.substring(0, queryString.length() - 2) + "*")), BooleanClause.Occur.MUST);
+            query = q;
+        } else {
+            q = new BooleanQuery();
+            q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/trunk/*")), BooleanClause.Occur.MUST);
+            q.add(new WildcardQuery(new Term(Database.GAV, "*" + queryString + "*")), BooleanClause.Occur.MUST);
+            query = q;
         }
-        q.add(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")), BooleanClause.Occur.SHOULD);
-        q.add(new WildcardQuery(new Term(Database.ORIGIN, "*" + substring + "*")), BooleanClause.Occur.SHOULD);
-        return query(q);
+        return query(query);
     }
 
     //--
@@ -669,10 +670,6 @@ public class Database implements AutoCloseable {
             default:
                 throw new IllegalStateException("ambiguous origin: " + origin);
         }
-    }
-
-    public List<Pom> query(String queryString) throws IOException, QueryNodeException {
-        return query(new StandardQueryParser().parse(queryString, Database.GAV));
     }
 
     public List<Pom> query(Query query) throws IOException {

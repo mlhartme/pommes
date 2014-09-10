@@ -40,12 +40,7 @@ public class Main extends Cli implements Command {
 
     @Child("find")
     public Find find() throws IOException {
-        return new Find(false, console, maven());
-    }
-
-    @Child("query")
-    public Find query() throws IOException {
-        return new Find(true, console, maven());
+        return new Find(console, maven());
     }
 
     @Child("users")
@@ -106,12 +101,14 @@ public class Main extends Cli implements Command {
         console.info.println("Usage: ");
         console.info.println("  'pommes' ['-v'|'-e'] command args*");
         console.info.println("search commands");
-        console.info.println("  'find' substring      prints projects who's coordinates or scm url contains substring");
-        console.info.println("  'query' query         prints projects matching the specified Lucene query");
-        console.info.println("  'users' gav?          prints projects that use the specified artifact as a dependency of parent");
+        console.info.println("  'find' query          prints projects matching this query");
+        console.info.println("  'users' '-all'? '-branch'? gav?");
+        console.info.println("                        prints projects that use the specified artifact as a dependency of parent");
+        console.info.println("                        use -branch to search in branch projects only");
+        console.info.println("                        use -all to search all projects; default is to search trunk projects only");
         console.info.println("                        (gav defaults to current project)");
         console.info.println("mount commands");
-        console.info.println("  'mount' substring root?");
+        console.info.println("  'mount' query root?");
         console.info.println("                        mounts all project matches located under the specified root directory;");
         console.info.println("                        directory defaults to the current directory; skips existing checkouts;");
         console.info.println("                        asks before changing anything on your disk;");
@@ -121,7 +118,7 @@ public class Main extends Cli implements Command {
         console.info.println("                        a checkout is stale if the project has been removed from the database;");
         console.info.println("                        asks before changing anything on your disk");
         console.info.println("  'status' root?        prints all checkouts under the specified directory, along C or ? markers");
-        console.info.println("  'goto' substring      prompts to select a matching project and checks it out when necessary");
+        console.info.println("  'goto' query          prompts to select a matching project and checks it out when necessary");
         console.info.println("database commands");
         console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");
@@ -137,6 +134,13 @@ public class Main extends Cli implements Command {
                 + "no write updates to the global database");
         console.info.println("  '-global'             perform read/write update from/to global database");
         console.info.println("  '-local'              neither read- nor write updates from/to global database");
+        console.info.println();
+        console.info.println("queries:");
+        console.info.println("  substring             substring in groupId:artifactId:version of trunk projects");
+        console.info.println("  substring '%b'        substring in groupId:artifactId:version of branch projects");
+        console.info.println("  substring '%a'        substring in groupId:artifactId:version of all projects");
+        console.info.println("  '@' substring         substring in origin");
+        console.info.println("  '%' string            for experts: Lucene query");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database file.");

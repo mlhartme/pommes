@@ -32,19 +32,16 @@ import java.util.List;
 public class Find extends SearchBase<Pom> {
     private final Fstab fstab;
 
-    private final boolean query;
-
-    public Find(boolean query, Console console, Maven maven) throws IOException {
+    public Find(Console console, Maven maven) throws IOException {
         super(console, maven);
-        this.query = query;
         this.fstab = Fstab.load(console.world);
     }
 
-    @Value(name = "substring", position = 1)
-    private String substring;
+    @Value(name = "query", position = 1)
+    private String query;
 
     public List<Pom> search(Database database) throws IOException, QueryNodeException {
-        return query ? database.query(substring) : database.substring(origin(), substring);
+        return database.substring(query);
     }
 
     @Override

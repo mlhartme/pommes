@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Mount extends Base {
-    @Value(name = "pattern", position = 1)
-    private String substring;
+    @Value(name = "query", position = 1)
+    private String query;
 
     private FileNode root;
 
@@ -58,7 +58,7 @@ public class Mount extends Base {
         fstab = Fstab.load(console.world);
         adds = new HashMap<>();
         try (Database database = Database.load(console.world)) {
-            for (Pom pom : database.substring(origin(), substring)) {
+            for (Pom pom : database.substring(query)) {
                 svnurl = pom.projectUrl();
                 directory = fstab.locateOpt(svnurl);
                 if (directory != null && directory.hasAnchestor(root)) {

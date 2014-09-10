@@ -17,7 +17,6 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Origin;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
@@ -26,13 +25,11 @@ import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Goto extends Base {
-    @Value(name = "pattern", position = 1)
-    private String substring;
+    @Value(name = "query", position = 1)
+    private String query;
 
     private FileNode root;
 
@@ -61,10 +58,10 @@ public class Goto extends Base {
         }
         fstab = Fstab.load(console.world);
         try (Database database = Database.load(console.world)) {
-            selection = database.substring(origin(), substring);
+            selection = database.substring(query);
         }
         if (selection.isEmpty()) {
-            throw new IOException("not found: " + substring);
+            throw new IOException("not found: " + query);
         }
         pom = select(selection);
         svnurl = pom.projectUrl();
