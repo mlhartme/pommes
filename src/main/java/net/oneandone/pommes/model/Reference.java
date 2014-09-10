@@ -24,10 +24,10 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
  */
 public class Reference implements Comparable<Reference> {
     public final Document document;
-    public final GAV from;
+    public final Pom from;
     public final GAV to;
 
-    public Reference(Document document, GAV from, GAV to) {
+    public Reference(Document document, Pom from, GAV to) {
         this.document = document;
         this.from = from;
         this.to = to;
@@ -40,12 +40,12 @@ public class Reference implements Comparable<Reference> {
         }
 
         Reference other = (Reference) obj;
-        return from.toGavString().equals(other.from.toGavString());
+        return from.coordinates.toGavString().equals(other.from.coordinates.toGavString());
     }
 
     @Override
     public int hashCode() {
-        return from.toGavString().hashCode();
+        return from.coordinates.toGavString().hashCode();
     }
 
     public int compareTo(Reference other) {
@@ -53,17 +53,17 @@ public class Reference implements Comparable<Reference> {
         ArtifactVersion left;
         ArtifactVersion right;
 
-        result = from.groupId.compareTo(other.from.groupId);
+        result = from.coordinates.groupId.compareTo(other.from.coordinates.groupId);
         if (result != 0) {
             return result;
         }
-        result = from.artifactId.compareTo(other.from.artifactId);
+        result = from.coordinates.artifactId.compareTo(other.from.coordinates.artifactId);
         if (result != 0) {
             return result;
         }
 
-        left = new DefaultArtifactVersion(from.version);
-        right = new DefaultArtifactVersion(other.from.version);
+        left = new DefaultArtifactVersion(from.coordinates.version);
+        right = new DefaultArtifactVersion(other.from.coordinates.version);
         return left.compareTo(right);
     }
 

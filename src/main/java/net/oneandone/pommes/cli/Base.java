@@ -56,7 +56,7 @@ public abstract class Base implements Command {
         } else if (originBranch) {
             return Origin.BRANCH;
         } else {
-            return Origin.TRUNC;
+            return Origin.TRUNK;
         }
     }
 

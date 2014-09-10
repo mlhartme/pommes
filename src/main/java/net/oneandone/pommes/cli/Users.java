@@ -18,6 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Origin;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Reference;
 import net.oneandone.sushi.cli.ArgumentException;
@@ -33,6 +34,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -167,7 +169,36 @@ public class Users extends SearchBase<Reference> {
         newerChildren.removeAll(exactChildren);
         result.addAll(newerChildren);
 
+        filterOrigin(result);
         return result;
+    }
+
+    private void filterOrigin(List<Reference> references) {
+        Origin o;
+        Iterator<Reference> iter;
+        Reference reference;
+
+        o = origin();
+        iter = references.iterator();
+        while (iter.hasNext()) {
+            reference = iter.next();
+            switch (o) {
+                case ANY:
+                    break;
+                case TRUNK:
+                    if (!reference.from.origin.contains("/trunk/")) {
+                        iter.remove();
+                    }
+                    break;
+                case BRANCH:
+                    if (!reference.from.origin.contains("/branches/")) {
+                        iter.remove();
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
     }
 
     @Override
@@ -177,6 +208,6 @@ public class Users extends SearchBase<Reference> {
 
     @Override
     public String toLine(Reference reference) {
-        return reference.from.toGavString() + " -> " + reference.to.toGavString();
+        return reference.from.coordinates.toGavString() + " -> " + reference.to.toGavString();
     }
 }

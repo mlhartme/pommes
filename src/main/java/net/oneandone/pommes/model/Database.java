@@ -342,7 +342,7 @@ public class Database implements AutoCloseable {
         if (list.isEmpty()) {
             throw new IllegalStateException("Artifact " + gav.toGavString() + " not found.");
         }
-        return Collections.max(list).from;
+        return Collections.max(list).from.coordinates;
     }
 
     public List<Reference> findDependeesIgnoringVersion(String groupId, String artifactId) throws IOException {
@@ -361,12 +361,12 @@ public class Database implements AutoCloseable {
 
     private List<Reference> queryGa(String gaField, String gaValue, String gavField) throws IOException {
         List<Reference> list;
-        GAV from;
+        Pom from;
         GAV to;
 
         list = new ArrayList<>();
         for (Document doc : doQuery(new TermQuery(new Term(gaField, gaValue)))) {
-            from = toPom(doc).coordinates;
+            from = toPom(doc);
             to = gavField == null ? null : getReference(doc, gavField, gaValue);
             list.add(new Reference(doc, from, to));
         }
@@ -415,7 +415,7 @@ public class Database implements AutoCloseable {
             Reference ubi = iterator.next();
 
             boolean addPrevious = false;
-            if (!ubi.from.toGaString().equals(previous.from.toGaString())) {
+            if (!ubi.from.coordinates.toGaString().equals(previous.from.coordinates.toGaString())) {
                 addPrevious = true;
             }
             // else {
@@ -441,8 +441,8 @@ public class Database implements AutoCloseable {
         iterator = results.iterator();
         while (iterator.hasNext()) {
             Reference ubi = iterator.next();
-            net.oneandone.pommes.model.GAV gav = ubi.from;
-            net.oneandone.pommes.model.GAV latest = findLatestVersion(gav);
+            GAV gav = ubi.from.coordinates;
+            GAV latest = findLatestVersion(gav);
             if (!gav.gavEquals(latest)) {
                 iterator.remove();
             }
@@ -483,7 +483,7 @@ public class Database implements AutoCloseable {
         }
 
         Reference previous = artifacts.get(0);
-        String lowerVersion = artifacts.get(0).from.version;
+        String lowerVersion = artifacts.get(0).from.coordinates.version;
         String upperVersion = lowerVersion;
 
         Iterator<Reference> iterator = artifacts.iterator();
@@ -491,10 +491,10 @@ public class Database implements AutoCloseable {
             Reference ubi = iterator.next();
 
             boolean addPrevious = false;
-            if (ubi.from.toGaString().equals(previous.from.toGaString())
+            if (ubi.from.coordinates.toGaString().equals(previous.from.coordinates.toGaString())
                     && ubi.to.toGavString().equals(previous.to.toGavString())) {
                 // as long as artifact.ga is equal and reference.gav is equal
-                upperVersion = ubi.from.version;
+                upperVersion = ubi.from.coordinates.version;
             } else {
                 addPrevious = true;
             }
@@ -503,12 +503,12 @@ public class Database implements AutoCloseable {
                 addAggregated(results, previous, lowerVersion, upperVersion);
 
                 // reset versions
-                lowerVersion = ubi.from.version;
+                lowerVersion = ubi.from.coordinates.version;
                 upperVersion = lowerVersion;
             }
 
             if (!iterator.hasNext()) {
-                addAggregated(results, ubi, lowerVersion, ubi.from.version);
+                addAggregated(results, ubi, lowerVersion, ubi.from.coordinates.version);
             }
 
             previous = ubi;
@@ -518,16 +518,16 @@ public class Database implements AutoCloseable {
     }
 
     private void addAggregated(List<Reference> results, Reference ubi, String lowerVersion, String upperVersion) {
-        net.oneandone.pommes.model.GAV previous;
+        Pom previous;
         String version;
-        net.oneandone.pommes.model.GAV aggregated;
+        Pom aggregated;
 
         previous = ubi.from;
         version = lowerVersion;
         if (!lowerVersion.equals(upperVersion)) {
             version = "[" + lowerVersion + "," + upperVersion + "]";
         }
-        aggregated = new net.oneandone.pommes.model.GAV(previous.groupId, previous.artifactId, version);
+        aggregated = new Pom(previous.origin, new GAV(previous.coordinates.groupId, previous.coordinates.artifactId, version));
         results.add(new Reference(ubi.document, aggregated, ubi.to));
     }
 
@@ -641,7 +641,7 @@ public class Database implements AutoCloseable {
             case ANY:
                 // do nothing
                 break;
-            case TRUNC:
+            case TRUNK:
                 q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/trunk/*")), BooleanClause.Occur.MUST);
                 break;
             case BRANCH:
