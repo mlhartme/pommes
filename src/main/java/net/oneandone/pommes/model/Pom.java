@@ -16,6 +16,7 @@
 package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.util.Strings;
 import org.apache.maven.project.MavenProject;
 
 public class Pom {
@@ -29,12 +30,16 @@ public class Pom {
 
     //--
 
+    /** currently always starts with svn:https:// */
     public final String origin;
 
     public final GAV coordinates;
 
     public Pom(String origin, GAV coordinates) {
         if (origin == null || origin.endsWith("/")) {
+            throw new IllegalArgumentException(origin);
+        }
+        if (!origin.startsWith("svn:https://")) {
             throw new IllegalArgumentException(origin);
         }
         this.origin = origin;
@@ -46,11 +51,11 @@ public class Pom {
     }
 
     /**
-     * URL to checkout the whole project.
+     * URL to checkout the whole project, without initial svn:
      * @return always with tailing slash
      */
     public String projectUrl() {
-        return origin.substring(0, origin.lastIndexOf('/') + 1);
+        return Strings.removeLeft(origin.substring(0, origin.lastIndexOf('/') + 1), "svn:");
     }
 
     @Override
