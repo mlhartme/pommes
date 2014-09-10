@@ -108,8 +108,8 @@ public class Main extends Cli implements Command {
         console.info.println("                        use -all to search all projects; default is to search trunk projects only");
         console.info.println("                        (gav defaults to current project)");
         console.info.println("mount commands");
-        console.info.println("  'mount' query root?");
-        console.info.println("                        mounts all project matches located under the specified root directory;");
+        console.info.println("  'mount' ('-match' query)? root?");
+        console.info.println("                        mounts all matching projects under the specified root directory;");
         console.info.println("                        directory defaults to the current directory; skips existing checkouts;");
         console.info.println("                        asks before changing anything on your disk;");
         console.info.println("  'umount' '-stale'? root?");

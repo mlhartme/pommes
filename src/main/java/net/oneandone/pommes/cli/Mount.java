@@ -20,6 +20,7 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
+import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -28,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Mount extends Base {
-    @Value(name = "query", position = 1)
-    private String query;
+    @Option("match")
+    private String query = "";
 
     private FileNode root;
 
