@@ -80,7 +80,7 @@ public class Users extends SearchBase<Reference> {
         if (gavString == null) {
             origin = console.world.file("pom.xml");
             project = maven.loadPom(origin);
-            gav = Pom.forProject(project, origin.getURI().toString()).coordinates;
+            gav = Pom.forProject(origin.getURI().toString(), project).coordinates;
         } else {
             switch (Strings.count(gavString, ":")) {
                 case 1:

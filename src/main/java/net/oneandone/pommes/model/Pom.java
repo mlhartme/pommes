@@ -23,15 +23,15 @@ public class Pom {
         return new Pom(composer.getURI().toString(), new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"));
     }
 
-    public static Pom forProject(MavenProject project, String origin) {
+    public static Pom forProject(String origin, MavenProject project) {
         return new Pom(origin, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
     }
 
     //--
 
-    public final GAV coordinates;
-
     public final String origin;
+
+    public final GAV coordinates;
 
     public Pom(String origin, GAV coordinates) {
         if (origin == null || origin.endsWith("/")) {
@@ -46,7 +46,7 @@ public class Pom {
     }
 
     /**
-     * URL to checkout whole project.
+     * URL to checkout the whole project.
      * @return always with tailing slash
      */
     public String projectUrl() {

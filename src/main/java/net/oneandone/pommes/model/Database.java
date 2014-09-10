@@ -32,6 +32,8 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
@@ -243,7 +245,7 @@ public class Database implements AutoCloseable {
         MavenProject parent;
         Pom parPom;
 
-        doc = document(origin, Pom.forProject(mavenProject, origin));
+        doc = document(origin, Pom.forProject(origin, mavenProject));
         for (Dependency dependency : mavenProject.getDependencies()) {
             net.oneandone.pommes.model.GAV dep = net.oneandone.pommes.model.GAV.forDependency(dependency);
 
@@ -261,7 +263,7 @@ public class Database implements AutoCloseable {
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
-            parPom = Pom.forProject(parent, origin);
+            parPom = Pom.forProject(origin, parent);
             doc.add(new StringField(PAR_GA, parPom.coordinates.toGaString(), Field.Store.YES));
             doc.add(new StringField(PAR_GAV, parPom.coordinates.toGavString(), Field.Store.YES));
         }
@@ -631,7 +633,12 @@ public class Database implements AutoCloseable {
     //--
 
     public List<Pom> substring(String substring) throws IOException {
-        return query(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")));
+        BooleanQuery q;
+
+        q = new BooleanQuery();
+        q.add(new WildcardQuery(new Term(Database.GAV, "*" + substring + "*")), BooleanClause.Occur.SHOULD);
+        q.add(new WildcardQuery(new Term(Database.ORIGIN, "*" + substring + "*")), BooleanClause.Occur.SHOULD);
+        return query(q);
     }
 
     //--
