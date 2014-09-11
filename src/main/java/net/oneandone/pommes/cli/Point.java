@@ -20,6 +20,7 @@ import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.util.List;
@@ -71,7 +72,7 @@ public class Point {
 
     public FileNode directoryOpt(String svnurl) {
         if (svnurl.startsWith(uri)) {
-            return directory.join(Fstab.fold(svnurl.substring(uri.length())));
+            return directory.join(fold(svnurl.substring(uri.length())));
         } else {
             return null;
         }
@@ -81,5 +82,55 @@ public class Point {
         if (directory.hasAnchestor(existing.directory) || existing.directory.hasAnchestor(directory)) {
             throw new IOException("conflicting mount points: " + directory + " vs" + existing.directory);
         }
+    }
+
+    //--
+
+
+    private static final String TRUNK = "/trunk/";
+    private static final String BRANCHES = "/branches/";
+
+    public static String fold(String path) {
+        int beforeBranches;
+        int beforeProjectName;
+        // with tailing slash:
+        String projectName;
+        // with tailing slash:
+        String branchName;
+
+        if (!path.endsWith("/")) {
+            throw new IllegalArgumentException(path);
+        }
+        beforeBranches = path.indexOf(BRANCHES);
+        if (beforeBranches == -1) {
+            if (path.endsWith(TRUNK)) {
+                path = path.substring(0, path.length() - TRUNK.length() + 1);
+            }
+        } else {
+            branchName = path.substring(beforeBranches + BRANCHES.length());
+            beforeProjectName = path.lastIndexOf('/', beforeBranches - 1);
+            if (beforeProjectName == -1) {
+                throw new IllegalStateException(path);
+            }
+            projectName = path.substring(beforeProjectName + 1, beforeBranches + 1);
+            path = path.substring(0, beforeProjectName + 1) +
+                    ((common(projectName, branchName) >= 3) ? branchName : Strings.removeRight(projectName, "/") + "-" + branchName);
+        }
+        if (!path.endsWith("/")) {
+            throw new IllegalStateException(path);
+        }
+        return path;
+    }
+
+    private static int common(String left, String right) {
+        int max;
+
+        max = Math.min(left.length(), right.length());
+        for (int i = 0; i < max; i++) {
+            if (left.charAt(i) != right.charAt(i)) {
+                return i;
+            }
+        }
+        return max;
     }
 }

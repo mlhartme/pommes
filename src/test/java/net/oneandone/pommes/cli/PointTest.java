@@ -19,16 +19,16 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FstabTest {
+public class PointTest {
     @Test
     public void fold() {
-        assertEquals("/", Fstab.fold(("/")));
-        assertEquals("a/b/c/", Fstab.fold(("a/b/c/")));
-        assertEquals("a/b/", Fstab.fold(("a/b/trunk/")));
+        assertEquals("/", Point.fold(("/")));
+        assertEquals("a/b/c/", Point.fold(("a/b/c/")));
+        assertEquals("a/b/", Point.fold(("a/b/trunk/")));
 
-        assertEquals("a/puc/", Fstab.fold(("a/puc/trunk/")));
-        assertEquals("a/pucwar/", Fstab.fold(("a/puc/branches/pucwar/")));
-        assertEquals("a/puc-4/", Fstab.fold(("a/puc/branches/puc-4/")));
-        assertEquals("a/puc-VTR.42/", Fstab.fold(("a/puc/branches/VTR.42/")));
+        assertEquals("a/puc/", Point.fold(("a/puc/trunk/")));
+        assertEquals("a/pucwar/", Point.fold(("a/puc/branches/pucwar/")));
+        assertEquals("a/puc-4/", Point.fold(("a/puc/branches/puc-4/")));
+        assertEquals("a/puc-VTR.42/", Point.fold(("a/puc/branches/VTR.42/")));
     }
 }
