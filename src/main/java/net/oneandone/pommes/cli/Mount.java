@@ -22,11 +22,11 @@ import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
-import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Mount extends Base {
     @Option("match")
@@ -50,23 +50,38 @@ public class Mount extends Base {
     public void invoke() throws Exception {
         Fstab fstab;
         String svnurl;
-        Map<FileNode, String> adds;
+        List<Action> adds;
+        Action action;
         FileNode directory;
+        int problems;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
         }
         fstab = Fstab.load(console.world);
-        adds = new HashMap<>();
+        adds = new ArrayList<>();
+        problems = 0;
         try (Database database = Database.load(console.world)) {
             for (Pom pom : database.substring(query)) {
                 svnurl = pom.projectUrl();
                 directory = fstab.locateOpt(svnurl);
                 if (directory != null && directory.hasAnchestor(root)) {
-                    adds.put(directory, svnurl);
+                    try {
+                        action = Action.Checkout.createOpt(directory, svnurl);
+                        if (action != null) {
+                            adds.add(action);
+                        }
+                    } catch (Action.StatusException e) {
+                        console.error.println(e.getMessage());
+                        problems++;
+                    }
+
                 }
             }
         }
-        updateCheckouts(adds, new HashMap<FileNode, String>());
+        if (problems > 0) {
+            throw new IOException("aborted - fix the above problem(s) first: " + problems);
+        }
+        runAll(adds);
     }
 }

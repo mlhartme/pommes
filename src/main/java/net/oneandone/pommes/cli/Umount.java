@@ -55,7 +55,7 @@ public class Umount extends Base {
         Fstab fstab;
         List<FileNode> checkouts;
         String scannedUrl;
-        Map<FileNode, String> removes;
+        List<Action> removes;
         String origin;
         FileNode located;
 
@@ -68,14 +68,14 @@ public class Umount extends Base {
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }
-        removes = new HashMap<>();
+        removes = new ArrayList<>();
         for (FileNode directory : checkouts) {
             scannedUrl = scanUrl(directory);
             located = fstab.locateOpt(scannedUrl);
             if (located == null) {
                 console.info.println("? " + directory + " (" + scannedUrl + ")");
             } else if (directory.equals(located)) {
-                removes.put(directory, scannedUrl);
+                removes.add(Action.Remove.create(directory, scannedUrl));
             } else {
                 console.info.println("C " + directory + " (" + scannedUrl + ")");
                 console.info.println("  expected in directory " + located);
@@ -83,14 +83,14 @@ public class Umount extends Base {
         }
         if (stale) {
             try (Database database = Database.load(console.world)) {
-                for (FileNode directory : new HashSet<>(removes.keySet())) {
-                    origin = Database.withSlash(removes.get(directory)) + "pom.xml";
+                for (Action action : new ArrayList<>(removes)) {
+                    origin = Database.withSlash(action.svnurl) + "pom.xml";
                     if (database.lookup(origin) != null) {
-                        removes.remove(directory);
+                        removes.remove(action);
                     }
                 }
             }
         }
-        updateCheckouts(new HashMap<FileNode, String>(), removes);
+        runAll(removes);
     }
 }

@@ -74,7 +74,7 @@ public class Goto extends Base {
                 throw new IOException("directory already exists with a different checkout: " + directory);
             }
         } else {
-            doCheckout(directory, svnurl);
+            new Action.Checkout(directory, svnurl).run(console);
         }
         console.info.println("cd " + directory.getAbsolute());
         console.world.getHome().join(".pommes.goto").writeString("cd " + directory.getAbsolute());
