@@ -35,8 +35,8 @@ public class Remove extends Action {
         super(directory, svnurl);
     }
 
-    public String status() {
-        return "D " + directory + " (" + svnurl + ")";
+    public char status() {
+        return 'D';
     }
 
     public void run(Console console) throws NodeNotFoundException, DeleteException {

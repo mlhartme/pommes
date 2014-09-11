@@ -54,7 +54,7 @@ public abstract class Base implements Command {
         do {
             no = 1;
             for (Action action : actions) {
-                console.info.println("[" + no + "] " + action.status());
+                console.info.println("[" + no + "] " + action);
                 no++;
             }
             console.info.println("[d]      done without actions");

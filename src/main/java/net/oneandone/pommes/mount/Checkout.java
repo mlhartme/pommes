@@ -44,8 +44,8 @@ public class Checkout extends Action {
         super(directory, svnurl);
     }
 
-    public String status() {
-        return "A " + directory + " (" + svnurl + ")";
+    public char status() {
+        return 'A';
     }
 
     public void run(Console console) throws MkdirException, Failure {

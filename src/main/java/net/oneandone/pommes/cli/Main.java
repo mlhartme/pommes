@@ -100,6 +100,7 @@ public class Main extends Cli implements Command {
         console.info.println();
         console.info.println("Usage: ");
         console.info.println("  'pommes' ['-v'|'-e'] command args*");
+        console.info.println();
         console.info.println("search commands");
         console.info.println("  'find' query          prints projects matching this query");
         console.info.println("  'users' '-all'? '-branch'? gav?");
@@ -107,6 +108,7 @@ public class Main extends Cli implements Command {
         console.info.println("                        use -branch to search in branch projects only");
         console.info.println("                        use -all to search all projects; default is to search trunk projects only");
         console.info.println("                        (gav defaults to current project)");
+        console.info.println();
         console.info.println("mount commands");
         console.info.println("  'mount' ('-match' query)? root?");
         console.info.println("                        mounts all matching projects under the specified root directory;");
@@ -121,21 +123,15 @@ public class Main extends Cli implements Command {
         console.info.println("                        C - checkout url does not match url configured by fstab");
         console.info.println("                        ? - checkout has no configured url configured by fstab");
         console.info.println("  'goto' query          prompts to select a matching project and checks it out when necessary");
+        console.info.println();
         console.info.println("database commands");
         console.info.println("  'database-clear'");
         console.info.println("                        creates a new empty database");
-        console.info.println("  'database-add' url* '-withBranches'?");
+        console.info.println("  'database-add' url* '-noBranches'?");
         console.info.println("                        adds projects found under the specified urls to the database;");
-        console.info.println("                        use '-' pattern to exclude from the url before;");
-        console.info.println("                        (urls default to all ciso urls if not specified)");
+        console.info.println("                        use '-' pattern to exclude from the url before");
         console.info.println("  'database-remove' url*");
         console.info.println("                        removes all documents prefixed with one of the specified urls");
-        console.info.println();
-        console.info.println("update options (for all aearch and database commands:");
-        console.info.println("  default behavior      one read update from global database per day, "
-                + "no write updates to the global database");
-        console.info.println("  '-global'             perform read/write update from/to global database");
-        console.info.println("  '-local'              neither read- nor write updates from/to global database");
         console.info.println();
         console.info.println("query:");
         console.info.println("  gav? origin?          optional substring of groupId:artifactId:version ");
@@ -143,6 +139,12 @@ public class Main extends Cli implements Command {
         console.info.println("  '%' string            for experts: Lucene query");
         console.info.println("origin:");
         console.info.println("  '@' substring         substring in svn url of this project, default is trunk");
+        console.info.println();
+        console.info.println("update options (for all aearch and database commands:");
+        console.info.println("  default behavior      one read update from global database per day, "
+                + "no write updates to the global database");
+        console.info.println("  '-global'             perform read/write update from/to global database");
+        console.info.println("  '-local'              neither read- nor write updates from/to global database");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database zip file");

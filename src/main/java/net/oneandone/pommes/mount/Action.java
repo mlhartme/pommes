@@ -27,8 +27,13 @@ public abstract class Action implements Comparable<Action> {
         this.svnurl = svnurl;
     }
 
-    public abstract String status();
+    public abstract char status();
+
     public abstract void run(Console console) throws Exception;
+
+    public String toString() {
+        return status() + " " + directory + " (" + svnurl + ")";
+    }
 
     @Override
     public int compareTo(Action action) {

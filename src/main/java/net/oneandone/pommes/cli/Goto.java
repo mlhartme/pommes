@@ -21,7 +21,7 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Fstab;
-import net.oneandone.pommes.mount.Noop;
+import net.oneandone.pommes.mount.Nop;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Remaining;
@@ -75,7 +75,7 @@ public class Goto extends Base {
                 }
                 for (FileNode directory : directories) {
                     action = Checkout.createOpt(directory, svnurl);
-                    actions.add(action != null ? action : new Noop(directory, svnurl));
+                    actions.add(action != null ? action : new Nop(directory, svnurl));
                 }
             }
         }
@@ -109,7 +109,7 @@ public class Goto extends Base {
         do {
             no = 1;
             for (Action action : actions) {
-                console.info.println("[" + no + "] " + action.status());
+                console.info.println("[" + no + "] " + action);
                 no++;
             }
             selection = console.readline("Please select: ");

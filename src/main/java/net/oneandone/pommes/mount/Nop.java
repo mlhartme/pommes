@@ -18,14 +18,14 @@ package net.oneandone.pommes.mount;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.fs.file.FileNode;
 
-public class Noop extends Action {
-    public Noop(FileNode directory, String svnurl) {
+public class Nop extends Action {
+    public Nop(FileNode directory, String svnurl) {
         super(directory, svnurl);
     }
 
     @Override
-    public String status() {
-        return "  " + directory + " (" + svnurl + ")";
+    public char status() {
+        return ' ';
     }
 
     @Override
