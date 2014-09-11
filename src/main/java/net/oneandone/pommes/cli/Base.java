@@ -41,10 +41,11 @@ public abstract class Base implements Command {
         this.maven = maven;
     }
 
-    protected void runAll(Collection<Action> actionsOrig) throws IOException {
+    protected void runAll(Collection<Action> actionsOrig) throws Exception {
         List<Action> actions;
         int no;
         int problems;
+        String selection;
 
         actions = new ArrayList<>(actionsOrig);
         if (actions.isEmpty()) {
@@ -52,25 +53,52 @@ public abstract class Base implements Command {
             return;
         }
         Collections.sort(actions);
-        no = 0;
-        for (Action action : actions) {
-            console.info.println("[" + no + "] " + action.status());
-        }
-        console.pressReturn();
-        problems = 0;
-        for (Action action : actions) {
-            try {
-                action.run(console);
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                console.error.println(e.getMessage());
-                problems++;
+        do {
+            no = 1;
+            for (Action action : actions) {
+                console.info.println("[" + no + "] " + action.status());
+                no++;
             }
-        }
-        if (problems > 0) {
-            throw new IOException(problems + " actions failed");
-        }
+            console.info.println("[d] done, no more actions");
+            console.info.println("[a] all");
+            selection = console.readline("Please select (default is a): ");
+            if (selection.isEmpty()) {
+                selection = "a";
+            }
+            for (String one : Separator.SPACE.split(selection)) {
+                problems = 0;
+                if (one.equals("d")) {
+                    console.info.println("done");
+                    actions.clear();
+                } else if (one.equals("a")) {
+                    for (Action action : actions) {
+                        try {
+                            action.run(console);
+                        } catch (RuntimeException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            console.error.println(e.getMessage());
+                            problems++;
+                        }
+                    }
+                    actions.clear();
+                } else {
+                    try {
+                        no = Integer.parseInt(one);
+                        if (no > 0 && no <= actions.size()) {
+                            actions.remove(no - 1).run(console);
+                        } else {
+                            console.info.println("action not found: " + no);
+                        }
+                    } catch (NumberFormatException e) {
+                        console.info.println("action not found: " + no);
+                    }
+                }
+                if (problems > 0) {
+                    throw new IOException(problems + " actions failed");
+                }
+            }
+        } while (!actions.isEmpty());
     }
 
     //--
@@ -86,11 +114,11 @@ public abstract class Base implements Command {
         return launcher;
     }
 
-    public static boolean modified(FileNode directory) throws IOException {
-        return isModified(directory.exec("svn", "status"));
+    public static boolean notCommitted(FileNode directory) throws IOException {
+        return notCommitted(directory.exec("svn", "status"));
     }
 
-    private static boolean isModified(String lines) {
+    private static boolean notCommitted(String lines) {
         for (String line : Separator.on("\n").split(lines)) {
             if (line.trim().length() > 0) {
                 if (line.startsWith("X") || line.startsWith("Performing status on external item")) {

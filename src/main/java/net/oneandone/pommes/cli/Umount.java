@@ -52,6 +52,7 @@ public class Umount extends Base {
 
     @Override
     public void invoke() throws Exception {
+        int problems;
         Fstab fstab;
         List<FileNode> checkouts;
         String scannedUrl;
@@ -69,17 +70,22 @@ public class Umount extends Base {
             throw new ArgumentException("no checkouts under " + root);
         }
         removes = new ArrayList<>();
+        problems = 0;
         for (FileNode directory : checkouts) {
             scannedUrl = scanUrl(directory);
             located = fstab.locateOpt(scannedUrl);
             if (located == null) {
-                console.info.println("? " + directory + " (" + scannedUrl + ")");
+                console.error.println("? " + directory + " (" + scannedUrl + ")");
+                problems++;
             } else if (directory.equals(located)) {
                 removes.add(Action.Remove.create(directory, scannedUrl));
             } else {
-                console.info.println("C " + directory + " (" + scannedUrl + ")");
-                console.info.println("  expected in directory " + located);
+                console.error.println("C " + directory + " (" + scannedUrl + " vs " + located + ")");
+                problems++;
             }
+        }
+        if (problems > 0) {
+            throw new IOException("aborted - fix the above problem(s) first: " + problems);
         }
         if (stale) {
             try (Database database = Database.load(console.world)) {

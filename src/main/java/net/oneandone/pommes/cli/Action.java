@@ -95,7 +95,7 @@ public abstract class Action implements Comparable<Action> {
 
     public static class Remove extends Action {
         public static Remove create(FileNode directory, String svnurl) throws IOException {
-            if (Base.modified(directory)) {
+            if (Base.notCommitted(directory)) {
                 throw new StatusException("M " + directory + " (" + svnurl + ")");
             }
             return new Remove(directory, svnurl);
