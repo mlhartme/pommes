@@ -58,10 +58,7 @@ public class Status extends Base {
             throw new ArgumentException("no checkouts under " + root);
         }
         for (FileNode directory : checkouts) {
-            scannedUrl = scanUrlOpt(directory);
-            if (scannedUrl == null) {
-                throw new IllegalStateException(directory.toString());
-            }
+            scannedUrl = scanUrl(directory);
             located = fstab.locateOpt(scannedUrl);
             if (located == null) {
                 console.info.println("? " + directory + " (" + scannedUrl + ")");

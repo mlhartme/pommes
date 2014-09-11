@@ -125,6 +125,16 @@ public abstract class Base implements Command {
         return false;
     }
 
+    public static String scanUrl(FileNode directory) throws IOException {
+        String result;
+
+        result = scanUrlOpt(directory);
+        if (result == null) {
+            throw new IllegalStateException(directory.toString());
+        }
+        return result;
+    }
+
     /** @return null if not a working copy */
     public static String scanUrlOpt(FileNode directory) throws IOException {
         String url;
