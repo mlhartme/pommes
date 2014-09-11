@@ -69,7 +69,10 @@ public class Fstab {
         this.points = new ArrayList<>();
     }
 
-    public void add(Point point) {
+    public void add(Point point) throws IOException {
+        for (Point existing : points) {
+            point.checkConflict(existing);
+        }
         points.add(point);
     }
 

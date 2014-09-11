@@ -21,6 +21,7 @@ import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
+import java.io.IOException;
 import java.util.List;
 
 /** mount point */
@@ -73,6 +74,12 @@ public class Point {
             return directory.join(Fstab.fold(svnurl.substring(uri.length())));
         } else {
             return null;
+        }
+    }
+
+    public void checkConflict(Point existing) throws IOException {
+        if (directory.hasAnchestor(existing.directory) || existing.directory.hasAnchestor(directory)) {
+            throw new IOException("conflicting mount points: " + directory + " vs" + existing.directory);
         }
     }
 }
