@@ -97,7 +97,7 @@ public abstract class Action implements Comparable<Action> {
             if (console.getVerbose()) {
                 console.verbose.println(svn.toString());
             } else {
-                console.info.println("svn co " + svnurl + " /" + directory.getAbsolute());
+                console.info.println("svn co " + svnurl + " " + directory.getAbsolute());
             }
             if (console.getVerbose()) {
                 svn.exec(console.verbose);

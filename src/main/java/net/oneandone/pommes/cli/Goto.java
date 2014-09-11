@@ -80,7 +80,7 @@ public class Goto extends Base {
         if (action == null) {
             throw new IOException("nothing selected");
         }
-        result = "cd /" + action.directory.getAbsolute();
+        result = "cd " + action.directory.getAbsolute();
         console.info.println(result);
         console.world.getHome().join(".pommes.goto").writeString(result);
     }

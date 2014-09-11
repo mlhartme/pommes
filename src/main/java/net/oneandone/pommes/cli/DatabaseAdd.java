@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class DatabaseAdd extends DatabaseBase {
-    @Option("withBranches")
-    private boolean withBranches;
+    @Option("noBranches")
+    private boolean noBranches;
 
     private List<Node> nodes = new ArrayList<>();
     private List<Filter> excludes = new ArrayList<>();
@@ -222,7 +222,7 @@ public class DatabaseAdd extends DatabaseBase {
             scan(trunk, excludes, false, result);
         }
         branches = child(children, "branches");
-        if (branches != null && withBranches) {
+        if (branches != null && !noBranches) {
             grandChildren = branches.list();
             if (grandChildren != null) {
                 for (Node grandChild : grandChildren) {
