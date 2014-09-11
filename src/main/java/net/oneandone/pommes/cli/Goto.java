@@ -76,8 +76,6 @@ public class Goto extends Base {
         } else {
             new Action.Checkout(directory, svnurl).run(console);
         }
-        console.info.println("cd " + directory.getAbsolute());
-        console.world.getHome().join(".pommes.goto").writeString("cd " + directory.getAbsolute());
     }
 
     private Pom select(List<Pom> selection) {
