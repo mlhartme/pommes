@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.cli;
+package net.oneandone.pommes.mount;
 
+import net.oneandone.pommes.cli.Base;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.fs.DeleteException;
 import net.oneandone.sushi.fs.MkdirException;
@@ -26,8 +27,8 @@ import net.oneandone.sushi.launcher.Launcher;
 import java.io.IOException;
 
 public abstract class Action implements Comparable<Action> {
-    protected final FileNode directory;
-    protected final String svnurl;
+    public final FileNode directory;
+    public final String svnurl;
 
     protected Action(FileNode directory, String svnurl) {
         this.directory = directory;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.cli;
+package net.oneandone.pommes.mount;
 
 import org.junit.Test;
 
