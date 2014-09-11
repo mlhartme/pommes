@@ -15,16 +15,8 @@
  */
 package net.oneandone.pommes.mount;
 
-import net.oneandone.pommes.cli.Base;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.fs.DeleteException;
-import net.oneandone.sushi.fs.MkdirException;
-import net.oneandone.sushi.fs.NodeNotFoundException;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.launcher.Failure;
-import net.oneandone.sushi.launcher.Launcher;
-
-import java.io.IOException;
 
 public abstract class Action implements Comparable<Action> {
     public final FileNode directory;

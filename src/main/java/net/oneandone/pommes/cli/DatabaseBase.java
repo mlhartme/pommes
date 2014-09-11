@@ -21,8 +21,6 @@ import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 
-import java.io.IOException;
-
 public abstract class DatabaseBase extends Base {
     @Option("local")
     private boolean local;
