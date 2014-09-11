@@ -19,9 +19,7 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Separator;
 
@@ -29,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class Base implements Command {
@@ -49,7 +46,7 @@ public abstract class Base implements Command {
 
         actions = new ArrayList<>(actionsOrig);
         if (actions.isEmpty()) {
-            console.info.println("no changes");
+            console.info.println("nothing to do");
             return;
         }
         Collections.sort(actions);
@@ -88,10 +85,10 @@ public abstract class Base implements Command {
                         if (no > 0 && no <= actions.size()) {
                             actions.remove(no - 1).run(console);
                         } else {
-                            console.info.println("action not found: " + no);
+                            console.info.println("action not found: " + one);
                         }
                     } catch (NumberFormatException e) {
-                        console.info.println("action not found: " + no);
+                        console.info.println("action not found: " + one);
                     }
                 }
                 if (problems > 0) {

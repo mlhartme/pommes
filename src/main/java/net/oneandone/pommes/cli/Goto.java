@@ -25,6 +25,9 @@ import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Goto extends Base {
@@ -48,55 +51,77 @@ public class Goto extends Base {
     @Override
     public void invoke() throws Exception {
         Fstab fstab;
-        List<Pom> selection;
-        Pom pom;
+        List<Action> actions;
         FileNode directory;
         String svnurl;
+        Action action;
+        String result;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
         }
         fstab = Fstab.load(console.world);
+        actions = new ArrayList<>();
         try (Database database = Database.load(console.world)) {
-            selection = database.substring(query);
-        }
-        if (selection.isEmpty()) {
-            throw new IOException("not found: " + query);
-        }
-        pom = select(selection);
-        svnurl = pom.projectUrl();
-        directory = fstab.locateOpt(svnurl);
-        if (directory == null) {
-            throw new ArgumentException("no mount point for " + svnurl);
-        }
-        if (directory.exists()) {
-            if (!scanUrl(directory).equals(svnurl)) {
-                throw new IOException("directory already exists with a different checkout: " + directory);
+            for (Pom pom : database.substring(query)) {
+                svnurl = pom.projectUrl();
+                directory = fstab.locateOpt(svnurl);
+                if (directory == null) {
+                    throw new ArgumentException("no mount point for " + svnurl);
+                }
+                action = Action.Checkout.createOpt(directory, svnurl);
+                if (action == null) {
+                    action = new Action.Noop(directory, svnurl);
+                }
+                actions.add(action);
             }
-        } else {
-            new Action.Checkout(directory, svnurl).run(console);
         }
+        action = runSingle(actions);
+        if (action == null) {
+            throw new IOException("nothing selected");
+        }
+        result = "cd /" + action.directory.getAbsolute();
+        console.info.println(result);
+        console.world.getHome().join(".pommes.goto").writeString(result);
     }
 
-    private Pom select(List<Pom> selection) {
+    /** @return never null */
+    protected Action runSingle(Collection<Action> actionsOrig) throws Exception {
+        List<Action> actions;
         int no;
-        String input;
+        String selection;
+        Action last;
 
-        if (selection.size() == 1) {
-            return selection.get(0);
+        if (actionsOrig.isEmpty()) {
+            throw new IOException("not found: " + query);
         }
-        no = 1;
-        for (Pom pom : selection) {
-            console.info.println("[" + no + "] " + pom.toLine());
-            no++;
+        actions = new ArrayList<>(actionsOrig);
+        if (actions.size() == 1) {
+            last = actions.get(0);
+            last.run(console);
+            return last;
         }
-        while (true) {
-            input = console.readline("Please select: ");
-            no = Integer.parseInt(input);
-            if (no >= 1 && no <= selection.size()) {
-                return selection.get(no - 1);
+        Collections.sort(actions);
+        last = null;
+        do {
+            no = 1;
+            for (Action action : actions) {
+                console.info.println("[" + no + "] " + action.status());
+                no++;
             }
-            console.info.println("invalid selection");
-        }
+            selection = console.readline("Please select: ");
+            try {
+                no = Integer.parseInt(selection);
+                if (no > 0 && no <= actions.size()) {
+                    last = actions.remove(no - 1);
+                    last.run(console);
+                } else {
+                    console.info.println("action not found: " + no);
+                }
+            } catch (NumberFormatException e) {
+                console.info.println("action not found: " + no);
+            }
+        } while (last == null);
+        return last;
     }
 }

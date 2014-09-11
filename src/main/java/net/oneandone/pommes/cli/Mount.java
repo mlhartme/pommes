@@ -70,6 +70,8 @@ public class Mount extends Base {
                         action = Action.Checkout.createOpt(directory, svnurl);
                         if (action != null) {
                             adds.add(action);
+                        } else {
+                            console.verbose.println("already mouned: " + directory);
                         }
                     } catch (Action.StatusException e) {
                         console.error.println(e.getMessage());

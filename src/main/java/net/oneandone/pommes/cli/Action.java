@@ -50,12 +50,31 @@ public abstract class Action implements Comparable<Action> {
         }
     }
 
+    public static class Noop extends Action {
+        public Noop(FileNode directory, String svnurl) {
+            super(directory, svnurl);
+        }
+
+        @Override
+        public String status() {
+            return "  " + directory + " (" + svnurl + ")";
+        }
+
+        @Override
+        public void run(Console console) throws Exception {
+        }
+    }
+
     public static class Checkout extends Action {
-        public static Checkout createOpt(FileNode directory, String svnurl) throws IOException {
+        public static Checkout createOpt(FileNode directory, String svnurl) throws StatusException {
             String scannedUrl;
 
             if (directory.exists()) {
-                scannedUrl = Base.scanUrl(directory);
+                try {
+                    scannedUrl = Base.scanUrl(directory);
+                } catch (IOException e) {
+                    scannedUrl = "[scan failed: " + e.getMessage() + "]";
+                }
                 if (svnurl.equals(scannedUrl)) {
                     return null;
                 } else {
@@ -82,7 +101,7 @@ public abstract class Action implements Comparable<Action> {
             if (console.getVerbose()) {
                 console.verbose.println(svn.toString());
             } else {
-                console.info.println("[svn co " + svnurl + " " + directory.getName() + "]");
+                console.info.println("svn co " + svnurl + " /" + directory.getAbsolute());
             }
             if (console.getVerbose()) {
                 svn.exec(console.verbose);
