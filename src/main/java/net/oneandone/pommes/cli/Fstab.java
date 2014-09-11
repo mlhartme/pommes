@@ -26,7 +26,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Maps absolute directories to svn urls */
+/** List of mount points */
 public class Fstab {
     public static Fstab load(World world) throws IOException {
         return load(world, ".pommes.fstab");
@@ -69,14 +69,14 @@ public class Fstab {
         this.lines = new ArrayList<>();
     }
 
-    public void add(Point line) {
-        lines.add(line);
+    public void add(Point point) {
+        lines.add(point);
     }
 
-    public Point line(FileNode directory) {
-        for (Point line : lines) {
-            if (line.svnurl(directory) != null) {
-                return line;
+    public Point pointOpt(FileNode directory) {
+        for (Point point : lines) {
+            if (point.svnurl(directory) != null) {
+                return point;
             }
         }
         return null;
@@ -87,8 +87,8 @@ public class Fstab {
         List<FileNode> result;
 
         result = new ArrayList<>();
-        for (Point line : lines) {
-            directory = line.directoryOpt(svnurl);
+        for (Point point : lines) {
+            directory = point.directoryOpt(svnurl);
             if (directory != null) {
                 result.add(directory);
             }

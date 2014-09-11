@@ -52,7 +52,7 @@ public class Umount extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         List<Action> removes;
-        Point line;
+        Point point;
         FileNode configuredDirectory;
 
         if (root == null) {
@@ -72,12 +72,12 @@ public class Umount extends Base {
                     continue;
                 }
                 scannedUrl = scanUrl(directory);
-                line = fstab.line(directory);
-                if (line == null) {
+                point = fstab.pointOpt(directory);
+                if (point == null) {
                     console.error.println("? " + directory + " (" + scannedUrl + ")");
                     problems++;
                 } else {
-                    configuredDirectory = line.directory(scannedUrl);
+                    configuredDirectory = point.directory(scannedUrl);
                     if (directory.equals(configuredDirectory)) {
                         removes.add(Action.Remove.create(directory, scannedUrl));
                     } else {
@@ -94,15 +94,15 @@ public class Umount extends Base {
     }
 
     private boolean isStale(Database database, Fstab fstab, FileNode directory) throws IOException {
-        Point line;
+        Point point;
         String origin;
 
-        line = fstab.line(directory);
-        if (line == null) {
+        point = fstab.pointOpt(directory);
+        if (point == null) {
             return false;
         }
         // TODO: composer.json
-        origin = line.svnurl(directory) + "pom.xml";
+        origin = point.svnurl(directory) + "pom.xml";
         return database.lookup(origin) == null;
     }
 }

@@ -23,6 +23,7 @@ import net.oneandone.sushi.util.Separator;
 
 import java.util.List;
 
+/** mount point */
 public class Point {
     public static Point parse(World world, String str) throws ExistsException, DirectoryNotFoundException {
         List<String> parts;

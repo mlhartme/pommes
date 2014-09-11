@@ -49,7 +49,7 @@ public class Mount extends Base {
     @Override
     public void invoke() throws Exception {
         Fstab fstab;
-        Point line;
+        Point point;
         String svnurl;
         List<Action> adds;
         Action action;
@@ -60,16 +60,16 @@ public class Mount extends Base {
             root = (FileNode) console.world.getWorking();
         }
         fstab = Fstab.load(console.world);
-        line = fstab.line(root);
-        if (line == null) {
+        point = fstab.pointOpt(root);
+        if (point == null) {
             throw new ArgumentException("no url configured for directory " + root);
         }
         adds = new ArrayList<>();
         problems = 0;
         try (Database database = Database.load(console.world)) {
-            for (Pom pom : database.query(line.svnurl(root), query)) {
+            for (Pom pom : database.query(point.svnurl(root), query)) {
                 svnurl = pom.projectUrl();
-                directory = line.directory(svnurl);
+                directory = point.directory(svnurl);
                 try {
                     action = Action.Checkout.createOpt(directory, svnurl);
                     if (action != null) {

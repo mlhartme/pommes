@@ -47,7 +47,7 @@ public class Status extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         FileNode configuredDirectory;
-        Point line;
+        Point point;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
@@ -60,11 +60,11 @@ public class Status extends Base {
         }
         for (FileNode directory : checkouts) {
             scannedUrl = scanUrl(directory);
-            line = fstab.line(directory);
-            if (line == null) {
+            point = fstab.pointOpt(directory);
+            if (point == null) {
                 console.info.println("? " + directory + " (" + scannedUrl + ")");
             } else {
-                configuredDirectory = line.directory(scannedUrl);
+                configuredDirectory = point.directory(scannedUrl);
                 if (directory.equals(configuredDirectory)) {
                     console.info.println("  " + directory + " (" + scannedUrl + ")");
                 } else {
