@@ -56,28 +56,28 @@ public abstract class Base implements Command {
                 console.info.println("[" + no + "] " + action.status());
                 no++;
             }
-            console.info.println("[d] done, no more actions");
-            console.info.println("[a] all");
-            selection = console.readline("Please select (default is a): ");
+            console.info.println("[d]      done without actions");
+            console.info.println("[return] all");
+            selection = console.readline("Selection(s): ");
             if (selection.isEmpty()) {
-                selection = "a";
-            }
-            for (String one : Separator.SPACE.split(selection)) {
                 problems = 0;
+                for (Action action : actions) {
+                    try {
+                        action.run(console);
+                    } catch (RuntimeException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        console.error.println(e.getMessage());
+                        problems++;
+                    }
+                }
+                actions.clear();
+                if (problems > 0) {
+                    throw new IOException(problems + " actions failed");
+                }
+            } else for (String one : Separator.SPACE.split(selection)) {
                 if (one.equals("d")) {
                     console.info.println("done");
-                    actions.clear();
-                } else if (one.equals("a")) {
-                    for (Action action : actions) {
-                        try {
-                            action.run(console);
-                        } catch (RuntimeException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            console.error.println(e.getMessage());
-                            problems++;
-                        }
-                    }
                     actions.clear();
                 } else {
                     try {
@@ -90,9 +90,6 @@ public abstract class Base implements Command {
                     } catch (NumberFormatException e) {
                         console.info.println("action not found: " + one);
                     }
-                }
-                if (problems > 0) {
-                    throw new IOException(problems + " actions failed");
                 }
             }
         } while (!actions.isEmpty());
@@ -128,10 +125,14 @@ public abstract class Base implements Command {
         return false;
     }
 
-    public static String scanUrl(FileNode directory) throws IOException {
+    /** @return null if not a working copy */
+    public static String scanUrlOpt(FileNode directory) throws IOException {
         String url;
         int idx;
 
+        if (!directory.join(".svn").exists()) {
+            return null;
+        }
         url = directory.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
         return Database.withSlash(url.substring(idx, url.indexOf("\n", idx)));

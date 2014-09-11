@@ -66,15 +66,11 @@ public abstract class Action implements Comparable<Action> {
     }
 
     public static class Checkout extends Action {
-        public static Checkout createOpt(FileNode directory, String svnurl) throws StatusException {
+        public static Checkout createOpt(FileNode directory, String svnurl) throws IOException {
             String scannedUrl;
 
             if (directory.exists()) {
-                try {
-                    scannedUrl = Base.scanUrl(directory);
-                } catch (IOException e) {
-                    scannedUrl = "[scan failed: " + e.getMessage() + "]";
-                }
+                scannedUrl = Base.scanUrlOpt(directory);
                 if (svnurl.equals(scannedUrl)) {
                     return null;
                 } else {

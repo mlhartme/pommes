@@ -72,7 +72,10 @@ public class Umount extends Base {
         removes = new ArrayList<>();
         problems = 0;
         for (FileNode directory : checkouts) {
-            scannedUrl = scanUrl(directory);
+            scannedUrl = scanUrlOpt(directory);
+            if (scannedUrl == null) {
+                throw new IllegalStateException(directory.toString());
+            }
             located = fstab.locateOpt(scannedUrl);
             if (located == null) {
                 console.error.println("? " + directory + " (" + scannedUrl + ")");

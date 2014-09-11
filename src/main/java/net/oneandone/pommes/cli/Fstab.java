@@ -115,26 +115,58 @@ public class Fstab {
     }
 
     public FileNode locateOpt(String url) {
-        String path;
-        int idx;
-        int beforeName;
-
         for (Line line : lines) {
             if (url.startsWith(line.uri)) {
-                path = url.substring(line.uri.length());
-                idx = path.indexOf("/branches/");
-                if (idx != -1) {
-                    beforeName = path.lastIndexOf('/', idx - 1);
-                    if (beforeName == -1) {
-                        throw new IllegalStateException(path);
-                    }
-                    path = path.substring(0, beforeName + 1) + path.substring(idx + 10);
-                } else {
-                    path = Strings.removeRightOpt(path, "/trunk/");
-                }
-                return line.directory.join(path);
+                return line.directory.join(fold(url.substring(line.uri.length())));
             }
         }
         return null;
+    }
+
+    private static final String TRUNK = "/trunk/";
+    private static final String BRANCHES = "/branches/";
+
+    public static String fold(String path) {
+        int beforeBranches;
+        int beforeProjectName;
+        // with tailing slash:
+        String projectName;
+        // with tailing slash:
+        String branchName;
+
+        if (!path.endsWith("/")) {
+            throw new IllegalArgumentException(path);
+        }
+        beforeBranches = path.indexOf(BRANCHES);
+        if (beforeBranches == -1) {
+            if (path.endsWith(TRUNK)) {
+                path = path.substring(0, path.length() - TRUNK.length() + 1);
+            }
+        } else {
+            branchName = path.substring(beforeBranches + BRANCHES.length());
+            beforeProjectName = path.lastIndexOf('/', beforeBranches - 1);
+            if (beforeProjectName == -1) {
+                throw new IllegalStateException(path);
+            }
+            projectName = path.substring(beforeProjectName + 1, beforeBranches + 1);
+            path = path.substring(0, beforeProjectName + 1) +
+                    ((common(projectName, branchName) >= 3) ? branchName : Strings.removeRight(projectName, "/") + "-" + branchName);
+        }
+        if (!path.endsWith("/")) {
+            throw new IllegalStateException(path);
+        }
+        return path;
+    }
+
+    private static int common(String left, String right) {
+        int max;
+
+        max = Math.min(left.length(), right.length());
+        for (int i = 0; i < max; i++) {
+            if (left.charAt(i) != right.charAt(i)) {
+                return i;
+            }
+        }
+        return max;
     }
 }
