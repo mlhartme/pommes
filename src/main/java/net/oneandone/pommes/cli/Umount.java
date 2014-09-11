@@ -20,6 +20,7 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.mount.Remove;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
@@ -82,7 +83,7 @@ public class Umount extends Base {
                 } else {
                     configuredDirectory = point.directory(scannedUrl);
                     if (directory.equals(configuredDirectory)) {
-                        removes.add(Action.Remove.create(directory, scannedUrl));
+                        removes.add(Remove.create(directory, scannedUrl));
                     } else {
                         console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
                         problems++;

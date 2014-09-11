@@ -19,8 +19,10 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
+import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.mount.StatusException;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
@@ -74,13 +76,13 @@ public class Mount extends Base {
                 svnurl = pom.projectUrl();
                 directory = point.directory(svnurl);
                 try {
-                    action = Action.Checkout.createOpt(directory, svnurl);
+                    action = Checkout.createOpt(directory, svnurl);
                     if (action != null) {
                         adds.add(action);
                     } else {
                         console.verbose.println("already mounted: " + directory);
                     }
-                } catch (Action.StatusException e) {
+                } catch (StatusException e) {
                     console.error.println(e.getMessage());
                     problems++;
                 }

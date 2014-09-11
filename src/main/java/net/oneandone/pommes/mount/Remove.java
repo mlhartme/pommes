@@ -18,31 +18,29 @@ package net.oneandone.pommes.mount;
 import net.oneandone.pommes.cli.Base;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.fs.DeleteException;
-import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.NodeNotFoundException;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.launcher.Failure;
-import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
 
-public abstract class Action implements Comparable<Action> {
-    public final FileNode directory;
-    public final String svnurl;
-
-    protected Action(FileNode directory, String svnurl) {
-        this.directory = directory;
-        this.svnurl = svnurl;
+public class Remove extends Action {
+    public static net.oneandone.pommes.mount.Remove create(FileNode directory, String svnurl) throws IOException {
+        if (Base.notCommitted(directory)) {
+            throw new StatusException("M " + directory + " (" + svnurl + ")");
+        }
+        return new net.oneandone.pommes.mount.Remove(directory, svnurl);
     }
 
-    public abstract String status();
-    public abstract void run(Console console) throws Exception;
-
-    @Override
-    public int compareTo(Action action) {
-        return directory.getPath().compareTo(action.directory.getPath());
+    public Remove(FileNode directory, String svnurl) {
+        super(directory, svnurl);
     }
 
-    //--
+    public String status() {
+        return "D " + directory + " (" + svnurl + ")";
+    }
 
+    public void run(Console console) throws NodeNotFoundException, DeleteException {
+        console.info.println("rm -rf " + directory);
+        directory.deleteTree();
+    }
 }

@@ -19,7 +19,9 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
+import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Fstab;
+import net.oneandone.pommes.mount.Noop;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Remaining;
@@ -72,8 +74,8 @@ public class Goto extends Base {
                     throw new ArgumentException("no mount point for " + svnurl);
                 }
                 for (FileNode directory : directories) {
-                    action = Action.Checkout.createOpt(directory, svnurl);
-                    actions.add(action != null ? action : new Action.Noop(directory, svnurl));
+                    action = Checkout.createOpt(directory, svnurl);
+                    actions.add(action != null ? action : new Noop(directory, svnurl));
                 }
             }
         }
