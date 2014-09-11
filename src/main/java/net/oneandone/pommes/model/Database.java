@@ -632,7 +632,7 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public List<Pom> substring(String queryString) throws IOException, QueryNodeException {
+    public List<Pom> query(String context, String queryString) throws IOException, QueryNodeException {
         int idx;
         String gav;
         String origin;
@@ -650,6 +650,9 @@ public class Database implements AutoCloseable {
                 origin =  queryString.substring(idx + 1);
             }
             query = new BooleanQuery();
+            if (context != null) {
+                query.add(new WildcardQuery(new Term(Database.ORIGIN, context + "*")), BooleanClause.Occur.MUST);
+            }
             query.add(new WildcardQuery(new Term(Database.ORIGIN, "*/" + origin + "/*")), BooleanClause.Occur.MUST);
             query.add(new WildcardQuery(new Term(Database.GAV, "*" + gav + "*")), BooleanClause.Occur.MUST);
             return query(query);

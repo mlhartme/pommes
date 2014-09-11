@@ -113,11 +113,13 @@ public class Main extends Cli implements Command {
         console.info.println("                        directory defaults to the current directory; skips existing checkouts;");
         console.info.println("                        asks before changing anything on your disk;");
         console.info.println("  'umount' '-stale'? root?");
-        console.info.println("                        removes all or stale checkouts under the specified root directory;");
-        console.info.println("                        fails for checkouts with uncommitted changed;");
+        console.info.println("                        removes all (or all stale) checkouts under the specified root directory;");
         console.info.println("                        a checkout is stale if the project has been removed from the database;");
-        console.info.println("                        asks before changing anything on your disk");
-        console.info.println("  'status' root?        prints all checkouts under the specified directory, along C or ? markers");
+        console.info.println("                        asks before changing anything on your disk;");
+        console.info.println("                        checks for uncommitted changes before asking");
+        console.info.println("  'status' root?        prints all checkouts with status markers under the specified directory");
+        console.info.println("                        C - checkout url does not match url configured by fstab");
+        console.info.println("                        ? - checkout has no configured url configured by fstab");
         console.info.println("  'goto' query          prompts to select a matching project and checks it out when necessary");
         console.info.println("database commands");
         console.info.println("  'database-clear'");
@@ -136,14 +138,14 @@ public class Main extends Cli implements Command {
         console.info.println("  '-local'              neither read- nor write updates from/to global database");
         console.info.println();
         console.info.println("query:");
-        console.info.println("  gav?origin?           optional substring of groupId:artifactId:version ");
-        console.info.println("                        optionally followed WITHOUT BLANK by origin.");
+        console.info.println("  gav? origin?          optional substring of groupId:artifactId:version ");
+        console.info.println("                        optionally followed WITHOUT BLANK by origin");
         console.info.println("  '%' string            for experts: Lucene query");
         console.info.println("origin:");
         console.info.println("  '@' substring         substring in svn url of this project, default is trunk");
         console.info.println();
         console.info.println("environment:");
-        console.info.println("  POMMES_GLOBAL         where to store the global database file.");
+        console.info.println("  POMMES_GLOBAL         where to store the global database zip file");
         console.info.println();
         console.info.println("Home: https://github.com/mlhartme/pommes");
     }
