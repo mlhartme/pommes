@@ -71,7 +71,7 @@ public class Mount extends Base {
                         if (action != null) {
                             adds.add(action);
                         } else {
-                            console.verbose.println("already mouned: " + directory);
+                            console.verbose.println("already mounted: " + directory);
                         }
                     } catch (Action.StatusException e) {
                         console.error.println(e.getMessage());
