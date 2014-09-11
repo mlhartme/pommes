@@ -140,9 +140,7 @@ public class Main extends Cli implements Command {
         console.info.println("                        optionally followed WITHOUT BLANK by origin.");
         console.info.println("  '%' string            for experts: Lucene query");
         console.info.println("origin:");
-        console.info.println("  '@' substring         substring in origin");
-        console.info.println("  '@b'                  branch projects");
-        console.info.println("  '@a'                  all projects");
+        console.info.println("  '@' substring         substring in svn url of this project, default is trunk");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database file.");

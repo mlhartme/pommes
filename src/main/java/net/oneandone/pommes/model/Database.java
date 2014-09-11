@@ -633,27 +633,27 @@ public class Database implements AutoCloseable {
     //--
 
     public List<Pom> substring(String queryString) throws IOException, QueryNodeException {
-        BooleanQuery q;
-        Query query;
+        int idx;
+        String gav;
+        String origin;
+        BooleanQuery query;
 
         if (queryString.startsWith("%")) {
-            query = new StandardQueryParser().parse(queryString.substring(1), Database.GAV);
-        } else if (queryString.startsWith("@")) {
-            query = new WildcardQuery(new Term(Database.ORIGIN, "*" + queryString.substring(1) + "*"));
-        } else if (queryString.endsWith("%a")) {
-            query = new WildcardQuery(new Term(Database.GAV, "*" + queryString.substring(0, queryString.length() - 2) + "*"));
-        } else if (queryString.endsWith("%b")) {
-            q = new BooleanQuery();
-            q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/branches/*")), BooleanClause.Occur.MUST);
-            q.add(new WildcardQuery(new Term(Database.GAV, "*" + queryString.substring(0, queryString.length() - 2) + "*")), BooleanClause.Occur.MUST);
-            query = q;
+            return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV));
         } else {
-            q = new BooleanQuery();
-            q.add(new WildcardQuery(new Term(Database.ORIGIN, "*/trunk/*")), BooleanClause.Occur.MUST);
-            q.add(new WildcardQuery(new Term(Database.GAV, "*" + queryString + "*")), BooleanClause.Occur.MUST);
-            query = q;
+            idx = queryString.lastIndexOf('@');
+            if (idx == -1) {
+                gav = queryString;
+                origin = "trunk";
+            } else {
+                gav = queryString.substring(0, idx);
+                origin =  queryString.substring(idx + 1);
+            }
+            query = new BooleanQuery();
+            query.add(new WildcardQuery(new Term(Database.ORIGIN, "*/" + origin + "/*")), BooleanClause.Occur.MUST);
+            query.add(new WildcardQuery(new Term(Database.GAV, "*" + gav + "*")), BooleanClause.Occur.MUST);
+            return query(query);
         }
-        return query(query);
     }
 
     //--
