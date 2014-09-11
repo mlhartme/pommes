@@ -63,18 +63,18 @@ public class Fstab {
 
     //--
 
-    private final List<Point> lines;
+    private final List<Point> points;
 
     public Fstab() {
-        this.lines = new ArrayList<>();
+        this.points = new ArrayList<>();
     }
 
     public void add(Point point) {
-        lines.add(point);
+        points.add(point);
     }
 
     public Point pointOpt(FileNode directory) {
-        for (Point point : lines) {
+        for (Point point : points) {
             if (point.svnurl(directory) != null) {
                 return point;
             }
@@ -87,7 +87,7 @@ public class Fstab {
         List<FileNode> result;
 
         result = new ArrayList<>();
-        for (Point point : lines) {
+        for (Point point : points) {
             directory = point.directoryOpt(svnurl);
             if (directory != null) {
                 result.add(directory);
