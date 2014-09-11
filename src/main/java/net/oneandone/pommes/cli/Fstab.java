@@ -80,9 +80,16 @@ public class Fstab {
         public final List<String> defaults;
 
         public Line(String uri, FileNode directory, List<String> defaults) {
+            if (!uri.endsWith("/")) {
+                throw new IllegalArgumentException(uri);
+            }
             this.uri = uri;
             this.directory = directory;
             this.defaults = defaults;
+        }
+
+        public String svnurl(FileNode child) {
+            return child.hasAnchestor(directory) ? uri + "/" + child.getRelative(directory) : null;
         }
     }
 
@@ -105,9 +112,9 @@ public class Fstab {
         lines.add(line);
     }
 
-    public Line lookup(String prefix) {
+    public Line line(FileNode directory) {
         for (Line line : lines) {
-            if (prefix.equals(line)) {
+            if (line.svnurl(directory) != null) {
                 return line;
             }
         }

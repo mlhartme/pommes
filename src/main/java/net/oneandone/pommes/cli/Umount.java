@@ -57,7 +57,6 @@ public class Umount extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         List<Action> removes;
-        String origin;
         FileNode located;
 
         if (root == null) {
@@ -71,32 +70,40 @@ public class Umount extends Base {
         }
         removes = new ArrayList<>();
         problems = 0;
-        for (FileNode directory : checkouts) {
-            scannedUrl = scanUrl(directory);
-            located = fstab.locateOpt(scannedUrl);
-            if (located == null) {
-                console.error.println("? " + directory + " (" + scannedUrl + ")");
-                problems++;
-            } else if (directory.equals(located)) {
-                removes.add(Action.Remove.create(directory, scannedUrl));
-            } else {
-                console.error.println("C " + directory + " (" + scannedUrl + " vs " + located + ")");
-                problems++;
+        try (Database database = Database.load(console.world)) {
+            for (FileNode directory : checkouts) {
+                if (stale && !isStale(database, fstab, directory)) {
+                    continue;
+                }
+                scannedUrl = scanUrl(directory);
+                located = fstab.locateOpt(scannedUrl);
+                if (located == null) {
+                    console.error.println("? " + directory + " (" + scannedUrl + ")");
+                    problems++;
+                } else if (directory.equals(located)) {
+                    removes.add(Action.Remove.create(directory, scannedUrl));
+                } else {
+                    console.error.println("C " + directory + " (" + scannedUrl + " vs " + located + ")");
+                    problems++;
+                }
             }
         }
         if (problems > 0) {
             throw new IOException("aborted - fix the above problem(s) first: " + problems);
         }
-        if (stale) {
-            try (Database database = Database.load(console.world)) {
-                for (Action action : new ArrayList<>(removes)) {
-                    origin = Database.withSlash(action.svnurl) + "pom.xml";
-                    if (database.lookup(origin) != null) {
-                        removes.remove(action);
-                    }
-                }
-            }
-        }
         runAll(removes);
+    }
+
+    private boolean isStale(Database database, Fstab fstab, FileNode directory) throws IOException {
+        Fstab.Line line;
+        String origin;
+
+        line = fstab.line(directory);
+        if (line == null) {
+            return false;
+        }
+        // TODO: composer.json
+        origin = line.svnurl(directory) + "pom.xml";
+        return database.lookup(origin) == null;
     }
 }
