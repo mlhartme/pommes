@@ -46,7 +46,8 @@ public class Status extends Base {
         Fstab fstab;
         List<FileNode> checkouts;
         String scannedUrl;
-        FileNode located;
+        FileNode configuredDirectory;
+        Fstab.Line line;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
@@ -59,14 +60,16 @@ public class Status extends Base {
         }
         for (FileNode directory : checkouts) {
             scannedUrl = scanUrl(directory);
-            located = fstab.locateOpt(scannedUrl);
-            if (located == null) {
+            line = fstab.line(directory);
+            if (line == null) {
                 console.info.println("? " + directory + " (" + scannedUrl + ")");
-            } else if (directory.equals(located)) {
-                console.info.println("  " + directory + " (" + scannedUrl + ")");
             } else {
-                console.info.println("C " + directory + " (" + scannedUrl + ")");
-                console.info.println("  expected in directory " + located);
+                configuredDirectory = line.directory(scannedUrl);
+                if (directory.equals(configuredDirectory)) {
+                    console.info.println("  " + directory + " (" + scannedUrl + ")");
+                } else {
+                    console.info.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
+                }
             }
         }
         for (FileNode directory : unknown(root, checkouts)) {

@@ -57,7 +57,8 @@ public class Umount extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         List<Action> removes;
-        FileNode located;
+        Fstab.Line line;
+        FileNode configuredDirectory;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();
@@ -76,15 +77,18 @@ public class Umount extends Base {
                     continue;
                 }
                 scannedUrl = scanUrl(directory);
-                located = fstab.locateOpt(scannedUrl);
-                if (located == null) {
+                line = fstab.line(directory);
+                if (line == null) {
                     console.error.println("? " + directory + " (" + scannedUrl + ")");
                     problems++;
-                } else if (directory.equals(located)) {
-                    removes.add(Action.Remove.create(directory, scannedUrl));
                 } else {
-                    console.error.println("C " + directory + " (" + scannedUrl + " vs " + located + ")");
-                    problems++;
+                    configuredDirectory = line.directory(scannedUrl);
+                    if (directory.equals(configuredDirectory)) {
+                        removes.add(Action.Remove.create(directory, scannedUrl));
+                    } else {
+                        console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
+                        problems++;
+                    }
                 }
             }
         }

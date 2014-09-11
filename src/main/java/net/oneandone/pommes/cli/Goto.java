@@ -52,7 +52,7 @@ public class Goto extends Base {
     public void invoke() throws Exception {
         Fstab fstab;
         List<Action> actions;
-        FileNode directory;
+        List<FileNode> directories;
         String svnurl;
         Action action;
         String result;
@@ -65,15 +65,14 @@ public class Goto extends Base {
         try (Database database = Database.load(console.world)) {
             for (Pom pom : database.query(null, query)) {
                 svnurl = pom.projectUrl();
-                directory = fstab.locateOpt(svnurl);
-                if (directory == null) {
+                directories = fstab.directories(svnurl);
+                if (directories.isEmpty()) {
                     throw new ArgumentException("no mount point for " + svnurl);
                 }
-                action = Action.Checkout.createOpt(directory, svnurl);
-                if (action == null) {
-                    action = new Action.Noop(directory, svnurl);
+                for (FileNode directory : directories) {
+                    action = Action.Checkout.createOpt(directory, svnurl);
+                    actions.add(action != null ? action : new Action.Noop(directory, svnurl));
                 }
-                actions.add(action);
             }
         }
         action = runSingle(actions);

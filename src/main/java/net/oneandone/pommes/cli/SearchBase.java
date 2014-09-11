@@ -71,7 +71,7 @@ public abstract class SearchBase<T> extends DatabaseBase {
         Fstab fstab;
         Iterator<T> iter;
         String url;
-        FileNode directory;
+        boolean found;
 
         result = new ArrayList<>();
         fstab = Fstab.load(console.world);
@@ -79,9 +79,14 @@ public abstract class SearchBase<T> extends DatabaseBase {
         while (iter.hasNext()) {
             pom = toPom(iter.next());
             url = pom.projectUrl();
-            directory = fstab.locateOpt(url);
-            if (directory != null && directory.exists()) {
-                result.add(directory);
+            found = false;
+            for (FileNode directory : fstab.directories(url)) {
+                if (directory.exists()) {
+                    result.add(directory);
+                    found = true;
+                }
+            }
+            if (found) {
                 iter.remove();
             }
         }

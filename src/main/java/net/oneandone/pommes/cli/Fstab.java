@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.LineFormat;
@@ -91,6 +90,24 @@ public class Fstab {
         public String svnurl(FileNode child) {
             return child.hasAnchestor(directory) ? uri + "/" + child.getRelative(directory) : null;
         }
+
+        public FileNode directory(String svnurl) {
+            FileNode result;
+
+            result = directoryOpt(svnurl);
+            if (result == null) {
+                throw new IllegalStateException(svnurl);
+            }
+            return result;
+        }
+
+        public FileNode directoryOpt(String svnurl) {
+            if (svnurl.startsWith(uri)) {
+                return directory.join(fold(svnurl.substring(uri.length())));
+            } else {
+                return null;
+            }
+        }
     }
 
     private static String withSlash(String url) {
@@ -121,13 +138,18 @@ public class Fstab {
         return null;
     }
 
-    public FileNode locateOpt(String url) {
+    public List<FileNode> directories(String svnurl) {
+        FileNode directory;
+        List<FileNode> result;
+
+        result = new ArrayList<>();
         for (Line line : lines) {
-            if (url.startsWith(line.uri)) {
-                return line.directory.join(fold(url.substring(line.uri.length())));
+            directory = line.directoryOpt(svnurl);
+            if (directory != null) {
+                result.add(directory);
             }
         }
-        return null;
+        return result;
     }
 
     private static final String TRUNK = "/trunk/";

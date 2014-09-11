@@ -69,10 +69,7 @@ public class Mount extends Base {
         try (Database database = Database.load(console.world)) {
             for (Pom pom : database.query(line.svnurl(root), query)) {
                 svnurl = pom.projectUrl();
-                directory = fstab.locateOpt(svnurl);
-                if (directory == null) {
-                    throw new IllegalStateException(svnurl);
-                }
+                directory = line.directory(svnurl);
                 try {
                     action = Action.Checkout.createOpt(directory, svnurl);
                     if (action != null) {

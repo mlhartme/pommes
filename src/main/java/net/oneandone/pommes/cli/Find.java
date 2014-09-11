@@ -53,13 +53,13 @@ public class Find extends SearchBase<Pom> {
     public String toLine(Pom pom) {
         StringBuilder result;
         String url;
-        FileNode directory;
 
         result = new StringBuilder(pom.toLine());
         url = pom.projectUrl();
-        directory = fstab.locateOpt(url);
-        if (directory != null && directory.exists()) {
-            result.append(' ').append(directory.getAbsolute());
+        for (FileNode directory : fstab.directories(url)) {
+            if (directory.exists()) {
+                result.append(' ').append(directory.getAbsolute());
+            }
         }
         return result.toString();
     }
