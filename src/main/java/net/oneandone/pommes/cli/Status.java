@@ -47,7 +47,7 @@ public class Status extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         FileNode configuredDirectory;
-        Fstab.Line line;
+        Point line;
 
         if (root == null) {
             root = (FileNode) console.world.getWorking();

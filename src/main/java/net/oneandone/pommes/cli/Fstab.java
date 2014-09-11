@@ -15,13 +15,10 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.sushi.fs.DirectoryNotFoundException;
-import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.LineFormat;
 import net.oneandone.sushi.fs.LineReader;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
@@ -50,67 +47,14 @@ public class Fstab {
                     if (line == null) {
                         break;
                     }
-                    result.add(Line.parse(world, line));
+                    result.add(Point.parse(world, line));
                 }
             }
         }
         return result;
     }
 
-    public static class Line {
-        public static Line parse(World world, String str) throws ExistsException, DirectoryNotFoundException {
-            List<String> parts;
-            String uri;
-            FileNode directory;
-
-            parts = Separator.SPACE.split(str);
-            if (parts.size() < 2) {
-                throw new IllegalArgumentException(str);
-            }
-            uri = parts.remove(0);
-            uri = withSlash(uri);
-            directory = world.file(parts.remove(0));
-            directory.checkDirectory();
-            return new Line(uri, directory, parts);
-        }
-
-        public final String uri;
-        public final FileNode directory;
-        public final List<String> defaults;
-
-        public Line(String uri, FileNode directory, List<String> defaults) {
-            if (!uri.endsWith("/")) {
-                throw new IllegalArgumentException(uri);
-            }
-            this.uri = uri;
-            this.directory = directory;
-            this.defaults = defaults;
-        }
-
-        public String svnurl(FileNode child) {
-            return child.hasAnchestor(directory) ? uri + "/" + child.getRelative(directory) : null;
-        }
-
-        public FileNode directory(String svnurl) {
-            FileNode result;
-
-            result = directoryOpt(svnurl);
-            if (result == null) {
-                throw new IllegalStateException(svnurl);
-            }
-            return result;
-        }
-
-        public FileNode directoryOpt(String svnurl) {
-            if (svnurl.startsWith(uri)) {
-                return directory.join(fold(svnurl.substring(uri.length())));
-            } else {
-                return null;
-            }
-        }
-    }
-
-    private static String withSlash(String url) {
+    public static String withSlash(String url) {
         if (!url.endsWith("/")) {
             url = url + "/";
         }
@@ -119,18 +63,18 @@ public class Fstab {
 
     //--
 
-    private final List<Line> lines;
+    private final List<Point> lines;
 
     public Fstab() {
         this.lines = new ArrayList<>();
     }
 
-    public void add(Line line) {
+    public void add(Point line) {
         lines.add(line);
     }
 
-    public Line line(FileNode directory) {
-        for (Line line : lines) {
+    public Point line(FileNode directory) {
+        for (Point line : lines) {
             if (line.svnurl(directory) != null) {
                 return line;
             }
@@ -143,7 +87,7 @@ public class Fstab {
         List<FileNode> result;
 
         result = new ArrayList<>();
-        for (Line line : lines) {
+        for (Point line : lines) {
             directory = line.directoryOpt(svnurl);
             if (directory != null) {
                 result.add(directory);

@@ -21,16 +21,11 @@ import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
-import net.oneandone.sushi.fs.DirectoryNotFoundException;
-import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class Umount extends Base {
     private FileNode root;
@@ -57,7 +52,7 @@ public class Umount extends Base {
         List<FileNode> checkouts;
         String scannedUrl;
         List<Action> removes;
-        Fstab.Line line;
+        Point line;
         FileNode configuredDirectory;
 
         if (root == null) {
@@ -99,7 +94,7 @@ public class Umount extends Base {
     }
 
     private boolean isStale(Database database, Fstab fstab, FileNode directory) throws IOException {
-        Fstab.Line line;
+        Point line;
         String origin;
 
         line = fstab.line(directory);

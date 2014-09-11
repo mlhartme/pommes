@@ -49,7 +49,7 @@ public class Mount extends Base {
     @Override
     public void invoke() throws Exception {
         Fstab fstab;
-        Fstab.Line line;
+        Point line;
         String svnurl;
         List<Action> adds;
         Action action;
