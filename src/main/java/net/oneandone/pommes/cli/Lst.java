@@ -28,7 +28,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Status extends Base {
+public class Lst extends Base {
     private FileNode root;
 
     @Remaining
@@ -39,7 +39,7 @@ public class Status extends Base {
         root = console.world.file(str);
     }
 
-    public Status(Console console, Maven maven) {
+    public Lst(Console console, Maven maven) {
         super(console, maven);
     }
 

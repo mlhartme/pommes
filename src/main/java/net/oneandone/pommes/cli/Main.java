@@ -60,13 +60,13 @@ public class Main extends Cli implements Command {
         return new Umount(console, maven());
     }
 
-    @Child("status")
-    public Status status() throws IOException {
-        return new Status(console, maven());
+    @Child("list")
+    public Lst list() throws IOException {
+        return new Lst(console, maven());
     }
 
     @Child("goto")
-    public Goto goto_() throws IOException {
+    public Goto goTo() throws IOException {
         return new Goto(console, maven());
     }
 
@@ -119,7 +119,7 @@ public class Main extends Cli implements Command {
         console.info.println("                        a checkout is stale if the project has been removed from the database;");
         console.info.println("                        asks before changing anything on your disk;");
         console.info.println("                        checks for uncommitted changes before asking");
-        console.info.println("  'status' root?        prints all checkouts with status markers under the specified directory");
+        console.info.println("  'list' root?          prints all checkouts with status markers under the specified directory");
         console.info.println("                        C - checkout url does not match url configured by fstab");
         console.info.println("                        ? - checkout has no configured url configured by fstab");
         console.info.println("  'goto' query          prompts to select a matching project and checks it out when necessary");
