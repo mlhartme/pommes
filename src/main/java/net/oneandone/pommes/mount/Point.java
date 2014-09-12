@@ -111,9 +111,7 @@ public class Point {
         } else {
             branchName = path.substring(beforeBranches + BRANCHES.length());
             beforeProjectName = path.lastIndexOf('/', beforeBranches - 1);
-            if (beforeProjectName == -1) {
-                throw new IllegalStateException(path);
-            }
+            // -1 ok, we'll add +1 anyway
             projectName = path.substring(beforeProjectName + 1, beforeBranches + 1);
             path = path.substring(0, beforeProjectName + 1) +
                     ((common(projectName, branchName) >= 3) ? branchName : Strings.removeRight(projectName, "/") + "-" + branchName);
