@@ -57,7 +57,10 @@ public class Point {
     }
 
 
-    /** @return url with tailing slash or null */
+    /**
+     * CAUTION: it's not possible to not "unfold" directory names into the original url.
+     * @return url with tailing slash or null
+     */
     public String svnurl(FileNode childDirectory) {
         return childDirectory.hasAnchestor(directory) ? uri + childDirectory.getRelative(directory) + "/" : null;
     }
