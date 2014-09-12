@@ -27,26 +27,28 @@ import java.util.List;
 
 /** List of mount points */
 public class Fstab {
-    public static Fstab load(World world) throws IOException {
-        return load(world, ".pommes.fstab");
+    public static FileNode file(World world) throws IOException {
+        return (FileNode) world.getHome().join(".pommes.fstab");
     }
 
-    private static Fstab load(World world, String name) throws IOException {
-        FileNode origin;
+    public static Fstab load(World world) throws IOException {
+        return load(file(world));
+    }
+
+    public static Fstab load(FileNode file) throws IOException {
         Fstab result;
         String line;
 
-        origin = (FileNode) world.getHome().join(name);
         result = new Fstab();
-        if (origin.exists()) {
-            try (Reader reader = origin.createReader();
+        if (file.exists()) {
+            try (Reader reader = file.createReader();
                 LineReader src = new LineReader(reader, new LineFormat(LineFormat.LF_SEPARATOR))) {
                 while (true) {
                     line = src.next();
                     if (line == null) {
                         break;
                     }
-                    result.add(Point.parse(world, line));
+                    result.add(Point.parse(file.getWorld(), line));
                 }
             }
         }
@@ -96,5 +98,16 @@ public class Fstab {
             }
         }
         return result;
+    }
+
+    public void save(FileNode dest) throws IOException {
+        StringBuilder buffer;
+
+        buffer = new StringBuilder();
+        for (Point point : points) {
+            buffer.append(point.toLine());
+            buffer.append('\n');
+        }
+        dest.writeString(buffer.toString());
     }
 }

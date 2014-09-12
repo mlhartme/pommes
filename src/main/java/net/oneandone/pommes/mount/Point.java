@@ -27,14 +27,14 @@ import java.util.List;
 
 /** mount point */
 public class Point {
-    public static Point parse(World world, String str) throws ExistsException, DirectoryNotFoundException {
+    public static Point parse(World world, String line) throws ExistsException, DirectoryNotFoundException {
         List<String> parts;
         String uri;
         FileNode directory;
 
-        parts = Separator.SPACE.split(str);
+        parts = Separator.SPACE.split(line);
         if (parts.size() < 2) {
-            throw new IllegalArgumentException(str);
+            throw new IllegalArgumentException(line);
         }
         uri = parts.remove(0);
         uri = Fstab.withSlash(uri);
@@ -45,7 +45,7 @@ public class Point {
 
     public final String uri;
     public final FileNode directory;
-    public final List<String> defaults;
+    public final List<String> defaults; // TODO: unused
 
     public Point(String uri, FileNode directory, List<String> defaults) {
         if (!uri.endsWith("/")) {
@@ -55,6 +55,7 @@ public class Point {
         this.directory = directory;
         this.defaults = defaults;
     }
+
 
     /** @return url with tailing slash or null */
     public String svnurl(FileNode childDirectory) {
@@ -81,7 +82,7 @@ public class Point {
 
     public void checkConflict(Point existing) throws IOException {
         if (directory.hasAnchestor(existing.directory) || existing.directory.hasAnchestor(directory)) {
-            throw new IOException("conflicting mount points: " + directory + " vs" + existing.directory);
+            throw new IOException("conflicting mount points: " + directory + " vs " + existing.directory);
         }
     }
 
@@ -133,5 +134,19 @@ public class Point {
             }
         }
         return max;
+    }
+
+    public String toLine() {
+        StringBuilder result;
+
+        result = new StringBuilder();
+        result.append(uri);
+        result.append(' ');
+        result.append(directory.getAbsolute());
+        for (String dflt : defaults) {
+            result.append(' ');
+            result.append(dflt);
+        }
+        return result.toString();
     }
 }

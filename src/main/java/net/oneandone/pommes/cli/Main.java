@@ -72,6 +72,13 @@ public class Main extends Cli implements Command {
 
     //--
 
+    @Child("fstab-add")
+    public FstabAdd fstabAdd() throws IOException {
+        return new FstabAdd(console, maven());
+    }
+
+    //--
+
     @Child("database-clear")
     public DatabaseClear clear() throws IOException {
         return new DatabaseClear(console, maven());
@@ -99,7 +106,7 @@ public class Main extends Cli implements Command {
         console.info.println("Pom database. ");
         console.info.println();
         console.info.println("Usage: ");
-        console.info.println("  'pommes' ['-v'|'-e'] command args*");
+        console.info.println("  'pommes' ['-v'|'-e'] command update-options args*");
         console.info.println();
         console.info.println("search commands");
         console.info.println("  'find' query          prints projects matching this query");
@@ -133,6 +140,10 @@ public class Main extends Cli implements Command {
         console.info.println("  'database-remove' url*");
         console.info.println("                        removes all documents prefixed with one of the specified urls");
         console.info.println();
+        console.info.println("other commands");
+        console.info.println("  'fstab-add' url directory");
+        console.info.println("                        adds an entry to fstab; create directory if it does not exist");
+        console.info.println();
         console.info.println("query:");
         console.info.println("  gav? origin?          optional substring of groupId:artifactId:version ");
         console.info.println("                        optionally followed WITHOUT BLANK by origin");
@@ -140,11 +151,11 @@ public class Main extends Cli implements Command {
         console.info.println("origin:");
         console.info.println("  '@' substring         substring in svn url of this project, default is trunk");
         console.info.println();
-        console.info.println("update options (for all aearch and database commands:");
-        console.info.println("  default behavior      one read update from global database per day, "
-                + "no write updates to the global database");
-        console.info.println("  '-global'             perform read/write update from/to global database");
-        console.info.println("  '-local'              neither read- nor write updates from/to global database");
+        console.info.println("sync options (between global and local database)");
+        console.info.println("  default behavior      download global database once a day, no uploads");
+        console.info.println("  '-download'           download global database before command execution");
+        console.info.println("  '-noDownload'         no download of global database");
+        console.info.println("  '-upload'             upload local database after command execution");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         where to store the global database zip file");

@@ -34,11 +34,14 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class Base implements Command {
-    @Option("local")
-    private boolean local;
+    @Option("download")
+    private boolean download;
 
-    @Option("global")
-    private boolean global;
+    @Option("no-download")
+    private boolean noDownload;
+
+    @Option("upload")
+    private boolean upload;
 
     protected final Console console;
     protected final Maven maven;
@@ -51,17 +54,21 @@ public abstract class Base implements Command {
     public void invoke() throws Exception {
         Node node;
 
-        if (local && global) {
-            throw new ArgumentException("cannot combine local and global mode");
+        if (download && noDownload) {
+            throw new ArgumentException("incompatible load options");
         }
         try (Database database = Database.load(console.world)) {
-            if (global) {
-                database.update();
-            } else if (!local) {
-                database.updateOpt();
+            if (download) {
+                database.download();
+                console.verbose.println("database downloaded.");
+            } else if (noDownload) {
+                console.verbose.println("no database download.");
+                // nothing to do
+            } else {
+                database.downloadOpt();
             }
             invoke(database);
-            if (global) {
+            if (upload) {
                 node = database.upload();
                 console.info.println("uploaded global pommes database: " + node.getURI() + ", " + (node.length() / 1024) + "k");
             }

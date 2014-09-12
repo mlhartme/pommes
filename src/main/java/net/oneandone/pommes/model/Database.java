@@ -154,14 +154,14 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public Database updateOpt() throws IOException {
+    public Database downloadOpt() throws IOException {
         if (global != null) {
-            update();
+            download();
         }
         return this;
     }
 
-    public void update() throws IOException {
+    public void download() throws IOException {
         FileNode zip;
 
         if (global == null) {
