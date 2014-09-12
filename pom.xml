@@ -33,6 +33,8 @@
     <!-- too picky -->
     <cpd.skip>true</cpd.skip>
 
+    <jacoco.skip>true</jacoco.skip>
+
     <!-- TODO: fails with Java 8 -->
     <findbugs.skip>true</findbugs.skip>
 
