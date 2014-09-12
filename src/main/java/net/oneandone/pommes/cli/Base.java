@@ -167,7 +167,7 @@ public abstract class Base implements Command {
         return result;
     }
 
-    /** @return null if not a working copy */
+    /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
     public static String scanUrlOpt(FileNode directory) throws IOException {
         String url;
         int idx;

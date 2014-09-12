@@ -21,6 +21,7 @@ import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.mount.Remove;
+import net.oneandone.pommes.mount.StatusException;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
@@ -71,7 +72,7 @@ public class Umount extends Base {
         removes = new ArrayList<>();
         problems = 0;
         for (FileNode directory : checkouts) {
-            if (stale && !isStale(database, fstab, directory)) {
+            if (stale && !isStale(database, directory)) {
                 continue;
             }
             scannedUrl = scanUrl(directory);
@@ -82,7 +83,12 @@ public class Umount extends Base {
             } else {
                 configuredDirectory = point.directory(scannedUrl);
                 if (directory.equals(configuredDirectory)) {
-                    removes.add(Remove.create(directory, scannedUrl));
+                    try {
+                        removes.add(Remove.create(directory, scannedUrl));
+                    } catch (StatusException e) {
+                        console.error.println(e.getMessage());
+                        problems++;
+                    }
                 } else {
                     console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
                     problems++;
@@ -95,16 +101,11 @@ public class Umount extends Base {
         runAll(removes);
     }
 
-    private boolean isStale(Database database, Fstab fstab, FileNode directory) throws IOException {
-        Point point;
+    private boolean isStale(Database database, FileNode directory) throws IOException {
         String origin;
 
-        point = fstab.pointOpt(directory);
-        if (point == null) {
-            return false;
-        }
         // TODO: composer.json
-        origin = point.svnurl(directory) + "pom.xml";
+        origin = "svn:" + Base.scanUrl(directory) + "pom.xml";
         return database.lookup(origin) == null;
     }
 }
