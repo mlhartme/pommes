@@ -644,7 +644,7 @@ public class Database implements AutoCloseable {
             idx = queryString.lastIndexOf('@');
             if (idx == -1) {
                 gav = queryString;
-                origin = "trunk";
+                origin = "/trunk/";
             } else {
                 gav = queryString.substring(0, idx);
                 origin =  queryString.substring(idx + 1);
@@ -653,7 +653,7 @@ public class Database implements AutoCloseable {
             if (context != null) {
                 query.add(new WildcardQuery(new Term(Database.ORIGIN, "svn:" + context + "*")), BooleanClause.Occur.MUST);
             }
-            query.add(new WildcardQuery(new Term(Database.ORIGIN, "*/" + origin + "/*")), BooleanClause.Occur.MUST);
+            query.add(new WildcardQuery(new Term(Database.ORIGIN, "*" + origin + "*")), BooleanClause.Occur.MUST);
             query.add(new WildcardQuery(new Term(Database.GAV, "*" + gav + "*")), BooleanClause.Occur.MUST);
             return query(query);
         }
