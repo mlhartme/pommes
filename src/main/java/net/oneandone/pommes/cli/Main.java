@@ -132,15 +132,15 @@ public class Main extends Cli implements Command {
         console.info.println("database commands");
         console.info.println("  'database-clear'      creates a new empty database");
         console.info.println("  'database-add' url* '-noBranches'?");
-        console.info.println("                        adds projects found under the specified urls to the database;");
+        console.info.println("                        add projects found under the specified urls to the database;");
         console.info.println("                        overwrites projects with same origin;");
         console.info.println("                        use '-' pattern to exclude from the url before");
         console.info.println("  'database-remove' url*");
-        console.info.println("                        removes all documents prefixed with one of the specified urls");
+        console.info.println("                        remove all documents prefixed with one of the specified urls");
         console.info.println();
         console.info.println("other commands");
         console.info.println("  'fstab-add' url directory");
-        console.info.println("                        adds an entry to fstab; create directory if it does not exist");
+        console.info.println("                        add an entry to fstab; create directory if it does not exist");
         console.info.println();
         console.info.println("sync options            how to sync between global and local database");
         console.info.println("  default behavior      download global database once a day; no uploads");

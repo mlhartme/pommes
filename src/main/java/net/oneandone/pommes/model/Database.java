@@ -330,10 +330,7 @@ public class Database implements AutoCloseable {
     }
 
     public static Pom toPom(Document document) {
-        GAV c;
-
-        c = GAV.forGav(document.get(Database.GAV_NAME));
-        return new Pom(document.get(Database.ORIGIN), new GAV(c.groupId, c.artifactId, c.version));
+        return new Pom(document.get(Database.ORIGIN), GAV.forGav(document.get(Database.GAV_NAME)));
     }
 
     //-- searching
