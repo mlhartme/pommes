@@ -101,7 +101,7 @@ public class Database implements AutoCloseable {
     public static final String ARTIFACT = "a";
     public static final String VERSION = "v";
     public static final String GA = "ga";
-    public static final String GAV = "gav";
+    public static final String GAV_NAME = "gav";
 
     public static final String DEP_GA = "dep-ga";
     public static final String DEP_GAV = "dep-gav";
@@ -236,7 +236,7 @@ public class Database implements AutoCloseable {
         doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
         doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
         doc.add(new StringField(GA, pom.coordinates.toGaString(), Field.Store.YES));
-        doc.add(new StringField(GAV, pom.coordinates.toGavString(), Field.Store.YES));
+        doc.add(new StringField(GAV_NAME, pom.coordinates.toGavString(), Field.Store.YES));
         return doc;
     }
 
@@ -247,7 +247,7 @@ public class Database implements AutoCloseable {
 
         doc = document(origin, Pom.forProject(origin, mavenProject));
         for (Dependency dependency : mavenProject.getDependencies()) {
-            net.oneandone.pommes.model.GAV dep = net.oneandone.pommes.model.GAV.forDependency(dependency);
+            GAV dep = GAV.forDependency(dependency);
 
             // index groupId:artifactId for non-version searches
             doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
@@ -327,15 +327,15 @@ public class Database implements AutoCloseable {
     }
 
     public static Pom toPom(Document document) {
-        net.oneandone.pommes.model.GAV c;
+        GAV c;
 
-        c = net.oneandone.pommes.model.GAV.forGav(document.get(Database.GAV));
+        c = GAV.forGav(document.get(Database.GAV_NAME));
         return new Pom(document.get(Database.ORIGIN), new GAV(c.groupId, c.artifactId, c.version));
     }
 
     //-- searching
 
-    public net.oneandone.pommes.model.GAV findLatestVersion(net.oneandone.pommes.model.GAV gav) throws IOException {
+    public GAV findLatestVersion(GAV gav) throws IOException {
         List<Reference> list;
 
         list = queryGa(Database.GA, gav.toGaString(), null);
@@ -373,13 +373,13 @@ public class Database implements AutoCloseable {
         return list;
     }
 
-    private net.oneandone.pommes.model.GAV getReference(Document doc, String gavField, String gaValue) {
-        net.oneandone.pommes.model.GAV result;
-        net.oneandone.pommes.model.GAV gav;
+    private GAV getReference(Document doc, String gavField, String gaValue) {
+        GAV result;
+        GAV gav;
 
         result = null;
         for (IndexableField field : doc.getFields(gavField)) {
-            gav = net.oneandone.pommes.model.GAV.forGav(field.stringValue());
+            gav = GAV.forGav(field.stringValue());
             if (gav.toGaString().equals(gaValue)) {
                 if (result != null) {
                     throw new IllegalStateException("ambiguous: " + result + " vs " + gav);
@@ -639,7 +639,7 @@ public class Database implements AutoCloseable {
         BooleanQuery query;
 
         if (queryString.startsWith("%")) {
-            return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV));
+            return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME));
         } else {
             idx = queryString.lastIndexOf('@');
             if (idx == -1) {
@@ -654,7 +654,7 @@ public class Database implements AutoCloseable {
                 query.add(new WildcardQuery(new Term(Database.ORIGIN, "svn:" + context + "*")), BooleanClause.Occur.MUST);
             }
             query.add(new WildcardQuery(new Term(Database.ORIGIN, "*" + origin + "*")), BooleanClause.Occur.MUST);
-            query.add(new WildcardQuery(new Term(Database.GAV, "*" + gav + "*")), BooleanClause.Occur.MUST);
+            query.add(new WildcardQuery(new Term(Database.GAV_NAME, "*" + gav + "*")), BooleanClause.Occur.MUST);
             return query(query);
         }
     }
