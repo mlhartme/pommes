@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Lists all indexed POMs in index *without* updating from the server. Warning: this will be a long list, only useful with grep.
  */
-public abstract class SearchBase<T> extends DatabaseBase {
+public abstract class SearchBase<T> extends Base {
     public SearchBase(Console console, Maven maven) {
         super(console, maven);
     }

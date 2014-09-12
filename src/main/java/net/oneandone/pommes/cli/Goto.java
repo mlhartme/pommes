@@ -53,7 +53,7 @@ public class Goto extends Base {
     }
 
     @Override
-    public void invoke() throws Exception {
+    public void invoke(Database database) throws Exception {
         Fstab fstab;
         List<Action> actions;
         List<FileNode> directories;
@@ -66,17 +66,15 @@ public class Goto extends Base {
         }
         fstab = Fstab.load(console.world);
         actions = new ArrayList<>();
-        try (Database database = Database.load(console.world)) {
-            for (Pom pom : database.query(null, query)) {
-                svnurl = pom.projectUrl();
-                directories = fstab.directories(svnurl);
-                if (directories.isEmpty()) {
-                    throw new ArgumentException("no mount point for " + svnurl);
-                }
-                for (FileNode directory : directories) {
-                    action = Checkout.createOpt(directory, svnurl);
-                    actions.add(action != null ? action : new Nop(directory, svnurl));
-                }
+        for (Pom pom : database.query(null, query)) {
+            svnurl = pom.projectUrl();
+            directories = fstab.directories(svnurl);
+            if (directories.isEmpty()) {
+                throw new ArgumentException("no mount point for " + svnurl);
+            }
+            for (FileNode directory : directories) {
+                action = Checkout.createOpt(directory, svnurl);
+                actions.add(action != null ? action : new Nop(directory, svnurl));
             }
         }
         action = runSingle(actions);

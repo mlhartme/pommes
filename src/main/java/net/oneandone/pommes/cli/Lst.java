@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.cli.ArgumentException;
@@ -44,7 +45,7 @@ public class Lst extends Base {
     }
 
     @Override
-    public void invoke() throws Exception {
+    public void invoke(Database notUsed) throws Exception {
         Fstab fstab;
         List<FileNode> checkouts;
         String scannedUrl;

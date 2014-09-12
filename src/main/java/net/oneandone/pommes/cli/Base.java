@@ -18,8 +18,11 @@ package net.oneandone.pommes.cli;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Action;
+import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Console;
+import net.oneandone.sushi.cli.Option;
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Separator;
@@ -31,6 +34,12 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class Base implements Command {
+    @Option("local")
+    private boolean local;
+
+    @Option("global")
+    private boolean global;
+
     protected final Console console;
     protected final Maven maven;
 
@@ -38,6 +47,28 @@ public abstract class Base implements Command {
         this.console = console;
         this.maven = maven;
     }
+
+    public void invoke() throws Exception {
+        Node node;
+
+        if (local && global) {
+            throw new ArgumentException("cannot combine local and global mode");
+        }
+        try (Database database = Database.load(console.world)) {
+            if (global) {
+                database.update();
+            } else if (!local) {
+                database.updateOpt();
+            }
+            invoke(database);
+            if (global) {
+                node = database.upload();
+                console.info.println("uploaded global pommes database: " + node.getURI() + ", " + (node.length() / 1024) + "k");
+            }
+        }
+    }
+
+    public abstract void invoke(Database database) throws Exception;
 
     protected void runAll(Collection<Action> actionsOrig) throws Exception {
         List<Action> actions;

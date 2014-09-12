@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class DatabaseAdd extends DatabaseBase {
+public class DatabaseAdd extends Base {
     @Option("noBranches")
     private boolean noBranches;
 

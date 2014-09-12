@@ -52,7 +52,7 @@ public class Mount extends Base {
     }
 
     @Override
-    public void invoke() throws Exception {
+    public void invoke(Database database) throws Exception {
         Fstab fstab;
         Point point;
         String svnurl;
@@ -71,21 +71,19 @@ public class Mount extends Base {
         }
         adds = new ArrayList<>();
         problems = 0;
-        try (Database database = Database.load(console.world)) {
-            for (Pom pom : database.query(point.svnurl(root), query)) {
-                svnurl = pom.projectUrl();
-                directory = point.directory(svnurl);
-                try {
-                    action = Checkout.createOpt(directory, svnurl);
-                    if (action != null) {
-                        adds.add(action);
-                    } else {
-                        console.verbose.println("already mounted: " + directory);
-                    }
-                } catch (StatusException e) {
-                    console.error.println(e.getMessage());
-                    problems++;
+        for (Pom pom : database.query(point.svnurl(root), query)) {
+            svnurl = pom.projectUrl();
+            directory = point.directory(svnurl);
+            try {
+                action = Checkout.createOpt(directory, svnurl);
+                if (action != null) {
+                    adds.add(action);
+                } else {
+                    console.verbose.println("already mounted: " + directory);
                 }
+            } catch (StatusException e) {
+                console.error.println(e.getMessage());
+                problems++;
             }
         }
         if (problems > 0) {

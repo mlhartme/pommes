@@ -19,7 +19,7 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
 
-public class DatabaseClear extends DatabaseBase {
+public class DatabaseClear extends Base {
     public DatabaseClear(Console console, Maven maven) {
         super(console, maven);
     }

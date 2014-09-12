@@ -57,7 +57,7 @@ public class Point {
     }
 
     public String svnurl(FileNode child) {
-        return child.hasAnchestor(directory) ? uri + "/" + child.getRelative(directory) : null;
+        return child.hasAnchestor(directory) ? uri + child.getRelative(directory) : null;
     }
 
     public FileNode directory(String svnurl) {

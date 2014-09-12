@@ -651,7 +651,7 @@ public class Database implements AutoCloseable {
             }
             query = new BooleanQuery();
             if (context != null) {
-                query.add(new WildcardQuery(new Term(Database.ORIGIN, context + "*")), BooleanClause.Occur.MUST);
+                query.add(new WildcardQuery(new Term(Database.ORIGIN, "svn:" + context + "*")), BooleanClause.Occur.MUST);
             }
             query.add(new WildcardQuery(new Term(Database.ORIGIN, "*/" + origin + "/*")), BooleanClause.Occur.MUST);
             query.add(new WildcardQuery(new Term(Database.GAV, "*" + gav + "*")), BooleanClause.Occur.MUST);

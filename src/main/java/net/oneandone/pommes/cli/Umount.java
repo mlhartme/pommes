@@ -50,7 +50,7 @@ public class Umount extends Base {
     }
 
     @Override
-    public void invoke() throws Exception {
+    public void invoke(Database database) throws Exception {
         int problems;
         Fstab fstab;
         List<FileNode> checkouts;
@@ -70,24 +70,22 @@ public class Umount extends Base {
         }
         removes = new ArrayList<>();
         problems = 0;
-        try (Database database = Database.load(console.world)) {
-            for (FileNode directory : checkouts) {
-                if (stale && !isStale(database, fstab, directory)) {
-                    continue;
-                }
-                scannedUrl = scanUrl(directory);
-                point = fstab.pointOpt(directory);
-                if (point == null) {
-                    console.error.println("? " + directory + " (" + scannedUrl + ")");
-                    problems++;
+        for (FileNode directory : checkouts) {
+            if (stale && !isStale(database, fstab, directory)) {
+                continue;
+            }
+            scannedUrl = scanUrl(directory);
+            point = fstab.pointOpt(directory);
+            if (point == null) {
+                console.error.println("? " + directory + " (" + scannedUrl + ")");
+                problems++;
+            } else {
+                configuredDirectory = point.directory(scannedUrl);
+                if (directory.equals(configuredDirectory)) {
+                    removes.add(Remove.create(directory, scannedUrl));
                 } else {
-                    configuredDirectory = point.directory(scannedUrl);
-                    if (directory.equals(configuredDirectory)) {
-                        removes.add(Remove.create(directory, scannedUrl));
-                    } else {
-                        console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
-                        problems++;
-                    }
+                    console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
+                    problems++;
                 }
             }
         }

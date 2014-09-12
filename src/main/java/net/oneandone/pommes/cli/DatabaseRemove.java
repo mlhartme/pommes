@@ -23,7 +23,7 @@ import net.oneandone.sushi.cli.Remaining;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseRemove extends DatabaseBase {
+public class DatabaseRemove extends Base {
     private List<String> removes = new ArrayList<>();
 
     @Remaining
