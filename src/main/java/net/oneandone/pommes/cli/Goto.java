@@ -66,7 +66,7 @@ public class Goto extends Base {
         }
         fstab = Fstab.load(console.world);
         actions = new ArrayList<>();
-        for (Pom pom : database.query(null, query)) {
+        for (Pom pom : database.query(Fstab.load(console.world), query)) {
             svnurl = pom.projectUrl();
             directories = fstab.directories(svnurl);
             if (directories.isEmpty()) {
