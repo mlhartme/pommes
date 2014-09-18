@@ -632,6 +632,7 @@ public class Database implements AutoCloseable {
 
     //--
 
+    /** @param context null or without initial svn: */
     public List<Pom> query(String context, String queryString) throws IOException, QueryNodeException {
         int idx;
         String gav;

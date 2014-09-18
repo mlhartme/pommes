@@ -59,7 +59,14 @@ public class Point {
 
     /** @return url with tailing slash or null */
     public String svnurl(FileNode childDirectory) {
-        return childDirectory.hasAnchestor(directory) ? uri + childDirectory.getRelative(directory) + "/" : null;
+        if (childDirectory.equals(directory)) {
+            // to avoid "." returned by get relative
+            return uri;
+        } else if (!childDirectory.hasAnchestor(directory)) {
+            return null;
+        } else {
+            return uri + childDirectory.getRelative(directory) + "/";
+        }
     }
 
     public FileNode directory(String svnurl) {
