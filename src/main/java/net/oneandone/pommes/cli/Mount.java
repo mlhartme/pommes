@@ -21,12 +21,9 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Fstab;
-import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.mount.StatusException;
-import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
-import net.oneandone.sushi.cli.Remaining;
+import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -34,18 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Mount extends Base {
-    @Option("match")
-    private String query = "";
-
-    private FileNode root;
-
-    @Remaining
-    public void add(String str) {
-        if (root != null) {
-            throw new ArgumentException("too many root arguments");
-        }
-        root = console.world.file(str);
-    }
+    @Value(name = "query", position = 1)
+    private String query;
 
     public Mount(Console console, Maven maven) {
         super(console, maven);
@@ -54,36 +41,33 @@ public class Mount extends Base {
     @Override
     public void invoke(Database database) throws Exception {
         Fstab fstab;
-        Point point;
         String svnurl;
         List<Action> adds;
         Action action;
-        FileNode directory;
         int problems;
+        List<FileNode> directories;
 
-        if (root == null) {
-            root = (FileNode) console.world.getWorking();
-        }
         fstab = Fstab.load(console.world);
-        point = fstab.pointOpt(root);
-        if (point == null) {
-            throw new ArgumentException("no url configured for directory " + root);
-        }
         adds = new ArrayList<>();
         problems = 0;
-        for (Pom pom : database.query(point.svnurl(root), query)) {
+        for (Pom pom : database.query(fstab, query)) {
             svnurl = pom.projectUrl();
-            directory = point.directory(svnurl);
-            try {
-                action = Checkout.createOpt(directory, svnurl);
-                if (action != null) {
-                    adds.add(action);
-                } else {
-                    console.verbose.println("already mounted: " + directory);
-                }
-            } catch (StatusException e) {
-                console.error.println(e.getMessage());
+            directories = fstab.directories(svnurl);
+            if (directories.isEmpty()) {
+                console.error.println("no mount point for " + svnurl);
                 problems++;
+            } else for (FileNode directory : directories) {
+                try {
+                    action = Checkout.createOpt(directory, svnurl);
+                    if (action != null) {
+                        adds.add(action);
+                    } else {
+                        console.verbose.println("already mounted: " + directory);
+                    }
+                } catch (StatusException e) {
+                    console.error.println(e.getMessage());
+                    problems++;
+                }
             }
         }
         if (problems > 0) {
