@@ -150,9 +150,10 @@ public class Main extends Cli implements Command {
         console.info.println();
         console.info.println("query syntax");
         console.info.println("  query     = term ('+' term)* | lucene");
-        console.info.println("  term      = substring | gav | origin");
+        console.info.println("  term      = substring | gav | dep | origin");
         console.info.println("  substring = STR             ; substring in gav OR origin");
         console.info.println("  gav       = ':' STR         ; substring match in groupId:artifactId:version");
+        console.info.println("  dep       = ':-' STR        ; substring match in dependnecy or parent");
         console.info.println("  origin    = '@' STR         ; substring match in origin");
         console.info.println("  context   = '^ DIR          ; prefix match in origin DIR");
         console.info.println("  lucene    = '%' STR         ; Lucene Query Syntax");

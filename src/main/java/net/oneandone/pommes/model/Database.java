@@ -653,7 +653,11 @@ public class Database implements AutoCloseable {
                 marker = termString.isEmpty() ? ' ' : termString.charAt(0);
                 switch (marker) {
                     case ':':
-                        term = substring(Database.GAV_NAME, termString.substring(1));
+                        if (termString.length() > 1 && termString.charAt(1) == '-') {
+                            term = or(substring(Database.PAR_GAV, termString.substring(2)), substring(Database.DEP_GAV, termString.substring(2)));
+                        } else {
+                            term = substring(Database.GAV_NAME, termString.substring(1));
+                        }
                         break;
                     case '@':
                         term = substring(Database.ORIGIN, termString.substring(1));
