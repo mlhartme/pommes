@@ -159,18 +159,18 @@ public class Database implements AutoCloseable {
 
     public Database downloadOpt() throws IOException {
         if (global != null) {
-            download();
+            download(false);
         }
         return this;
     }
 
-    public void download() throws IOException {
+    public void download(boolean force) throws IOException {
         FileNode zip;
 
         if (global == null) {
             throw new IllegalStateException();
         }
-        if (!directory.exists() || directory.getLastModified() - System.currentTimeMillis() > 1000L * 60 * 60 * 24) {
+        if (force || !directory.exists() || directory.getLastModified() - System.currentTimeMillis() > 1000L * 60 * 60 * 24) {
             zip = directory.getWorld().getTemp().createTempFile();
             global.copyFile(zip);
             clear();

@@ -59,7 +59,7 @@ public abstract class Base implements Command {
         }
         try (Database database = Database.load(console.world)) {
             if (download) {
-                database.download();
+                database.download(true);
                 console.verbose.println("database downloaded.");
             } else if (noDownload) {
                 console.verbose.println("no database download.");
