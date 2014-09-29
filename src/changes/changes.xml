@@ -5,7 +5,7 @@
         Improved setup: 'goto' is 'pommes goto'. To implement this, 'pommes' is a shell function now.
       </action>
       <action date="2014-09-29" dev="mhm" type="update">
-        Configurable outout format for find.
+        Configurable outout format for find. Also added dependencies to pom objects, so you can output them, too.
       </action>
       <action date="2014-09-29" dev="mhm" type="fix">
         umount -stale no longer removes active json projects.

@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.sushi.cli.Console;
@@ -64,6 +65,9 @@ public class Find extends SearchBase<Pom> {
         StringBuilder result;
         String url;
         boolean first;
+        String str;
+        int end;
+        String filter;
 
         result = new StringBuilder();
         for (int i = 0, max = format.length(); i < max; i++) {
@@ -102,6 +106,24 @@ public class Find extends SearchBase<Pom> {
                                 }
                                 result.append(directory.getAbsolute());
                             }
+                        }
+                        break;
+                    case 'D':
+                        if (i + 1 < max && format.charAt(i + 1) == '[') {
+                            end = format.indexOf(']', i + 2);
+                            if (end == -1) {
+                                throw new IllegalStateException("invalid format: " + format);
+                            }
+                            filter = format.substring(i + 2, end);
+                            i = end;
+                            for (GAV dep : pom.dependencies) {
+                                str = dep.toGavString();
+                                if (str.contains(filter)) {
+                                    result.append(str);
+                                }
+                            }
+                        } else {
+                            result.append(pom.dependencies.toString());
                         }
                         break;
                     default:

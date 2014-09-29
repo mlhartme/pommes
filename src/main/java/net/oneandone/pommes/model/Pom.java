@@ -17,7 +17,14 @@ package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pom {
     public static Pom forComposer(Node composer) {
@@ -25,7 +32,13 @@ public class Pom {
     }
 
     public static Pom forProject(String origin, MavenProject project) {
-        return new Pom(origin, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
+        Pom result;
+
+        result = new Pom(origin, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
+        for (Dependency dependency : project.getDependencies()) {
+            result.dependencies.add(GAV.forDependency(dependency));
+        }
+        return result;
     }
 
     //--
@@ -34,6 +47,8 @@ public class Pom {
     public final String origin;
 
     public final GAV coordinates;
+
+    public final List<GAV> dependencies;
 
     public Pom(String origin, GAV coordinates) {
         if (origin == null || origin.endsWith("/")) {
@@ -44,6 +59,7 @@ public class Pom {
         }
         this.origin = origin;
         this.coordinates = coordinates;
+        this.dependencies = new ArrayList<>();
     }
 
     public String toLine() {
