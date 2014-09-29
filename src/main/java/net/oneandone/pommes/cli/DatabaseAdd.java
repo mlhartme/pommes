@@ -73,8 +73,8 @@ public class DatabaseAdd extends Base {
         }
     }
 
-    public DatabaseAdd(Console console, Maven maven) {
-        super(console, maven);
+    public DatabaseAdd(Console console, Environment environment) {
+        super(console, environment);
     }
 
     public void invoke(Database database) throws Exception {
@@ -87,7 +87,7 @@ public class DatabaseAdd extends Base {
         console.info.println("scanning svn ...");
         projects = projects();
         console.info.println("indexing ...");
-        iterator = new ProjectIterator(console, maven, projects.iterator());
+        iterator = new ProjectIterator(console, environment.maven, projects.iterator());
         database.index(iterator);
         iterator.summary();
     }

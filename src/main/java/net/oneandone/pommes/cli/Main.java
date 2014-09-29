@@ -34,8 +34,8 @@ public class Main extends Cli implements Command {
         super(new World());
     }
 
-    private Maven maven() throws IOException {
-        return Maven.withSettings(console.world);
+    private Environment env() throws IOException {
+        return new Environment(console.world, Maven.withSettings(console.world));
     }
 
     @Option("shellFile")
@@ -45,58 +45,58 @@ public class Main extends Cli implements Command {
 
     @Child("find")
     public Find find() throws IOException {
-        return new Find(console, maven());
+        return new Find(console, env());
     }
 
     @Child("users")
     public Users users() throws IOException {
-        return new Users(console, maven());
+        return new Users(console, env());
     }
 
     //--
 
     @Child("mount")
     public Mount mount() throws IOException {
-        return new Mount(console, maven());
+        return new Mount(console, env());
     }
 
     @Child("umount")
     public Umount umount() throws IOException {
-        return new Umount(console, maven());
+        return new Umount(console, env());
     }
 
     @Child("list")
     public Lst list() throws IOException {
-        return new Lst(console, maven());
+        return new Lst(console, env());
     }
 
     @Child("goto")
     public Goto goTo() throws IOException {
-        return new Goto(console, maven(), shellFile);
+        return new Goto(console, env(), shellFile);
     }
 
     //--
 
     @Child("fstab-add")
     public FstabAdd fstabAdd() throws IOException {
-        return new FstabAdd(console, maven());
+        return new FstabAdd(console, env());
     }
 
     //--
 
     @Child("database-clear")
     public DatabaseClear clear() throws IOException {
-        return new DatabaseClear(console, maven());
+        return new DatabaseClear(console, env());
     }
 
     @Child("database-add")
     public DatabaseAdd add() throws IOException {
-        return new DatabaseAdd(console, maven());
+        return new DatabaseAdd(console, env());
     }
 
     @Child("database-remove")
     public DatabaseRemove remove() throws IOException {
-        return new DatabaseRemove(console, maven());
+        return new DatabaseRemove(console, env());
     }
 
     //--

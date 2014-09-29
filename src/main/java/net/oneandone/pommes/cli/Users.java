@@ -72,8 +72,8 @@ public class Users extends SearchBase<Reference> {
     @Option("format")
     protected OutputFormat format = OutputFormat.COMPACT;
 
-    public Users(Console console, Maven maven) {
-        super(console, maven);
+    public Users(Console console, Environment environment) {
+        super(console, environment);
     }
 
     public List<Reference> search(Database database) throws IOException, InvalidVersionSpecificationException, ProjectBuildingException {
@@ -86,7 +86,7 @@ public class Users extends SearchBase<Reference> {
 
         if (gavString == null) {
             origin = console.world.file("pom.xml");
-            project = maven.loadPom(origin);
+            project = environment.maven.loadPom(origin);
             gav = Pom.forProject(origin.getURI().toString(), project).coordinates;
         } else {
             switch (Strings.count(gavString, ":")) {

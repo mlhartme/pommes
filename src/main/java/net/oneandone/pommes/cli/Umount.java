@@ -46,8 +46,8 @@ public class Umount extends Base {
         root = console.world.file(str);
     }
 
-    public Umount(Console console, Maven maven) {
-        super(console, maven);
+    public Umount(Console console, Environment environment) {
+        super(console, environment);
     }
 
     @Override

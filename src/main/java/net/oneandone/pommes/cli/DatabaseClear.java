@@ -20,8 +20,8 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.cli.Console;
 
 public class DatabaseClear extends Base {
-    public DatabaseClear(Console console, Maven maven) {
-        super(console, maven);
+    public DatabaseClear(Console console, Environment environment) {
+        super(console, environment);
     }
 
     public void invoke(Database database) throws Exception {

@@ -32,8 +32,8 @@ public class FstabAdd extends Base {
     @Value(name = "directory", position = 2)
     private FileNode directory;
 
-    public FstabAdd(Console console, Maven maven) {
-        super(console, maven);
+    public FstabAdd(Console console, Environment environment) {
+        super(console, environment);
     }
 
     @Override

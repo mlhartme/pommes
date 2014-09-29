@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
@@ -33,20 +32,18 @@ public class Mount extends Base {
     @Value(name = "query", position = 1)
     private String query;
 
-    public Mount(Console console, Maven maven) {
-        super(console, maven);
+    public Mount(Console console, Environment environment) {
+        super(console, environment);
     }
 
     @Override
     public void invoke(Database database) throws Exception {
-        Environment environment;
         String svnurl;
         List<Action> adds;
         Action action;
         int problems;
         List<FileNode> directories;
 
-        environment = new Environment(console.world, maven);
         adds = new ArrayList<>();
         problems = 0;
         for (Pom pom : database.query(query, environment)) {

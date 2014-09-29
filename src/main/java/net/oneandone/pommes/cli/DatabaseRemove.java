@@ -31,8 +31,8 @@ public class DatabaseRemove extends Base {
         removes.add(prefix);
     }
 
-    public DatabaseRemove(Console console, Maven maven) {
-        super(console, maven);
+    public DatabaseRemove(Console console, Environment environment) {
+        super(console, environment);
     }
 
     public void invoke(Database database) throws Exception {

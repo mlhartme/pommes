@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
@@ -40,8 +39,8 @@ public class Lst extends Base {
         root = console.world.file(str);
     }
 
-    public Lst(Console console, Maven maven) {
-        super(console, maven);
+    public Lst(Console console, Environment environment) {
+        super(console, environment);
     }
 
     @Override

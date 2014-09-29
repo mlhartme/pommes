@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Pom;
@@ -29,14 +28,11 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Lists all indexed POMs in index *without* updating from the server. Warning: this will be a long list, only useful with grep.
- */
 public class Find extends SearchBase<Pom> {
     private final Fstab fstab;
 
-    public Find(Console console, Maven maven) throws IOException {
-        super(console, maven);
+    public Find(Console console, Environment environment) throws IOException {
+        super(console, environment);
         this.fstab = Fstab.load(console.world);
     }
 
@@ -47,7 +43,7 @@ public class Find extends SearchBase<Pom> {
     private String format = "%g @ %o %c";
 
     public List<Pom> search(Database database) throws IOException, QueryNodeException {
-        return database.query(query, new Environment(console.world, maven));
+        return database.query(query, environment);
     }
 
     @Override

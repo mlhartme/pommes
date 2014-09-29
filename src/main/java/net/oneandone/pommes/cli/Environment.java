@@ -28,7 +28,7 @@ import java.io.IOException;
 
 public class Environment implements Variables {
     private final World world;
-    private final Maven maven;
+    public final Maven maven;
 
     private MavenProject lazyProject;
     private Fstab lazyFstab;

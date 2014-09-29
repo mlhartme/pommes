@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.sushi.cli.ArgumentException;
@@ -44,11 +43,12 @@ public abstract class Base implements Command {
     private boolean upload;
 
     protected final Console console;
-    protected final Maven maven;
 
-    public Base(Console console, Maven maven) {
+    protected final Environment environment;
+
+    public Base(Console console, Environment environment) {
         this.console = console;
-        this.maven = maven;
+        this.environment = environment;
     }
 
     public void invoke() throws Exception {
