@@ -17,18 +17,14 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Environment;
 import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Fstab;
-import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 import java.util.List;

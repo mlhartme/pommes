@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
