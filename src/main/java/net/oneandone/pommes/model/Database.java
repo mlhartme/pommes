@@ -16,7 +16,6 @@
 package net.oneandone.pommes.model;
 
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -82,7 +81,7 @@ public class Database implements AutoCloseable {
         try {
             return new Database(local, global == null ? null : world.node(global));
         } catch (URISyntaxException e) {
-            throw new ArgumentException("invalid url for global pommes database file: " + global, e);
+            throw new IllegalArgumentException("invalid url for global pommes database file: " + global, e);
         }
     }
 
