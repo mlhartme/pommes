@@ -114,7 +114,10 @@ public class Main extends Cli implements Command {
         console.info.println("  'pommes' ['-v'|'-e'] command sync-options args*");
         console.info.println();
         console.info.println("search commands");
-        console.info.println("  'find' query          print projects matching this query");
+        console.info.println("  'find' ('-format' str)? query");
+        console.info.println("                        print projects matching this query;");
+        console.info.println("                        format string supports the following place holder:");
+        console.info.println("                        %g gav   %o origin  %d dependencies  %c checkouts");
         console.info.println("  'users' '-all'? '-branch'? gav?");
         console.info.println("                        print projects that use the specified artifact as a dependency of parent;");
         console.info.println("                        use -branch to search in branch projects only");
