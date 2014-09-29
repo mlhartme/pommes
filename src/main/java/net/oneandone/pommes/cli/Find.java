@@ -22,14 +22,12 @@ import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.cli.Remaining;
-import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
 import java.util.List;
 
-public class Find extends SearchBase<Pom> {
+public class Find extends Base {
     private boolean explicitQuery;
 
     public Find(Console console, Environment environment, String defaultQuery, String defaultFormat) throws IOException {
@@ -53,18 +51,13 @@ public class Find extends SearchBase<Pom> {
     @Option("format")
     private String format;
 
-    public List<Pom> search(Database database) throws IOException, QueryNodeException {
-        return database.query(query, environment);
-    }
+    public void invoke(Database database) throws Exception {
+        List<Pom> matches;
 
-    @Override
-    public Pom toPom(Pom pom) {
-        return pom;
-    }
-
-    @Override
-    public String toLine(Pom pom) throws IOException {
-        return format(pom);
+        matches = database.query(query, environment);
+        for (Pom pom : matches) {
+            console.info.println(format(pom));
+        }
     }
 
     private String format(Pom pom) throws IOException {
