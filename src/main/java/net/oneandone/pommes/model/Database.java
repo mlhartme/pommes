@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.model;
 
-import net.oneandone.pommes.cli.Environment;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -643,13 +642,13 @@ public class Database implements AutoCloseable {
 
     private static final Separator PLUS = Separator.on('+');
 
-    public List<Pom> query(Environment environment, String queryString) throws IOException, QueryNodeException {
+    public List<Pom> query(String queryString, Variables variables) throws IOException, QueryNodeException {
         BooleanQuery query;
         List<String> terms;
         Query term;
         char marker;
 
-        queryString = macros(environment, queryString);
+        queryString = macros(variables, queryString);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
             return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME));
@@ -685,7 +684,7 @@ public class Database implements AutoCloseable {
     private static final String prefix = "${";
     private static final String suffix = "}";
 
-    public String macros(Environment environment, String content) throws IOException {
+    public String macros(Variables variables, String content) throws IOException {
         StringBuilder builder;
         int start;
         int end;
@@ -710,9 +709,9 @@ public class Database implements AutoCloseable {
                 throw new IllegalArgumentException("missing end marker");
             }
             var = content.substring(start + prefix.length(), end);
-            replaced = environment.get(var);
+            replaced = variables.lookup(var);
             if (replaced == null) {
-                throw new IllegalArgumentException("undefined variable: " + var);
+                throw new IOException("undefined variable: " + var);
             }
             builder.append(content.substring(last, start));
             builder.append(replaced);

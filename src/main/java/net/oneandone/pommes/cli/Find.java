@@ -47,7 +47,7 @@ public class Find extends SearchBase<Pom> {
     private String format = "%g @ %o %c";
 
     public List<Pom> search(Database database) throws IOException, QueryNodeException {
-        return database.query(new Environment(console.world, maven), query);
+        return database.query(query, new Environment(console.world, maven));
     }
 
     @Override

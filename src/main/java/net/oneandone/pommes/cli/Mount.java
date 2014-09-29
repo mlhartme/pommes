@@ -49,7 +49,7 @@ public class Mount extends Base {
         environment = new Environment(console.world, maven);
         adds = new ArrayList<>();
         problems = 0;
-        for (Pom pom : database.query(environment, query)) {
+        for (Pom pom : database.query(query, environment)) {
             svnurl = pom.projectUrl();
             directories = environment.fstab().directories(svnurl);
             if (directories.isEmpty()) {

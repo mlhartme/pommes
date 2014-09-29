@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.fs.World;
@@ -25,7 +26,7 @@ import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class Environment {
+public class Environment implements Variables {
     private final World world;
     private final Maven maven;
 
@@ -37,7 +38,7 @@ public class Environment {
         this.maven = maven;
     }
 
-    public String get(String name) throws IOException {
+    public String lookup(String name) throws IOException {
         MavenProject p;
         FileNode here;
         Point point;
@@ -57,7 +58,7 @@ public class Environment {
                 p = project();
                 return p.getGroupId() + ":" + p.getArtifactId();
             default:
-                throw new IllegalArgumentException(name);
+                return null;
         }
     }
 
