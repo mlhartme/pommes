@@ -35,7 +35,7 @@ public class Main extends Cli implements Command {
     }
 
     private Environment env() throws IOException {
-        return new Environment(console.world, Maven.withSettings(console.world));
+        return new Environment(console.world);
     }
 
     @Option("shellFile")

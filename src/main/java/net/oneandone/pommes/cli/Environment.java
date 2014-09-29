@@ -28,14 +28,13 @@ import java.io.IOException;
 
 public class Environment implements Variables {
     private final World world;
-    public final Maven maven;
 
+    private Maven lazyMaven;
     private MavenProject lazyProject;
     private Fstab lazyFstab;
 
-    public Environment(World world, Maven maven) {
+    public Environment(World world) {
         this.world = world;
-        this.maven = maven;
     }
 
     public String lookup(String name) throws IOException {
@@ -62,6 +61,10 @@ public class Environment implements Variables {
         }
     }
 
+    public Maven maven() throws IOException {
+        return Maven.withSettings(world);
+    }
+
     public Fstab fstab() throws IOException {
         if (lazyFstab == null) {
             lazyFstab = Fstab.load(world);
@@ -72,7 +75,7 @@ public class Environment implements Variables {
     public MavenProject project() throws IOException {
         if (lazyProject == null) {
             try {
-                lazyProject = maven.loadPom((FileNode) world.getWorking().join("pom.xml"));
+                lazyProject = maven().loadPom((FileNode) world.getWorking().join("pom.xml"));
             } catch (ProjectBuildingException e) {
                 throw new IOException("cannot load pom: " + e.getMessage(), e);
             }

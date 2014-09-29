@@ -87,7 +87,7 @@ public class DatabaseAdd extends Base {
         console.info.println("scanning svn ...");
         projects = projects();
         console.info.println("indexing ...");
-        iterator = new ProjectIterator(console, environment.maven, projects.iterator());
+        iterator = new ProjectIterator(console, environment.maven(), projects.iterator());
         database.index(iterator);
         iterator.summary();
     }
