@@ -102,10 +102,8 @@ public class Umount extends Base {
     }
 
     private boolean isStale(Database database, FileNode directory) throws IOException {
-        String origin;
-
-        // TODO: composer.json
-        origin = "svn:" + Base.scanUrl(directory) + "pom.xml";
-        return database.lookup(origin) == null;
+        // TODO: ugly ugly ...
+        return database.lookup("svn:" + Base.scanUrl(directory) + "pom.xml") == null
+                && database.lookup("svn:" + Base.scanUrl(directory) + "composer.json") == null;
     }
 }

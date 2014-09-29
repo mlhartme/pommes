@@ -7,6 +7,9 @@
       <action date="2014-09-29" dev="mhm" type="update">
         Configurable outout format for find.
       </action>
+      <action date="2014-09-29" dev="mhm" type="fix">
+        umount -stale no longer removes active json projects.
+      </action>
     </release>
     <release date="2014-09-22" version="2.3.0">
       <action date="2014-08-27" dev="mhm" type="update">
