@@ -19,7 +19,9 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.sushi.cli.Child;
 import net.oneandone.sushi.cli.Cli;
 import net.oneandone.sushi.cli.Command;
+import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
 
@@ -35,6 +37,9 @@ public class Main extends Cli implements Command {
     private Maven maven() throws IOException {
         return Maven.withSettings(console.world);
     }
+
+    @Option("shellFile")
+    private FileNode shellFile;
 
     //--
 
@@ -67,7 +72,7 @@ public class Main extends Cli implements Command {
 
     @Child("goto")
     public Goto goTo() throws IOException {
-        return new Goto(console, maven());
+        return new Goto(console, maven(), shellFile);
     }
 
     //--

@@ -124,13 +124,14 @@
         <configuration>
           <name>pommes</name>
           <main>net.oneandone.pommes.cli.Main</main>
+          <launcher>${basedir}/src/launcher</launcher>
           <remove>META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
           <overwrite>META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat</overwrite>
           <concat>META-INF/services/org.apache.lucene.codecs.PostingsFormat</concat>
           <equal>com/jcraft/jsch/agentproxy/**.*</equal>
 
           <!-- for upload -->
-          <symlink>${env.WSDTOOLS_HOME}/bin/pommes</symlink>
+          <symlink>${env.WSDTOOLS_HOME}/bin/setup-pommes</symlink>
           <target>${env.WSDTOOLS_HOME}/pommes</target>
         </configuration>
         <executions>

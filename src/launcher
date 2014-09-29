@@ -1,0 +1,53 @@
+#!/bin/bash
+# This is Pommes' setup code. Add
+#
+#    eval "`/path/to/this/file`"
+#
+# to your ~/.bashrc to setup Pommes in your shell.
+
+function pommes() {
+  local shellFile=$HOME/.pommes-shell-$$-$(date +%N)
+
+  PATH=${{path}}
+  OPTIONS=${{options}}
+  MAIN=${{main}}
+  NAME=${{name}}
+  java $OPTIONS $${{optionsVariable}} -cp "$POMMES_BIN" $MAIN -shellFile $shellFile "$@"
+
+  result=$?
+  if [ -f $shellFile ] ; then
+    . $shellFile
+    rm $shellFile
+  fi
+  return $result
+}
+
+# Helper function, prefixed with _pommes to avoid naming collisions
+function _pommes_absolute() {
+    local ME=$1
+    while [ -h "$ME" ] ; do
+      ls=$(ls -ld "$ME")
+      link=$(expr "$ls" : '.*-> \(.*\)$')
+      if expr "$link" : '/.*' > /dev/null; then
+        ME="$link"
+      else
+        ME=$(dirname "$ME")"/$link"
+      fi
+    done
+    NAME=$(basename "$ME")
+    ME=$(dirname "$ME")
+    ME=$(cd "$ME" && pwd)
+    echo "$ME/$NAME"
+}
+
+# This is Pommes' setup code, scroll back to the beginning to read more.
+# EndOfSetup
+
+if [ $0 == "-bash" ] ; then
+  echo Do not source this file!
+  return 1
+fi
+POMMES_BIN=`_pommes_absolute $0`
+echo export POMMES_BIN=$POMMES_BIN
+grep -a -B 500 -m 1 EndOfSetup $POMMES_BIN | tail -n +2
+exit $?

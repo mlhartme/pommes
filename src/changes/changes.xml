@@ -2,6 +2,9 @@
   <body>
     <release date="2014-09-29" version="2.3.1">
       <action date="2014-09-29" dev="mhm" type="update">
+        Improved setup: 'goto' is 'pommes goto'. To implement this, 'pommes' is a shell function now.
+      </action>
+      <action date="2014-09-29" dev="mhm" type="update">
         Configurable outout format for find.
       </action>
     </release>

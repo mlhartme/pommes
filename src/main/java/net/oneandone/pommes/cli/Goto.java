@@ -38,6 +38,7 @@ public class Goto extends Base {
     @Value(name = "query", position = 1)
     private String query;
 
+    private final FileNode shellFile;
     private FileNode root;
 
     @Remaining
@@ -48,8 +49,10 @@ public class Goto extends Base {
         root = console.world.file(str);
     }
 
-    public Goto(Console console, Maven maven) {
+
+    public Goto(Console console, Maven maven, FileNode shellFile) {
         super(console, maven);
+        this.shellFile = shellFile;
     }
 
     @Override
@@ -83,7 +86,7 @@ public class Goto extends Base {
         }
         result = "cd " + action.directory.getAbsolute();
         console.info.println(result);
-        console.world.getHome().join(".pommes.goto").writeString(result);
+        shellFile.writeString(result);
     }
 
     /** @return never null */
