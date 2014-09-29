@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
+    <release date="2014-09-29" version="2.3.1">
+      <action date="2014-09-29" dev="mhm" type="update">
+        Configurable outout format for find.
+      </action>
+    </release>
     <release date="2014-09-22" version="2.3.0">
       <action date="2014-08-27" dev="mhm" type="update">
         Support branches in database and query commands. The database schema has changed.

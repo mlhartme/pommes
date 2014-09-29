@@ -127,7 +127,7 @@ public class Main extends Cli implements Command {
         console.info.println("  'list' root?          print all checkouts under the specified directory with status markers:");
         console.info.println("                        C - checkout url does not match url configured by fstab");
         console.info.println("                        ? - checkout has no configured url configured by fstab");
-        console.info.println("  'goto' query          offer selection of matching project and checks it out when necessary");
+        console.info.println("  'goto' query          offer selection of matching project and check it out when necessary");
         console.info.println();
         console.info.println("database commands");
         console.info.println("  'database-clear'      creates a new empty database");
