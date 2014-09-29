@@ -17,9 +17,6 @@ package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
