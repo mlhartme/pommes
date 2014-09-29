@@ -44,7 +44,7 @@ public class Find extends SearchBase<Pom> {
     private String query;
 
     @Option("format")
-    private String format = "%c @ %o %d";
+    private String format = "%g @ %o %c";
 
     public List<Pom> search(Database database) throws IOException, QueryNodeException {
         return database.query(Fstab.load(console.world), query);
@@ -79,36 +79,13 @@ public class Find extends SearchBase<Pom> {
                     case '%':
                         result.append(c);
                         break;
-                    case 'c':
-                        result.append(pom.coordinates.toGavString());
-                        break;
                     case 'g':
-                        result.append(pom.coordinates.groupId);
-                        break;
-                    case 'a':
-                        result.append(pom.coordinates.artifactId);
-                        break;
-                    case 'v':
-                        result.append(pom.coordinates.version);
+                        result.append(pom.coordinates.toGavString());
                         break;
                     case 'o':
                         result.append(pom.origin);
                         break;
                     case 'd':
-                        first = true;
-                        url = pom.projectUrl();
-                        for (FileNode directory : fstab.directories(url)) {
-                            if (directory.exists()) {
-                                if (first) {
-                                    first = false;
-                                } else {
-                                    result.append(' ');
-                                }
-                                result.append(directory.getAbsolute());
-                            }
-                        }
-                        break;
-                    case 'D':
                         if (i + 1 < max && format.charAt(i + 1) == '[') {
                             end = format.indexOf(']', i + 2);
                             if (end == -1) {
@@ -124,6 +101,20 @@ public class Find extends SearchBase<Pom> {
                             }
                         } else {
                             result.append(pom.dependencies.toString());
+                        }
+                        break;
+                    case 'c':
+                        first = true;
+                        url = pom.projectUrl();
+                        for (FileNode directory : fstab.directories(url)) {
+                            if (directory.exists()) {
+                                if (first) {
+                                    first = false;
+                                } else {
+                                    result.append(' ');
+                                }
+                                result.append(directory.getAbsolute());
+                            }
                         }
                         break;
                     default:
