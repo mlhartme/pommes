@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Environment;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
@@ -40,19 +41,19 @@ public class Mount extends Base {
 
     @Override
     public void invoke(Database database) throws Exception {
-        Fstab fstab;
+        Environment environment;
         String svnurl;
         List<Action> adds;
         Action action;
         int problems;
         List<FileNode> directories;
 
-        fstab = Fstab.load(console.world);
+        environment = new Environment(console.world, maven);
         adds = new ArrayList<>();
         problems = 0;
-        for (Pom pom : database.query(fstab, query)) {
+        for (Pom pom : database.query(environment, query)) {
             svnurl = pom.projectUrl();
-            directories = fstab.directories(svnurl);
+            directories = environment.fstab().directories(svnurl);
             if (directories.isEmpty()) {
                 console.error.println("no mount point for " + svnurl);
                 problems++;

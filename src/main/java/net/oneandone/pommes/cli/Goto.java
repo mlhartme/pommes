@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Environment;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
@@ -69,7 +70,7 @@ public class Goto extends Base {
         }
         fstab = Fstab.load(console.world);
         actions = new ArrayList<>();
-        for (Pom pom : database.query(Fstab.load(console.world), query)) {
+        for (Pom pom : database.query(new Environment(console.world, maven), query)) {
             svnurl = pom.projectUrl();
             directories = fstab.directories(svnurl);
             if (directories.isEmpty()) {

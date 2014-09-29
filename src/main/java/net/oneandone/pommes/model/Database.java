@@ -15,8 +15,6 @@
  */
 package net.oneandone.pommes.model;
 
-import net.oneandone.pommes.mount.Fstab;
-import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -645,12 +643,13 @@ public class Database implements AutoCloseable {
 
     private static final Separator PLUS = Separator.on('+');
 
-    public List<Pom> query(Fstab fstab, String queryString) throws IOException, QueryNodeException {
+    public List<Pom> query(Environment environment, String queryString) throws IOException, QueryNodeException {
         BooleanQuery query;
         List<String> terms;
         Query term;
         char marker;
 
+        queryString = macros(environment, queryString);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
             return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME));
@@ -673,12 +672,6 @@ public class Database implements AutoCloseable {
                     case '@':
                         term = substring(Database.ORIGIN, termString.substring(1));
                         break;
-                    case '^':
-                        if (fstab == null) {
-                            throw new IllegalArgumentException("cannot use context operator without fstab");
-                        }
-                        term = new WildcardQuery(new Term(Database.ORIGIN, "svn:" + context(fstab, termString.substring(1)) + "*"));
-                        break;
                     default:
                         term = or(substring(Database.GAV_NAME, termString), substring(Database.ORIGIN, termString));
                         break;
@@ -689,16 +682,42 @@ public class Database implements AutoCloseable {
         }
     }
 
-    private String context(Fstab fstab, String contextString) {
-        FileNode context;
-        Point point;
+    private static final String prefix = "${";
+    private static final String suffix = "}";
 
-        context = directory.getWorld().file(contextString);
-        point = fstab.pointOpt(context);
-        if (point == null) {
-            throw new IllegalArgumentException("no mount point for directory " + context.getAbsolute());
+    public String macros(Environment environment, String content) throws IOException {
+        StringBuilder builder;
+        int start;
+        int end;
+        int last;
+        String var;
+        String replaced;
+
+        builder = new StringBuilder();
+        last = 0;
+        while (true) {
+            start = content.indexOf(prefix, last);
+            if (start == -1) {
+                if (last == 0) {
+                    return content;
+                } else {
+                    builder.append(content.substring(last));
+                    return builder.toString();
+                }
+            }
+            end = content.indexOf(suffix, start + prefix.length());
+            if (end == -1) {
+                throw new IllegalArgumentException("missing end marker");
+            }
+            var = content.substring(start + prefix.length(), end);
+            replaced = environment.get(var);
+            if (replaced == null) {
+                throw new IllegalArgumentException("undefined variable: " + var);
+            }
+            builder.append(content.substring(last, start));
+            builder.append(replaced);
+            last = end + suffix.length();
         }
-        return point.svnurl(context);
     }
 
     private static Query or(Query left, Query right) {
