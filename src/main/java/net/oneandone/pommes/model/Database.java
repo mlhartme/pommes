@@ -647,8 +647,9 @@ public class Database implements AutoCloseable {
         List<String> terms;
         Query term;
         char marker;
+        String string;
 
-        queryString = macros(variables, queryString);
+        queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
             return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME));
@@ -663,16 +664,20 @@ public class Database implements AutoCloseable {
                 switch (marker) {
                     case ':':
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
-                            term = or(substring(Database.PAR_GAV, termString.substring(2)), substring(Database.DEP_GAV, termString.substring(2)));
+                            string = variables(termString.substring(2), variables);
+                            term = or(substring(Database.PAR_GAV, string), substring(Database.DEP_GAV, string));
                         } else {
-                            term = substring(Database.GAV_NAME, termString.substring(1));
+                            string = variables(termString.substring(1), variables);
+                            term = substring(Database.GAV_NAME, string);
                         }
                         break;
                     case '@':
-                        term = substring(Database.ORIGIN, termString.substring(1));
+                        string = variables(termString.substring(1), variables);
+                        term = substring(Database.ORIGIN, string);
                         break;
                     default:
-                        term = or(substring(Database.GAV_NAME, termString), substring(Database.ORIGIN, termString));
+                        string = variables(termString, variables);
+                        term = or(substring(Database.GAV_NAME, string), substring(Database.ORIGIN, string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
@@ -684,7 +689,7 @@ public class Database implements AutoCloseable {
     private static final String prefix = "${";
     private static final String suffix = "}";
 
-    public String macros(Variables variables, String content) throws IOException {
+    private static String variables(String string, Variables variables) throws IOException {
         StringBuilder builder;
         int start;
         int end;
@@ -695,25 +700,25 @@ public class Database implements AutoCloseable {
         builder = new StringBuilder();
         last = 0;
         while (true) {
-            start = content.indexOf(prefix, last);
+            start = string.indexOf(prefix, last);
             if (start == -1) {
                 if (last == 0) {
-                    return content;
+                    return string;
                 } else {
-                    builder.append(content.substring(last));
+                    builder.append(string.substring(last));
                     return builder.toString();
                 }
             }
-            end = content.indexOf(suffix, start + prefix.length());
+            end = string.indexOf(suffix, start + prefix.length());
             if (end == -1) {
                 throw new IllegalArgumentException("missing end marker");
             }
-            var = content.substring(start + prefix.length(), end);
+            var = string.substring(start + prefix.length(), end);
             replaced = variables.lookup(var);
             if (replaced == null) {
                 throw new IOException("undefined variable: " + var);
             }
-            builder.append(content.substring(last, start));
+            builder.append(string.substring(last, start));
             builder.append(replaced);
             last = end + suffix.length();
         }
