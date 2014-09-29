@@ -18,9 +18,10 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.mount.Fstab;
+import net.oneandone.sushi.cli.ArgumentException;
 import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
+import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
@@ -29,18 +30,28 @@ import java.io.IOException;
 import java.util.List;
 
 public class Find extends SearchBase<Pom> {
-    private final Fstab fstab;
+    private boolean explicitQuery;
 
-    public Find(Console console, Environment environment) throws IOException {
+    public Find(Console console, Environment environment, String defaultQuery, String defaultFormat) throws IOException {
         super(console, environment);
-        this.fstab = Fstab.load(console.world);
+        this.format = defaultFormat;
+        this.query = defaultQuery;
+        this.explicitQuery = false;
     }
 
-    @Value(name = "query", position = 1)
     private String query;
 
+    @Remaining
+    public void remaining(String str) {
+        if (explicitQuery) {
+            throw new ArgumentException("too many queries");
+        }
+        query = str;
+        explicitQuery = true;
+    }
+
     @Option("format")
-    private String format = "%g @ %o %c";
+    private String format;
 
     public List<Pom> search(Database database) throws IOException, QueryNodeException {
         return database.query(query, environment);
@@ -52,17 +63,18 @@ public class Find extends SearchBase<Pom> {
     }
 
     @Override
-    public String toLine(Pom pom) {
+    public String toLine(Pom pom) throws IOException {
         return format(pom);
     }
 
-    private String format(Pom pom) {
+    private String format(Pom pom) throws IOException {
         char c;
         StringBuilder result;
         String url;
         boolean first;
         String str;
         int end;
+        String variable;
         String filter;
 
         result = new StringBuilder();
@@ -88,6 +100,13 @@ public class Find extends SearchBase<Pom> {
                                 throw new IllegalStateException("invalid format: " + format);
                             }
                             filter = format.substring(i + 2, end);
+                            if (filter.startsWith("%")) {
+                                variable = filter.substring(1);
+                                filter = environment.lookup(variable);
+                                if (filter == null) {
+                                    throw new IllegalStateException("unknown variable in format: " + variable);
+                                }
+                            }
                             i = end;
                             for (GAV dep : pom.dependencies) {
                                 str = dep.toGavString();
@@ -102,7 +121,7 @@ public class Find extends SearchBase<Pom> {
                     case 'c':
                         first = true;
                         url = pom.projectUrl();
-                        for (FileNode directory : fstab.directories(url)) {
+                        for (FileNode directory : environment.fstab().directories(url)) {
                             if (directory.exists()) {
                                 if (first) {
                                     first = false;

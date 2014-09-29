@@ -63,7 +63,7 @@ public abstract class SearchBase<T> extends Base {
 
     public abstract List<T> search(Database database) throws Exception;
     public abstract Pom toPom(T t);
-    public abstract String toLine(T t);
+    public abstract String toLine(T t) throws IOException;
 
     private List<FileNode> extractLocal(List<T> matches) throws IOException {
         List<FileNode> result;

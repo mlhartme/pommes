@@ -44,12 +44,12 @@ public class Main extends Cli implements Command {
 
     @Child("find")
     public Find find() throws IOException {
-        return new Find(console, env());
+        return new Find(console, env(), "", "%g @ %o %c");
     }
 
     @Child("users")
-    public Users users() throws IOException {
-        return new Users(console, env());
+    public Find users() throws IOException {
+        return new Find(console, env(), ":-${ga}+@trunk", "%g @ %o -> %d[%ga]");
     }
 
     //--
