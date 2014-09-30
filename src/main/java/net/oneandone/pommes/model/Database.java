@@ -25,7 +25,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
@@ -222,75 +221,7 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public static Document document(String origin, Pom pom) throws InvalidVersionSpecificationException {
-        Document doc;
-
-        doc = new Document();
-        doc.add(new StringField(ORIGIN, origin, Field.Store.YES));
-        doc.add(new StringField(GROUP, pom.coordinates.groupId, Field.Store.YES));
-        doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
-        doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
-        doc.add(new StringField(GA, pom.coordinates.toGaString(), Field.Store.YES));
-        doc.add(new StringField(GAV_NAME, pom.coordinates.toGavString(), Field.Store.YES));
-        return doc;
-    }
-
-    public static Document document(String origin, MavenProject mavenProject) throws InvalidVersionSpecificationException {
-        Document doc;
-        MavenProject parent;
-        Pom parPom;
-
-        doc = document(origin, Pom.forProject(origin, mavenProject));
-        for (Dependency dependency : mavenProject.getDependencies()) {
-            GAV dep = GAV.forDependency(dependency);
-
-            // index groupId:artifactId for non-version searches
-            doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
-            // index groupId:artifactId:version for exact-version searches
-            doc.add(new StringField(DEP_GAV, dep.toGavString(), Field.Store.YES));
-            // index groupId:artifactId for searches that need to evaluate the range
-            VersionRange vr = VersionRange.createFromVersionSpec(dependency.getVersion());
-            if (vr.hasRestrictions()) {
-                doc.add(new StringField(DEP_GA_RANGE, dep.toGaString(), Field.Store.YES));
-            }
-        }
-
-        // parent
-        parent = mavenProject.getParent();
-        if (parent != null) {
-            parPom = Pom.forProject(origin, parent);
-            doc.add(new StringField(PAR_GA, parPom.coordinates.toGaString(), Field.Store.YES));
-            doc.add(new StringField(PAR_GAV, parPom.coordinates.toGavString(), Field.Store.YES));
-        }
-        return doc;
-    }
-
     //--
-
-    /**
-     * TODO: git support
-     * @return urls with tailing slash
-     */
-    public List<String> list(String urlPrefix) throws IOException {
-        List<String> result;
-        String origin;
-        String prefix;
-        Document doc;
-
-        result = new ArrayList<>();
-        prefix = Database.SCM_SVN + urlPrefix;
-        try (IndexReader reader = DirectoryReader.open(getIndexLuceneDirectory())) {
-            int numDocs = reader.numDocs();
-            for (int i = 0; i < numDocs; i++) {
-                doc = reader.document(i);
-                origin = doc.get(Database.ORIGIN);
-                if (origin.startsWith(prefix)) {
-                    result.add(origin);
-                }
-            }
-        }
-        return result;
-    }
 
     public static String withSlash(String url) {
         if (!url.endsWith("/")) {
@@ -300,26 +231,6 @@ public class Database implements AutoCloseable {
     }
 
     //--
-
-    public List<Pom> search(String substring) throws IOException {
-        List<Pom> result;
-        Document document;
-        Pom pom;
-        IndexReader reader;
-
-        result = new ArrayList<>();
-        reader = DirectoryReader.open(getIndexLuceneDirectory());
-        int numDocs = reader.numDocs();
-        for (int i = 0; i < numDocs; i++) {
-            document = reader.document(i);
-            pom = toPom(document);
-            if (pom.toLine().contains(substring)) {
-                result.add(pom);
-            }
-        }
-        reader.close();
-        return result;
-    }
 
     public static Pom toPom(Document document) {
         Pom result;
@@ -435,8 +346,6 @@ public class Database implements AutoCloseable {
         return new WildcardQuery(new Term(field, "*" + substring + "*"));
     }
 
-    //--
-
     public Pom lookup(String origin) throws IOException {
         List<Pom> result;
 
@@ -474,5 +383,50 @@ public class Database implements AutoCloseable {
             list.add(searcher.getIndexReader().document(scoreDoc.doc));
         }
         return list;
+    }
+
+    //--
+
+    public static Document document(String origin, Pom pom) throws InvalidVersionSpecificationException {
+        Document doc;
+
+        doc = new Document();
+        doc.add(new StringField(ORIGIN, origin, Field.Store.YES));
+        doc.add(new StringField(GROUP, pom.coordinates.groupId, Field.Store.YES));
+        doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
+        doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
+        doc.add(new StringField(GA, pom.coordinates.toGaString(), Field.Store.YES));
+        doc.add(new StringField(GAV_NAME, pom.coordinates.toGavString(), Field.Store.YES));
+        return doc;
+    }
+
+    public static Document document(String origin, MavenProject mavenProject) throws InvalidVersionSpecificationException {
+        Document doc;
+        MavenProject parent;
+        Pom parPom;
+
+        doc = document(origin, Pom.forProject(origin, mavenProject));
+        for (Dependency dependency : mavenProject.getDependencies()) {
+            GAV dep = GAV.forDependency(dependency);
+
+            // index groupId:artifactId for non-version searches
+            doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
+            // index groupId:artifactId:version for exact-version searches
+            doc.add(new StringField(DEP_GAV, dep.toGavString(), Field.Store.YES));
+            // index groupId:artifactId for searches that need to evaluate the range
+            VersionRange vr = VersionRange.createFromVersionSpec(dependency.getVersion());
+            if (vr.hasRestrictions()) {
+                doc.add(new StringField(DEP_GA_RANGE, dep.toGaString(), Field.Store.YES));
+            }
+        }
+
+        // parent
+        parent = mavenProject.getParent();
+        if (parent != null) {
+            parPom = Pom.forProject(origin, parent);
+            doc.add(new StringField(PAR_GA, parPom.coordinates.toGaString(), Field.Store.YES));
+            doc.add(new StringField(PAR_GAV, parPom.coordinates.toGavString(), Field.Store.YES));
+        }
+        return doc;
     }
 }
