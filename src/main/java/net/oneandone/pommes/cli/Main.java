@@ -164,9 +164,9 @@ public class Main extends Cli implements Command {
         console.info.println("  origin    = '@' STR         ; substring match in origin");
         console.info.println("  lucene    = '%' STR         ; Lucene Query Syntax");
         console.info.println("and STR may contain the following context variables:");
-        console.info.println("  ${gav}    = coordinates for current project");
-        console.info.println("  ${ga}     = group and artifact of current project");
-        console.info.println("  ${svn}    = svn location for current directory");
+        console.info.println("  =gav=     = coordinates for current project");
+        console.info.println("  =ga=      = group and artifact of current project");
+        console.info.println("  =svn=     = svn location for current directory");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         url pointing to global database zip file");
