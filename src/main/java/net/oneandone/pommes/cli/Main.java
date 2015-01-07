@@ -49,7 +49,7 @@ public class Main extends Cli implements Command {
 
     @Child("users")
     public Find users() throws IOException {
-        return new Find(console, env(), ":-${ga}+@trunk", "%g @ %o -> %d[%ga]");
+        return new Find(console, env(), ":-=ga=+@trunk", "%g @ %o -> %d[%ga]");
     }
 
     //--
@@ -117,11 +117,9 @@ public class Main extends Cli implements Command {
         console.info.println("                        print projects matching this query;");
         console.info.println("                        format string supports the following place holder:");
         console.info.println("                        %g gav   %o origin  %d dependencies  %c checkouts");
-        console.info.println("  'users' '-all'? '-branch'? gav?");
-        console.info.println("                        print projects that use the specified artifact as a dependency of parent;");
-        console.info.println("                        use -branch to search in branch projects only");
-        console.info.println("                        use -all to search all projects; default is to search trunk projects only");
-        console.info.println("                        (gav defaults to current project)");
+        console.info.println("  'users'");
+        console.info.println("                        print projects that have a dependency to the current project;");
+        console.info.println("                        same as 'pommes find -format \"%g @ %o -> %d[%ga]\" :-=ga=+@trunk ");
         console.info.println();
         console.info.println("mount commands");
         console.info.println("  'mount' query         checkout matching projects; skips existing checkouts;");
@@ -134,7 +132,8 @@ public class Main extends Cli implements Command {
         console.info.println("  'list' root?          print all checkouts under the specified directory with status markers:");
         console.info.println("                        C - checkout url does not match url configured by fstab");
         console.info.println("                        ? - checkout has no configured url configured by fstab");
-        console.info.println("  'goto' query          offer selection of matching project and check it out when necessary");
+        console.info.println("  'goto' query          offer selection of matching project, check it out when necessary, ");
+        console.info.println("                        and cd into the checkout directory");
         console.info.println();
         console.info.println("database commands");
         console.info.println("  'database-clear'      creates a new empty database");
