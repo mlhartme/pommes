@@ -99,7 +99,7 @@ public class Main extends Cli implements Command {
     }
 
     //--
-
+    
     @Override
     public void invoke() throws Exception {
         printHelp();
@@ -107,7 +107,7 @@ public class Main extends Cli implements Command {
 
     @Override
     public void printHelp() {
-        console.info.println("Pom database. ");
+        console.info.println("Project database tool. ");
         console.info.println();
         console.info.println("Usage: ");
         console.info.println("  'pommes' ['-v'|'-e'] command sync-options args*");
