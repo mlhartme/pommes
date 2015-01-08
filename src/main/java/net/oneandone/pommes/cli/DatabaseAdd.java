@@ -27,6 +27,7 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import org.apache.lucene.document.Document;
+import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
@@ -129,7 +130,7 @@ public class DatabaseAdd extends Base {
             while (true) {
                 try {
                     return iterUnchecked();
-                } catch (IOException e) {
+                } catch (InvalidArtifactRTException | IOException e) {
                     console.error.println(e.getMessage());
                     e.getCause().printStackTrace(console.verbose);
                     errors++;
