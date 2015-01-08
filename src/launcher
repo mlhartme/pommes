@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 # This is Pommes' setup code. Add
 #
 #    eval "`/path/to/this/file`"
 #
 # to your ~/.bashrc to setup Pommes in your shell.
 
-function pommes() {
+pommes() {
   local shellFile=$HOME/.pommes-shell-$$-$(date +%N)
 
   PATH=${{path}}
@@ -23,7 +23,7 @@ function pommes() {
 }
 
 # Helper function, prefixed with _pommes to avoid naming collisions
-function _pommes_absolute() {
+_pommes_absolute() {
     local ME=$1
     while [ -h "$ME" ] ; do
       ls=$(ls -ld "$ME")
