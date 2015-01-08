@@ -99,7 +99,7 @@ public class Main extends Cli implements Command {
     }
 
     //--
-    
+
     @Override
     public void invoke() throws Exception {
         printHelp();
@@ -167,7 +167,7 @@ public class Main extends Cli implements Command {
         console.info.println("and STR may contain the following variables:");
         console.info.println("  =gav=     = coordinates for current project");
         console.info.println("  =ga=      = group and artifact of current project");
-        console.info.println("  =svn=     = svn location for current directory");
+        console.info.println("  =svn=     = svn location for current directory (according to fstab)");
         console.info.println();
         console.info.println("examples:");
         console.info.println("  pommes find :foo+@trunk                   # projects with foo in they gav and trunk in their origin");
