@@ -118,7 +118,7 @@ public class Main extends Cli implements Command {
         console.info.println("                        format string supports the following place holder:");
         console.info.println("                        %g gav   %o origin  %d dependencies  %c checkouts;");
         console.info.println("                        place holders can be followed by angle brackets to filter for");
-        console.info.println("                        the enclosed substring or variable");
+        console.info.println("                        the enclosed substring or variables");
         console.info.println("  'users'");
         console.info.println("                        print projects that have a dependency to the current project;");
         console.info.println("                        same as 'pommes find -format \"%g @ %o -> %d[%ga]\" :-=ga=+@trunk ");
@@ -168,6 +168,12 @@ public class Main extends Cli implements Command {
         console.info.println("  =gav=     = coordinates for current project");
         console.info.println("  =ga=      = group and artifact of current project");
         console.info.println("  =svn=     = svn location for current directory");
+        console.info.println();
+        console.info.println("examples:");
+        console.info.println("  pommes find :foo+@trunk                   # projects with foo in they gav and trunk in their origin");
+        console.info.println("  pommes find :-slf4j                       # projects with a dependency to slf4j");
+        console.info.println("  pommes find -format %g :-slf4j            # same, but only print gav of the matches");
+        console.info.println("  pommes find -format %d[slf4j] :-slf4j     # same, but only print the matched dependency");
         console.info.println();
         console.info.println("environment:");
         console.info.println("  POMMES_GLOBAL         url pointing to global database zip file");
