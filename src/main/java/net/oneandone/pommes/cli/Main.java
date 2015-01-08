@@ -116,7 +116,9 @@ public class Main extends Cli implements Command {
         console.info.println("  'find' ('-format' str)? query");
         console.info.println("                        print projects matching this query;");
         console.info.println("                        format string supports the following place holder:");
-        console.info.println("                        %g gav   %o origin  %d dependencies  %c checkouts");
+        console.info.println("                        %g gav   %o origin  %d dependencies  %c checkouts;");
+        console.info.println("                        place holders can be followed by angle brackets to filter for");
+        console.info.println("                        the enclosed substring or variable");
         console.info.println("  'users'");
         console.info.println("                        print projects that have a dependency to the current project;");
         console.info.println("                        same as 'pommes find -format \"%g @ %o -> %d[%ga]\" :-=ga=+@trunk ");
@@ -162,7 +164,7 @@ public class Main extends Cli implements Command {
         console.info.println("  dep       = ':-' STR        ; substring match in dependency or parent");
         console.info.println("  origin    = '@' STR         ; substring match in origin");
         console.info.println("  lucene    = '%' STR         ; Lucene Query Syntax");
-        console.info.println("and STR may contain the following context variables:");
+        console.info.println("and STR may contain the following variables:");
         console.info.println("  =gav=     = coordinates for current project");
         console.info.println("  =ga=      = group and artifact of current project");
         console.info.println("  =svn=     = svn location for current directory");

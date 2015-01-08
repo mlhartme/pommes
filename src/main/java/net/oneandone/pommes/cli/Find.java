@@ -25,6 +25,7 @@ import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Find extends Base {
@@ -64,11 +65,11 @@ public class Find extends Base {
         char c;
         StringBuilder result;
         String url;
-        boolean first;
-        String str;
         int end;
         String variable;
         String filter;
+        List<String> values;
+        boolean first;
 
         result = new StringBuilder();
         for (int i = 0, max = format.length(); i < max; i++) {
@@ -76,57 +77,64 @@ public class Find extends Base {
             if (c == '%' && i + 1 < max) {
                 i++;
                 c = format.charAt(i);
+                values = new ArrayList<>();
                 switch (c) {
                     case '%':
                         result.append(c);
+                        values.add(Character.toString(c));
                         break;
                     case 'g':
-                        result.append(pom.coordinates.toGavString());
+                        values.add(pom.coordinates.toGavString());
                         break;
                     case 'o':
-                        result.append(pom.origin);
+                        values.add(pom.origin);
                         break;
                     case 'd':
-                        if (i + 1 < max && format.charAt(i + 1) == '[') {
-                            end = format.indexOf(']', i + 2);
-                            if (end == -1) {
-                                throw new IllegalStateException("invalid format: " + format);
-                            }
-                            filter = format.substring(i + 2, end);
-                            if (filter.startsWith("%")) {
-                                variable = filter.substring(1);
-                                filter = environment.lookup(variable);
-                                if (filter == null) {
-                                    throw new IllegalStateException("unknown variable in format: " + variable);
-                                }
-                            }
-                            i = end;
-                            for (GAV dep : pom.dependencies) {
-                                str = dep.toGavString();
-                                if (str.contains(filter)) {
-                                    result.append(str);
-                                }
-                            }
-                        } else {
-                            result.append(pom.dependencies.toString());
+                        for (GAV d : pom.dependencies) {
+                            values.add(d.toGavString());
                         }
                         break;
                     case 'c':
-                        first = true;
                         url = pom.projectUrl();
                         for (FileNode directory : environment.fstab().directories(url)) {
                             if (directory.exists()) {
-                                if (first) {
-                                    first = false;
-                                } else {
-                                    result.append(' ');
-                                }
-                                result.append(directory.getAbsolute());
+                                values.add(directory.getAbsolute());
                             }
                         }
                         break;
                     default:
                         throw new IllegalStateException("invalid format character: " + c);
+                }
+                if (i + 1 < max && format.charAt(i + 1) == '[') {
+                    end = format.indexOf(']', i + 2);
+                    if (end == -1) {
+                        throw new IllegalStateException("invalid format: " + format);
+                    }
+                    filter = format.substring(i + 2, end);
+                    if (filter.startsWith("=")) {
+                        if (filter.length() == 1 || !filter.endsWith("=")) {
+                            throw new IllegalStateException("variable is not terminated: " + filter);
+                        }
+                        variable = filter.substring(1, filter.length() - 1);
+                        filter = environment.lookup(variable);
+                        if (filter == null) {
+                            throw new IllegalStateException("unknown variable in format: " + variable);
+                        }
+                    }
+                    i = end;
+                } else {
+                    filter = "";
+                }
+                first = true;
+                for (String value : values) {
+                    if (value.contains(filter)) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            result.append(' ');
+                        }
+                        result.append(value);
+                    }
                 }
             } else {
                 result.append(c);
