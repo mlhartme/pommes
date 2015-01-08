@@ -132,7 +132,11 @@ public class DatabaseAdd extends Base {
                     return iterUnchecked();
                 } catch (InvalidArtifactRTException | IOException e) {
                     console.error.println(e.getMessage());
-                    e.getCause().printStackTrace(console.verbose);
+                    if (e.getCause() == null) {
+                        console.verbose.println("(unknown cause)");
+                    } else {
+                        e.getCause().printStackTrace(console.verbose);
+                    }
                     errors++;
                     // fall-through
                 }
