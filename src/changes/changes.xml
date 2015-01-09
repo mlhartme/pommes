@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
+    <release date="2015-01-09" version="2.4.1">
+      <action date="2015-01-09" dev="mhm" type="fix">
+        Fix == in launcher script, has to be = instead.
+      </action>
+    </release>
     <release date="2015-01-08" version="2.4.0">
       <action date="2014-09-29" dev="mhm" type="update">
         Added dependencies to pom objects, you can search for them with "find :-substring". (The users command is just a shortcut for this)
