@@ -43,7 +43,7 @@ _pommes_absolute() {
 # This is Pommes' setup code, scroll back to the beginning to read more.
 # EndOfSetup
 
-if [ $0 == "-bash" ] ; then
+if [ $0 = "-bash" ] ; then
   echo Do not source this file!
   return 1
 fi
