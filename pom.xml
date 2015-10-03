@@ -19,8 +19,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <wsd.ypid>20084</wsd.ypid>
-
     <guava.version>14.0.1</guava.version>
     <oneandone.java.source>1.7</oneandone.java.source>
     <oneandone.java.target>1.7</oneandone.java.target>
@@ -92,6 +90,11 @@
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queryparser</artifactId>
       <version>4.9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.3.1</version>
     </dependency>
     <!-- this is used by lucense-sandbox, but the dependency is not fetched transitivly ... -->
     <dependency>

@@ -15,14 +15,14 @@
  */
 package net.oneandone.pommes.cli;
 
+import java.io.IOException;
+
 import net.oneandone.sushi.cli.Child;
 import net.oneandone.sushi.cli.Cli;
 import net.oneandone.sushi.cli.Command;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-
-import java.io.IOException;
 
 public class Main extends Cli implements Command {
     public static void main(String[] args) throws IOException {
@@ -98,6 +98,10 @@ public class Main extends Cli implements Command {
         return new DatabaseRemove(console, env());
     }
 
+    @Child("database-export")
+    public DatabaseExport export() throws IOException {
+        return new DatabaseExport(console, env());
+    }
     //--
 
     @Override
