@@ -20,9 +20,11 @@ import java.io.IOException;
 import net.oneandone.sushi.cli.Child;
 import net.oneandone.sushi.cli.Cli;
 import net.oneandone.sushi.cli.Command;
+import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.cli.Option;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.fs.svn.SvnFilesystem;
 
 public class Main extends Cli implements Command {
     public static void main(String[] args) throws IOException {
@@ -37,70 +39,85 @@ public class Main extends Cli implements Command {
         return new Environment(console.world);
     }
 
+    private Console console(){
+        if (svnuser != null && svnpassword != null) {
+            SvnFilesystem filesystem = (SvnFilesystem) console.world.getFilesystem("svn");
+            filesystem.setDefaultCredentials(svnuser, svnpassword);
+            console.verbose.println("Using credentials from cli.");
+        }
+        return console;
+    }
+
     @Option("shellFile")
     private FileNode shellFile;
+
+    @Option("svnuser")
+    private String svnuser;
+
+    @Option("svnpassword")
+    private String svnpassword;
 
     //--
 
     @Child("find")
     public Find find() throws IOException {
-        return new Find(console, env(), "", "%g @ %o %c");
+        return new Find(console(), env(), "", "%g @ %o %c");
     }
 
     @Child("users")
     public Find users() throws IOException {
-        return new Find(console, env(), ":-=ga=+@trunk", "%g @ %o -> %d[%ga]");
+        return new Find(console(), env(), ":-=ga=+@trunk", "%g @ %o -> %d[%ga]");
     }
 
     //--
 
     @Child("mount")
     public Mount mount() throws IOException {
-        return new Mount(console, env());
+        return new Mount(console(), env());
     }
 
     @Child("umount")
     public Umount umount() throws IOException {
-        return new Umount(console, env());
+        return new Umount(console(), env());
     }
 
     @Child("list")
     public Lst list() throws IOException {
-        return new Lst(console, env());
+        return new Lst(console(), env());
     }
 
     @Child("goto")
     public Goto goTo() throws IOException {
-        return new Goto(console, env(), shellFile);
+        return new Goto(console(), env(), shellFile);
     }
 
     //--
 
     @Child("fstab-add")
     public FstabAdd fstabAdd() throws IOException {
-        return new FstabAdd(console, env());
+        return new FstabAdd(console(), env());
     }
 
     //--
 
     @Child("database-clear")
     public DatabaseClear clear() throws IOException {
-        return new DatabaseClear(console, env());
+        return new DatabaseClear(console(), env());
     }
 
     @Child("database-add")
     public DatabaseAdd add() throws IOException {
-        return new DatabaseAdd(console, env());
+        return new DatabaseAdd(console(), env());
     }
 
     @Child("database-remove")
     public DatabaseRemove remove() throws IOException {
-        return new DatabaseRemove(console, env());
+        return new DatabaseRemove(console(), env());
     }
 
     @Child("database-export")
     public DatabaseExport export() throws IOException {
-        return new DatabaseExport(console, env());
+        return new DatabaseExport(console(), env());
     }
     //--
 
@@ -149,6 +166,8 @@ public class Main extends Cli implements Command {
         console.info.println("                        use '-' pattern to exclude from the url before");
         console.info.println("  'database-remove' url*");
         console.info.println("                        remove all documents prefixed with one of the specified urls");
+        console.info.println("  'database-export' filter target");
+        console.info.println("                        saves a filtered list of artifacts in json-format to the target");
         console.info.println();
         console.info.println("other commands");
         console.info.println("  'fstab-add' url directory");
