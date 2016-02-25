@@ -16,14 +16,13 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
-import net.oneandone.sushi.cli.Console;
 
 public class DatabaseClear extends Base {
-    public DatabaseClear(Console console, Environment environment) {
-        super(console, environment);
+    public DatabaseClear(Globals globals) {
+        super(globals);
     }
 
-    public void invoke(Database database) throws Exception {
+    public void run(Database database) throws Exception {
         database.clear();
     }
 }

@@ -15,8 +15,8 @@
  */
 package net.oneandone.pommes.mount;
 
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Base;
-import net.oneandone.sushi.cli.Console;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;

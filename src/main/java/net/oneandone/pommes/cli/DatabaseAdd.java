@@ -15,15 +15,14 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.inline.ArgumentException;
+import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.sushi.cli.ArgumentException;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
-import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import org.apache.lucene.document.Document;
@@ -38,14 +37,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class DatabaseAdd extends Base {
-    @Option("noBranches")
-    private boolean noBranches;
+    private final boolean noBranches;
 
     private List<Node> nodes = new ArrayList<>();
     private List<Filter> excludes = new ArrayList<>();
 
-    @Remaining
-    public void remaining(String str) {
+    public DatabaseAdd(Globals globals, boolean noBranches) {
+        super(globals);
+        this.noBranches = noBranches;
+    }
+
+    public void xclude(String str) {
         Filter exclude;
 
         if (str.startsWith("-")) {
@@ -64,7 +66,7 @@ public class DatabaseAdd extends Base {
             exclude.include("**/" + str.substring(1));
         } else {
             try {
-                nodes.add(console.world.node("svn:" + str));
+                nodes.add(world.node("svn:" + str));
             } catch (URISyntaxException e) {
                 throw new ArgumentException(str + ": invalid url", e);
             } catch (NodeInstantiationException e) {
@@ -74,11 +76,8 @@ public class DatabaseAdd extends Base {
         }
     }
 
-    public DatabaseAdd(Console console, Environment environment) {
-        super(console, environment);
-    }
-
-    public void invoke(Database database) throws Exception {
+    @Override
+    public void run(Database database) throws Exception {
         List<Node> projects;
         ProjectIterator iterator;
 
@@ -88,13 +87,14 @@ public class DatabaseAdd extends Base {
         console.info.println("scanning svn ...");
         projects = projects();
         console.info.println("indexing ...");
-        iterator = new ProjectIterator(console, environment.maven(), projects.iterator());
+        iterator = new ProjectIterator(console, world, environment.maven(), projects.iterator());
         database.index(iterator);
         iterator.summary();
     }
 
     public static class ProjectIterator implements Iterator<Document> {
         private final Console console;
+        private final World world;
         private final Maven maven;
         private final Iterator<Node> projects;
 
@@ -102,8 +102,9 @@ public class DatabaseAdd extends Base {
         private int count;
         private int errors;
 
-        public ProjectIterator(Console console, Maven maven, Iterator<Node> projects) {
+        public ProjectIterator(Console console, World world, Maven maven, Iterator<Node> projects) {
             this.console = console;
+            this.world = world;
             this.maven = maven;
             this.projects = projects;
             this.current = iter();
@@ -156,7 +157,7 @@ public class DatabaseAdd extends Base {
                         return Database.document(pom.getURI().toString(), Pom.forComposer(pom));
                     } else {
                         count++;
-                        local = console.world.getTemp().createTempFile();
+                        local = world.getTemp().createTempFile();
                         try {
                             pom.copyFile(local);
                             console.info.println(pom.getURI().toString());

@@ -17,48 +17,104 @@ package net.oneandone.pommes.cli;
 
 import java.io.IOException;
 
-import net.oneandone.sushi.cli.Child;
-import net.oneandone.sushi.cli.Cli;
-import net.oneandone.sushi.cli.Command;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
-import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.fs.svn.SvnFilesystem;
+import net.oneandone.inline.Cli;
 
-public class Main extends Cli implements Command {
+public class Main {
     public static void main(String[] args) throws IOException {
-        System.exit(new Main().run(args));
+        Cli cli;
+
+        cli = Cli.create("Project database tool.\n"
+                + "\n"
+                + "Usage:\n"
+                + "  'pommes' ['-v'|'-e'] command sync-options args*\n"
+                + "\n"
+                + "search commands\n"
+                + "  'find' ('-format' str)? query\n"
+                + "                        print projects matching this query;\n"
+                + "                        format string supports the following place holder:\n"
+                + "                        %g gav   %o origin  %d dependencies  %c checkouts;\n"
+                + "                        place holders can be followed by angle brackets to filter for\n"
+                + "                        the enclosed substring or variables\n"
+                + "  'users'\n"
+                + "                        print projects that have a dependency to the current project;\n"
+                + "                        same as 'pommes find -format \"%g @ %o -> %d[%ga]\" :-=ga=+@trunk\n"
+                + "\n"
+                + "mount commands\n"
+                + "  'mount' query         checkout matching projects; skips existing checkouts;\n"
+                + "                        offers selection before changing anything on disk;\n"
+                + "  'umount' '-stale'? root?\n"
+                + "                        remove (optional: stale) checkouts under the specified root directory;\n"
+                + "                        a checkout is stale if the project has been removed from the database;\n"
+                + "                        offers selection before changing anything on disk;\n"
+                + "                        checks for uncommitted changes before selection\n"
+                + "  'list' root?          print all checkouts under the specified directory with status markers:\n"
+                + "                        C - checkout url does not match url configured by fstab\n"
+                + "                        ? - checkout has no configured url configured by fstab\n"
+                + "  'goto' query          offer selection of matching project, check it out when necessary,\n"
+                + "                        and cd into the checkout directory\n"
+                + "\n"
+                + "database commands\n"
+                + "  'database-clear'      creates a new empty database\n"
+                + "  'database-add' url* '-noBranches'?\n"
+                + "                        add projects found under the specified urls to the database;\n"
+                + "                        overwrites projects with same origin;\n"
+                + "                        use '-' pattern to exclude from the url before\n"
+                + "  'database-remove' url*\n"
+                + "                        remove all documents prefixed with one of the specified urls\n"
+                + "  'database-export' filter target\n"
+                + "                        saves a filtered list of artifacts in json-format to the target\n"
+                + "\n"
+                + "other commands\n"
+                + "  'fstab-add' url directory\n"
+                + "                        add an entry to fstab; create directory if it does not exist\n"
+                + "\n"
+                + "sync options            how to sync between global and local database\n"
+                + "  default behavior      download global database once a day; no uploads\n"
+                + "  '-download'           download global database before command execution\n"
+                + "  '-noDownload'         no download of global database\n"
+                + "  '-upload'             upload local database after command execution\n"
+                + "\n"
+                + "query syntax\n"
+                + "  query     = term ('+' term)* | lucene\n"
+                + "  term      = substring | gav | dep | origin\n"
+                + "  substring = STR             ; substring in gav OR origin\n"
+                + "  gav       = ':' STR         ; substring match in groupId:artifactId:version\n"
+                + "  dep       = ':-' STR        ; substring match in dependency or parent\n"
+                + "  origin    = '@' STR         ; substring match in origin\n"
+                + "  lucene    = '%' STR         ; Lucene Query Syntax\n"
+                + "and STR may contain the following variables:\n"
+                + "  =gav=     = coordinates for current project\n"
+                + "  =ga=      = group and artifact of current project\n"
+                + "  =svn=     = svn location for current directory (according to fstab)\n"
+                + "\n"
+                + "examples:\n"
+                + "  pommes find :foo+@trunk                   # projects with foo in they gav and trunk in their origin\n"
+                + "  pommes find :-slf4j                       # projects with a dependency to slf4j\n"
+                + "  pommes find -format %g :-slf4j            # same, but only print gav of the matches\n"
+                + "  pommes find -format %d[slf4j] :-slf4j     # same, but only print the matched dependency\n"
+                + "\n"
+                + "environment:\n"
+                + "  POMMES_GLOBAL         url pointing to global database zip file\n"
+                + "\n"
+                + "Home: https://github.com/mlhartme/pommes\n");
+        cli.begin(Globals.class, "-shellFile -svnuser -svnpassword -download -no-download -upload");
+          cli.add(Mount.class, "mount query");
+          cli.add(Umount.class, "umount -stale root=.?");
+
+          cli.add(Lst.class, "list");
+          cli.add(Goto.class, "goto query root=.?");
+
+          cli.add(FstabAdd.class, "fstab-add url directory");
+
+          cli.add(DatabaseClear.class, "database-clear");
+          cli.add(DatabaseAdd.class, "database-add -noBranches xclude* { xclude*(xclude) }");
+          cli.add(DatabaseRemove.class, "database-remove");
+          cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
+
+        System.exit(cli.run(args));
     }
 
-    public Main() {
-        super(new World());
-    }
-
-    private Environment env() throws IOException {
-        return new Environment(console.world);
-    }
-
-    private Console console(){
-        if (svnuser != null && svnpassword != null) {
-            SvnFilesystem filesystem = (SvnFilesystem) console.world.getFilesystem("svn");
-            filesystem.setDefaultCredentials(svnuser, svnpassword);
-            console.verbose.println("Using credentials from cli.");
-        }
-        return console;
-    }
-
-    @Option("shellFile")
-    private FileNode shellFile;
-
-    @Option("svnuser")
-    private String svnuser;
-
-    @Option("svnpassword")
-    private String svnpassword;
-
-    //--
-
+    /* TODO
     @Child("find")
     public Find find() throws IOException {
         return new Find(console(), env(), "", "%g @ %o %c");
@@ -67,140 +123,5 @@ public class Main extends Cli implements Command {
     @Child("users")
     public Find users() throws IOException {
         return new Find(console(), env(), ":-=ga=+@trunk", "%g @ %o -> %d[%ga]");
-    }
-
-    //--
-
-    @Child("mount")
-    public Mount mount() throws IOException {
-        return new Mount(console(), env());
-    }
-
-    @Child("umount")
-    public Umount umount() throws IOException {
-        return new Umount(console(), env());
-    }
-
-    @Child("list")
-    public Lst list() throws IOException {
-        return new Lst(console(), env());
-    }
-
-    @Child("goto")
-    public Goto goTo() throws IOException {
-        return new Goto(console(), env(), shellFile);
-    }
-
-    //--
-
-    @Child("fstab-add")
-    public FstabAdd fstabAdd() throws IOException {
-        return new FstabAdd(console(), env());
-    }
-
-    //--
-
-    @Child("database-clear")
-    public DatabaseClear clear() throws IOException {
-        return new DatabaseClear(console(), env());
-    }
-
-    @Child("database-add")
-    public DatabaseAdd add() throws IOException {
-        return new DatabaseAdd(console(), env());
-    }
-
-    @Child("database-remove")
-    public DatabaseRemove remove() throws IOException {
-        return new DatabaseRemove(console(), env());
-    }
-
-    @Child("database-export")
-    public DatabaseExport export() throws IOException {
-        return new DatabaseExport(console(), env());
-    }
-    //--
-
-    @Override
-    public void invoke() throws Exception {
-        printHelp();
-    }
-
-    @Override
-    public void printHelp() {
-        console.info.println("Project database tool. ");
-        console.info.println();
-        console.info.println("Usage: ");
-        console.info.println("  'pommes' ['-v'|'-e'] command sync-options args*");
-        console.info.println();
-        console.info.println("search commands");
-        console.info.println("  'find' ('-format' str)? query");
-        console.info.println("                        print projects matching this query;");
-        console.info.println("                        format string supports the following place holder:");
-        console.info.println("                        %g gav   %o origin  %d dependencies  %c checkouts;");
-        console.info.println("                        place holders can be followed by angle brackets to filter for");
-        console.info.println("                        the enclosed substring or variables");
-        console.info.println("  'users'");
-        console.info.println("                        print projects that have a dependency to the current project;");
-        console.info.println("                        same as 'pommes find -format \"%g @ %o -> %d[%ga]\" :-=ga=+@trunk ");
-        console.info.println();
-        console.info.println("mount commands");
-        console.info.println("  'mount' query         checkout matching projects; skips existing checkouts;");
-        console.info.println("                        offers selection before changing anything on disk;");
-        console.info.println("  'umount' '-stale'? root?");
-        console.info.println("                        remove (optional: stale) checkouts under the specified root directory;");
-        console.info.println("                        a checkout is stale if the project has been removed from the database;");
-        console.info.println("                        offers selection before changing anything on disk;");
-        console.info.println("                        checks for uncommitted changes before selection");
-        console.info.println("  'list' root?          print all checkouts under the specified directory with status markers:");
-        console.info.println("                        C - checkout url does not match url configured by fstab");
-        console.info.println("                        ? - checkout has no configured url configured by fstab");
-        console.info.println("  'goto' query          offer selection of matching project, check it out when necessary, ");
-        console.info.println("                        and cd into the checkout directory");
-        console.info.println();
-        console.info.println("database commands");
-        console.info.println("  'database-clear'      creates a new empty database");
-        console.info.println("  'database-add' url* '-noBranches'?");
-        console.info.println("                        add projects found under the specified urls to the database;");
-        console.info.println("                        overwrites projects with same origin;");
-        console.info.println("                        use '-' pattern to exclude from the url before");
-        console.info.println("  'database-remove' url*");
-        console.info.println("                        remove all documents prefixed with one of the specified urls");
-        console.info.println("  'database-export' filter target");
-        console.info.println("                        saves a filtered list of artifacts in json-format to the target");
-        console.info.println();
-        console.info.println("other commands");
-        console.info.println("  'fstab-add' url directory");
-        console.info.println("                        add an entry to fstab; create directory if it does not exist");
-        console.info.println();
-        console.info.println("sync options            how to sync between global and local database");
-        console.info.println("  default behavior      download global database once a day; no uploads");
-        console.info.println("  '-download'           download global database before command execution");
-        console.info.println("  '-noDownload'         no download of global database");
-        console.info.println("  '-upload'             upload local database after command execution");
-        console.info.println();
-        console.info.println("query syntax");
-        console.info.println("  query     = term ('+' term)* | lucene");
-        console.info.println("  term      = substring | gav | dep | origin");
-        console.info.println("  substring = STR             ; substring in gav OR origin");
-        console.info.println("  gav       = ':' STR         ; substring match in groupId:artifactId:version");
-        console.info.println("  dep       = ':-' STR        ; substring match in dependency or parent");
-        console.info.println("  origin    = '@' STR         ; substring match in origin");
-        console.info.println("  lucene    = '%' STR         ; Lucene Query Syntax");
-        console.info.println("and STR may contain the following variables:");
-        console.info.println("  =gav=     = coordinates for current project");
-        console.info.println("  =ga=      = group and artifact of current project");
-        console.info.println("  =svn=     = svn location for current directory (according to fstab)");
-        console.info.println();
-        console.info.println("examples:");
-        console.info.println("  pommes find :foo+@trunk                   # projects with foo in they gav and trunk in their origin");
-        console.info.println("  pommes find :-slf4j                       # projects with a dependency to slf4j");
-        console.info.println("  pommes find -format %g :-slf4j            # same, but only print gav of the matches");
-        console.info.println("  pommes find -format %d[slf4j] :-slf4j     # same, but only print the matched dependency");
-        console.info.println();
-        console.info.println("environment:");
-        console.info.println("  POMMES_GLOBAL         url pointing to global database zip file");
-        console.info.println();
-        console.info.println("Home: https://github.com/mlhartme/pommes");
-    }
+    }*/
 }

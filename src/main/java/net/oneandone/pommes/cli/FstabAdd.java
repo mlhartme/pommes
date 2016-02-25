@@ -18,32 +18,29 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;
 
 public class FstabAdd extends Base {
-    @Value(name = "url", position = 1)
     private String url;
-
-    @Value(name = "directory", position = 2)
     private FileNode directory;
 
-    public FstabAdd(Console console, Environment environment) {
-        super(console, environment);
+    public FstabAdd(Globals globals, String url, FileNode directory) {
+        super(globals);
+        this.url = url;
+        this.directory = directory;
     }
 
     @Override
-    public void invoke(Database database) throws Exception {
+    public void run(Database database) throws Exception {
         Fstab fstab;
 
         url = Database.withSlash(url);
-        fstab = Fstab.load(console.world);
+        fstab = Fstab.load(world);
         directory.getParent().checkDirectory();
         directory.mkdirOpt();
-        fstab.add(new Point(url, directory, new ArrayList<String>()));
-        fstab.save(Fstab.file(console.world));
+        fstab.add(new Point(url, directory, new ArrayList<>()));
+        fstab.save(Fstab.file(world));
     }
 }

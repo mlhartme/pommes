@@ -20,8 +20,6 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.StatusException;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -29,15 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Mount extends Base {
-    @Value(name = "query", position = 1)
-    private String query;
+    private final String query;
 
-    public Mount(Console console, Environment environment) {
-        super(console, environment);
+    public Mount(Globals globals, String query) {
+        super(globals);
+        this.query = query;
     }
 
     @Override
-    public void invoke(Database database) throws Exception {
+    public void run(Database database) throws Exception {
         String svnurl;
         List<Action> adds;
         Action action;

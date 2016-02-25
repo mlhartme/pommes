@@ -15,16 +15,13 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.mount.Remove;
 import net.oneandone.pommes.mount.StatusException;
-import net.oneandone.sushi.cli.ArgumentException;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
-import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -32,25 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Umount extends Base {
-    private FileNode root;
+    private final boolean stale;
+    private final FileNode root;
 
-    @Option("stale")
-    private boolean stale;
-
-    @Remaining
-    public void add(String str) {
-        if (root != null) {
-            throw new ArgumentException("too many root arguments");
-        }
-        root = console.world.file(str);
-    }
-
-    public Umount(Console console, Environment environment) {
-        super(console, environment);
+    public Umount(Globals globals, boolean stale, FileNode root) {
+        super(globals);
+        this.stale = stale;
+        this.root = root;
     }
 
     @Override
-    public void invoke(Database database) throws Exception {
+    public void run(Database database) throws Exception {
         int problems;
         Fstab fstab;
         List<FileNode> checkouts;
@@ -59,10 +48,7 @@ public class Umount extends Base {
         Point point;
         FileNode configuredDirectory;
 
-        if (root == null) {
-            root = (FileNode) console.world.getWorking();
-        }
-        fstab = Fstab.load(console.world);
+        fstab = Fstab.load(world);
         checkouts = new ArrayList<>();
         scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {

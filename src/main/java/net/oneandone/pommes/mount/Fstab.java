@@ -15,10 +15,10 @@
  */
 package net.oneandone.pommes.mount;
 
-import net.oneandone.sushi.fs.LineFormat;
-import net.oneandone.sushi.fs.LineReader;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.io.LineFormat;
+import net.oneandone.sushi.io.LineReader;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -41,7 +41,7 @@ public class Fstab {
 
         result = new Fstab();
         if (file.exists()) {
-            try (Reader reader = file.createReader();
+            try (Reader reader = file.newReader();
                 LineReader src = new LineReader(reader, new LineFormat(LineFormat.LF_SEPARATOR))) {
                 while (true) {
                     line = src.next();

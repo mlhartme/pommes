@@ -15,12 +15,10 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
-import net.oneandone.sushi.cli.ArgumentException;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -31,30 +29,27 @@ import java.util.List;
 public class Lst extends Base {
     private FileNode root;
 
-    @Remaining
     public void add(String str) {
         if (root != null) {
             throw new ArgumentException("too many root arguments");
         }
-        root = console.world.file(str);
+        root = world.file(str);
     }
 
-    public Lst(Console console, Environment environment) {
-        super(console, environment);
+    public Lst(Globals globals, FileNode root) {
+        super(globals);
+        this.root = root;
     }
 
     @Override
-    public void invoke(Database notUsed) throws Exception {
+    public void run(Database notUsed) throws Exception {
         Fstab fstab;
         List<FileNode> checkouts;
         String scannedUrl;
         FileNode configuredDirectory;
         Point point;
 
-        if (root == null) {
-            root = (FileNode) console.world.getWorking();
-        }
-        fstab = Fstab.load(console.world);
+        fstab = Fstab.load(world);
         checkouts = new ArrayList<>();
         scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {

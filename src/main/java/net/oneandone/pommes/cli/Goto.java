@@ -15,16 +15,13 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Nop;
-import net.oneandone.sushi.cli.ArgumentException;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Remaining;
-import net.oneandone.sushi.cli.Value;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -34,27 +31,19 @@ import java.util.Collections;
 import java.util.List;
 
 public class Goto extends Base {
-    @Value(name = "query", position = 1)
-    private String query;
-
+    private final String query;
+    private final FileNode root;
     private final FileNode shellFile;
-    private FileNode root;
 
-    @Remaining
-    public void add(String str) {
-        if (root != null) {
-            throw new ArgumentException("too many root arguments");
-        }
-        root = console.world.file(str);
-    }
-
-    public Goto(Console console, Environment environment, FileNode shellFile) {
-        super(console, environment);
-        this.shellFile = shellFile;
+    public Goto(Globals globals, String query, FileNode root) {
+        super(globals);
+        this.query = query;
+        this.root = root;
+        this.shellFile = globals.shellFile;
     }
 
     @Override
-    public void invoke(Database database) throws Exception {
+    public void run(Database database) throws Exception {
         Fstab fstab;
         List<Action> actions;
         List<FileNode> directories;
@@ -62,10 +51,7 @@ public class Goto extends Base {
         Action action;
         String result;
 
-        if (root == null) {
-            root = (FileNode) console.world.getWorking();
-        }
-        fstab = Fstab.load(console.world);
+        fstab = Fstab.load(world);
         actions = new ArrayList<>();
         for (Pom pom : database.query(query, environment)) {
             svnurl = pom.projectUrl();

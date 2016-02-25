@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.mount;
 
-import net.oneandone.sushi.cli.Console;
+import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public abstract class Action implements Comparable<Action> {

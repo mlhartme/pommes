@@ -18,10 +18,6 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.GAV;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.sushi.cli.ArgumentException;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
-import net.oneandone.sushi.cli.Remaining;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -29,30 +25,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Find extends Base {
-    private boolean explicitQuery;
+    private final String query;
+    private final String format;
 
-    public Find(Console console, Environment environment, String defaultQuery, String defaultFormat) throws IOException {
-        super(console, environment);
-        this.format = defaultFormat;
-        this.query = defaultQuery;
-        this.explicitQuery = false;
+    public Find(Globals globals, String query, String format) throws IOException {
+        super(globals);
+        this.query = query;
+        this.format = format;
     }
 
-    private String query;
 
-    @Remaining
-    public void remaining(String str) {
-        if (explicitQuery) {
-            throw new ArgumentException("too many queries");
-        }
-        query = str;
-        explicitQuery = true;
-    }
-
-    @Option("format")
-    private String format;
-
-    public void invoke(Database database) throws Exception {
+    @Override
+    public void run(Database database) throws Exception {
         List<Pom> matches;
 
         matches = database.query(query, environment);

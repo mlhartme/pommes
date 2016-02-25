@@ -15,13 +15,10 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Action;
-import net.oneandone.sushi.cli.ArgumentException;
-import net.oneandone.sushi.cli.Command;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Option;
-import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Separator;
@@ -32,50 +29,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class Base implements Command {
-    @Option("download")
-    private boolean download;
-
-    @Option("no-download")
-    private boolean noDownload;
-
-    @Option("upload")
-    private boolean upload;
-
+public abstract class Base {
+    protected final Globals globals;
+    protected final World world;
     protected final Console console;
-
     protected final Environment environment;
 
-    public Base(Console console, Environment environment) {
-        this.console = console;
-        this.environment = environment;
+    public Base(Globals globals) {
+        this.globals = globals;
+        this.world = globals.world();
+        this.console = globals.console();
+        this.environment = globals.env();
     }
 
-    public void invoke() throws Exception {
-        Node node;
-
-        if (download && noDownload) {
-            throw new ArgumentException("incompatible load options");
-        }
-        try (Database database = Database.load(console.world)) {
-            if (download) {
-                database.download(true);
-                console.verbose.println("database downloaded.");
-            } else if (noDownload) {
-                console.verbose.println("no database download.");
-                // nothing to do
-            } else {
-                database.downloadOpt();
-            }
-            invoke(database);
-            if (upload) {
-                node = database.upload();
-                console.info.println("uploaded global pommes database: " + node.getURI() + ", " + (node.length() / 1024) + "k");
-            }
+    public void run() throws Exception {
+        try (Database database = Database.load(world)) {
+            globals.begin(database);
+            run(database);
+            globals.end(database);
         }
     }
 
-    public abstract void invoke(Database database) throws Exception;
+    public abstract void run(Database database) throws Exception;
 
     protected void runAll(Collection<Action> actionsOrig) throws Exception {
         List<Action> actions;

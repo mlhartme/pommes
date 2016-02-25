@@ -16,25 +16,19 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
-import net.oneandone.sushi.cli.Console;
-import net.oneandone.sushi.cli.Remaining;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseRemove extends Base {
-    private List<String> removes = new ArrayList<>();
+    private final List<String> removes;
 
-    @Remaining
-    public void remaining(String prefix) {
-        removes.add(prefix);
+    public DatabaseRemove(Globals globals, List<String> removes) {
+        super(globals);
+        this.removes = removes;
     }
 
-    public DatabaseRemove(Console console, Environment environment) {
-        super(console, environment);
-    }
-
-    public void invoke(Database database) throws Exception {
+    @Override
+    public void run(Database database) throws Exception {
         database.remove(removes);
     }
 }
