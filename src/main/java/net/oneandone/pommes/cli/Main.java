@@ -59,7 +59,7 @@ public class Main {
                 + "\n"
                 + "database commands\n"
                 + "  'database-clear'      creates a new empty database\n"
-                + "  'database-add' url* '-noBranches'?\n"
+                + "  'database-add' '-noBranches'? xclude*\n"
                 + "                        add projects found under the specified urls to the database;\n"
                 + "                        overwrites projects with same origin;\n"
                 + "                        use '-' pattern to exclude from the url before\n"
@@ -75,7 +75,7 @@ public class Main {
                 + "sync options            how to sync between global and local database\n"
                 + "  default behavior      download global database once a day; no uploads\n"
                 + "  '-download'           download global database before command execution\n"
-                + "  '-noDownload'         no download of global database\n"
+                + "  '-no-download'        no download of global database\n"
                 + "  '-upload'             upload local database after command execution\n"
                 + "\n"
                 + "query syntax\n"
@@ -108,13 +108,13 @@ public class Main {
           cli.add(Umount.class, "umount -stale root?=.");
 
           cli.add(Ls.class, "list root?=.");
-          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query root?=.");
+          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query");
 
           cli.add(FstabAdd.class, "fstab-add url directory");
 
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAdd.class, "database-add -noBranches xclude* { xclude*(xclude) }");
-          cli.add(DatabaseRemove.class, "database-remove remove*");
+          cli.add(DatabaseRemove.class, "database-remove prefix*");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 
           cli.add(Find.class, "find -format=%g§20@§20%o§20%c query");

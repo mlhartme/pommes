@@ -32,14 +32,12 @@ import java.util.List;
 
 public class Goto extends Base {
     private final String query;
-    private final FileNode root;
     private final FileNode shellFile;
 
-    public Goto(Globals globals, FileNode shellFile, String query, FileNode root) {
+    public Goto(Globals globals, FileNode shellFile, String query) {
         super(globals);
         this.shellFile = shellFile;
         this.query = query;
-        this.root = root;
     }
 
     @Override

@@ -20,15 +20,15 @@ import net.oneandone.pommes.model.Database;
 import java.util.List;
 
 public class DatabaseRemove extends Base {
-    private final List<String> removes;
+    private final List<String> prefixes;
 
-    public DatabaseRemove(Globals globals, List<String> removes) {
+    public DatabaseRemove(Globals globals, List<String> prefixes) {
         super(globals);
-        this.removes = removes;
+        this.prefixes = prefixes;
     }
 
     @Override
     public void run(Database database) throws Exception {
-        database.remove(removes);
+        database.remove(prefixes);
     }
 }
