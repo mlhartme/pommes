@@ -137,7 +137,7 @@
           <equal>com/jcraft/jsch/agentproxy/**.*</equal>
 
           <!-- for upload -->
-          <symlink>${env.CISOTOOLS_HOME}/bin/setup-pommes</symlink>
+          <symlink>${env.CISOTOOLS_HOME}/bin/pommes</symlink>
           <target>${env.CISOTOOLS_HOME}/pommes</target>
         </configuration>
         <executions>
