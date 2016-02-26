@@ -44,9 +44,9 @@ public class Mount extends Base {
 
         adds = new ArrayList<>();
         problems = 0;
-        for (Pom pom : database.query(query, environment)) {
+        for (Pom pom : database.query(query, globals)) {
             svnurl = pom.projectUrl();
-            directories = environment.fstab().directories(svnurl);
+            directories = globals.fstab().directories(svnurl);
             if (directories.isEmpty()) {
                 console.error.println("no mount point for " + svnurl);
                 problems++;

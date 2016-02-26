@@ -17,14 +17,21 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
+import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Variables;
+import net.oneandone.pommes.mount.Fstab;
+import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.svn.SvnFilesystem;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class Globals {
+public class Globals implements Variables {
     private final Console console;
     private final World world;
 
@@ -35,6 +42,9 @@ public class Globals {
     private boolean noDownload;
     private boolean upload;
 
+    private Maven lazyMaven;
+    private MavenProject lazyProject;
+    private Fstab lazyFstab;
 
     public Globals(Console console, World world, String svnuser, String svnpassword,
                    boolean download, boolean noDownload, boolean upload) throws IOException {
@@ -48,6 +58,10 @@ public class Globals {
         this.download = download;
         this.noDownload = noDownload;
         this.upload = upload;
+
+        this.lazyMaven = null;
+        this.lazyProject = null;
+        this.lazyFstab = null;
     }
 
     public void begin(Database database) throws IOException {
@@ -71,10 +85,6 @@ public class Globals {
         }
     }
 
-    public Environment env() {
-        return new Environment(world);
-    }
-
     public Console console() {
         if (svnuser != null && svnpassword != null) {
             SvnFilesystem filesystem = (SvnFilesystem) world.getFilesystem("svn");
@@ -86,5 +96,56 @@ public class Globals {
 
     public World world() {
         return world;
+    }
+
+    public Maven maven() throws IOException {
+        if (lazyMaven == null) {
+            lazyMaven = Maven.withSettings(world);
+        }
+        return lazyMaven;
+    }
+
+    public Fstab fstab() throws IOException {
+        if (lazyFstab == null) {
+            lazyFstab = Fstab.load(world);
+        }
+        return lazyFstab;
+    }
+
+    public MavenProject project() throws IOException {
+        if (lazyProject == null) {
+            try {
+                lazyProject = maven().loadPom(world.getWorking().join("pom.xml"));
+            } catch (ProjectBuildingException e) {
+                throw new IOException("cannot load pom: " + e.getMessage(), e);
+            }
+        }
+        return lazyProject;
+    }
+
+    //-- Variables interface
+
+    public String lookup(String name) throws IOException {
+        MavenProject p;
+        FileNode here;
+        Point point;
+
+        switch (name) {
+            case "svn":
+                here = world.getWorking();
+                point = fstab().pointOpt(here);
+                if (point == null) {
+                    throw new IllegalArgumentException("no mount point for directory " + here.getAbsolute());
+                }
+                return point.svnurl(here);
+            case "gav":
+                p = project();
+                return p.getGroupId() + ":" + p.getArtifactId() + ":" + p.getVersion();
+            case "ga":
+                p = project();
+                return p.getGroupId() + ":" + p.getArtifactId();
+            default:
+                return null;
+        }
     }
 }

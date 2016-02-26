@@ -33,13 +33,11 @@ public abstract class Base {
     protected final Globals globals;
     protected final World world;
     protected final Console console;
-    protected final Environment environment;
 
     public Base(Globals globals) {
         this.globals = globals;
         this.world = globals.world();
         this.console = globals.console();
-        this.environment = globals.env();
     }
 
     public void run() throws Exception {
