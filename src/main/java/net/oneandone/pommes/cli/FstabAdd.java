@@ -26,8 +26,8 @@ public class FstabAdd extends Base {
     private String url;
     private FileNode directory;
 
-    public FstabAdd(Globals globals, String url, FileNode directory) {
-        super(globals);
+    public FstabAdd(Environment environment, String url, FileNode directory) {
+        super(environment);
         this.url = url;
         this.directory = directory;
     }

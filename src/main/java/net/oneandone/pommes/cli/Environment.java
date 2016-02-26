@@ -31,7 +31,7 @@ import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class Globals implements Variables {
+public class Environment implements Variables {
     private final Console console;
     private final World world;
 
@@ -46,8 +46,8 @@ public class Globals implements Variables {
     private MavenProject lazyProject;
     private Fstab lazyFstab;
 
-    public Globals(Console console, World world, String svnuser, String svnpassword,
-                   boolean download, boolean noDownload, boolean upload) throws IOException {
+    public Environment(Console console, World world, String svnuser, String svnpassword,
+                       boolean download, boolean noDownload, boolean upload) throws IOException {
         if (download && noDownload) {
             throw new ArgumentException("incompatible load options");
         }

@@ -29,8 +29,8 @@ import java.util.List;
 public class Mount extends Base {
     private final String query;
 
-    public Mount(Globals globals, String query) {
-        super(globals);
+    public Mount(Environment environment, String query) {
+        super(environment);
         this.query = query;
     }
 
@@ -44,9 +44,9 @@ public class Mount extends Base {
 
         adds = new ArrayList<>();
         problems = 0;
-        for (Pom pom : database.query(query, globals)) {
+        for (Pom pom : database.query(query, environment)) {
             svnurl = pom.projectUrl();
-            directories = globals.fstab().directories(svnurl);
+            directories = environment.fstab().directories(svnurl);
             if (directories.isEmpty()) {
                 console.error.println("no mount point for " + svnurl);
                 problems++;

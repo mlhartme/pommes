@@ -42,8 +42,8 @@ public class DatabaseAdd extends Base {
     private List<Node> nodes = new ArrayList<>();
     private List<Filter> excludes = new ArrayList<>();
 
-    public DatabaseAdd(Globals globals, boolean noBranches) {
-        super(globals);
+    public DatabaseAdd(Environment environment, boolean noBranches) {
+        super(environment);
         this.noBranches = noBranches;
     }
 
@@ -87,7 +87,7 @@ public class DatabaseAdd extends Base {
         console.info.println("scanning svn ...");
         projects = projects();
         console.info.println("indexing ...");
-        iterator = new ProjectIterator(console, world, globals.maven(), projects.iterator());
+        iterator = new ProjectIterator(console, world, environment.maven(), projects.iterator());
         database.index(iterator);
         iterator.summary();
     }

@@ -30,21 +30,21 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class Base {
-    protected final Globals globals;
+    protected final Environment environment;
     protected final World world;
     protected final Console console;
 
-    public Base(Globals globals) {
-        this.globals = globals;
-        this.world = globals.world();
-        this.console = globals.console();
+    public Base(Environment environment) {
+        this.environment = environment;
+        this.world = this.environment.world();
+        this.console = this.environment.console();
     }
 
     public void run() throws Exception {
         try (Database database = Database.load(world)) {
-            globals.begin(database);
+            environment.begin(database);
             run(database);
-            globals.end(database);
+            environment.end(database);
         }
     }
 

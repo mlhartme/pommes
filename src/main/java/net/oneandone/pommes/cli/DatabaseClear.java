@@ -18,8 +18,8 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.model.Database;
 
 public class DatabaseClear extends Base {
-    public DatabaseClear(Globals globals) {
-        super(globals);
+    public DatabaseClear(Environment environment) {
+        super(environment);
     }
 
     public void run(Database database) throws Exception {

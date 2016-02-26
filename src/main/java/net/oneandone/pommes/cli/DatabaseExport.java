@@ -30,8 +30,8 @@ public class DatabaseExport extends Base {
     private final String scmSubstring;
     private final String exportPath;
 
-    public DatabaseExport(Globals globals, String scmSubstring, String exportPath) {
-        super(globals);
+    public DatabaseExport(Environment environment, String scmSubstring, String exportPath) {
+        super(environment);
 
         this.scmSubstring = scmSubstring;
         this.exportPath = exportPath;

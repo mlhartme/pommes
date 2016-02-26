@@ -29,8 +29,8 @@ import java.util.List;
 public class Ls extends Base {
     private final FileNode root;
 
-    public Ls(Globals globals, FileNode root) {
-        super(globals);
+    public Ls(Environment environment, FileNode root) {
+        super(environment);
         this.root = root;
     }
 

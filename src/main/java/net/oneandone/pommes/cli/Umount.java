@@ -32,8 +32,8 @@ public class Umount extends Base {
     private final boolean stale;
     private final FileNode root;
 
-    public Umount(Globals globals, boolean stale, FileNode root) {
-        super(globals);
+    public Umount(Environment environment, boolean stale, FileNode root) {
+        super(environment);
         this.stale = stale;
         this.root = root;
     }

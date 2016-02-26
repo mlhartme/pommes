@@ -34,8 +34,8 @@ public class Goto extends Base {
     private final String query;
     private final FileNode shellFile;
 
-    public Goto(Globals globals, FileNode shellFile, String query) {
-        super(globals);
+    public Goto(Environment environment, FileNode shellFile, String query) {
+        super(environment);
         this.shellFile = shellFile;
         this.query = query;
     }
@@ -51,7 +51,7 @@ public class Goto extends Base {
 
         fstab = Fstab.load(world);
         actions = new ArrayList<>();
-        for (Pom pom : database.query(query, globals)) {
+        for (Pom pom : database.query(query, environment)) {
             svnurl = pom.projectUrl();
             directories = fstab.directories(svnurl);
             if (directories.isEmpty()) {

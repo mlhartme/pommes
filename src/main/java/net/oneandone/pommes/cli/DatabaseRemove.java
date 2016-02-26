@@ -22,8 +22,8 @@ import java.util.List;
 public class DatabaseRemove extends Base {
     private final List<String> prefixes;
 
-    public DatabaseRemove(Globals globals, List<String> prefixes) {
-        super(globals);
+    public DatabaseRemove(Environment environment, List<String> prefixes) {
+        super(environment);
         this.prefixes = prefixes;
     }
 

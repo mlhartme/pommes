@@ -28,8 +28,8 @@ public class Find extends Base {
     private final String format;
     private final String query;
 
-    public Find(Globals globals, String format, String query) {
-        super(globals);
+    public Find(Environment environment, String format, String query) {
+        super(environment);
         this.format = format;
         this.query = query;
     }
@@ -39,7 +39,7 @@ public class Find extends Base {
     public void run(Database database) throws Exception {
         List<Pom> matches;
 
-        matches = database.query(query, globals);
+        matches = database.query(query, environment);
         for (Pom pom : matches) {
             console.info.println(format(pom));
         }
@@ -80,7 +80,7 @@ public class Find extends Base {
                         break;
                     case 'c':
                         url = pom.projectUrl();
-                        for (FileNode directory : globals.fstab().directories(url)) {
+                        for (FileNode directory : environment.fstab().directories(url)) {
                             if (directory.exists()) {
                                 values.add(directory.getAbsolute());
                             }
@@ -100,7 +100,7 @@ public class Find extends Base {
                             throw new IllegalStateException("variable is not terminated: " + filter);
                         }
                         variable = filter.substring(1, filter.length() - 1);
-                        filter = globals.lookup(variable);
+                        filter = environment.lookup(variable);
                         if (filter == null) {
                             throw new IllegalStateException("unknown variable in format: " + variable);
                         }
