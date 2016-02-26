@@ -103,22 +103,22 @@ public class Main {
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
-        cli.begin(Globals.class, "-shellFile -svnuser -svnpassword -download -no-download -upload");
+        cli.begin(Globals.class, "-svnuser -svnpassword -download -no-download -upload");
           cli.add(Mount.class, "mount query");
-          cli.add(Umount.class, "umount -stale root=.?");
+          cli.add(Umount.class, "umount -stale root?=.");
 
-          cli.add(Lst.class, "list");
-          cli.add(Goto.class, "goto query root=.?");
+          cli.add(Ls.class, "list root?=.");
+          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query root?=.");
 
           cli.add(FstabAdd.class, "fstab-add url directory");
 
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAdd.class, "database-add -noBranches xclude* { xclude*(xclude) }");
-          cli.add(DatabaseRemove.class, "database-remove");
+          cli.add(DatabaseRemove.class, "database-remove remove*");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 
           cli.add(Find.class, "find -format=%g§20@§20%o§20%c query");
-          cli.add(FindUsers.class, "users -format=%g§20@§20%o -> %d[%ga]'");
+          cli.add(FindUsers.class, "users -format=%g§20@§20%o§20->§20%d[%ga]");
 
         System.exit(cli.run(args));
     }

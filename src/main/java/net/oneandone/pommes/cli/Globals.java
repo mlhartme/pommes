@@ -20,7 +20,6 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.svn.SvnFilesystem;
 
 import java.io.IOException;
@@ -29,7 +28,6 @@ public class Globals {
     private final Console console;
     private final World world;
 
-    public FileNode shellFile;
     private String svnuser;
     private String svnpassword;
 
@@ -38,14 +36,13 @@ public class Globals {
     private boolean upload;
 
 
-    public Globals(Console console, World world, FileNode shellFile, String svnuser, String svnpassword,
+    public Globals(Console console, World world, String svnuser, String svnpassword,
                    boolean download, boolean noDownload, boolean upload) throws IOException {
         if (download && noDownload) {
             throw new ArgumentException("incompatible load options");
         }
         this.console = console;
         this.world = world;
-        this.shellFile = shellFile;
         this.svnuser = svnuser;
         this.svnpassword = svnpassword;
         this.download = download;

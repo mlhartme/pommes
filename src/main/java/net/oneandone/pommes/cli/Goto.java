@@ -35,11 +35,11 @@ public class Goto extends Base {
     private final FileNode root;
     private final FileNode shellFile;
 
-    public Goto(Globals globals, String query, FileNode root) {
+    public Goto(Globals globals, FileNode shellFile, String query, FileNode root) {
         super(globals);
+        this.shellFile = shellFile;
         this.query = query;
         this.root = root;
-        this.shellFile = globals.shellFile;
     }
 
     @Override

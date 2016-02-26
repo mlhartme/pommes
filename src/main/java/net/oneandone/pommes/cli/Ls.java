@@ -26,17 +26,10 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lst extends Base {
-    private FileNode root;
+public class Ls extends Base {
+    private final FileNode root;
 
-    public void add(String str) {
-        if (root != null) {
-            throw new ArgumentException("too many root arguments");
-        }
-        root = world.file(str);
-    }
-
-    public Lst(Globals globals, FileNode root) {
+    public Ls(Globals globals, FileNode root) {
         super(globals);
         this.root = root;
     }
