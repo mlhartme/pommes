@@ -111,17 +111,15 @@ public class Main {
           cli.add(DatabaseRemove.class, "database-remove");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 
+          cli.add(Find.class, "find -format='%g @ %o %c' query");
+          cli.add(FindUsers.class, "users -format='%g @ %o -> %d[%ga]'");
+
         System.exit(cli.run(args));
     }
 
-    /* TODO
-    @Child("find")
-    public Find find() throws IOException {
-        return new Find(console(), env(), "", "%g @ %o %c");
+    public static class FindUsers extends Find {
+        public FindUsers(Globals globals, String format) {
+            super(globals, format, ":-=ga=+@trunk");
+        }
     }
-
-    @Child("users")
-    public Find users() throws IOException {
-        return new Find(console(), env(), ":-=ga=+@trunk", "%g @ %o -> %d[%ga]");
-    }*/
 }

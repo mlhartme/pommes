@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Find extends Base {
-    private final String query;
     private final String format;
+    private final String query;
 
-    public Find(Globals globals, String query, String format) throws IOException {
+    public Find(Globals globals, String format, String query) {
         super(globals);
-        this.query = query;
         this.format = format;
+        this.query = query;
     }
 
 
