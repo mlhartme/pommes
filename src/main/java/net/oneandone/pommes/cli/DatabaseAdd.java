@@ -47,7 +47,7 @@ public class DatabaseAdd extends Base {
         this.noBranches = noBranches;
     }
 
-    public void xclude(String str) {
+    public void url(String str) {
         Filter exclude;
 
         if (str.startsWith("-")) {

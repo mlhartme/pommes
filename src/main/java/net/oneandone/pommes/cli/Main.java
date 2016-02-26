@@ -59,10 +59,10 @@ public class Main {
                 + "\n"
                 + "database commands\n"
                 + "  'database-clear'      creates a new empty database\n"
-                + "  'database-add' '-noBranches'? xclude*\n"
+                + "  'database-add' '-noBranches'? url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
                 + "                        overwrites projects with same origin;\n"
-                + "                        use '-' pattern to exclude from the url before\n"
+                + "                        url is a svn url or '-' with a pattern to exclude from the url before\n"
                 + "  'database-remove' url*\n"
                 + "                        remove all documents prefixed with one of the specified urls\n"
                 + "  'database-export' filter target\n"
@@ -113,7 +113,7 @@ public class Main {
           cli.add(FstabAdd.class, "fstab-add url directory");
 
           cli.add(DatabaseClear.class, "database-clear");
-          cli.add(DatabaseAdd.class, "database-add -noBranches xclude* { xclude*(xclude) }");
+          cli.add(DatabaseAdd.class, "database-add -noBranches url* { url*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 
