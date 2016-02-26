@@ -133,8 +133,7 @@
           <name>pommes</name>
           <main>net.oneandone.pommes.cli.Main</main>
           <remove>META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
-          <overwrite>META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat</overwrite>
-          <concat>META-INF/services/org.apache.lucene.codecs.PostingsFormat</concat>
+          <concat>META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat</concat>
           <equal>com/jcraft/jsch/agentproxy/**.*</equal>
 
           <!-- for upload -->
