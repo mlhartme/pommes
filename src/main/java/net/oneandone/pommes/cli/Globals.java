@@ -38,13 +38,13 @@ public class Globals {
     private boolean upload;
 
 
-    public Globals(Console console, FileNode shellFile, String svnuser, String svnpassword,
+    public Globals(Console console, World world, FileNode shellFile, String svnuser, String svnpassword,
                    boolean download, boolean noDownload, boolean upload) throws IOException {
         if (download && noDownload) {
             throw new ArgumentException("incompatible load options");
         }
         this.console = console;
-        this.world = World.create();
+        this.world = world;
         this.shellFile = shellFile;
         this.svnuser = svnuser;
         this.svnpassword = svnpassword;

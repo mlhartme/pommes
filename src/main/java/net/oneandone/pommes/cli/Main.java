@@ -18,11 +18,15 @@ package net.oneandone.pommes.cli;
 import java.io.IOException;
 
 import net.oneandone.inline.Cli;
+import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.file.FileNode;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        World world;
         Cli cli;
 
+        world = World.create();
         cli = Cli.create("Project database tool.\n"
                 + "\n"
                 + "Usage:\n"
@@ -97,6 +101,8 @@ public class Main {
                 + "  POMMES_GLOBAL         url pointing to global database zip file\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
+        cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
+        cli.begin(world);
         cli.begin(Globals.class, "-shellFile -svnuser -svnpassword -download -no-download -upload");
           cli.add(Mount.class, "mount query");
           cli.add(Umount.class, "umount -stale root=.?");
@@ -111,8 +117,8 @@ public class Main {
           cli.add(DatabaseRemove.class, "database-remove");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 
-          cli.add(Find.class, "find -format='%g @ %o %c' query");
-          cli.add(FindUsers.class, "users -format='%g @ %o -> %d[%ga]'");
+          cli.add(Find.class, "find -format=%g§20@§20%o§20%c query");
+          cli.add(FindUsers.class, "users -format=%g§20@§20%o -> %d[%ga]'");
 
         System.exit(cli.run(args));
     }
