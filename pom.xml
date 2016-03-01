@@ -20,10 +20,6 @@
 
   <url>https://github.com/mlhartme/pommes</url>
 
-  <properties>
-    <guava.version>19.0</guava.version>
-  </properties>
-
   <scm>
     <url>https://github.com/mlhartme/pommes</url>
     <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git</connection>
