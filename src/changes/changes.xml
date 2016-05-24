@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
+    <release date="2016-02-xx" version="2.5.0">
+      <action date="2016-02-25" dev="mhm" type="update">
+        Added database-add-artifactory command, renamed database-add to database-add-svn.
+      </action>
+    </release>
     <release date="2016-02-xx" version="2.4.3">
-      <action date="2016-02-25" dev="mabraun" type="update">
+      <action date="2016-02-25" dev="mlhartme" type="update">
         Pommes goto no longer modifies your environment. To get the previous behavior, invoke pommes goto ... && . ~/.pommes.goto.
         Technically, pommes is a normal shell script now (not a shell function).
       </action>
-      <action date="2016-02-25" dev="mabraun" type="update">
+      <action date="2016-02-25" dev="mlhartme" type="update">
         Internal change: update sushi 2.8.x to 3.0.0 and inline 1.0.0.
       </action>
     </release>
     <release date="2015-10-05" version="2.4.2">
       <action date="2015-01-09" dev="mabraun" type="add">
-        Added database export method.
+        Added database export command.
       </action>
     </release>
     <release date="2015-01-16" version="2.4.1">

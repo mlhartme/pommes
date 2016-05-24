@@ -36,13 +36,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class DatabaseAdd extends Base {
+public class DatabaseAddSvn extends Base {
     private final boolean noBranches;
 
     private List<Node> nodes = new ArrayList<>();
     private List<Filter> excludes = new ArrayList<>();
 
-    public DatabaseAdd(Environment environment, boolean noBranches) {
+    public DatabaseAddSvn(Environment environment, boolean noBranches) {
         super(environment);
         this.noBranches = noBranches;
     }
@@ -148,6 +148,7 @@ public class DatabaseAdd extends Base {
             Node pom;
             FileNode local;
             MavenProject project;
+            String origin;
 
             while (projects.hasNext()) {
                 pom = projects.next();
@@ -162,7 +163,11 @@ public class DatabaseAdd extends Base {
                             pom.copyFile(local);
                             console.info.println(pom.getURI().toString());
                             project = maven.loadPom(local);
-                            return Database.document(pom.getURI().toString(), project);
+                            origin = pom.getURI().toString();
+                            if (origin.startsWith("https://artifactory")) {
+                                origin = "svn:" + origin;
+                            }
+                            return Database.document(origin, project);
                         } finally {
                             local.deleteFile();
                         }
