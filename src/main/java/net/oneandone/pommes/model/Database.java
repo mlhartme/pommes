@@ -86,6 +86,7 @@ public class Database implements AutoCloseable {
      * branches. And they only point to the directory containing the pom.
      */
     public static final String ORIGIN = "origin";
+    public static final String REVISION = "revision";
 
     public static final String GROUP = "g";
     public static final String ARTIFACT = "a";
@@ -230,7 +231,7 @@ public class Database implements AutoCloseable {
         Pom result;
         String parent;
 
-        result = new Pom(document.get(Database.ORIGIN), GAV.forGav(document.get(Database.GAV_NAME)));
+        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), GAV.forGav(document.get(Database.GAV_NAME)));
         parent = document.get(PAR_GAV);
         if (parent != null) {
             result.dependencies.add(GAV.forGav(parent));
@@ -385,11 +386,12 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public static Document document(String origin, Pom pom) throws InvalidVersionSpecificationException {
+    public static Document document(Pom pom) throws InvalidVersionSpecificationException {
         Document doc;
 
         doc = new Document();
-        doc.add(new StringField(ORIGIN, origin, Field.Store.YES));
+        doc.add(new StringField(ORIGIN, pom.origin, Field.Store.YES));
+        doc.add(new StringField(REVISION, pom.revision, Field.Store.YES));
         doc.add(new StringField(GROUP, pom.coordinates.groupId, Field.Store.YES));
         doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
         doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
@@ -398,12 +400,12 @@ public class Database implements AutoCloseable {
         return doc;
     }
 
-    public static Document document(String origin, MavenProject mavenProject) throws InvalidVersionSpecificationException {
+    public static Document document(String origin, String revision, MavenProject mavenProject) throws InvalidVersionSpecificationException {
         Document doc;
         MavenProject parent;
         Pom parPom;
 
-        doc = document(origin, Pom.forProject(origin, mavenProject));
+        doc = document(Pom.forProject(origin, revision, mavenProject));
         for (Dependency dependency : mavenProject.getDependencies()) {
             GAV dep = GAV.forDependency(dependency);
 
@@ -421,7 +423,7 @@ public class Database implements AutoCloseable {
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
-            parPom = Pom.forProject(origin, parent);
+            parPom = Pom.forProject(origin, revision, parent);
             doc.add(new StringField(PAR_GA, parPom.coordinates.toGaString(), Field.Store.YES));
             doc.add(new StringField(PAR_GAV, parPom.coordinates.toGavString(), Field.Store.YES));
         }

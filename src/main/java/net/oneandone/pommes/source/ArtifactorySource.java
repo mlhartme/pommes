@@ -131,10 +131,10 @@ public class ArtifactorySource implements Source {
                         throw new IllegalStateException();
                     }
                     parser.eatKeyValueFalse("folder");
-                    parser.eatKeyValueString("sha1");
+                    sha1 = parser.eatKeyValueString("sha1");
                     if (uri.endsWith(".pom")) {
                         node = root.join(Strings.removeLeft(uri, "/"));
-                        dest.put(new Item("artifactory:" + node.getURI().toString(), node));
+                        dest.put(new Item("artifactory:" + node.getURI().toString(), sha1, node));
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

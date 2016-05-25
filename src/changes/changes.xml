@@ -2,6 +2,9 @@
   <body>
     <release date="2016-02-xx" version="2.5.0">
       <action date="2016-05-25" dev="mlhartme" type="update">
+        Added revision field. Old databases have to be re-built.
+      </action>
+      <action date="2016-05-25" dev="mlhartme" type="update">
         database-export: renamed to database-dump; added -pp option for pretty-printing;
         replaced scmPrefix argument by optional query;
         target argument is optional now.

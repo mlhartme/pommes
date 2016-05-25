@@ -176,7 +176,7 @@ public class DatabaseAdd extends Base {
                 try {
                     if (item.node.getName().equals("composer.json")) {
                         count++;
-                        return Database.document(item.origin, Pom.forComposer(item.node));
+                        return Database.document(Pom.forComposer(item.origin, item.revision, item.node));
                     } else {
                         count++;
                         local = world.getTemp().createTempFile();
@@ -184,7 +184,7 @@ public class DatabaseAdd extends Base {
                             item.node.copyFile(local);
                             console.info.println(item.origin);
                             project = maven.loadPom(local);
-                            return Database.document(item.origin, project);
+                            return Database.document(item.origin, item.revision, project);
                         } finally {
                             local.deleteFile();
                         }

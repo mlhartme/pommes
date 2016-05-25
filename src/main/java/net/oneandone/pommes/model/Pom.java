@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pom {
-    public static Pom forComposer(Node composer) {
-        return new Pom(composer.getURI().toString(), new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"));
+    public static Pom forComposer(String origin, String revision, Node composer) {
+        return new Pom(origin, revision, new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"));
     }
 
-    public static Pom forProject(String origin, MavenProject project) {
+    public static Pom forProject(String origin, String revision, MavenProject project) {
         Pom result;
 
-        result = new Pom(origin, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
+        result = new Pom(origin, revision, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
         for (Dependency dependency : project.getDependencies()) {
             result.dependencies.add(GAV.forDependency(dependency));
         }
@@ -42,16 +42,18 @@ public class Pom {
 
     /** currently always starts with svn:https:// */
     public final String origin;
+    public final String revision;
 
     public final GAV coordinates;
 
     public final List<GAV> dependencies;
 
-    public Pom(String origin, GAV coordinates) {
+    public Pom(String origin, String revision, GAV coordinates) {
         if (origin == null || origin.endsWith("/")) {
             throw new IllegalArgumentException(origin);
         }
         this.origin = origin;
+        this.revision = revision;
         this.coordinates = coordinates;
         this.dependencies = new ArrayList<>();
     }

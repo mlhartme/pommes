@@ -21,6 +21,8 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.filter.Filter;
+import net.oneandone.sushi.fs.svn.SvnNode;
+import org.tmatesoft.svn.core.SVNException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -67,16 +69,17 @@ public class NodeSource implements Source {
     }
 
     @Override
-    public void scan(BlockingQueue<Item> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Item> dest) throws IOException, InterruptedException, SVNException {
         scan(node, true, dest);
     }
 
-    public void scan(Node root, boolean recurse, BlockingQueue<Item> dest) throws IOException, InterruptedException {
+    public void scan(Node root, boolean recurse, BlockingQueue<Item> dest) throws IOException, InterruptedException, SVNException {
         List<? extends Node> children;
         Node project;
         Node trunk;
         Node branches;
         List<? extends Node> grandChildren;
+        long revision;
 
         if (exclude.matches(root.getPath())) {
             return;
@@ -86,13 +89,16 @@ public class NodeSource implements Source {
             return;
         }
         project = pom(children);
-        if (project != null) {
-            dest.put(new Item(project));
-            return;
+        if (project == null) {
+            project = child(children, "composer.json");
         }
-        project = child(children, "composer.json");
         if (project != null) {
-            dest.put(new Item(node));
+            if (project instanceof SvnNode) {
+                revision = ((SvnNode) project).getLatestRevision();
+            } else {
+                revision = project.getLastModified();
+            }
+            dest.put(new Item(Long.toString(revision), project));
             return;
         }
         trunk = child(children, "trunk");

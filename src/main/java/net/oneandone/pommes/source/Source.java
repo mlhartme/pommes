@@ -6,6 +6,7 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import org.tmatesoft.svn.core.SVNException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -33,5 +34,5 @@ public interface Source {
 
     void addOption(String option);
     void addExclude(String exclude);
-    void scan(BlockingQueue<Item> dest) throws IOException, InterruptedException, URISyntaxException;
+    void scan(BlockingQueue<Item> dest) throws IOException, InterruptedException, URISyntaxException, SVNException;
 }
