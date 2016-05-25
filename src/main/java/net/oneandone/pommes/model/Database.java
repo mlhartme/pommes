@@ -21,6 +21,7 @@ import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.io.OS;
 import net.oneandone.sushi.util.Separator;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -127,7 +128,7 @@ public class Database implements AutoCloseable {
 
     private Directory getIndexLuceneDirectory() throws IOException {
         if (indexLuceneDirectory == null) {
-            indexLuceneDirectory = FSDirectory.open(directory.toPath().toFile());
+            indexLuceneDirectory = FSDirectory.open(directory.toPath());
         }
         return indexLuceneDirectory;
     }
@@ -192,7 +193,7 @@ public class Database implements AutoCloseable {
         IndexWriterConfig config;
 
         close();
-        config =  new IndexWriterConfig(Version.LUCENE_4_10_4, null);
+        config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         writer.deleteDocuments(pommesQuery(query, variables));
@@ -206,7 +207,7 @@ public class Database implements AutoCloseable {
 
         close();
         // no analyzer, I have String fields only
-        config =  new IndexWriterConfig(Version.LUCENE_4_9, null);
+        config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
