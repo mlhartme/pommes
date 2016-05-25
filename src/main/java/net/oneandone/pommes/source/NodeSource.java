@@ -16,6 +16,7 @@
 package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Item;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -66,11 +67,11 @@ public class NodeSource implements Source {
     }
 
     @Override
-    public void scan(BlockingQueue<Node> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Item> dest) throws IOException, InterruptedException {
         scan(node, true, dest);
     }
 
-    public void scan(Node root, boolean recurse, BlockingQueue<Node> dest) throws IOException, InterruptedException {
+    public void scan(Node root, boolean recurse, BlockingQueue<Item> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
         Node project;
         Node trunk;
@@ -86,12 +87,12 @@ public class NodeSource implements Source {
         }
         project = pom(children);
         if (project != null) {
-            dest.put(project);
+            dest.put(new Item(project));
             return;
         }
         project = child(children, "composer.json");
         if (project != null) {
-            dest.put(project);
+            dest.put(new Item(node));
             return;
         }
         trunk = child(children, "trunk");
@@ -132,7 +133,7 @@ public class NodeSource implements Source {
         }
         return null;
     }
-    
+
     private static Node pom(List<? extends Node> childen) {
         String name;
 

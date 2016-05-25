@@ -85,7 +85,7 @@ public class Main {
                 + "  gav       = ':' STR         ; substring match in groupId:artifactId:version\n"
                 + "  dep       = ':-' STR        ; substring match in dependency or parent\n"
                 + "  origin    = '@' STR         ; substring match in origin\n"
-                + "  lucene    = '%' STR         ; Lucene Query Syntax\n"
+                + "  lucene    = '%' STR         ; STR in Lucene Query Syntax\n"
                 + "and STR may contain the following variables:\n"
                 + "  =gav=     = coordinates for current project\n"
                 + "  =ga=      = group and artifact of current project\n"

@@ -1,6 +1,7 @@
 package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Item;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -32,5 +33,5 @@ public interface Source {
 
     void addOption(String option);
     void addExclude(String exclude);
-    void scan(BlockingQueue<Node> dest) throws IOException, InterruptedException, URISyntaxException;
+    void scan(BlockingQueue<Item> dest) throws IOException, InterruptedException, URISyntaxException;
 }

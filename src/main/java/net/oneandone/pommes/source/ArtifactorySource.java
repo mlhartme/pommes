@@ -16,6 +16,7 @@
 package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Item;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.util.Strings;
@@ -71,7 +72,7 @@ public class ArtifactorySource implements Source {
     }
 
     @Override
-    public void scan(BlockingQueue<Node> dest) throws IOException, URISyntaxException {
+    public void scan(BlockingQueue<Item> dest) throws IOException, URISyntaxException {
         Node listing;
         Node root;
 
@@ -106,12 +107,13 @@ public class ArtifactorySource implements Source {
     public static class Parser implements AutoCloseable {
         private static final SimpleDateFormat FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-        public static void run(Node listing, Node root, BlockingQueue<Node> dest) throws Exception {
+        public static void run(Node listing, Node root, BlockingQueue<Item> dest) throws Exception {
             String uri;
             long size;
             Date lastModified;
             String sha1;
             int count;
+            Node node;
 
             count = 0;
             try (InputStream is = listing.newInputStream(); Parser parser = new Parser(Json.createParser(is))) {
@@ -131,7 +133,8 @@ public class ArtifactorySource implements Source {
                     parser.eatKeyValueFalse("folder");
                     parser.eatKeyValueString("sha1");
                     if (uri.endsWith(".pom")) {
-                        dest.put(root.join(Strings.removeLeft(uri, "/")));
+                        node = root.join(Strings.removeLeft(uri, "/"));
+                        dest.put(new Item("artifactory:" + node.getURI().toString(), node));
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

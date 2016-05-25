@@ -21,7 +21,6 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
-import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -67,16 +66,14 @@ public class DatabaseAdd extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        Node endOfQueue;
         Indexer indexer;
 
-        endOfQueue = world.getHome();
-        indexer = new Indexer(dryrun, console, world, environment.maven(), endOfQueue, database);
+        indexer = new Indexer(dryrun, console, world, environment.maven(), database);
         indexer.start();
         for (Source source : sources) {
             source.scan(indexer.src);
         }
-        indexer.src.put(endOfQueue);
+        indexer.src.put(Item.END_OF_QUEUE);
         indexer.join();
         if (indexer.exception != null) {
             throw indexer.exception;
@@ -89,9 +86,8 @@ public class DatabaseAdd extends Base {
         private final Console console;
         private final World world;
         private final Maven maven;
-        private final Node endOfQueue;
 
-        public final BlockingQueue<Node> src;
+        public final BlockingQueue<Item> src;
         private final Database database;
         private Exception exception;
 
@@ -99,7 +95,7 @@ public class DatabaseAdd extends Base {
         private int count;
         private int errors;
 
-        public Indexer(boolean dryrun, Console console, World world, Maven maven, Node endOfQueue, Database database) {
+        public Indexer(boolean dryrun, Console console, World world, Maven maven, Database database) {
             super("Indexer");
 
             this.dryrun = dryrun;
@@ -107,7 +103,6 @@ public class DatabaseAdd extends Base {
             this.console = console;
             this.world = world;
             this.maven = maven;
-            this.endOfQueue = endOfQueue;
 
             this.src = new ArrayBlockingQueue<>(25);
             this.database = database;
@@ -169,29 +164,27 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iterUnchecked() throws IOException, InterruptedException {
-            Node pom;
+            Item item;
             FileNode local;
             MavenProject project;
-            String origin;
 
             while (true) {
-                pom = src.take();
-                if (pom == endOfQueue) {
+                item = src.take();
+                if (item == Item.END_OF_QUEUE) {
                     return null;
                 }
                 try {
-                    if (pom.getName().equals("composer.json")) {
+                    if (item.node.getName().equals("composer.json")) {
                         count++;
-                        return Database.document(pom.getURI().toString(), Pom.forComposer(pom));
+                        return Database.document(item.origin, Pom.forComposer(item.node));
                     } else {
                         count++;
                         local = world.getTemp().createTempFile();
                         try {
-                            pom.copyFile(local);
-                            console.info.println(pom.getURI().toString());
+                            item.node.copyFile(local);
+                            console.info.println(item.origin);
                             project = maven.loadPom(local);
-                            origin = pom.getURI().toString();
-                            return Database.document(origin, project);
+                            return Database.document(item.origin, project);
                         } finally {
                             local.deleteFile();
                         }
@@ -199,7 +192,7 @@ public class DatabaseAdd extends Base {
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new IOException("error processing " + pom.getURI() + ": " + e.getMessage(), e);
+                    throw new IOException("error processing " + item.origin + ": " + e.getMessage(), e);
                 }
             }
         }
