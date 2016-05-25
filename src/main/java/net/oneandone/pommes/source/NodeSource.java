@@ -84,7 +84,7 @@ public class NodeSource implements Source {
         if (children == null) {
             return;
         }
-        project = child(children, "pom.xml");
+        project = pom(children);
         if (project != null) {
             dest.put(project);
             return;
@@ -127,6 +127,18 @@ public class NodeSource implements Source {
     private static Node child(List<? extends Node> childen, String name) {
         for (Node node : childen) {
             if (node.getName().equals(name)) {
+                return node;
+            }
+        }
+        return null;
+    }
+    
+    private static Node pom(List<? extends Node> childen) {
+        String name;
+
+        for (Node node : childen) {
+            name = node.getName();
+            if (name.equals("pom.xml") || name.endsWith(".pom")) {
                 return node;
             }
         }
