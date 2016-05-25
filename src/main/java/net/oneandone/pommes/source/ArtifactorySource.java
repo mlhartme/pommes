@@ -43,13 +43,23 @@ public class ArtifactorySource implements Source {
 
     private final String url;
     private final World world;
+    private String contextPath;
 
     public ArtifactorySource(World world, String url) {
         this.world = world;
         this.url = url;
+        this.contextPath = "/artifactory/";
     }
 
     public void addOption(String option) {
+        String prefix = "context=";
+
+        if (option.startsWith(prefix)) {
+            contextPath = Strings.removeLeft(option, prefix);
+            if (!contextPath.endsWith("/")) {
+                throw new ArgumentException("context path does not end with a slash: " + contextPath);
+            }
+        }
         throw new ArgumentException(url + ": unknown option: " + option);
     }
 
@@ -63,7 +73,7 @@ public class ArtifactorySource implements Source {
         Node root;
 
         root = world.node(url);
-        listing = world.node(strip(url) + "/api/storage/" + root.getName() + "?list&deep=1&mdTimestamps=0");
+        listing = world.node(artifactory() + "api/storage/" + repositoryAndPath() + "?list&deep=1&mdTimestamps=0");
         try {
             Parser.run(listing, root, dest);
         } catch (IOException | RuntimeException e) {
@@ -73,11 +83,19 @@ public class ArtifactorySource implements Source {
         }
     }
 
-    private static String strip(String url) {
+    /** @return with tailing slash */
+    private String artifactory() {
         int idx;
 
-        idx = url.lastIndexOf('/');
-        return url.substring(0, idx);
+        idx = url.indexOf(contextPath, url.indexOf("://") + 3);
+        if (idx == -1) {
+            throw new ArgumentException("cannot locate artifactory root. Please specify a context");
+        }
+        return url.substring(0, idx + contextPath.length());
+    }
+
+    private String repositoryAndPath() {
+        return Strings.removeLeft(url, artifactory());
     }
 
     //--
