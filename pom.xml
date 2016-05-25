@@ -9,9 +9,6 @@
     <relativePath />
   </parent>
 
-  <properties>
-    <lucene.version>5.0.0</lucene.version>
-  </properties>
   <name>Pommes</name>
   <description>Database for pom files. You can search it and perform bulk-svn operations.</description>
 
@@ -22,6 +19,10 @@
   <packaging>jar</packaging>
 
   <url>https://github.com/mlhartme/pommes</url>
+
+  <properties>
+    <lucene.version>5.5.1</lucene.version>
+  </properties>
 
   <scm>
     <url>https://github.com/mlhartme/pommes</url>
@@ -122,7 +123,7 @@
           <name>pommes</name>
           <main>net.oneandone.pommes.cli.Main</main>
           <remove>META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
-          <concat>META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat</concat>
+          <concat>META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat, META-INF/services/org.apache.lucene.codecs.DocValuesFormat</concat>
           <equal>com/jcraft/jsch/agentproxy/**.*</equal>
 
           <!-- for upload -->
