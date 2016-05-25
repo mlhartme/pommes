@@ -26,12 +26,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class SubversionSource implements Source {
-    public static final String PROTOCOL = "svn:";
+public class NodeSource implements Source {
+    public static final String FILE = "file:";
+    public static final String SVN = "svn:";
 
-    public static SubversionSource createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(PROTOCOL)) {
-            return new SubversionSource(world.node(url));
+    public static NodeSource createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
+        if (url.startsWith(SVN) || url.startsWith(FILE)) {
+            return new NodeSource(world.node(url));
         } else {
             return null;
         }
@@ -43,7 +44,7 @@ public class SubversionSource implements Source {
     private boolean withBranches;
     private final Filter exclude;
 
-    public SubversionSource(Node node) {
+    public NodeSource(Node node) {
         this.node = node;
         this.exclude = new Filter();
         this.withBranches = true;

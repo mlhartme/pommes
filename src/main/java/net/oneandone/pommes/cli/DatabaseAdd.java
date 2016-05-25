@@ -20,9 +20,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.source.ArtifactorySource;
 import net.oneandone.pommes.source.Source;
-import net.oneandone.pommes.source.SubversionSource;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -51,21 +49,12 @@ public class DatabaseAdd extends Base {
     }
 
     public void add(String str) throws URISyntaxException, NodeInstantiationException {
-        Source source;
-
         if (str.startsWith("-")) {
             previous(str).addExclude(str.substring(1));
         } else if (str.startsWith("%")) {
             previous(str).addOption(str.substring(1));
         } else {
-            source = ArtifactorySource.createOpt(world, str);
-            if (source == null) {
-                source = SubversionSource.createOpt(world, str);
-            }
-            if (source == null) {
-                throw new ArgumentException("unknown source type: " + str);
-            }
-            sources.add(source);
+            sources.add(Source.create(world, str));
         }
     }
 
@@ -202,9 +191,6 @@ public class DatabaseAdd extends Base {
                             console.info.println(pom.getURI().toString());
                             project = maven.loadPom(local);
                             origin = pom.getURI().toString();
-                            if (origin.startsWith("https://artifactory")) {
-                                origin = "svn:" + origin;
-                            }
                             return Database.document(origin, project);
                         } finally {
                             local.deleteFile();

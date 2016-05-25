@@ -51,9 +51,6 @@ public class Pom {
         if (origin == null || origin.endsWith("/")) {
             throw new IllegalArgumentException(origin);
         }
-        if (!origin.startsWith("svn:https://")) {
-            throw new IllegalArgumentException(origin);
-        }
         this.origin = origin;
         this.coordinates = coordinates;
         this.dependencies = new ArrayList<>();
