@@ -14,41 +14,35 @@
  * limitations under the License.
  */
 package net.oneandone.pommes.cli;
+import java.net.URISyntaxException;
 import java.util.List;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.WildcardQuery;
 
 import com.google.gson.Gson;
 
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
 
-public class DatabaseExport extends Base {
+public class DatabaseDump extends Base {
     private final Gson gson = new Gson();
-    private final String scmSubstring;
-    private final String exportPath;
+    private final String query;
+    private final Node target;
 
-    public DatabaseExport(Environment environment, String scmSubstring, String exportPath) {
+    public DatabaseDump(Environment environment, String query, String target) throws URISyntaxException, NodeInstantiationException {
         super(environment);
-
-        this.scmSubstring = scmSubstring;
-        this.exportPath = exportPath;
+        this.query = query;
+        this.target = target.isEmpty() ? world.node("console:///") : world.node(target);
     }
 
     @Override
     public void run(Database database) throws Exception {
-        Node export = world.node(exportPath);
-        console.verbose.println("Selecting all documents with " + scmSubstring + " in its origin");
-        List<Pom> poms = database.query(new WildcardQuery(new Term(Database.ORIGIN, "*" + scmSubstring + "*")));
+        List<Pom> poms;
+
+        console.verbose.println("Selecting all documents matching '" + query + "'");
+        poms = database.query(query, environment);
         console.verbose.println("Got " + poms.size() + " doucments");
-        Node temp = world.getTemp().createTempFile();
-        temp.writeLines(gson.toJson(poms));
-        console.verbose.println("Wrote temp file " + temp.getPath());
-        console.verbose.println("Saving to  " + export.getPath());
-        temp.copyFile(export);
-        console.verbose.println("Saving done.");
+        target.writeString(gson.toJson(poms));
 
     }
 }

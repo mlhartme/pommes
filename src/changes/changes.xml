@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
     <release date="2016-02-xx" version="2.5.0">
-      <action date="2016-05-25" dev="mhm" type="update">
+      <action date="2016-05-25" dev="mlhartme" type="update">
+        database-export: renamed to database-dump; replaced scmPrefix argument by optional query;
+        target argument is optional now.
+      </action>
+      <action date="2016-05-25" dev="mlhartme" type="update">
         database-add: Added artifactory support - specify urls prefixed with 'artifactory:'.
         Added file support - speficy file urls.
         Subversion urls have to be prefixed with 'svn': now; -noBranches changed to %NO_BRANCHES.
