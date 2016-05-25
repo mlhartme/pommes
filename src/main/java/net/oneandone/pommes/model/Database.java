@@ -252,7 +252,7 @@ public class Database implements AutoCloseable {
     }
 
     private Query pommesQuery(String queryString, Variables variables) throws IOException, QueryNodeException {
-        BooleanQuery query;
+        BooleanQuery.Builder query;
         List<String> terms;
         Query term;
         char marker;
@@ -263,7 +263,7 @@ public class Database implements AutoCloseable {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
             return new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME);
         } else {
-            query = new BooleanQuery();
+            query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
             if (terms.isEmpty()) {
                 terms.add("");
@@ -291,7 +291,7 @@ public class Database implements AutoCloseable {
                 }
                 query.add(term, BooleanClause.Occur.MUST);
             }
-            return query;
+            return query.build();
         }
     }
 
@@ -334,12 +334,12 @@ public class Database implements AutoCloseable {
     }
 
     private static Query or(Query left, Query right) {
-        BooleanQuery result;
+        BooleanQuery.Builder result;
 
-        result = new BooleanQuery();
+        result = new BooleanQuery.Builder();
         result.add(left, BooleanClause.Occur.SHOULD);
         result.add(right, BooleanClause.Occur.SHOULD);
-        return result;
+        return result.build();
     }
 
     private static Query substring(String field, String substring) {
