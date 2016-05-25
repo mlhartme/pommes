@@ -17,18 +17,17 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
 
-import java.util.List;
 
 public class DatabaseRemove extends Base {
-    private final List<String> prefixes;
+    private final String query;
 
-    public DatabaseRemove(Environment environment, List<String> prefixes) {
+    public DatabaseRemove(Environment environment, String query) {
         super(environment);
-        this.prefixes = prefixes;
+        this.query = query;
     }
 
     @Override
     public void run(Database database) throws Exception {
-        database.remove(prefixes);
+        database.remove(query, environment);
     }
 }

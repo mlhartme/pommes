@@ -186,7 +186,7 @@ public class Database implements AutoCloseable {
         directory.mkdir();
     }
 
-    public void remove(List<String> prefixes) throws IOException {
+    public void remove(String query, Variables variables) throws IOException, QueryNodeException {
         IndexWriter writer;
         IndexWriterConfig config;
 
@@ -194,9 +194,7 @@ public class Database implements AutoCloseable {
         config =  new IndexWriterConfig(Version.LUCENE_4_9, null);
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
-        for (String prefix : prefixes) {
-            writer.deleteDocuments(new PrefixQuery(new Term(ORIGIN, prefix)));
-        }
+        writer.deleteDocuments(pommesQuery(query, variables));
         writer.close();
     }
 
@@ -248,6 +246,10 @@ public class Database implements AutoCloseable {
     private static final Separator PLUS = Separator.on('+');
 
     public List<Pom> query(String queryString, Variables variables) throws IOException, QueryNodeException {
+        return query(pommesQuery(queryString, variables));
+    }
+
+    private Query pommesQuery(String queryString, Variables variables) throws IOException, QueryNodeException {
         BooleanQuery query;
         List<String> terms;
         Query term;
@@ -257,7 +259,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return query(new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME));
+            return new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME);
         } else {
             query = new BooleanQuery();
             terms = PLUS.split(queryString);
@@ -287,7 +289,7 @@ public class Database implements AutoCloseable {
                 }
                 query.add(term, BooleanClause.Occur.MUST);
             }
-            return query(query);
+            return query;
         }
     }
 
