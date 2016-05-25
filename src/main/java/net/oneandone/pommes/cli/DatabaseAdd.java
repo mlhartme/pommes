@@ -20,7 +20,11 @@ import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.source.ArtifactorySource;
+import net.oneandone.pommes.source.Source;
+import net.oneandone.pommes.source.SubversionSource;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.document.Document;
@@ -36,23 +40,38 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public abstract class BaseDatabaseAdd extends Base {
+public class DatabaseAdd extends Base {
     private List<Source> sources;
 
-    public BaseDatabaseAdd(Environment environment) {
+    public DatabaseAdd(Environment environment) {
         super(environment);
         sources = new ArrayList<>();
     }
 
-    public void add(String urlOrExclude) {
-        if (urlOrExclude.startsWith("-")) {
-            if (sources.isEmpty()) {
-                throw new ArgumentException("missing url before exclude " + urlOrExclude);
-            }
-            sources.get(sources.size() - 1).excludes.add(urlOrExclude.substring(1));
+    public void add(String str) throws URISyntaxException, NodeInstantiationException {
+        Source source;
+
+        if (str.startsWith("-")) {
+            previous(str).addExclude(str.substring(1));
+        } else if (str.startsWith("%")) {
+            previous(str).addOption(str.substring(1));
         } else {
-            sources.add(new Source(urlOrExclude));
+            source = ArtifactorySource.createOpt(world, str);
+            if (source == null) {
+                source = SubversionSource.createOpt(world, str);
+            }
+            if (source == null) {
+                throw new ArgumentException("unknown source type: " + str);
+            }
+            sources.add(source);
         }
+    }
+
+    private Source previous(String str) {
+        if (sources.isEmpty()) {
+            throw new ArgumentException("missing url before '" + str + "'");
+        }
+        return sources.get(sources.size() - 1);
     }
 
     @Override
@@ -64,7 +83,7 @@ public abstract class BaseDatabaseAdd extends Base {
         indexer = new Indexer(database, endOfQueue);
         indexer.start();
         for (Source source : sources) {
-            collect(source, indexer.src);
+            source.scan(indexer.src);
         }
         indexer.src.put(endOfQueue);
         indexer.join();
@@ -72,8 +91,6 @@ public abstract class BaseDatabaseAdd extends Base {
             throw indexer.exception;
         }
     }
-
-    public abstract void collect(Source src, BlockingQueue<Node> dest) throws IOException, URISyntaxException, InterruptedException;
 
     public class Indexer extends Thread {
         public final BlockingQueue<Node> src;

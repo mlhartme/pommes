@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.cli;
+package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
@@ -24,47 +26,59 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class DatabaseAddSvn extends BaseDatabaseAdd {
-    public DatabaseAddSvn(Environment environment) {
-        super(environment);
+public class SubversionSource implements Source {
+    public static final String PROTOCOL = "svn:";
+
+    public static SubversionSource createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
+        if (url.startsWith(PROTOCOL)) {
+            return new SubversionSource(world.node(url));
+        } else {
+            return null;
+        }
+    }
+
+    //--
+
+    private final Node node;
+    private boolean withBranches;
+    private final Filter exclude;
+
+    public SubversionSource(Node node) {
+        this.node = node;
+        this.exclude = new Filter();
+        this.withBranches = true;
     }
 
     @Override
-    public void collect(Source source, BlockingQueue<Node> dest) throws IOException, InterruptedException, URISyntaxException {
-        Node node;
-        Filter exclude;
-        boolean noBranches;
-
-        node = world.node("svn:" + source.url);
-        noBranches = false;
-        exclude = new Filter();
-        for (String str : source.excludes) {
-            if (str.equals("%BRANCHES")) {
-                noBranches = true;
-            } else {
-                if (str.startsWith("/") || str.endsWith("/")) {
-                    throw new ArgumentException("do not use '/' before or after excludes: " + str);
-                }
-                exclude.include("**/" + str);
-            }
+    public void addOption(String option) {
+        if (option.equals("NO_BRANCHES")) {
+            withBranches = false;
         }
-        if (exclude.getIncludes().length == 0) {
-            exclude = null;
-        }
-        scan(node, exclude, true, noBranches, dest);
     }
 
-    public void scan(Node root, Filter excludes, boolean recurse, boolean noBranches, BlockingQueue<Node> dest) throws IOException, InterruptedException {
+    @Override
+    public void addExclude(String str) {
+        if (str.startsWith("/") || str.endsWith("/")) {
+            throw new ArgumentException("do not use '/' before or after excludes: " + str);
+        }
+        exclude.include("**/" + str);
+    }
+
+    @Override
+    public void scan(BlockingQueue<Node> dest) throws IOException, InterruptedException {
+        scan(node, true, dest);
+    }
+
+    public void scan(Node root, boolean recurse, BlockingQueue<Node> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
         Node project;
         Node trunk;
         Node branches;
         List<? extends Node> grandChildren;
 
-        if (excludes != null && excludes.matches(root.getPath())) {
+        if (exclude.matches(root.getPath())) {
             return;
         }
-        console.verbose.println("scanning ... " + root.getURI());
         children = root.list();
         if (children == null) {
             return;
@@ -81,14 +95,14 @@ public class DatabaseAddSvn extends BaseDatabaseAdd {
         }
         trunk = child(children, "trunk");
         if (trunk != null) {
-            scan(trunk, excludes, false, noBranches, dest);
+            scan(trunk, false, dest);
         }
         branches = child(children, "branches");
-        if (branches != null && !noBranches) {
+        if (branches != null && withBranches) {
             grandChildren = branches.list();
             if (grandChildren != null) {
                 for (Node grandChild : grandChildren) {
-                    scan(grandChild, excludes, false, noBranches, dest);
+                    scan(grandChild, false, dest);
                 }
             }
         }
@@ -104,7 +118,7 @@ public class DatabaseAddSvn extends BaseDatabaseAdd {
         if (recurse) {
             // recurse
             for (Node node : children) {
-                scan(node, excludes, true, noBranches, dest);
+                scan(node, true, dest);
             }
         }
     }

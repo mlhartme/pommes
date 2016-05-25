@@ -59,10 +59,10 @@ public class Main {
                 + "\n"
                 + "database commands\n"
                 + "  'database-clear'      creates a new empty database\n"
-                + "  'database-add-svn' '-noBranches'? url*\n"
-                + "                        add projects found under the specified svn urls to the database;\n"
+                + "  'database-add' url*\n"
+                + "                        add projects found under the specified urls to the database;\n"
                 + "                        overwrites projects with same origin;\n"
-                + "                        url is a svn url or '-' with a pattern to exclude from the url before\n"
+                + "                        url is a svn url, artifactory url, an option (prefixed with '%') or an exclude (prefixed with '-')"
                 + "  'database-add-artifactory' repository root+\n"
                 + "                        add all artifacts found in the specified repository under one of the roots;\n"
                 + "  'database-remove' url*\n"
@@ -115,8 +115,7 @@ public class Main {
           cli.add(FstabAdd.class, "fstab-add url directory");
 
           cli.add(DatabaseClear.class, "database-clear");
-          cli.add(DatabaseAddSvn.class, "database-add-svn url* { add*(url) }");
-          cli.add(DatabaseAddArtifactory.class, "database-add-artifactory url* { add*(url) }");
+          cli.add(DatabaseAdd.class, "database-add url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 

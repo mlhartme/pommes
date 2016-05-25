@@ -13,30 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.cli;
+package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Parser;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.World;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
-public class DatabaseAddArtifactory extends BaseDatabaseAdd {
-    public DatabaseAddArtifactory(Environment environment) {
-        super(environment);
+public class ArtifactorySource implements Source {
+    private static final String PROTOCOL = "artifactory:";
+
+    public static ArtifactorySource createOpt(World world, String url) {
+        if (url.startsWith(PROTOCOL)) {
+            return new ArtifactorySource(world, url.substring(PROTOCOL.length()));
+        } else {
+            return null;
+        }
+    }
+
+    private final String url;
+    private final World world;
+
+    public ArtifactorySource(World world, String url) {
+        this.world = world;
+        this.url = url;
+    }
+
+    public void addOption(String option) {
+        throw new ArgumentException(url + ": unknown option: " + option);
+    }
+
+    public void addExclude(String exclude) {
+        throw new ArgumentException(url + ": excludes not supported: " + exclude);
     }
 
     @Override
-    public void collect(Source source, BlockingQueue<Node> dest) throws IOException, URISyntaxException {
-        String url;
+    public void scan(BlockingQueue<Node> dest) throws IOException, URISyntaxException {
         Node listing;
         Node root;
 
-        if (!source.excludes.isEmpty()) {
-            throw new ArgumentException("excludes not supported for artifactory: " + source.excludes);
-        }
-        url = source.url;
         root = world.node(url);
         listing = world.node(strip(url) + "/api/storage/" + root.getName() + "?list&deep=1&mdTimestamps=0");
         try {
