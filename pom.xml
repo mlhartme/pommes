@@ -91,12 +91,6 @@
       <artifactId>javax.json</artifactId>
       <version>1.0.4</version>
     </dependency>
-    <!-- this is used by lucense-sandbox, but the dependency is not fetched transitivly ... -->
-    <dependency>
-      <groupId>jakarta-regexp</groupId>
-      <artifactId>jakarta-regexp</artifactId>
-      <version>1.4</version>
-    </dependency>
 
     <!-- TODO: because dependencyManagement excludes it from httpcomponent!? And sets it to provided!? -->
     <dependency>
