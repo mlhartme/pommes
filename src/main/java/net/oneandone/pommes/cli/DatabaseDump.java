@@ -19,18 +19,28 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import com.google.gson.GsonBuilder;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 
 public class DatabaseDump extends Base {
-    private final Gson gson = new Gson();
+    private final Gson gson;
     private final String query;
     private final Node target;
 
-    public DatabaseDump(Environment environment, String query, String target) throws URISyntaxException, NodeInstantiationException {
+    public DatabaseDump(Environment environment, boolean prettyPrint, String query, String target)
+            throws URISyntaxException, NodeInstantiationException {
         super(environment);
+
+        GsonBuilder builder;
+
+        builder = new GsonBuilder();
+        if (prettyPrint) {
+            builder.setPrettyPrinting();
+        }
+        this.gson = builder.create();
         this.query = query;
         this.target = target.isEmpty() ? world.node("console:///") : world.node(target);
     }

@@ -65,7 +65,7 @@ public class Main {
                 + "                        url is a svn url, artifactory url, an option (prefixed with '%') or an exclude (prefixed with '-')"
                 + "  'database-remove' url*\n"
                 + "                        remove all documents whose scm url is prefixed with one of the specified urls\n"
-                + "  'database-dump' query? target?\n"
+                + "  'database-dump' '-pp'? query? target?\n"
                 + "                        writes a filtered list of matching (default: all) documents in json-format to the target (or console)\n"
                 + "\n"
                 + "other commands\n"
@@ -123,7 +123,7 @@ public class Main {
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
-          cli.add(DatabaseDump.class, "database-dump query? target?");
+          cli.add(DatabaseDump.class, "database-dump -pp query? target?");
 
           cli.add(Find.class, "find -format=%g§20@§20%o§20%c query");
           cli.add(FindUsers.class, "users -format=%g§20@§20%o§20->§20%d[%ga]");
