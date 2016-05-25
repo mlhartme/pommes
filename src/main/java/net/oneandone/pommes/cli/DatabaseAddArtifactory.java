@@ -16,14 +16,14 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseAddArtifactory extends Base {
+public class DatabaseAddArtifactory extends BaseDatabaseAdd {
     private List<String> urls;
 
     public DatabaseAddArtifactory(Environment environment) {
@@ -36,31 +36,28 @@ public class DatabaseAddArtifactory extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public List<Node> collect() throws IOException, URISyntaxException {
         Node listing;
-        Node r;
+        Node root;
         List<Node> lst;
-        DatabaseAddSvn.ProjectIterator iterator;
 
         if (urls.size() == 0) {
             throw new ArgumentException("missing roots");
         }
         console.info.println("scanning artifactory ...");
+        lst = new ArrayList<>();
         for (String url : urls) {
-            r = world.node(url);
-            listing = world.node(strip(url) + "/api/storage/" + r.getName() + "?list&deep=1&mdTimestamps=0");
+            root = world.node(url);
+            listing = world.node(strip(url) + "/api/storage/" + root.getName() + "?list&deep=1&mdTimestamps=0");
             try {
-                lst = Parser.run(listing, r);
+                lst.addAll(Parser.run(listing, root));
             } catch (IOException | RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 throw new IOException("scanning failed: " + e.getMessage(), e);
             }
-            System.out.println("adding " + lst.size() + " poms ...");
-            iterator = new DatabaseAddSvn.ProjectIterator(console, world, environment.maven(), lst.iterator());
-            database.index(iterator);
-            iterator.summary();
         }
+        return lst;
     }
 
     private static String strip(String url) {
