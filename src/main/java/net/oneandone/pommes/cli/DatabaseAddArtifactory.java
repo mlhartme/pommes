@@ -24,38 +24,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseAddArtifactory extends Base {
-    private final String repository;
-    private List<String> roots;
+    private List<String> urls;
 
-    public DatabaseAddArtifactory(Environment environment, String repository) {
+    public DatabaseAddArtifactory(Environment environment) {
         super(environment);
-        this.repository = repository;
-        this.roots = new ArrayList<>();
+        this.urls = new ArrayList<>();
     }
 
-    public void root(String root) {
-        roots.add(root);
+    public void url(String url) {
+        urls.add(url);
     }
 
     @Override
     public void run(Database database) throws Exception {
-        String user;
-        String password;
         Node listing;
         Node r;
         List<Node> lst;
         DatabaseAddSvn.ProjectIterator iterator;
 
-        if (roots.size() == 0) {
+        if (urls.size() == 0) {
             throw new ArgumentException("missing roots");
         }
-        user = console.readline("artifactory user: ");
-        password = console.readline("password: ");
         console.info.println("scanning artifactory ...");
-        for (String root : roots) {
-            listing = world.validNode("https://" + user + ":" + password + "@artifactory.1and1.org/artifactory/api/storage/"
-                    + repository + "/" + root + "?list&deep=1&mdTimestamps=0");
-            r = world.validNode("https://" + user + ":" + password + "@artifactory.1and1.org/artifactory/" + repository + "/" + root);
+        for (String url : urls) {
+            r = world.node(url);
+            listing = world.node(strip(url) + "/api/storage/" + r.getName() + "?list&deep=1&mdTimestamps=0");
             try {
                 lst = Parser.run(listing, r);
             } catch (IOException | RuntimeException e) {
@@ -68,5 +61,12 @@ public class DatabaseAddArtifactory extends Base {
             database.index(iterator);
             iterator.summary();
         }
+    }
+
+    private static String strip(String url) {
+        int idx;
+
+        idx = url.lastIndexOf('/');
+        return url.substring(0, idx);
     }
 }

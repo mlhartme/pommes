@@ -116,7 +116,7 @@ public class Main {
 
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAddSvn.class, "database-add-svn -noBranches url* { url*(url) }");
-          cli.add(DatabaseAddArtifactory.class, "database-add-artifactory repository root+ { root*(root) }");
+          cli.add(DatabaseAddArtifactory.class, "database-add-artifactory url* { url*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 
