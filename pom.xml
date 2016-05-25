@@ -9,6 +9,9 @@
     <relativePath />
   </parent>
 
+  <properties>
+    <lucene.version>4.10.4</lucene.version>
+  </properties>
   <name>Pommes</name>
   <description>Database for pom files. You can search it and perform bulk-svn operations.</description>
 
@@ -65,12 +68,12 @@
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>4.9.1</version>
+      <version>${lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queryparser</artifactId>
-      <version>4.9.1</version>
+      <version>${lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>

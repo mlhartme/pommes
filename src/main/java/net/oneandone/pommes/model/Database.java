@@ -192,7 +192,7 @@ public class Database implements AutoCloseable {
         IndexWriterConfig config;
 
         close();
-        config =  new IndexWriterConfig(Version.LUCENE_4_9, null);
+        config =  new IndexWriterConfig(Version.LUCENE_4_10_4, null);
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         writer.deleteDocuments(pommesQuery(query, variables));
