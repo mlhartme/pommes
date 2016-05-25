@@ -5,7 +5,7 @@
         Added database-add-artifactory command, renamed database-add to database-add-svn.
       </action>
     </release>
-    <release date="2016-02-xx" version="2.4.3">
+    <release date="2016-03-01" version="2.4.3">
       <action date="2016-02-25" dev="mlhartme" type="update">
         Pommes goto no longer modifies your environment. To get the previous behavior, invoke pommes goto ... && . ~/.pommes.goto.
         Technically, pommes is a normal shell script now (not a shell function).

@@ -78,10 +78,6 @@ public class Database implements AutoCloseable {
         }
     }
 
-    //--
-
-    public static final String SCM_SVN = "scm:svn:";
-
     //-- field names
 
     /**
