@@ -41,11 +41,13 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAdd extends Base {
-    private List<Source> sources;
+    private final boolean dryrun;
+    private final List<Source> sources;
 
-    public DatabaseAdd(Environment environment) {
+    public DatabaseAdd(Environment environment, boolean dryrun) {
         super(environment);
-        sources = new ArrayList<>();
+        this.dryrun = dryrun;
+        this.sources = new ArrayList<>();
     }
 
     public void add(String str) throws URISyntaxException, NodeInstantiationException {
@@ -80,7 +82,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         endOfQueue = world.getHome();
-        indexer = new Indexer(database, endOfQueue);
+        indexer = new Indexer(dryrun, console, world, environment.maven(), endOfQueue, database);
         indexer.start();
         for (Source source : sources) {
             source.scan(indexer.src);
@@ -92,51 +94,50 @@ public class DatabaseAdd extends Base {
         }
     }
 
-    public class Indexer extends Thread {
-        public final BlockingQueue<Node> src;
-        private final Database database;
-        private final Node endOfQueue;
-        private Exception exception;
+    public static class Indexer extends Thread implements Iterator<Document> {
+        private final boolean dryrun;
 
-        public Indexer(Database database, Node endOfQueue) {
-            super("Indexer");
-            this.src = new ArrayBlockingQueue<>(25);
-            this.database = database;
-            this.endOfQueue = endOfQueue;
-            this.exception = null;
-        }
-
-        public void run() {
-            ProjectIterator iterator;
-
-            try {
-                iterator = new ProjectIterator(console, world, environment.maven(), endOfQueue, src);
-                database.index(iterator);
-                iterator.summary();
-            } catch (Exception e) {
-                exception = e;
-            }
-        }
-    }
-
-    public static class ProjectIterator implements Iterator<Document> {
         private final Console console;
         private final World world;
         private final Maven maven;
         private final Node endOfQueue;
-        private final BlockingQueue<Node> projects;
+
+        public final BlockingQueue<Node> src;
+        private final Database database;
+        private Exception exception;
 
         private Document current;
         private int count;
         private int errors;
 
-        public ProjectIterator(Console console, World world, Maven maven, Node endOfQueue, BlockingQueue<Node> projects) {
+        public Indexer(boolean dryrun, Console console, World world, Maven maven, Node endOfQueue, Database database) {
+            super("Indexer");
+
+            this.dryrun = dryrun;
+
             this.console = console;
             this.world = world;
             this.maven = maven;
             this.endOfQueue = endOfQueue;
-            this.projects = projects;
-            this.current = iter();
+
+            this.src = new ArrayBlockingQueue<>(25);
+            this.database = database;
+            this.exception = null;
+
+            // CAUTION: current is not defined until this thread is started!
+
+            this.count = 0;
+            this.errors = 0;
+        }
+
+        public void run() {
+            try {
+                current = iter();
+                database.index(this);
+                summary();
+            } catch (Exception e) {
+                exception = e;
+            }
         }
 
         @Override
@@ -157,9 +158,14 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iter() {
+            Document document;
+
             while (true) {
                 try {
-                    return iterUnchecked();
+                    document = iterUnchecked();
+                    if (!dryrun) {
+                        return document;
+                    }
                 } catch (InterruptedException | InvalidArtifactRTException | IOException e) {
                     console.error.println(e.getMessage());
                     if (e.getCause() == null) {
@@ -180,7 +186,7 @@ public class DatabaseAdd extends Base {
             String origin;
 
             while (true) {
-                pom = projects.take();
+                pom = src.take();
                 if (pom == endOfQueue) {
                     return null;
                 }
@@ -214,7 +220,7 @@ public class DatabaseAdd extends Base {
 
         @Override
         public void remove() {
-
+            throw new UnsupportedOperationException();
         }
 
         public void summary() {

@@ -59,12 +59,10 @@ public class Main {
                 + "\n"
                 + "database commands\n"
                 + "  'database-clear'      creates a new empty database\n"
-                + "  'database-add' url*\n"
+                + "  'database-add' '-dryrun? url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
                 + "                        overwrites projects with same origin;\n"
                 + "                        url is a svn url, artifactory url, an option (prefixed with '%') or an exclude (prefixed with '-')"
-                + "  'database-add-artifactory' repository root+\n"
-                + "                        add all artifacts found in the specified repository under one of the roots;\n"
                 + "  'database-remove' url*\n"
                 + "                        remove all documents whose scm url is prefixed with one of the specified urls\n"
                 + "  'database-export' filter target\n"
@@ -99,6 +97,7 @@ public class Main {
                 + "  pommes find -format %g :-slf4j            # same, but only print gav of the matches\n"
                 + "  pommes find -format %d[slf4j] :-slf4j     # same, but only print the matched dependency\n"
                 + "\n"
+                + "  pommes -e database-add 'artifactory:https://user:password@artifactory.yourcompany.com/yourrepo'"
                 + "environment:\n"
                 + "  POMMES_GLOBAL         url pointing to global database zip file\n"
                 + "\n"
@@ -115,7 +114,7 @@ public class Main {
           cli.add(FstabAdd.class, "fstab-add url directory");
 
           cli.add(DatabaseClear.class, "database-clear");
-          cli.add(DatabaseAdd.class, "database-add url* { add*(url) }");
+          cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
           cli.add(DatabaseExport.class, "database-export scmSubstring exportPath");
 

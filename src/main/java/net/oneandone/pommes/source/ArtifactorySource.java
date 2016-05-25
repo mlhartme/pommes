@@ -49,6 +49,9 @@ public class ArtifactorySource implements Source {
         this.world = world;
         this.url = url;
         this.contextPath = "/artifactory/";
+        if (!url.contains(contextPath)) {
+            this.contextPath = "/";
+        }
     }
 
     public void addOption(String option) {
