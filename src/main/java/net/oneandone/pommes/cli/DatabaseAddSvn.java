@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAddSvn extends BaseDatabaseAdd {
     private final boolean noBranches;
@@ -66,20 +67,16 @@ public class DatabaseAddSvn extends BaseDatabaseAdd {
     }
 
     @Override
-    public List<Node> collect() throws IOException {
+    public void collect(BlockingQueue<Node> dest) throws IOException, InterruptedException {
         if (nodes.size() == 0) {
             throw new ArgumentException("missing urls");
         }
-        List<Node> result;
-
-        result = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
-            scan(nodes.get(i), excludes.get(i), true, result);
+            scan(nodes.get(i), excludes.get(i), true, dest);
         }
-        return result;
     }
 
-    public void scan(Node root, Filter excludes, boolean recurse, final List<Node> result) throws IOException {
+    public void scan(Node root, Filter excludes, boolean recurse, BlockingQueue<Node> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
         Node project;
         Node trunk;
@@ -96,24 +93,24 @@ public class DatabaseAddSvn extends BaseDatabaseAdd {
         }
         project = child(children, "pom.xml");
         if (project != null) {
-            result.add(project);
+            dest.put(project);
             return;
         }
         project = child(children, "composer.json");
         if (project != null) {
-            result.add(project);
+            dest.put(project);
             return;
         }
         trunk = child(children, "trunk");
         if (trunk != null) {
-            scan(trunk, excludes, false, result);
+            scan(trunk, excludes, false, dest);
         }
         branches = child(children, "branches");
         if (branches != null && !noBranches) {
             grandChildren = branches.list();
             if (grandChildren != null) {
                 for (Node grandChild : grandChildren) {
-                    scan(grandChild, excludes, false, result);
+                    scan(grandChild, excludes, false, dest);
                 }
             }
         }
@@ -129,7 +126,7 @@ public class DatabaseAddSvn extends BaseDatabaseAdd {
         if (recurse) {
             // recurse
             for (Node node : children) {
-                scan(node, excludes, true, result);
+                scan(node, excludes, true, dest);
             }
         }
     }

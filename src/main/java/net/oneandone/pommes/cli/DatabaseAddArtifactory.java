@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAddArtifactory extends BaseDatabaseAdd {
     private List<String> urls;
@@ -36,28 +37,25 @@ public class DatabaseAddArtifactory extends BaseDatabaseAdd {
     }
 
     @Override
-    public List<Node> collect() throws IOException, URISyntaxException {
+    public void collect(BlockingQueue<Node> dest) throws IOException, URISyntaxException {
         Node listing;
         Node root;
-        List<Node> lst;
 
         if (urls.size() == 0) {
             throw new ArgumentException("missing roots");
         }
         console.info.println("scanning artifactory ...");
-        lst = new ArrayList<>();
         for (String url : urls) {
             root = world.node(url);
             listing = world.node(strip(url) + "/api/storage/" + root.getName() + "?list&deep=1&mdTimestamps=0");
             try {
-                lst.addAll(Parser.run(listing, root));
+                Parser.run(listing, root, dest);
             } catch (IOException | RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 throw new IOException("scanning failed: " + e.getMessage(), e);
             }
         }
-        return lst;
     }
 
     private static String strip(String url) {

@@ -29,8 +29,9 @@ import org.apache.maven.project.MavenProject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public abstract class BaseDatabaseAdd extends Base {
     public BaseDatabaseAdd(Environment environment) {
@@ -39,38 +40,65 @@ public abstract class BaseDatabaseAdd extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        List<Node> nodes;
+        Node endOfQueue;
+        Indexer indexer;
 
-        console.info.println("scanning ...");
-        nodes = collect();
-        console.info.println("indexing ...");
-        index(database, nodes);
+        endOfQueue = world.getHome();
+        indexer = new Indexer(database, endOfQueue);
+        indexer.start();
+        collect(indexer.src);
+        indexer.src.put(endOfQueue);
+        indexer.join();
+        if (indexer.exception != null) {
+            throw indexer.exception;
+        }
     }
 
-    public abstract List<Node> collect() throws IOException, URISyntaxException;
+    public class Indexer extends Thread {
+        public final BlockingQueue<Node> src;
+        private final Database database;
+        private final Node endOfQueue;
+        private Exception exception;
 
-    public void index(Database database, List<Node> nodes) throws IOException {
-        ProjectIterator iterator;
+        public Indexer(Database database, Node endOfQueue) {
+            super("Indexer");
+            this.src = new ArrayBlockingQueue<>(25);
+            this.database = database;
+            this.endOfQueue = endOfQueue;
+            this.exception = null;
+        }
 
-        iterator = new ProjectIterator(console, world, environment.maven(), nodes.iterator());
-        database.index(iterator);
-        iterator.summary();
+        public void run() {
+            ProjectIterator iterator;
+
+            try {
+                iterator = new ProjectIterator(console, world, environment.maven(), endOfQueue, src);
+                database.index(iterator);
+                iterator.summary();
+            } catch (Exception e) {
+                exception = e;
+            }
+        }
     }
+
+    public abstract void collect(BlockingQueue<Node> dest) throws IOException, URISyntaxException, InterruptedException;
 
     public static class ProjectIterator implements Iterator<Document> {
         private final Console console;
         private final World world;
         private final Maven maven;
-        private final Iterator<Node> projects;
+        private final Node endOfQueue;
+        private final BlockingQueue<Node> projects;
 
         private Document current;
         private int count;
         private int errors;
 
-        public ProjectIterator(Console console, World world, Maven maven, Iterator<Node> projects) {
+        public ProjectIterator(Console console, World world, Maven maven, Node endOfQueue, BlockingQueue<Node> projects) {
             this.console = console;
             this.world = world;
             this.maven = maven;
+            this.endOfQueue = endOfQueue;
             this.projects = projects;
             this.current = iter();
         }
@@ -96,7 +124,7 @@ public abstract class BaseDatabaseAdd extends Base {
             while (true) {
                 try {
                     return iterUnchecked();
-                } catch (InvalidArtifactRTException | IOException e) {
+                } catch (InterruptedException | InvalidArtifactRTException | IOException e) {
                     console.error.println(e.getMessage());
                     if (e.getCause() == null) {
                         console.verbose.println("(unknown cause)");
@@ -109,14 +137,17 @@ public abstract class BaseDatabaseAdd extends Base {
             }
         }
 
-        private Document iterUnchecked() throws IOException {
+        private Document iterUnchecked() throws IOException, InterruptedException {
             Node pom;
             FileNode local;
             MavenProject project;
             String origin;
 
-            while (projects.hasNext()) {
-                pom = projects.next();
+            while (true) {
+                pom = projects.take();
+                if (pom == endOfQueue) {
+                    return null;
+                }
                 try {
                     if (pom.getName().equals("composer.json")) {
                         count++;
@@ -143,7 +174,6 @@ public abstract class BaseDatabaseAdd extends Base {
                     throw new IOException("error processing " + pom.getURI() + ": " + e.getMessage(), e);
                 }
             }
-            return null;
         }
 
         @Override
