@@ -20,41 +20,31 @@ import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAddArtifactory extends BaseDatabaseAdd {
-    private List<String> urls;
-
     public DatabaseAddArtifactory(Environment environment) {
         super(environment);
-        this.urls = new ArrayList<>();
-    }
-
-    public void url(String url) {
-        urls.add(url);
     }
 
     @Override
-    public void collect(BlockingQueue<Node> dest) throws IOException, URISyntaxException {
+    public void collect(Source source, BlockingQueue<Node> dest) throws IOException, URISyntaxException {
+        String url;
         Node listing;
         Node root;
 
-        if (urls.size() == 0) {
-            throw new ArgumentException("missing roots");
+        if (!source.excludes.isEmpty()) {
+            throw new ArgumentException("excludes not supported for artifactory: " + source.excludes);
         }
-        console.info.println("scanning artifactory ...");
-        for (String url : urls) {
-            root = world.node(url);
-            listing = world.node(strip(url) + "/api/storage/" + root.getName() + "?list&deep=1&mdTimestamps=0");
-            try {
-                Parser.run(listing, root, dest);
-            } catch (IOException | RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new IOException("scanning failed: " + e.getMessage(), e);
-            }
+        url = source.url;
+        root = world.node(url);
+        listing = world.node(strip(url) + "/api/storage/" + root.getName() + "?list&deep=1&mdTimestamps=0");
+        try {
+            Parser.run(listing, root, dest);
+        } catch (IOException | RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("scanning failed: " + e.getMessage(), e);
         }
     }
 

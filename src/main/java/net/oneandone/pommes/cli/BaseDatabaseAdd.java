@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
@@ -28,14 +29,30 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public abstract class BaseDatabaseAdd extends Base {
+    private List<Source> sources;
+
     public BaseDatabaseAdd(Environment environment) {
         super(environment);
+        sources = new ArrayList<>();
+    }
+
+    public void add(String urlOrExclude) {
+        if (urlOrExclude.startsWith("-")) {
+            if (sources.isEmpty()) {
+                throw new ArgumentException("missing url before exclude " + urlOrExclude);
+            }
+            sources.get(sources.size() - 1).excludes.add(urlOrExclude.substring(1));
+        } else {
+            sources.add(new Source(urlOrExclude));
+        }
     }
 
     @Override
@@ -46,13 +63,17 @@ public abstract class BaseDatabaseAdd extends Base {
         endOfQueue = world.getHome();
         indexer = new Indexer(database, endOfQueue);
         indexer.start();
-        collect(indexer.src);
+        for (Source source : sources) {
+            collect(source, indexer.src);
+        }
         indexer.src.put(endOfQueue);
         indexer.join();
         if (indexer.exception != null) {
             throw indexer.exception;
         }
     }
+
+    public abstract void collect(Source src, BlockingQueue<Node> dest) throws IOException, URISyntaxException, InterruptedException;
 
     public class Indexer extends Thread {
         public final BlockingQueue<Node> src;
@@ -80,8 +101,6 @@ public abstract class BaseDatabaseAdd extends Base {
             }
         }
     }
-
-    public abstract void collect(BlockingQueue<Node> dest) throws IOException, URISyntaxException, InterruptedException;
 
     public static class ProjectIterator implements Iterator<Document> {
         private final Console console;

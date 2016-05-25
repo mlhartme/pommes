@@ -2,6 +2,9 @@
   <body>
     <release date="2016-02-xx" version="2.5.0">
       <action date="2016-02-25" dev="mhm" type="update">
+        -noBranches changed to -%BRANCHES
+      </action>
+      <action date="2016-02-25" dev="mhm" type="update">
         Added database-add-artifactory command, renamed database-add to database-add-svn.
       </action>
     </release>
