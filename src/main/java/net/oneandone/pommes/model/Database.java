@@ -34,7 +34,6 @@ import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
@@ -42,7 +41,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
@@ -94,6 +92,8 @@ public class Database implements AutoCloseable {
     public static final String VERSION = "v";
     public static final String GA = "ga";
     public static final String GAV_NAME = "gav";
+
+    public static final String SCM = "scm";
 
     public static final String DEP_GA = "dep-ga";
     public static final String DEP_GAV = "dep-gav";
@@ -232,7 +232,8 @@ public class Database implements AutoCloseable {
         Pom result;
         String parent;
 
-        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), GAV.forGav(document.get(Database.GAV_NAME)));
+        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), GAV.forGav(document.get(Database.GAV_NAME)),
+                document.get(Database.SCM));
         parent = document.get(PAR_GAV);
         if (parent != null) {
             result.dependencies.add(GAV.forGav(parent));
@@ -398,6 +399,7 @@ public class Database implements AutoCloseable {
         doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
         doc.add(new StringField(GA, pom.coordinates.toGaString(), Field.Store.YES));
         doc.add(new StringField(GAV_NAME, pom.coordinates.toGavString(), Field.Store.YES));
+        doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
         return doc;
     }
 

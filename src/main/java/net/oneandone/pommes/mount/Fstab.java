@@ -86,13 +86,13 @@ public class Fstab {
         return null;
     }
 
-    public List<FileNode> directories(String svnurl) {
+    public List<FileNode> directories(String scm) {
         FileNode directory;
         List<FileNode> result;
 
         result = new ArrayList<>();
         for (Point point : points) {
-            directory = point.directoryOpt(svnurl);
+            directory = point.directoryOpt(scm);
             if (directory != null) {
                 result.add(directory);
             }

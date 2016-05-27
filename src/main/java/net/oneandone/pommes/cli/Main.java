@@ -98,6 +98,8 @@ public class Main {
                 + "  pommes find -format %d[slf4j] :-slf4j     # same, but only print the matched dependency\n"
                 + "\n"
                 + "  # add poms to the database:\n"
+                + "  # - your local repository:\n"
+                + "  pommes database-add ~/.m2/repository\n"
                 + "  # - from subversion:\n"
                 + "  pommes database-add 'svn:https://user:password@svn.yourcompany.com/your/repo/path'\n"
                 + "  # - from artifactory:\n"

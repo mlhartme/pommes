@@ -25,13 +25,21 @@ import java.util.List;
 
 public class Pom {
     public static Pom forComposer(String origin, String revision, Node composer) {
-        return new Pom(origin, revision, new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"));
+        return new Pom(origin, revision, new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"), "");
     }
 
     public static Pom forProject(String origin, String revision, MavenProject project) {
         Pom result;
+        String scm;
 
-        result = new Pom(origin, revision, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()));
+        scm = null;
+        if (project.getScm() != null) {
+            scm = project.getScm().getConnection();
+        }
+        if (scm == null) {
+            scm = "";
+        }
+        result = new Pom(origin, revision, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()), scm);
         for (Dependency dependency : project.getDependencies()) {
             result.dependencies.add(GAV.forDependency(dependency));
         }
@@ -46,28 +54,23 @@ public class Pom {
 
     public final GAV coordinates;
 
+    public final String scm;
+
     public final List<GAV> dependencies;
 
-    public Pom(String origin, String revision, GAV coordinates) {
+    public Pom(String origin, String revision, GAV coordinates, String scm) {
         if (origin == null || origin.endsWith("/")) {
             throw new IllegalArgumentException(origin);
         }
         this.origin = origin;
         this.revision = revision;
         this.coordinates = coordinates;
+        this.scm = scm;
         this.dependencies = new ArrayList<>();
     }
 
     public String toLine() {
         return coordinates.toGavString() + " @ " + origin;
-    }
-
-    /**
-     * URL to checkout the whole project, without initial svn:
-     * @return always with tailing slash
-     */
-    public String projectUrl() {
-        return Strings.removeLeft(origin.substring(0, origin.lastIndexOf('/') + 1), "svn:");
     }
 
     @Override

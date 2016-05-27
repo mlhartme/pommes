@@ -45,21 +45,21 @@ public class Goto extends Base {
         Fstab fstab;
         List<Action> actions;
         List<FileNode> directories;
-        String svnurl;
+        String scm;
         Action action;
         String result;
 
         fstab = Fstab.load(world);
         actions = new ArrayList<>();
         for (Pom pom : database.query(query, environment)) {
-            svnurl = pom.projectUrl();
-            directories = fstab.directories(svnurl);
+            scm = pom.scm;
+            directories = fstab.directories(scm);
             if (directories.isEmpty()) {
-                throw new ArgumentException("no mount point for " + svnurl);
+                throw new ArgumentException("no mount point for " + scm);
             }
             for (FileNode directory : directories) {
-                action = Checkout.createOpt(directory, svnurl);
-                actions.add(action != null ? action : new Nop(directory, svnurl));
+                action = Checkout.createOpt(directory, scm);
+                actions.add(action != null ? action : new Nop(directory, scm));
             }
         }
         action = runSingle(actions);

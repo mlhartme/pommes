@@ -82,9 +82,9 @@ public class Point {
         return result;
     }
 
-    public FileNode directoryOpt(String svnurl) {
-        if (svnurl.startsWith(uri)) {
-            return directory.join(fold(svnurl.substring(uri.length())));
+    public FileNode directoryOpt(String scm) {
+        if (scm.startsWith("svn:" + uri)) {
+            return directory.join(fold(scm.substring(4 + uri.length())));
         } else {
             return null;
         }
