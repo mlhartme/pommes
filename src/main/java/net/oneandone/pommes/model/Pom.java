@@ -38,6 +38,9 @@ public class Pom {
         }
         if (scm == null) {
             scm = "";
+        } else {
+            // removeOpt because I've seen project that omit the prefix ...
+            scm = Strings.removeLeftOpt(scm, "scm:");
         }
         result = new Pom(origin, revision, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()), scm);
         for (Dependency dependency : project.getDependencies()) {
@@ -70,7 +73,7 @@ public class Pom {
     }
 
     public String toLine() {
-        return coordinates.toGavString() + " @ " + origin;
+        return coordinates.toGavString() + " @ " + scm;
     }
 
     @Override

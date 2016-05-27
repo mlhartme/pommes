@@ -70,10 +70,13 @@ public class DatabaseAdd extends Base {
 
         indexer = new Indexer(dryrun, console, world, environment.maven(), database);
         indexer.start();
-        for (Source source : sources) {
-            source.scan(indexer.src);
+        try {
+            for (Source source : sources) {
+                source.scan(indexer.src);
+            }
+        } finally {
+            indexer.src.put(Item.END_OF_QUEUE);
         }
-        indexer.src.put(Item.END_OF_QUEUE);
         indexer.join();
         if (indexer.exception != null) {
             throw indexer.exception;
@@ -121,6 +124,12 @@ public class DatabaseAdd extends Base {
                 summary();
             } catch (Exception e) {
                 exception = e;
+                try {
+                    // consume remaining to avoid dead-lock
+                    while (iter() != null);
+                } catch (Exception e2) {
+                    e.addSuppressed(e2);
+                }
             }
         }
 

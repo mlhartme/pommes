@@ -274,6 +274,10 @@ public class Database implements AutoCloseable {
                         break;
                     case '@':
                         string = variables(termString.substring(1), variables);
+                        term = substring(Database.SCM, string);
+                        break;
+                    case '§':
+                        string = variables(termString.substring(1), variables);
                         term = substring(Database.ORIGIN, string);
                         break;
                     default:
