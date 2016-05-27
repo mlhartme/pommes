@@ -17,29 +17,19 @@ package net.oneandone.pommes.model;
 
 import org.apache.maven.model.Dependency;
 
-public class GAV {
-    public static GAV forGav(String gav) {
+public class Gav {
+    public static Gav forGav(String gav) {
         String[] splitted;
 
         splitted = gav.split(":");
         if (splitted.length != 3) {
             throw new IllegalArgumentException("expected groupId:artifactId:version, got " + gav);
         }
-        return new GAV(splitted[0], splitted[1], splitted[2]);
+        return new Gav(splitted[0], splitted[1], splitted[2]);
     }
 
-    public static GAV forGa(String ga, String v) {
-        String[] splitted;
-
-        splitted = ga.split(":");
-        if (splitted.length < 2) {
-            throw new IllegalArgumentException("expected groupId:artifactId, got " + ga);
-        }
-        return new GAV(splitted[0], splitted[1], v);
-    }
-
-    public static GAV forDependency(Dependency dependency) {
-        return new GAV(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+    public static Gav forDependency(Dependency dependency) {
+        return new Gav(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
     }
 
     //--
@@ -50,7 +40,7 @@ public class GAV {
 
     public final String version;
 
-    public GAV(String groupId, String artifactId, String version) {
+    public Gav(String groupId, String artifactId, String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
@@ -67,9 +57,5 @@ public class GAV {
     @Override
     public String toString() {
         return toGavString();
-    }
-
-    public boolean gavEquals(GAV other) {
-        return artifactId.equals(other.artifactId) && groupId.equals(other.groupId) && version.equals(other.version);
     }
 }

@@ -216,14 +216,14 @@ public class Database implements AutoCloseable {
         Pom result;
         String parent;
 
-        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), GAV.forGav(document.get(Database.GAV_NAME)),
+        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), Gav.forGav(document.get(Database.GAV_NAME)),
                 document.get(Database.SCM));
         parent = document.get(PARENT);
         if (parent != null) {
-            result.dependencies.add(GAV.forGav(parent));
+            result.dependencies.add(Gav.forGav(parent));
         }
         for (String dep : document.getValues(Database.DEP)) {
-            result.dependencies.add(GAV.forGav(dep));
+            result.dependencies.add(Gav.forGav(dep));
         }
         return result;
     }
@@ -397,7 +397,7 @@ public class Database implements AutoCloseable {
 
         doc = document(Pom.forProject(origin, revision, mavenProject));
         for (Dependency dependency : mavenProject.getDependencies()) {
-            GAV dep = GAV.forDependency(dependency);
+            Gav dep = Gav.forDependency(dependency);
 
             // index groupId:artifactId:version for exact-version searches
             doc.add(new StringField(DEP, dep.toGavString(), Field.Store.YES));

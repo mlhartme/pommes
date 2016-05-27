@@ -16,7 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.GAV;
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -74,7 +74,7 @@ public class Find extends Base {
                         values.add(pom.origin);
                         break;
                     case 'd':
-                        for (GAV d : pom.dependencies) {
+                        for (Gav d : pom.dependencies) {
                             values.add(d.toGavString());
                         }
                         break;

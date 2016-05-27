@@ -25,7 +25,7 @@ import java.util.List;
 
 public class Pom {
     public static Pom forComposer(String origin, String revision, Node composer) {
-        return new Pom(origin, revision, new GAV("1and1-sales", composer.getParent().getParent().getName(), "0"), "");
+        return new Pom(origin, revision, new Gav("1and1-sales", composer.getParent().getParent().getName(), "0"), "");
     }
 
     public static Pom forProject(String origin, String revision, MavenProject project) {
@@ -42,9 +42,9 @@ public class Pom {
             // removeOpt because I've seen project that omit the prefix ...
             scm = Strings.removeLeftOpt(scm, "scm:");
         }
-        result = new Pom(origin, revision, new GAV(project.getGroupId(), project.getArtifactId(), project.getVersion()), scm);
+        result = new Pom(origin, revision, new Gav(project.getGroupId(), project.getArtifactId(), project.getVersion()), scm);
         for (Dependency dependency : project.getDependencies()) {
-            result.dependencies.add(GAV.forDependency(dependency));
+            result.dependencies.add(Gav.forDependency(dependency));
         }
         return result;
     }
@@ -55,13 +55,13 @@ public class Pom {
     public final String origin;
     public final String revision;
 
-    public final GAV coordinates;
+    public final Gav coordinates;
 
     public final String scm;
 
-    public final List<GAV> dependencies;
+    public final List<Gav> dependencies;
 
-    public Pom(String origin, String revision, GAV coordinates, String scm) {
+    public Pom(String origin, String revision, Gav coordinates, String scm) {
         if (origin == null || origin.endsWith("/")) {
             throw new IllegalArgumentException(origin);
         }
