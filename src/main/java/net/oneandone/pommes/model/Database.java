@@ -42,7 +42,6 @@ import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
@@ -94,13 +93,8 @@ public class Database implements AutoCloseable {
     public static final String GAV_NAME = "gav";
 
     public static final String SCM = "scm";
-
-    public static final String DEP_GA = "dep-ga";
-    public static final String DEP_GAV = "dep-gav";
-    public static final String DEP_GA_RANGE = "dep-ga-range";
-
-    public static final String PAR_GA = "par-ga";
-    public static final String PAR_GAV = "par-gav";
+    public static final String DEP = "dep";
+    public static final String PARENT = "parent";
 
     //--
 
@@ -225,11 +219,11 @@ public class Database implements AutoCloseable {
 
         result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), GAV.forGav(document.get(Database.GAV_NAME)),
                 document.get(Database.SCM));
-        parent = document.get(PAR_GAV);
+        parent = document.get(PARENT);
         if (parent != null) {
             result.dependencies.add(GAV.forGav(parent));
         }
-        for (String dep : document.getValues(Database.DEP_GAV)) {
+        for (String dep : document.getValues(Database.DEP)) {
             result.dependencies.add(GAV.forGav(dep));
         }
         return result;
@@ -266,7 +260,7 @@ public class Database implements AutoCloseable {
                     case ':':
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
                             string = variables(termString.substring(2), variables);
-                            term = or(substring(Database.PAR_GAV, string), substring(Database.DEP_GAV, string));
+                            term = or(substring(Database.PARENT, string), substring(Database.DEP, string));
                         } else {
                             string = variables(termString.substring(1), variables);
                             term = substring(Database.GAV_NAME, string);
@@ -407,23 +401,15 @@ public class Database implements AutoCloseable {
         for (Dependency dependency : mavenProject.getDependencies()) {
             GAV dep = GAV.forDependency(dependency);
 
-            // index groupId:artifactId for non-version searches
-            doc.add(new StringField(DEP_GA, dep.toGaString(), Field.Store.YES));
             // index groupId:artifactId:version for exact-version searches
-            doc.add(new StringField(DEP_GAV, dep.toGavString(), Field.Store.YES));
-            // index groupId:artifactId for searches that need to evaluate the range
-            VersionRange vr = VersionRange.createFromVersionSpec(dependency.getVersion());
-            if (vr.hasRestrictions()) {
-                doc.add(new StringField(DEP_GA_RANGE, dep.toGaString(), Field.Store.YES));
-            }
+            doc.add(new StringField(DEP, dep.toGavString(), Field.Store.YES));
         }
 
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
             parPom = Pom.forProject(origin, revision, parent);
-            doc.add(new StringField(PAR_GA, parPom.coordinates.toGaString(), Field.Store.YES));
-            doc.add(new StringField(PAR_GAV, parPom.coordinates.toGavString(), Field.Store.YES));
+            doc.add(new StringField(PARENT, parPom.coordinates.toGavString(), Field.Store.YES));
         }
         return doc;
     }
