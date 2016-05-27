@@ -49,18 +49,14 @@ public class Fstab {
                     if (line == null) {
                         break;
                     }
-                    result.add(Point.parse(file.getWorld(), line));
+                    line = line.trim();
+                    if (!line.isEmpty()) {
+                        result.add(Point.parse(file.getWorld(), line));
+                    }
                 }
             }
         }
         return result;
-    }
-
-    public static String withSlash(String url) {
-        if (!url.endsWith("/")) {
-            url = url + "/";
-        }
-        return url;
     }
 
     //--

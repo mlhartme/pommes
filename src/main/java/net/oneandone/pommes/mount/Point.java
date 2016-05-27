@@ -30,18 +30,17 @@ import java.util.List;
 public class Point {
     public static Point parse(World world, String line) throws ExistsException, DirectoryNotFoundException {
         List<String> parts;
-        String uri;
+        String group;
         FileNode directory;
 
         parts = Separator.SPACE.split(line);
-        if (parts.size() < 2) {
+        if (parts.size() != 2) {
             throw new IllegalArgumentException(line);
         }
-        uri = parts.remove(0);
-        uri = Fstab.withSlash(uri);
+        group = parts.remove(0);
         directory = world.file(parts.remove(0));
         directory.checkDirectory();
-        return new Point(uri, directory, parts);
+        return new Point(group, directory, parts);
     }
 
     public final String groupPrefix;
@@ -76,8 +75,11 @@ public class Point {
     }
 
     public FileNode directoryOpt(Pom pom) {
-        if (pom.scm.startsWith(groupPrefix + ".")) {
-            return directory.join(fold(pom.scm.substring(groupPrefix.length() + 1)));
+        String ga;
+
+        ga = pom.coordinates.groupId + "." + pom.coordinates.artifactId;
+        if ((ga + ".").startsWith(groupPrefix + ".")) {
+            return directory.join(fold(ga.substring(groupPrefix.length() + 1).replace('.', '/')));
         } else {
             return null;
         }
@@ -96,6 +98,10 @@ public class Point {
     private static final String BRANCHES = "/branches/";
 
     public static String fold(String path) {
+        return path;
+    }
+
+    public static String TODOfold(String path) {
         int beforeBranches;
         int beforeProjectName;
         // with tailing slash:

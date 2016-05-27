@@ -53,11 +53,12 @@ public class Goto extends Base {
         for (Pom pom : database.query(query, environment)) {
             directories = fstab.directories(pom);
             if (directories.isEmpty()) {
-                throw new ArgumentException("no mount point for " + pom);
-            }
-            for (FileNode directory : directories) {
-                action = Checkout.createOpt(environment, directory, pom);
-                actions.add(action != null ? action : new Nop(directory, pom.scm));
+                console.info.println("ignored (no mount points): " + pom);
+            } else {
+                for (FileNode directory : directories) {
+                    action = Checkout.createOpt(environment, directory, pom);
+                    actions.add(action != null ? action : new Nop(directory, pom.scm));
+                }
             }
         }
         action = runSingle(actions);
