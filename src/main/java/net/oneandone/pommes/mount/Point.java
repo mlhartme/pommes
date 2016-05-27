@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.mount;
 
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.World;
@@ -64,19 +65,19 @@ public class Point {
         }
     }
 
-    public FileNode directory(String svnurl) {
+    public FileNode directory(Pom pom) {
         FileNode result;
 
-        result = directoryOpt(svnurl);
+        result = directoryOpt(pom);
         if (result == null) {
-            throw new IllegalStateException(svnurl);
+            throw new IllegalStateException(pom.toLine());
         }
         return result;
     }
 
-    public FileNode directoryOpt(String g) {
-        if (g.startsWith(groupPrefix + ".")) {
-            return directory.join(fold(g.substring(groupPrefix.length() + 1)));
+    public FileNode directoryOpt(Pom pom) {
+        if (pom.scm.startsWith(groupPrefix + ".")) {
+            return directory.join(fold(pom.scm.substring(groupPrefix.length() + 1)));
         } else {
             return null;
         }

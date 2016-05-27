@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
@@ -38,7 +39,7 @@ public class Ls extends Base {
     public void run(Database notUsed) throws Exception {
         Fstab fstab;
         List<FileNode> checkouts;
-        String scannedUrl;
+        Pom scannedPom;
         FileNode configuredDirectory;
         Point point;
 
@@ -49,16 +50,16 @@ public class Ls extends Base {
             throw new ArgumentException("no checkouts under " + root);
         }
         for (FileNode directory : checkouts) {
-            scannedUrl = scanUrl(directory);
+            scannedPom = environment.scanPom(directory);
             point = fstab.pointOpt(directory);
             if (point == null) {
-                console.info.println("? " + directory + " (" + scannedUrl + ")");
+                console.info.println("? " + directory + " (" + scannedPom + ")");
             } else {
-                configuredDirectory = point.directory(scannedUrl);
+                configuredDirectory = point.directory(scannedPom);
                 if (directory.equals(configuredDirectory)) {
-                    console.info.println("  " + directory + " (" + scannedUrl + ")");
+                    console.info.println("  " + directory + " (" + scannedPom + ")");
                 } else {
-                    console.info.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
+                    console.info.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
                 }
             }
         }

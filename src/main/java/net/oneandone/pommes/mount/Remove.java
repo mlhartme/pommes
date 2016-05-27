@@ -17,6 +17,7 @@ package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Base;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.DeleteException;
 import net.oneandone.sushi.fs.NodeNotFoundException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -24,15 +25,15 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 
 public class Remove extends Action {
-    public static net.oneandone.pommes.mount.Remove create(FileNode directory, String svnurl) throws IOException {
+    public static Remove create(FileNode directory, Pom pom) throws IOException {
         if (Base.notCommitted(directory)) {
-            throw new StatusException("M " + directory + " (" + svnurl + ")");
+            throw new StatusException("M " + directory + " (" + pom + ")");
         }
-        return new net.oneandone.pommes.mount.Remove(directory, svnurl);
+        return new Remove(directory, pom.scm);
     }
 
-    public Remove(FileNode directory, String svnurl) {
-        super(directory, svnurl);
+    public Remove(FileNode directory, String scm) {
+        super(directory, scm);
     }
 
     public char status() {

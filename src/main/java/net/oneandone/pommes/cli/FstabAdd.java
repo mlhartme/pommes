@@ -23,12 +23,12 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.util.ArrayList;
 
 public class FstabAdd extends Base {
-    private String url;
+    private String group;
     private FileNode directory;
 
-    public FstabAdd(Environment environment, String url, FileNode directory) {
+    public FstabAdd(Environment environment, String group, FileNode directory) {
         super(environment);
-        this.url = url;
+        this.group = group;
         this.directory = directory;
     }
 
@@ -36,11 +36,10 @@ public class FstabAdd extends Base {
     public void run(Database database) throws Exception {
         Fstab fstab;
 
-        url = Database.withSlash(url);
         fstab = Fstab.load(world);
         directory.getParent().checkDirectory();
         directory.mkdirOpt();
-        fstab.add(new Point(url, directory, new ArrayList<>()));
+        fstab.add(new Point(group, directory, new ArrayList<>()));
         fstab.save(Fstab.file(world));
     }
 }

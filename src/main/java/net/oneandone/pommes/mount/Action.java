@@ -20,11 +20,11 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 public abstract class Action implements Comparable<Action> {
     public final FileNode directory;
-    public final String svnurl;
+    public final String scm;
 
-    protected Action(FileNode directory, String svnurl) {
+    protected Action(FileNode directory, String scm) {
         this.directory = directory;
-        this.svnurl = svnurl;
+        this.scm = scm;
     }
 
     public abstract char status();
@@ -32,7 +32,7 @@ public abstract class Action implements Comparable<Action> {
     public abstract void run(Console console) throws Exception;
 
     public String toString() {
-        return status() + " " + directory + " (" + svnurl + ")";
+        return status() + " " + directory + " (" + scm + ")";
     }
 
     @Override

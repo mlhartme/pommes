@@ -19,6 +19,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
@@ -137,7 +138,7 @@ public class Environment implements Variables {
                 if (point == null) {
                     throw new IllegalArgumentException("no mount point for directory " + here.getAbsolute());
                 }
-                return point.svnurl(here);
+                return point.group(here);
             case "gav":
                 p = project();
                 return p.getGroupId() + ":" + p.getArtifactId() + ":" + p.getVersion();
@@ -147,5 +148,46 @@ public class Environment implements Variables {
             default:
                 return null;
         }
+    }
+
+    //--
+
+    public Pom scanPom(FileNode directory) throws IOException {
+        Pom result;
+
+        result = scanPomOpt(directory);
+        if (result == null) {
+            throw new IllegalStateException(directory.toString());
+        }
+        return result;
+    }
+
+    /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
+    public Pom scanPomOpt(FileNode directory) throws IOException {
+        FileNode file;
+        String url;
+        int idx;
+        MavenProject p;
+
+        if (!directory.join(".svn").exists()) {
+            return null;
+        }
+        file = directory.join("pom.xml");
+        try {
+            p = maven().loadPom(file);
+        } catch (ProjectBuildingException e) {
+            throw new IOException(file + ": load failed: " + e.getMessage(), e);
+        }
+        url = directory.launcher("svn", "info").exec();
+        idx = url.indexOf("URL: ") + 5;
+        url = withSlash(url.substring(idx, url.indexOf("\n", idx)));
+        return Pom.forProject("scm:" + url, "checkout", p);
+    }
+
+    public static String withSlash(String url) {
+        if (!url.endsWith("/")) {
+            url = url + "/";
+        }
+        return url;
     }
 }

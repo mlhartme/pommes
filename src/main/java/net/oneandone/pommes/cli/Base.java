@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -135,29 +136,6 @@ public abstract class Base {
             }
         }
         return false;
-    }
-
-    public static String scanUrl(FileNode directory) throws IOException {
-        String result;
-
-        result = scanUrlOpt(directory);
-        if (result == null) {
-            throw new IllegalStateException(directory.toString());
-        }
-        return result;
-    }
-
-    /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
-    public static String scanUrlOpt(FileNode directory) throws IOException {
-        String url;
-        int idx;
-
-        if (!directory.join(".svn").exists()) {
-            return null;
-        }
-        url = directory.launcher("svn", "info").exec();
-        idx = url.indexOf("URL: ") + 5;
-        return Database.withSlash(url.substring(idx, url.indexOf("\n", idx)));
     }
 
     //--

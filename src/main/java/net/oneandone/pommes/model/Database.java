@@ -219,15 +219,6 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public static String withSlash(String url) {
-        if (!url.endsWith("/")) {
-            url = url + "/";
-        }
-        return url;
-    }
-
-    //--
-
     public static Pom toPom(Document document) {
         Pom result;
         String parent;

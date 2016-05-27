@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.mount;
 
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.io.LineFormat;
@@ -79,20 +80,20 @@ public class Fstab {
 
     public Point pointOpt(FileNode directory) {
         for (Point point : points) {
-            if (point.svnurl(directory) != null) {
+            if (point.group(directory) != null) {
                 return point;
             }
         }
         return null;
     }
 
-    public List<FileNode> directories(String scm) {
+    public List<FileNode> directories(Pom pom) {
         FileNode directory;
         List<FileNode> result;
 
         result = new ArrayList<>();
         for (Point point : points) {
-            directory = point.directoryOpt(scm);
+            directory = point.directoryOpt(pom);
             if (directory != null) {
                 result.add(directory);
             }

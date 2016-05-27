@@ -19,8 +19,8 @@ import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public class Nop extends Action {
-    public Nop(FileNode directory, String svnurl) {
-        super(directory, svnurl);
+    public Nop(FileNode directory, String scm) {
+        super(directory, scm);
     }
 
     @Override

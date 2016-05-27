@@ -36,7 +36,6 @@ public class Mount extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        String scm;
         List<Action> adds;
         Action action;
         int problems;
@@ -45,14 +44,13 @@ public class Mount extends Base {
         adds = new ArrayList<>();
         problems = 0;
         for (Pom pom : database.query(query, environment)) {
-            scm = pom.scm;
-            directories = environment.fstab().directories(scm);
+            directories = environment.fstab().directories(pom);
             if (directories.isEmpty()) {
-                console.error.println("no mount point for " + scm);
+                console.error.println("no mount point for " + pom);
                 problems++;
             } else for (FileNode directory : directories) {
                 try {
-                    action = Checkout.createOpt(directory, scm);
+                    action = Checkout.createOpt(environment, directory, pom);
                     if (action != null) {
                         adds.add(action);
                     } else {

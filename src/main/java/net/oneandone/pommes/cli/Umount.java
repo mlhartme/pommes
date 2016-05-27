@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
@@ -43,7 +44,7 @@ public class Umount extends Base {
         int problems;
         Fstab fstab;
         List<FileNode> checkouts;
-        String scannedUrl;
+        Pom scannedPom;
         List<Action> removes;
         Point point;
         FileNode configuredDirectory;
@@ -60,22 +61,22 @@ public class Umount extends Base {
             if (stale && !isStale(database, directory)) {
                 continue;
             }
-            scannedUrl = scanUrl(directory);
+            scannedPom = environment.scanPom(directory);
             point = fstab.pointOpt(directory);
             if (point == null) {
-                console.error.println("? " + directory + " (" + scannedUrl + ")");
+                console.error.println("? " + directory + " (" + scannedPom + ")");
                 problems++;
             } else {
-                configuredDirectory = point.directory(scannedUrl);
+                configuredDirectory = point.directory(scannedPom);
                 if (directory.equals(configuredDirectory)) {
                     try {
-                        removes.add(Remove.create(directory, scannedUrl));
+                        removes.add(Remove.create(directory, scannedPom));
                     } catch (StatusException e) {
                         console.error.println(e.getMessage());
                         problems++;
                     }
                 } else {
-                    console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedUrl + ")");
+                    console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
                     problems++;
                 }
             }
@@ -87,8 +88,10 @@ public class Umount extends Base {
     }
 
     private boolean isStale(Database database, FileNode directory) throws IOException {
-        // TODO: ugly ugly ...
+        return false;
+        /* TODO
         return database.lookup("svn:" + Base.scanUrl(directory) + "pom.xml") == null
                 && database.lookup("svn:" + Base.scanUrl(directory) + "composer.json") == null;
+                */
     }
 }

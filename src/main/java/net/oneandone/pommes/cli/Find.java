@@ -79,8 +79,7 @@ public class Find extends Base {
                         }
                         break;
                     case 'c':
-                        url = pom.scm;
-                        for (FileNode directory : environment.fstab().directories(url)) {
+                        for (FileNode directory : environment.fstab().directories(pom)) {
                             if (directory.exists()) {
                                 values.add(directory.getAbsolute());
                             }

@@ -17,31 +17,34 @@ package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Base;
+import net.oneandone.pommes.cli.Environment;
+import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 
 public class Checkout extends Action {
-    public static net.oneandone.pommes.mount.Checkout createOpt(FileNode directory, String svnurl) throws IOException {
-        String scannedUrl;
+    public static Checkout createOpt(Environment environment, FileNode directory, Pom pom) throws IOException {
+        Pom scannedPom;
 
         if (directory.exists()) {
-            scannedUrl = Base.scanUrlOpt(directory);
-            if (svnurl.equals(scannedUrl)) {
+            scannedPom = environment.scanPomOpt(directory);
+            if (scannedPom.equals(pom)) {
                 return null;
             } else {
-                throw new StatusException("C " + directory + " (" + svnurl + " vs " + scannedUrl + ")");
+                throw new StatusException("C " + directory + " (" + pom + " vs " + scannedPom + ")");
             }
         } else {
-            return new net.oneandone.pommes.mount.Checkout(directory, svnurl);
+            return new Checkout(directory, pom.scm);
         }
     }
 
-    public Checkout(FileNode directory, String svnurl) {
-        super(directory, svnurl);
+    public Checkout(FileNode directory, String scm) {
+        super(directory, scm);
     }
 
     public char status() {
@@ -50,13 +53,15 @@ public class Checkout extends Action {
 
     public void run(Console console) throws MkdirException, Failure {
         Launcher svn;
+        String url;
 
         directory.getParent().mkdirsOpt();
-        svn = Base.svn(directory.getParent(), "co", svnurl, directory.getName());
+        url = Strings.removeLeft(scm, "svn:"); // TODO
+        svn = Base.svn(directory.getParent(), "co", url, directory.getName());
         if (console.getVerbose()) {
             console.verbose.println(svn.toString());
         } else {
-            console.info.println("svn co " + svnurl + " " + directory.getAbsolute());
+            console.info.println("svn co " + url + " " + directory.getAbsolute());
         }
         if (console.getVerbose()) {
             svn.exec(console.verbose);
