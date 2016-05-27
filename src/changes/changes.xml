@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
     <release date="2016-02-xx" version="2.5.0">
-      <action date="2016-05-25" dev="mlhartme" type="update">
+      <action date="2016-05-27" dev="mlhartme" type="update">
         Database changes - you have to rebuild your's: updated from Lucene 4.9.1 to 6.0.0. Added revision and scm field.
+      </action>
+      <action date="2016-05-27" dev="mlhartme" type="update">
+        Renamed =svn= variable to =scm=.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
         database-export: renamed to database-dump; added -pp option for pretty-printing;

@@ -131,7 +131,7 @@ public class Environment implements Variables {
         Point point;
 
         switch (name) {
-            case "svn":
+            case "scm":
                 here = world.getWorking();
                 point = fstab().pointOpt(here);
                 if (point == null) {

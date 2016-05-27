@@ -25,7 +25,7 @@ import net.oneandone.sushi.util.Strings;
 import java.io.IOException;
 import java.util.List;
 
-/** mount point */
+/** mount point in fstab */
 public class Point {
     public static Point parse(World world, String line) throws ExistsException, DirectoryNotFoundException {
         List<String> parts;
@@ -43,32 +43,24 @@ public class Point {
         return new Point(uri, directory, parts);
     }
 
-    public final String uri;
+    public final String groupPrefix;
     public final FileNode directory;
     public final List<String> defaults; // TODO: unused
 
-    public Point(String uri, FileNode directory, List<String> defaults) {
-        if (!uri.endsWith("/")) {
-            throw new IllegalArgumentException(uri);
-        }
-        this.uri = uri;
+    public Point(String groupPrefix, FileNode directory, List<String> defaults) {
+        this.groupPrefix = groupPrefix;
         this.directory = directory;
         this.defaults = defaults;
     }
 
-
-    /**
-     * CAUTION: it's not possible to not "unfold" directory names into the original url.
-     * @return url with tailing slash or null
-     */
-    public String svnurl(FileNode childDirectory) {
+    public String group(FileNode childDirectory) {
         if (childDirectory.equals(directory)) {
             // to avoid "." returned by get relative
-            return uri;
+            return groupPrefix;
         } else if (!childDirectory.hasAnchestor(directory)) {
             return null;
         } else {
-            return uri + childDirectory.getRelative(directory) + "/";
+            return groupPrefix + "." + childDirectory.getRelative(directory).replace('/', '.');
         }
     }
 
@@ -82,9 +74,9 @@ public class Point {
         return result;
     }
 
-    public FileNode directoryOpt(String scm) {
-        if (scm.startsWith("svn:" + uri)) {
-            return directory.join(fold(scm.substring(4 + uri.length())));
+    public FileNode directoryOpt(String g) {
+        if (g.startsWith(groupPrefix + ".")) {
+            return directory.join(fold(g.substring(groupPrefix.length() + 1)));
         } else {
             return null;
         }
@@ -148,7 +140,7 @@ public class Point {
         StringBuilder result;
 
         result = new StringBuilder();
-        result.append(uri);
+        result.append(groupPrefix);
         result.append(' ');
         result.append(directory.getAbsolute());
         for (String dflt : defaults) {
