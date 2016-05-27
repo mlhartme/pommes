@@ -54,8 +54,8 @@ public class Main {
                 + "  'list' root?          print all checkouts under the specified directory with status markers:\n"
                 + "                        C - checkout url does not match url configured by fstab\n"
                 + "                        ? - checkout has no configured url configured by fstab\n"
-                + "  'goto' query          offer selection of matching project, check it out when necessary,\n"
-                + "                        and cd into the checkout directory\n"
+                + "  'goto' query choice?  offer selection of matching project, check it out when necessary,\n"
+                + "                        and cds into the checkout directory\n"
                 + "\n"
                 + "database commands\n"
                 + "  'database-clear'      creates a new empty database\n"
@@ -119,7 +119,7 @@ public class Main {
           cli.add(Umount.class, "umount -stale root?=.");
 
           cli.add(Ls.class, "list root?=.");
-          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query");
+          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query goto?");
 
           cli.add(FstabAdd.class, "fstab-add url directory");
 

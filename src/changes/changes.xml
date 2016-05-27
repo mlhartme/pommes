@@ -2,6 +2,9 @@
   <body>
     <release date="2016-02-xx" version="2.5.0">
       <action date="2016-05-27" dev="mlhartme" type="update">
+        Added goto choice parameter.
+      </action>
+      <action date="2016-05-27" dev="mlhartme" type="update">
         Database changes - you have to rebuild your's: updated from Lucene 4.9.1 to 6.0.0. Added revision and scm field.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
