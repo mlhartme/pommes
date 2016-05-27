@@ -2,7 +2,7 @@
   <body>
     <release date="2016-02-xx" version="2.5.0">
       <action date="2016-05-25" dev="mlhartme" type="update">
-        Added revision field. Old databases have to be re-built.
+        Database changes - you have to rebuild your's: updated from Lucene 4.9.1 to 6.0.0. Added revision and scm field.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
         database-export: renamed to database-dump; added -pp option for pretty-printing;
