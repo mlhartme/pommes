@@ -140,12 +140,6 @@ public class ArtifactorySource implements Source {
                         throw new IllegalStateException();
                     }
                     count++;
-                    if (count % 100 == 0) {
-                        System.out.print(".");
-                    }
-                    if (count % 10000 == 0) {
-                        System.out.println();
-                    }
                 }
             }
         }

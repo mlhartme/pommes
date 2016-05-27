@@ -29,7 +29,7 @@ public interface Source {
         if (file.exists()) {
             return new NodeSource(file);
         }
-        throw new ArgumentException("unknown source url: " + url);
+        throw new ArgumentException("unknown source type: " + url);
     }
 
     void addOption(String option);

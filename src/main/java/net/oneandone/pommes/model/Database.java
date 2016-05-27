@@ -86,11 +86,7 @@ public class Database implements AutoCloseable {
     public static final String ORIGIN = "origin";
     public static final String REVISION = "revision";
 
-    public static final String GROUP = "g";
-    public static final String ARTIFACT = "a";
-    public static final String VERSION = "v";
-    public static final String GAV_NAME = "gav";
-
+    public static final String GAV = "gav";
     public static final String SCM = "scm";
     public static final String DEP = "dep";
     public static final String PARENT = "parent";
@@ -216,7 +212,7 @@ public class Database implements AutoCloseable {
         Pom result;
         String parent;
 
-        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), Gav.forGav(document.get(Database.GAV_NAME)),
+        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), Gav.forGav(document.get(Database.GAV)),
                 document.get(Database.SCM));
         parent = document.get(PARENT);
         if (parent != null) {
@@ -246,7 +242,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Database.GAV_NAME);
+            return new StandardQueryParser().parse(queryString.substring(1), Database.GAV);
         } else {
             query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
@@ -262,7 +258,7 @@ public class Database implements AutoCloseable {
                             term = or(substring(Database.PARENT, string), substring(Database.DEP, string));
                         } else {
                             string = variables(termString.substring(1), variables);
-                            term = substring(Database.GAV_NAME, string);
+                            term = substring(Database.GAV, string);
                         }
                         break;
                     case '@':
@@ -275,7 +271,7 @@ public class Database implements AutoCloseable {
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(substring(Database.GAV_NAME, string), substring(Database.ORIGIN, string));
+                        term = or(substring(Database.GAV, string), substring(Database.ORIGIN, string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
@@ -382,10 +378,7 @@ public class Database implements AutoCloseable {
         doc = new Document();
         doc.add(new StringField(ORIGIN, pom.origin, Field.Store.YES));
         doc.add(new StringField(REVISION, pom.revision, Field.Store.YES));
-        doc.add(new StringField(GROUP, pom.coordinates.groupId, Field.Store.YES));
-        doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
-        doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
-        doc.add(new StringField(GAV_NAME, pom.coordinates.toGavString(), Field.Store.YES));
+        doc.add(new StringField(GAV, pom.coordinates.toGavString(), Field.Store.YES));
         doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
         return doc;
     }
