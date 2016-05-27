@@ -89,7 +89,6 @@ public class Database implements AutoCloseable {
     public static final String GROUP = "g";
     public static final String ARTIFACT = "a";
     public static final String VERSION = "v";
-    public static final String GA = "ga";
     public static final String GAV_NAME = "gav";
 
     public static final String SCM = "scm";
@@ -386,7 +385,6 @@ public class Database implements AutoCloseable {
         doc.add(new StringField(GROUP, pom.coordinates.groupId, Field.Store.YES));
         doc.add(new StringField(ARTIFACT, pom.coordinates.artifactId, Field.Store.YES));
         doc.add(new StringField(VERSION, pom.coordinates.version, Field.Store.YES));
-        doc.add(new StringField(GA, pom.coordinates.toGaString(), Field.Store.YES));
         doc.add(new StringField(GAV_NAME, pom.coordinates.toGavString(), Field.Store.YES));
         doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
         return doc;

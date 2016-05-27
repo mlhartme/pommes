@@ -6,7 +6,7 @@
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
         Database changes (CAUTION: you have to rebuild your's): updated from Lucene 4.9.1 to 6.0.0. Added revision and scm field.
-        Removed dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renaed dep-gav to dep and par-gav to parent.
+        Removed ga, dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renaed dep-gav to dep and par-gav to parent.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
         Renamed =svn= variable to =scm=.
