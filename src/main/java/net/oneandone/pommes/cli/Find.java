@@ -48,7 +48,6 @@ public class Find extends Base {
     private String format(Pom pom) throws IOException {
         char c;
         StringBuilder result;
-        String url;
         int end;
         String variable;
         String filter;
@@ -69,6 +68,9 @@ public class Find extends Base {
                         break;
                     case 'g':
                         values.add(pom.coordinates.toGavString());
+                        break;
+                    case 's':
+                        values.add(pom.scm);
                         break;
                     case 'o':
                         values.add(pom.origin);

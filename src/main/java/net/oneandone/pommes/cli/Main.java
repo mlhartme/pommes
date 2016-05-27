@@ -36,12 +36,12 @@ public class Main {
                 + "  'find' ('-format' str)? query\n"
                 + "                        print projects matching this query;\n"
                 + "                        format string supports the following place holder:\n"
-                + "                        %g gav   %o origin  %d dependencies  %c checkouts;\n"
+                + "                        %g gav  %s scm  %o origin  %d dependencies  %c checkouts;\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
                 + "                        the enclosed substring or variables\n"
                 + "  'users'\n"
                 + "                        print projects that have a dependency to the current project;\n"
-                + "                        same as 'pommes find -format \"%g @ %o -> %d[%ga]\" :-=ga=+@trunk\n"
+                + "                        same as 'pommes find -format \"%g @ %s -> %d[%ga]\" :-=ga=+@trunk\n"
                 + "\n"
                 + "mount commands\n"
                 + "  'mount' query         checkout matching projects; skips existing checkouts;\n"
@@ -128,7 +128,7 @@ public class Main {
           cli.add(DatabaseRemove.class, "database-remove prefix*");
           cli.add(DatabaseDump.class, "database-dump -pp query? target?");
 
-          cli.add(Find.class, "find -format=%g§20@§20%o§20%c query");
+          cli.add(Find.class, "find -format=%g§20@§20%s§20%c query");
           cli.add(FindUsers.class, "users -format=%g§20@§20%o§20->§20%d[%ga]");
 
         System.exit(cli.run(args));
