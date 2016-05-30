@@ -9,6 +9,13 @@ import java.io.IOException;
 
 /** Factory for Poms */
 public abstract class Type {
+    public static final Type END_OF_QUEUE = new Type(null) {
+        @Override
+        public Pom createPom(Environment environment) throws IOException {
+            throw new IllegalStateException();
+        }
+    };
+
     public static Type probe(Node node) {
         Type result;
 

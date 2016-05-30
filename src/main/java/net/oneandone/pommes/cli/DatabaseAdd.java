@@ -18,9 +18,9 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Item;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
+import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -72,7 +72,7 @@ public class DatabaseAdd extends Base {
                 source.scan(indexer.src);
             }
         } finally {
-            indexer.src.put(Item.END_OF_QUEUE);
+            indexer.src.put(Type.END_OF_QUEUE);
         }
         indexer.join();
         if (indexer.exception != null) {
@@ -84,7 +84,7 @@ public class DatabaseAdd extends Base {
         private final boolean dryrun;
         private final Environment environment;
 
-        public final BlockingQueue<Item> src;
+        public final BlockingQueue<Type> src;
         private final Database database;
         private Exception exception;
 
@@ -166,21 +166,21 @@ public class DatabaseAdd extends Base {
         }
 
         private Pom iterUnchecked() throws IOException, InterruptedException {
-            Item item;
+            Type type;
 
             while (true) {
-                item = src.take();
-                if (item == Item.END_OF_QUEUE) {
+                type = src.take();
+                if (type == Type.END_OF_QUEUE) {
                     return null;
                 }
                 try {
                     count++;
-                    environment.console().info.println(item);
-                    return item.createPom(environment);
+                    environment.console().info.println(type);
+                    return type.createPom(environment);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new IOException("error processing " + item + ": " + e.getMessage(), e);
+                    throw new IOException("error processing " + type + ": " + e.getMessage(), e);
                 }
             }
         }
