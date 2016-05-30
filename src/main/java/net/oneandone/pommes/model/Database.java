@@ -36,7 +36,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
@@ -329,20 +328,6 @@ public class Database implements AutoCloseable {
 
     private static Query substring(String field, String substring) {
         return new WildcardQuery(new Term(field, "*" + substring + "*"));
-    }
-
-    public Pom lookup(String origin) throws IOException {
-        List<Pom> result;
-
-        result = query(new TermQuery(new Term(Database.ORIGIN, origin)));
-        switch (result.size()) {
-            case 0:
-                return null;
-            case 1:
-                return result.get(0);
-            default:
-                throw new IllegalStateException("ambiguous origin: " + origin);
-        }
     }
 
     public List<Pom> query(Query query) throws IOException {
