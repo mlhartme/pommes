@@ -1,4 +1,4 @@
-package net.oneandone.pommes.type;
+package net.oneandone.pommes.project;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Gav;

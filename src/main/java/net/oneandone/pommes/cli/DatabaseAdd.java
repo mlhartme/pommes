@@ -20,7 +20,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
-import net.oneandone.pommes.type.Type;
+import net.oneandone.pommes.project.Type;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.InvalidArtifactRTException;
