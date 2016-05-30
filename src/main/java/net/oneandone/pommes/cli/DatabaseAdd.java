@@ -17,17 +17,12 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
-import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
-import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.NodeInstantiationException;
-import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.InvalidArtifactRTException;
-import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -152,7 +147,7 @@ public class DatabaseAdd extends Base {
             console = environment.console();
             while (true) {
                 try {
-                    document = iterUnchecked();
+                    document = Database.document(iterUnchecked());
                     if (!dryrun) {
                         return document;
                     }
@@ -169,7 +164,7 @@ public class DatabaseAdd extends Base {
             }
         }
 
-        private Document iterUnchecked() throws IOException, InterruptedException {
+        private Pom iterUnchecked() throws IOException, InterruptedException {
             Item item;
 
             while (true) {
@@ -180,7 +175,7 @@ public class DatabaseAdd extends Base {
                 try {
                     count++;
                     environment.console().info.println(item.origin);
-                    return item.type.createDocument(item.origin, item.revision, environment);
+                    return item.type.createPom(item.origin, item.revision, environment);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {

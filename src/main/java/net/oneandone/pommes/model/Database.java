@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.model;
 
-import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -41,9 +40,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -206,24 +202,6 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    //--
-
-    public static Pom toPom(Document document) {
-        Pom result;
-        String parent;
-
-        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION), Gav.forGav(document.get(Database.GAV)),
-                document.get(Database.SCM));
-        parent = document.get(PARENT);
-        if (parent != null) {
-            result.dependencies.add(Gav.forGav(parent));
-        }
-        for (String dep : document.getValues(Database.DEP)) {
-            result.dependencies.add(Gav.forGav(dep));
-        }
-        return result;
-    }
-
     //-- query
 
     private static final Separator PLUS = Separator.on('+');
@@ -358,36 +336,34 @@ public class Database implements AutoCloseable {
 
     //--
 
+    public static Pom toPom(Document document) {
+        Pom result;
+        String parent;
+
+        parent = document.get(Database.PARENT);
+        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION),
+                parent == null ? null : Gav.forGav(parent), Gav.forGav(document.get(Database.GAV)),
+                document.get(Database.SCM));
+        for (String dep : document.getValues(Database.DEP)) {
+            result.dependencies.add(Gav.forGav(dep));
+        }
+        return result;
+    }
+
     public static Document document(Pom pom) {
         Document doc;
 
         doc = new Document();
         doc.add(new StringField(ORIGIN, pom.origin, Field.Store.YES));
         doc.add(new StringField(REVISION, pom.revision, Field.Store.YES));
+        if (pom.parent != null) {
+            doc.add(new StringField(PARENT, pom.parent.toGavString(), Field.Store.YES));
+        }
         doc.add(new StringField(GAV, pom.coordinates.toGavString(), Field.Store.YES));
-        doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
-        return doc;
-    }
-
-    public static Document document(String origin, String revision, MavenProject mavenProject) {
-        Document doc;
-        MavenProject parent;
-        Pom parPom;
-
-        doc = document(Type.forProject(origin, revision, mavenProject));
-        for (Dependency dependency : mavenProject.getDependencies()) {
-            Gav dep = Gav.forDependency(dependency);
-
-            // index groupId:artifactId:version for exact-version searches
+        for (Gav dep : pom.dependencies) {
             doc.add(new StringField(DEP, dep.toGavString(), Field.Store.YES));
         }
-
-        // parent
-        parent = mavenProject.getParent();
-        if (parent != null) {
-            parPom = Type.forProject(origin, revision, parent);
-            doc.add(new StringField(PARENT, parPom.coordinates.toGavString(), Field.Store.YES));
-        }
+        doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
         return doc;
     }
 }

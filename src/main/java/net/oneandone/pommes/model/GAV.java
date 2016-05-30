@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 
 public class Gav {
@@ -30,6 +31,10 @@ public class Gav {
 
     public static Gav forDependency(Dependency dependency) {
         return new Gav(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+    }
+
+    public static Gav forArtifact(Artifact artifact) {
+        return new Gav(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
     }
 
     //--

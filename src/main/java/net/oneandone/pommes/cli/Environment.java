@@ -165,24 +165,23 @@ public class Environment implements Variables {
 
     /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
     public Pom scanPomOpt(FileNode directory) throws IOException {
-        FileNode file;
+        Type type;
         String url;
         int idx;
-        MavenProject p;
 
         if (!directory.join(".svn").exists()) {
             return null;
         }
-        file = directory.join("pom.xml");
-        try {
-            p = maven().loadPom(file);
-        } catch (ProjectBuildingException e) {
-            throw new IOException(file + ": load failed: " + e.getMessage(), e);
+        for (Node child : directory.list()) {
+            type = Type.probe(child);
+            if (type != null) {
+                url = directory.launcher("svn", "info").exec();
+                idx = url.indexOf("URL: ") + 5;
+                url = withSlash(url.substring(idx, url.indexOf("\n", idx)));
+                return type.createPom("scm:" + url, "checkout", this);
+            }
         }
-        url = directory.launcher("svn", "info").exec();
-        idx = url.indexOf("URL: ") + 5;
-        url = withSlash(url.substring(idx, url.indexOf("\n", idx)));
-        return Type.forProject("scm:" + url, "checkout", p);
+        return null;
     }
 
     public static String withSlash(String url) {

@@ -23,18 +23,19 @@ public class Pom {
     public final String origin;
     public final String revision;
 
+    /** may be null */
+    public final Gav parent;
     public final Gav coordinates;
-
     public final String scm;
-
     public final List<Gav> dependencies;
 
-    public Pom(String origin, String revision, Gav coordinates, String scm) {
-        if (origin == null || origin.endsWith("/")) {
+    public Pom(String origin, String revision, Gav parent, Gav coordinates, String scm) {
+        if (origin == null) {
             throw new IllegalArgumentException(origin);
         }
         this.origin = origin;
         this.revision = revision;
+        this.parent = parent;
         this.coordinates = coordinates;
         this.scm = scm;
         this.dependencies = new ArrayList<>();
