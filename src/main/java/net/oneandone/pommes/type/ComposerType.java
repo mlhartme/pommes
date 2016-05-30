@@ -21,6 +21,6 @@ public class ComposerType extends Type {
 
     @Override
     public Pom createPom(String origin, String revision, Environment notUsed) {
-        return new Pom(origin, revision, null, new Gav("1and1-sales", node.getParent().getParent().getName(), "0"), "");
+        return new Pom(origin, revision, null, new Gav("1and1-sales", node.getParent().getParent().getName(), "0"), null);
     }
 }

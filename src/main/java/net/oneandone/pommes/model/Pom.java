@@ -26,6 +26,7 @@ public class Pom {
     /** may be null */
     public final Gav parent;
     public final Gav coordinates;
+    /** may be null */
     public final String scm;
     public final List<Gav> dependencies;
 

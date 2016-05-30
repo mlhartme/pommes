@@ -80,6 +80,6 @@ public class MavenType extends Type {
                 return scm;
             }
         }
-        return "";
+        return null;
     }
 }
