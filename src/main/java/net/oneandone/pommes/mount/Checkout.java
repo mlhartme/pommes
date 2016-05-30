@@ -19,6 +19,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Base;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.scm.Subversion;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -57,7 +58,7 @@ public class Checkout extends Action {
 
         directory.getParent().mkdirsOpt();
         url = Strings.removeLeft(scm, "svn:"); // TODO
-        svn = Base.svn(directory.getParent(), "co", url, directory.getName());
+        svn = Subversion.svn(directory.getParent(), "co", url, directory.getName());
         if (console.getVerbose()) {
             console.verbose.println(svn.toString());
         } else {
