@@ -18,6 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Item;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
 import net.oneandone.sushi.fs.NodeInstantiationException;

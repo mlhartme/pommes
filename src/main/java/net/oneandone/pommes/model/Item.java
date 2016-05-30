@@ -1,6 +1,6 @@
-package net.oneandone.pommes.cli;
+package net.oneandone.pommes.model;
 
-import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.type.Type;
 
 import java.io.IOException;

@@ -16,7 +16,7 @@
 package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.cli.Item;
+import net.oneandone.pommes.model.Item;
 import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
