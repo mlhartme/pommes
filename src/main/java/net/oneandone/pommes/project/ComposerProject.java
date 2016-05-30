@@ -19,7 +19,7 @@ public class ComposerProject extends Project {
     }
 
     @Override
-    public Pom createPom(Environment notUsed) throws GetLastModifiedException {
+    public Pom load(Environment notUsed) throws GetLastModifiedException {
         return new Pom(getOrigin(), getRevision(), null, new Gav("1and1-sales", node.getParent().getParent().getName(), "0"), null);
     }
 }

@@ -30,7 +30,7 @@ public class MavenProject extends Project {
     //--
 
     @Override
-    public Pom createPom(Environment environment) throws IOException {
+    public Pom load(Environment environment) throws IOException {
         FileNode local;
         org.apache.maven.project.MavenProject project;
         Artifact pa;

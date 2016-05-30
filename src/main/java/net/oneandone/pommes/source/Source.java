@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
+/** A location to search for projects */
 public interface Source {
     static Source create(World world, String url) throws URISyntaxException, NodeInstantiationException {
         Source source;

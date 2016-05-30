@@ -11,7 +11,7 @@ import java.io.IOException;
 public abstract class Project {
     public static final Project END_OF_QUEUE = new Project(null) {
         @Override
-        public Pom createPom(Environment environment) throws IOException {
+        public Pom load(Environment environment) throws IOException {
             throw new IllegalStateException();
         }
     };
@@ -41,7 +41,7 @@ public abstract class Project {
         this.node = node;
     }
 
-    public abstract Pom createPom(Environment environment) throws IOException;
+    public abstract Pom load(Environment environment) throws IOException;
 
     public void setOrigin(String origin) {
         this.overrideOrigin = origin;

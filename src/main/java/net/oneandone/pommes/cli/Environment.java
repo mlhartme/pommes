@@ -173,7 +173,7 @@ public class Environment implements Variables {
                 idx = url.indexOf("URL: ") + 5;
                 project.setOrigin("scm:" + withSlash(url.substring(idx, url.indexOf("\n", idx))));
                 project.setRevision("checkout");
-                return project.createPom(this);
+                return project.load(this);
             }
         }
         return null;

@@ -176,7 +176,7 @@ public class DatabaseAdd extends Base {
                 try {
                     count++;
                     environment.console().info.println(project);
-                    return project.createPom(environment);
+                    return project.load(environment);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
