@@ -15,11 +15,11 @@
  */
 package net.oneandone.pommes.cli;
 
-import java.io.IOException;
-
 import net.oneandone.inline.Cli;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
