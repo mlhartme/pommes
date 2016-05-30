@@ -1,4 +1,4 @@
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.type.Type;
