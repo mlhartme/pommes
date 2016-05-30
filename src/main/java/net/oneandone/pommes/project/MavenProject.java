@@ -39,16 +39,16 @@ public class MavenProject extends Project {
 
         local = null;
         try {
-            if (node instanceof FileNode) {
-                local = (FileNode) node;
+            if (file instanceof FileNode) {
+                local = (FileNode) file;
             } else {
                 local = environment.world().getTemp().createTempFile();
             }
-            node.copyFile(local);
+            file.copyFile(local);
             try {
                 project = environment.maven().loadPom(local);
             } catch (ProjectBuildingException e) {
-                throw new IOException(node + ": cannot load maven project: " + e.getMessage(), e);
+                throw new IOException(file + ": cannot load maven project: " + e.getMessage(), e);
             }
 
             pa = project.getParentArtifact();
@@ -59,7 +59,7 @@ public class MavenProject extends Project {
             }
             return pom;
         } finally {
-            if (local != node) {
+            if (local != file) {
                 local.deleteFile();
             }
         }

@@ -35,10 +35,10 @@ public abstract class Project {
 
     //--
 
-    protected final Node node;
+    protected final Node file;
 
-    protected Project(Node node) {
-        this.node = node;
+    protected Project(Node file) {
+        this.file = file;
     }
 
     public abstract Pom load(Environment environment) throws IOException;
@@ -48,11 +48,11 @@ public abstract class Project {
     }
 
     public String getOrigin() {
-        return overrideOrigin == null ? node.getURI().toString() : overrideOrigin;
+        return overrideOrigin == null ? file.getURI().toString() : overrideOrigin;
     }
 
     public String getRevision() throws GetLastModifiedException {
-        return overrideRevision == null ? Long.toString(node.getLastModified()) : overrideRevision;
+        return overrideRevision == null ? Long.toString(file.getLastModified()) : overrideRevision;
     }
 
     public void setRevision(String revision) {
