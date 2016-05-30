@@ -23,6 +23,7 @@ import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.mount.Remove;
 import net.oneandone.pommes.mount.StatusException;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class Umount extends Base {
 
         fstab = Fstab.load(world);
         checkouts = new ArrayList<>();
-        scanCheckouts(root, checkouts);
+        Scm.scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }

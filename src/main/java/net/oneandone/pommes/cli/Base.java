@@ -19,7 +19,6 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
 import java.io.IOException;
@@ -104,22 +103,5 @@ public abstract class Base {
                 }
             }
         } while (!actions.isEmpty());
-    }
-
-    //--
-
-    public void scanCheckouts(FileNode directory, List<FileNode> result) throws IOException {
-        List<FileNode> children;
-
-        if (directory.join(".svn").isDirectory()) {
-            result.add(directory);
-        } else {
-            children = directory.list();
-            if (children != null) {
-                for (FileNode child : children) {
-                    scanCheckouts(child, result);
-                }
-            }
-        }
     }
 }

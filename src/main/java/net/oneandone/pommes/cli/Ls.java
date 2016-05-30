@@ -20,6 +20,7 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -45,7 +46,7 @@ public class Ls extends Base {
 
         fstab = Fstab.load(world);
         checkouts = new ArrayList<>();
-        scanCheckouts(root, checkouts);
+        Scm.scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }

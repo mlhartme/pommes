@@ -16,7 +16,6 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.cli.Base;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.scm.Subversion;
 import net.oneandone.sushi.fs.DeleteException;
