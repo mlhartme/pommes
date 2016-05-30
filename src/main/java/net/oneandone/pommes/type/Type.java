@@ -6,6 +6,7 @@ import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
 
+/** Factory for Poms */
 public abstract class Type {
     public static Type probe(Node node) {
         Type result;
