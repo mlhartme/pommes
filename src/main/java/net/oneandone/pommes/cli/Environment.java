@@ -28,8 +28,6 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.svn.SvnFilesystem;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
@@ -45,7 +43,7 @@ public class Environment implements Variables {
     private boolean upload;
 
     private Maven lazyMaven;
-    private MavenProject lazyProject;
+    private Pom lazyCurrentPom;
     private Fstab lazyFstab;
 
     public Environment(Console console, World world, String svnuser, String svnpassword,
@@ -62,7 +60,7 @@ public class Environment implements Variables {
         this.upload = upload;
 
         this.lazyMaven = null;
-        this.lazyProject = null;
+        this.lazyCurrentPom = null;
         this.lazyFstab = null;
     }
 
@@ -114,21 +112,17 @@ public class Environment implements Variables {
         return lazyFstab;
     }
 
-    public MavenProject project() throws IOException {
-        if (lazyProject == null) {
-            try {
-                lazyProject = maven().loadPom(world.getWorking().join("pom.xml"));
-            } catch (ProjectBuildingException e) {
-                throw new IOException("cannot load pom: " + e.getMessage(), e);
-            }
+    public Pom currentPom() throws IOException {
+        if (lazyCurrentPom == null) {
+            lazyCurrentPom = scanPom(world.getWorking());
         }
-        return lazyProject;
+        return lazyCurrentPom;
     }
 
     //-- Variables interface
 
     public String lookup(String name) throws IOException {
-        MavenProject p;
+        Pom p;
         FileNode here;
         Point point;
 
@@ -141,11 +135,11 @@ public class Environment implements Variables {
                 }
                 return point.group(here);
             case "gav":
-                p = project();
-                return p.getGroupId() + ":" + p.getArtifactId() + ":" + p.getVersion();
+                p = currentPom();
+                return p.coordinates.toGavString();
             case "ga":
-                p = project();
-                return p.getGroupId() + ":" + p.getArtifactId();
+                p = currentPom();
+                return p.coordinates.toGaString();
             default:
                 return null;
         }
