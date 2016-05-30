@@ -22,8 +22,6 @@ import net.oneandone.pommes.scm.Subversion;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
-import net.oneandone.sushi.launcher.Launcher;
-import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 
@@ -52,22 +50,7 @@ public class Checkout extends Action {
     }
 
     public void run(Console console) throws MkdirException, Failure {
-        Launcher svn;
-        String url;
-
         directory.getParent().mkdirsOpt();
-        url = Strings.removeLeft(scm, "svn:"); // TODO
-        svn = Subversion.svn(directory.getParent(), "co", url, directory.getName());
-        if (console.getVerbose()) {
-            console.verbose.println(svn.toString());
-        } else {
-            console.info.println("svn co " + url + " " + directory.getAbsolute());
-        }
-        if (console.getVerbose()) {
-            svn.exec(console.verbose);
-        } else {
-            // exec into string (and ignore it) - otherwise, Failure Exceptions cannot contains the output
-            svn.exec();
-        }
+        Subversion.checkout(directory, scm, console);
     }
 }
