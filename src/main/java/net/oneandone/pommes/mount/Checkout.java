@@ -32,10 +32,10 @@ public class Checkout extends Action {
 
         if (directory.exists()) {
             scannedPom = environment.scanPomOpt(directory);
-            if (scannedPom.equals(pom)) {
+            if (scannedPom.scm.equals(pom.scm)) {
                 return null;
             } else {
-                throw new StatusException("C " + directory + " (" + pom + " vs " + scannedPom + ")");
+                throw new StatusException("C " + directory + " (" + pom.scm + " vs " + scannedPom.scm + ")");
             }
         } else {
             scm = Scm.probeUrl(pom.scm);
