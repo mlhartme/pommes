@@ -142,18 +142,22 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iter() {
+            Pom pom;
             Console console;
             Document document;
 
             console = environment.console();
             while (true) {
                 try {
-                    document = Database.document(iterUnchecked());
+                    pom = iterPom();
+                    if (pom == null) {
+                        return null;
+                    }
+                    document = Database.document(pom);
                     if (!dryrun) {
                         return document;
                     }
                 } catch (InterruptedException | InvalidArtifactRTException | IOException e) {
-                    console.error.println(e.getMessage());
                     if (e.getCause() == null) {
                         console.verbose.println("(unknown cause)");
                     } else {
@@ -165,7 +169,7 @@ public class DatabaseAdd extends Base {
             }
         }
 
-        private Pom iterUnchecked() throws IOException, InterruptedException {
+        private Pom iterPom() throws IOException, InterruptedException {
             Project project;
 
             while (true) {
