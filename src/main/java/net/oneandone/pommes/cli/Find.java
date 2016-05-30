@@ -38,10 +38,17 @@ public class Find extends Base {
     @Override
     public void run(Database database) throws Exception {
         List<Pom> matches;
+        List<String> done;
+        String line;
 
+        done = new ArrayList<>();
         matches = database.query(query, environment);
         for (Pom pom : matches) {
-            console.info.println(format(pom));
+            line = format(pom);
+            if (!done.contains(line)) {
+                console.info.println(line);
+                done.add(line);
+            }
         }
     }
 
