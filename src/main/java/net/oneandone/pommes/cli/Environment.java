@@ -171,8 +171,9 @@ public class Environment implements Variables {
             if (type != null) {
                 url = directory.launcher("svn", "info").exec();
                 idx = url.indexOf("URL: ") + 5;
-                url = withSlash(url.substring(idx, url.indexOf("\n", idx)));
-                return type.createPom("scm:" + url, "checkout", this);
+                type.setOrigin("scm:" + withSlash(url.substring(idx, url.indexOf("\n", idx))));
+                type.setRevision("checkout");
+                return type.createPom(this);
             }
         }
         return null;

@@ -3,6 +3,7 @@ package net.oneandone.pommes.type;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 
 public class ComposerType extends Type {
@@ -13,14 +14,12 @@ public class ComposerType extends Type {
         return null;
     }
 
-    private final Node node;
-
     public ComposerType(Node node) {
-        this.node = node;
+        super(node);
     }
 
     @Override
-    public Pom createPom(String origin, String revision, Environment notUsed) {
-        return new Pom(origin, revision, null, new Gav("1and1-sales", node.getParent().getParent().getName(), "0"), null);
+    public Pom createPom(Environment notUsed) throws GetLastModifiedException {
+        return new Pom(getOrigin(), getRevision(), null, new Gav("1and1-sales", node.getParent().getParent().getName(), "0"), null);
     }
 }

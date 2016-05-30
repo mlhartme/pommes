@@ -137,7 +137,9 @@ public class ArtifactorySource implements Source {
                     node = root.join(Strings.removeLeft(uri, "/"));
                     type = Type.probe(node);
                     if (type != null) {
-                        dest.put(new Item("artifactory:" + node.getURI().toString(), sha1, type));
+                        type.setOrigin("artifactory:" + node.getURI().toString());
+                        type.setRevision(sha1);
+                        dest.put(new Item(type));
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

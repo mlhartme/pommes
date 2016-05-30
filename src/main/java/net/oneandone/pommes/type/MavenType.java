@@ -24,17 +24,14 @@ public class MavenType extends Type {
         return null;
     }
 
-    private final Node node;
-
     public MavenType(Node node) {
-        this.node = node;
+        super(node);
     }
-
 
     //--
 
     @Override
-    public Pom createPom(String origin, String revision, Environment environment) throws IOException {
+    public Pom createPom(Environment environment) throws IOException {
         FileNode local;
         MavenProject project;
         Artifact pa;
@@ -57,7 +54,7 @@ public class MavenType extends Type {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Pom(origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(project));
+            pom = new Pom(getOrigin(), getRevision(), paGav, Gav.forArtifact(project.getArtifact()), scm(project));
             for (Dependency dependency : project.getDependencies()) {
                 pom.dependencies.add(Gav.forDependency(dependency));
             }

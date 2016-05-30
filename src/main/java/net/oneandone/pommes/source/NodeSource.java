@@ -97,7 +97,8 @@ public class NodeSource implements Source {
                 } else {
                     revision = node.getLastModified();
                 }
-                dest.put(new Item(node.getURI().toString(), Long.toString(revision), type));
+                type.setRevision(Long.toString(revision));
+                dest.put(new Item(type));
                 return;
             }
         }
