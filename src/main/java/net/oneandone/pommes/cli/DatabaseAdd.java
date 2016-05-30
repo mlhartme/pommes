@@ -21,6 +21,7 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
+import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -68,7 +69,7 @@ public class DatabaseAdd extends Base {
     public void run(Database database) throws Exception {
         Indexer indexer;
 
-        indexer = new Indexer(dryrun, console, world, environment.maven(), database);
+        indexer = new Indexer(dryrun, environment, database);
         indexer.start();
         try {
             for (Source source : sources) {
@@ -85,10 +86,7 @@ public class DatabaseAdd extends Base {
 
     public static class Indexer extends Thread implements Iterator<Document> {
         private final boolean dryrun;
-
-        private final Console console;
-        private final World world;
-        private final Maven maven;
+        private final Environment environment;
 
         public final BlockingQueue<Item> src;
         private final Database database;
@@ -98,14 +96,11 @@ public class DatabaseAdd extends Base {
         private int count;
         private int errors;
 
-        public Indexer(boolean dryrun, Console console, World world, Maven maven, Database database) {
+        public Indexer(boolean dryrun, Environment environment, Database database) {
             super("Indexer");
 
             this.dryrun = dryrun;
-
-            this.console = console;
-            this.world = world;
-            this.maven = maven;
+            this.environment = environment;
 
             this.src = new ArrayBlockingQueue<>(25);
             this.database = database;
@@ -151,8 +146,10 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iter() {
+            Console console;
             Document document;
 
+            console = environment.console();
             while (true) {
                 try {
                     document = iterUnchecked();
@@ -174,8 +171,6 @@ public class DatabaseAdd extends Base {
 
         private Document iterUnchecked() throws IOException, InterruptedException {
             Item item;
-            FileNode local;
-            MavenProject project;
 
             while (true) {
                 item = src.take();
@@ -183,21 +178,9 @@ public class DatabaseAdd extends Base {
                     return null;
                 }
                 try {
-                    if (item.node.getName().equals("composer.json")) {
-                        count++;
-                        return Database.document(Pom.forComposer(item.origin, item.revision, item.node));
-                    } else {
-                        count++;
-                        local = world.getTemp().createTempFile();
-                        try {
-                            item.node.copyFile(local);
-                            console.info.println(item.origin);
-                            project = maven.loadPom(local);
-                            return Database.document(item.origin, item.revision, project);
-                        } finally {
-                            local.deleteFile();
-                        }
-                    }
+                    count++;
+                    environment.console().info.println(item.origin);
+                    return item.type.createDocument(item.origin, item.revision, environment);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
@@ -212,7 +195,7 @@ public class DatabaseAdd extends Base {
         }
 
         public void summary() {
-            console.info.println("Indexed " + (count - errors) + "/" + count + " poms successfully.");
+            environment.console().info.println("Indexed " + (count - errors) + "/" + count + " poms successfully.");
         }
     }
 }

@@ -17,6 +17,7 @@ package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Item;
+import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.util.Strings;
@@ -114,6 +115,7 @@ public class ArtifactorySource implements Source {
             String sha1;
             int count;
             Node node;
+            Type type;
 
             count = 0;
             try (InputStream is = listing.newInputStream(); Parser parser = new Parser(Json.createParser(is))) {
@@ -132,9 +134,10 @@ public class ArtifactorySource implements Source {
                     }
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
-                    if (uri.endsWith(".pom")) {
-                        node = root.join(Strings.removeLeft(uri, "/"));
-                        dest.put(new Item("artifactory:" + node.getURI().toString(), sha1, node));
+                    node = root.join(Strings.removeLeft(uri, "/"));
+                    type = Type.probe(node);
+                    if (type != null) {
+                        dest.put(new Item("artifactory:" + node.getURI().toString(), sha1, type));
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

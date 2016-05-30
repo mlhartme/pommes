@@ -15,42 +15,10 @@
  */
 package net.oneandone.pommes.model;
 
-import net.oneandone.sushi.fs.Node;
-import net.oneandone.sushi.util.Strings;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pom {
-    public static Pom forComposer(String origin, String revision, Node composer) {
-        return new Pom(origin, revision, new Gav("1and1-sales", composer.getParent().getParent().getName(), "0"), "");
-    }
-
-    public static Pom forProject(String origin, String revision, MavenProject project) {
-        Pom result;
-        String scm;
-
-        scm = null;
-        if (project.getScm() != null) {
-            scm = project.getScm().getConnection();
-        }
-        if (scm == null) {
-            scm = "";
-        } else {
-            // removeOpt because I've seen project that omit the prefix ...
-            scm = Strings.removeLeftOpt(scm, "scm:");
-        }
-        result = new Pom(origin, revision, new Gav(project.getGroupId(), project.getArtifactId(), project.getVersion()), scm);
-        for (Dependency dependency : project.getDependencies()) {
-            result.dependencies.add(Gav.forDependency(dependency));
-        }
-        return result;
-    }
-
-    //--
-
     /** currently always starts with svn:https:// */
     public final String origin;
     public final String revision;

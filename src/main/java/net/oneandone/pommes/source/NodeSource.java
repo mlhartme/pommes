@@ -17,6 +17,7 @@ package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Item;
+import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -75,7 +76,7 @@ public class NodeSource implements Source {
 
     public void scan(Node root, boolean recurse, BlockingQueue<Item> dest) throws IOException, InterruptedException, SVNException {
         List<? extends Node> children;
-        Node project;
+        Type type;
         Node trunk;
         Node branches;
         List<? extends Node> grandChildren;
@@ -88,18 +89,17 @@ public class NodeSource implements Source {
         if (children == null) {
             return;
         }
-        project = pom(children);
-        if (project == null) {
-            project = child(children, "composer.json");
-        }
-        if (project != null) {
-            if (project instanceof SvnNode) {
-                revision = ((SvnNode) project).getLatestRevision();
-            } else {
-                revision = project.getLastModified();
+        for (Node node : children) {
+            type = Type.probe(node);
+            if (type != null) {
+                if (node instanceof SvnNode) {
+                    revision = ((SvnNode) node).getLatestRevision();
+                } else {
+                    revision = node.getLastModified();
+                }
+                dest.put(new Item(node.getURI().toString(), Long.toString(revision), type));
+                return;
             }
-            dest.put(new Item(Long.toString(revision), project));
-            return;
         }
         trunk = child(children, "trunk");
         if (trunk != null) {
@@ -140,15 +140,4 @@ public class NodeSource implements Source {
         return null;
     }
 
-    private static Node pom(List<? extends Node> childen) {
-        String name;
-
-        for (Node node : childen) {
-            name = node.getName();
-            if (name.equals("pom.xml") || name.endsWith(".pom")) {
-                return node;
-            }
-        }
-        return null;
-    }
 }

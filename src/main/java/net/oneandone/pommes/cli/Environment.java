@@ -23,6 +23,7 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -181,7 +182,7 @@ public class Environment implements Variables {
         url = directory.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
         url = withSlash(url.substring(idx, url.indexOf("\n", idx)));
-        return Pom.forProject("scm:" + url, "checkout", p);
+        return Type.forProject("scm:" + url, "checkout", p);
     }
 
     public static String withSlash(String url) {

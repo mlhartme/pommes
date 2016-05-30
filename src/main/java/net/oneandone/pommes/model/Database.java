@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
+import net.oneandone.pommes.type.Type;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -357,7 +358,7 @@ public class Database implements AutoCloseable {
 
     //--
 
-    public static Document document(Pom pom) throws InvalidVersionSpecificationException {
+    public static Document document(Pom pom) {
         Document doc;
 
         doc = new Document();
@@ -368,12 +369,12 @@ public class Database implements AutoCloseable {
         return doc;
     }
 
-    public static Document document(String origin, String revision, MavenProject mavenProject) throws InvalidVersionSpecificationException {
+    public static Document document(String origin, String revision, MavenProject mavenProject) {
         Document doc;
         MavenProject parent;
         Pom parPom;
 
-        doc = document(Pom.forProject(origin, revision, mavenProject));
+        doc = document(Type.forProject(origin, revision, mavenProject));
         for (Dependency dependency : mavenProject.getDependencies()) {
             Gav dep = Gav.forDependency(dependency);
 
@@ -384,7 +385,7 @@ public class Database implements AutoCloseable {
         // parent
         parent = mavenProject.getParent();
         if (parent != null) {
-            parPom = Pom.forProject(origin, revision, parent);
+            parPom = Type.forProject(origin, revision, parent);
             doc.add(new StringField(PARENT, parPom.coordinates.toGavString(), Field.Store.YES));
         }
         return doc;
