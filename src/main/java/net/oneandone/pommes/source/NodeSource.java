@@ -75,7 +75,7 @@ public class NodeSource implements Source {
 
     public void scan(Node root, boolean recurse, BlockingQueue<Project> dest) throws IOException, InterruptedException, SVNException {
         List<? extends Node> children;
-        Project type;
+        Project project;
         Node trunk;
         Node branches;
         List<? extends Node> grandChildren;
@@ -89,15 +89,15 @@ public class NodeSource implements Source {
             return;
         }
         for (Node node : children) {
-            type = Project.probe(node);
-            if (type != null) {
+            project = Project.probe(node);
+            if (project != null) {
                 if (node instanceof SvnNode) {
                     revision = ((SvnNode) node).getLatestRevision();
                 } else {
                     revision = node.getLastModified();
                 }
-                type.setRevision(Long.toString(revision));
-                dest.put(type);
+                project.setRevision(Long.toString(revision));
+                dest.put(project);
                 return;
             }
         }

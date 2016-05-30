@@ -159,7 +159,7 @@ public class Environment implements Variables {
 
     /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
     public Pom scanPomOpt(FileNode directory) throws IOException {
-        Project type;
+        Project project;
         String url;
         int idx;
 
@@ -167,13 +167,13 @@ public class Environment implements Variables {
             return null;
         }
         for (Node child : directory.list()) {
-            type = Project.probe(child);
-            if (type != null) {
+            project = Project.probe(child);
+            if (project != null) {
                 url = directory.launcher("svn", "info").exec();
                 idx = url.indexOf("URL: ") + 5;
-                type.setOrigin("scm:" + withSlash(url.substring(idx, url.indexOf("\n", idx))));
-                type.setRevision("checkout");
-                return type.createPom(this);
+                project.setOrigin("scm:" + withSlash(url.substring(idx, url.indexOf("\n", idx))));
+                project.setRevision("checkout");
+                return project.createPom(this);
             }
         }
         return null;

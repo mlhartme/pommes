@@ -114,7 +114,7 @@ public class ArtifactorySource implements Source {
             String sha1;
             int count;
             Node node;
-            Project type;
+            Project project;
 
             count = 0;
             try (InputStream is = listing.newInputStream(); Parser parser = new Parser(Json.createParser(is))) {
@@ -134,11 +134,11 @@ public class ArtifactorySource implements Source {
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
                     node = root.join(Strings.removeLeft(uri, "/"));
-                    type = Project.probe(node);
-                    if (type != null) {
-                        type.setOrigin("artifactory:" + node.getURI().toString());
-                        type.setRevision(sha1);
-                        dest.put(type);
+                    project = Project.probe(node);
+                    if (project != null) {
+                        project.setOrigin("artifactory:" + node.getURI().toString());
+                        project.setRevision(sha1);
+                        dest.put(project);
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

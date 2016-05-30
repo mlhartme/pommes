@@ -166,21 +166,21 @@ public class DatabaseAdd extends Base {
         }
 
         private Pom iterUnchecked() throws IOException, InterruptedException {
-            Project type;
+            Project project;
 
             while (true) {
-                type = src.take();
-                if (type == Project.END_OF_QUEUE) {
+                project = src.take();
+                if (project == Project.END_OF_QUEUE) {
                     return null;
                 }
                 try {
                     count++;
-                    environment.console().info.println(type);
-                    return type.createPom(environment);
+                    environment.console().info.println(project);
+                    return project.createPom(environment);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new IOException("error processing " + type + ": " + e.getMessage(), e);
+                    throw new IOException("error processing " + project + ": " + e.getMessage(), e);
                 }
             }
         }
