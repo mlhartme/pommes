@@ -16,11 +16,12 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public class Nop extends Action {
-    public Nop(FileNode directory, String scm) {
-        super(directory, scm);
+    public Nop(FileNode directory, String url) {
+        super(null, directory, url);
     }
 
     @Override

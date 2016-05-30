@@ -26,7 +26,10 @@ import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Ls extends Base {
     private final FileNode root;
@@ -39,18 +42,18 @@ public class Ls extends Base {
     @Override
     public void run(Database notUsed) throws Exception {
         Fstab fstab;
-        List<FileNode> checkouts;
+        Map<FileNode, Scm> checkouts;
         Pom scannedPom;
         FileNode configuredDirectory;
         Point point;
 
         fstab = Fstab.load(world);
-        checkouts = new ArrayList<>();
+        checkouts = new HashMap<>();
         Scm.scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }
-        for (FileNode directory : checkouts) {
+        for (FileNode directory : checkouts.keySet()) {
             scannedPom = environment.scanPom(directory);
             point = fstab.pointOpt(directory);
             if (point == null) {
@@ -64,12 +67,12 @@ public class Ls extends Base {
                 }
             }
         }
-        for (FileNode directory : unknown(root, checkouts)) {
+        for (FileNode directory : unknown(root, checkouts.keySet())) {
             console.info.println("? " + directory);
         }
     }
 
-    private static List<FileNode> unknown(FileNode root, List<FileNode> directories) throws ListException, DirectoryNotFoundException {
+    private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories) throws ListException, DirectoryNotFoundException {
         List<FileNode> lst;
         List<FileNode> result;
 
@@ -92,7 +95,7 @@ public class Ls extends Base {
         return result;
     }
 
-    private static boolean hasAnchestor(List<FileNode> directories, FileNode node) {
+    private static boolean hasAnchestor(Collection<FileNode> directories, FileNode node) {
         for (FileNode directory : directories) {
             if (directory.hasAnchestor(node)) {
                 return true;

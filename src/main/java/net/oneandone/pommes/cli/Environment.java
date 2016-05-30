@@ -158,32 +158,23 @@ public class Environment implements Variables {
         return result;
     }
 
-    /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
+    /** @return null if not a checkout */
     public Pom scanPomOpt(FileNode directory) throws IOException {
+        Scm scm;
         Project project;
-        String url;
-        int idx;
 
-        if (!Scm.isCheckout(directory)) {
+        scm = Scm.probeCheckout(directory);
+        if (scm == null) {
             return null;
         }
         for (Node child : directory.list()) {
             project = Project.probe(child);
             if (project != null) {
-                url = directory.launcher("svn", "info").exec();
-                idx = url.indexOf("URL: ") + 5;
-                project.setOrigin("scm:" + withSlash(url.substring(idx, url.indexOf("\n", idx))));
+                project.setOrigin(scm.getUrl(directory));
                 project.setRevision("checkout");
                 return project.load(this);
             }
         }
         return null;
-    }
-
-    public static String withSlash(String url) {
-        if (!url.endsWith("/")) {
-            url = url + "/";
-        }
-        return url;
     }
 }

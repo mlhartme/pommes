@@ -28,7 +28,9 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Umount extends Base {
     private final boolean stale;
@@ -44,23 +46,31 @@ public class Umount extends Base {
     public void run(Database database) throws Exception {
         int problems;
         Fstab fstab;
-        List<FileNode> checkouts;
+        Map<FileNode, Scm> checkouts;
         Pom scannedPom;
         List<Action> removes;
         Point point;
         FileNode configuredDirectory;
+        FileNode directory;
+        Scm scm;
+        String url;
 
         fstab = Fstab.load(world);
-        checkouts = new ArrayList<>();
+        checkouts = new HashMap<>();
         Scm.scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }
         removes = new ArrayList<>();
         problems = 0;
-        for (FileNode directory : checkouts) {
-            if (stale && !isStale(database, directory)) {
-                continue;
+        for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
+            directory = entry.getKey();
+            scm = entry.getValue();
+            if (stale) {
+                url = scm.getUrl(directory);
+                if (scm.exists(world, url)) {
+                    continue;
+                }
             }
             scannedPom = environment.scanPom(directory);
             point = fstab.pointOpt(directory);
@@ -86,13 +96,5 @@ public class Umount extends Base {
             throw new IOException("aborted - fix the above problem(s) first: " + problems);
         }
         runAll(removes);
-    }
-
-    private boolean isStale(Database database, FileNode directory) throws IOException {
-        return false;
-        /* TODO
-        return database.lookup("svn:" + Base.scanUrl(directory) + "pom.xml") == null
-                && database.lookup("svn:" + Base.scanUrl(directory) + "composer.json") == null;
-                */
     }
 }

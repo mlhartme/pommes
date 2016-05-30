@@ -1,18 +1,27 @@
 package net.oneandone.pommes.scm;
 
-import net.oneandone.sushi.fs.ExistsException;
+import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.launcher.Failure;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-public class Scm {
-    public static void scanCheckouts(FileNode directory, List<FileNode> result) throws IOException {
+public abstract class Scm {
+    private static final Subversion[] SCMS = {
+        new Subversion()
+    };
+
+    public static void scanCheckouts(FileNode directory, Map<FileNode, Scm> result) throws IOException {
         List<FileNode> children;
+        Scm probed;
 
-        if (isCheckout(directory)) {
-            result.add(directory);
+        probed = probeCheckout(directory);
+        if (probed != null) {
+            result.put(directory, probed);
         } else {
             children = directory.list();
             if (children != null) {
@@ -23,10 +32,31 @@ public class Scm {
         }
     }
 
-    public static boolean isCheckout(Node dir) throws ExistsException {
-        if (Subversion.isCheckout(dir)) {
-            return true;
+    public static Scm probeCheckout(FileNode checkout) throws IOException {
+        for (Scm scm : SCMS) {
+            if (scm.isCheckout(checkout)) {
+                return scm;
+            }
         }
-        return false;
+        return null;
     }
+
+    public static Scm probeUrl(String url) throws IOException {
+        for (Scm scm : SCMS) {
+            if (scm.isUrl(url)) {
+                return scm;
+            }
+        }
+        return null;
+    }
+
+
+    //--
+
+    public abstract boolean isCheckout(FileNode directory) throws IOException;
+    public abstract boolean isCommitted(FileNode checkout) throws IOException;
+    public abstract boolean exists(World world, String url) throws IOException;
+    public abstract boolean isUrl(String url);
+    public abstract String getUrl(FileNode checkout) throws Failure;
+    public abstract void checkout(FileNode dir, String url, Console console) throws Failure;
 }

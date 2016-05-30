@@ -18,7 +18,7 @@ package net.oneandone.pommes.mount;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.scm.Subversion;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -28,6 +28,7 @@ import java.io.IOException;
 public class Checkout extends Action {
     public static Checkout createOpt(Environment environment, FileNode directory, Pom pom) throws IOException {
         Pom scannedPom;
+        Scm scm;
 
         if (directory.exists()) {
             scannedPom = environment.scanPomOpt(directory);
@@ -37,12 +38,13 @@ public class Checkout extends Action {
                 throw new StatusException("C " + directory + " (" + pom + " vs " + scannedPom + ")");
             }
         } else {
-            return new Checkout(directory, pom.scm);
+            scm = Scm.probeUrl(pom.scm);
+            return new Checkout(scm, directory, pom.scm);
         }
     }
 
-    public Checkout(FileNode directory, String scm) {
-        super(directory, scm);
+    public Checkout(Scm scm, FileNode directory, String url) {
+        super(scm, directory, url);
     }
 
     public char status() {
@@ -51,6 +53,6 @@ public class Checkout extends Action {
 
     public void run(Console console) throws MkdirException, Failure {
         directory.getParent().mkdirsOpt();
-        Subversion.checkout(directory, scm, console);
+        scm.checkout(directory, url, console);
     }
 }
