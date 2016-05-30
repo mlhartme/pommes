@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Item {
     public static final Item END_OF_QUEUE = new Item(null, null, null);
 
-    public final String origin;
+    private final String origin;
     private final String revision;
     private final Type type;
 
@@ -20,5 +20,9 @@ public class Item {
 
     public Pom createPom(Environment environment) throws IOException {
         return type.createPom(origin, revision, environment);
+    }
+
+    public String toString() {
+        return origin;
     }
 }

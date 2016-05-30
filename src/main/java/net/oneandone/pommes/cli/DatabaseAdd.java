@@ -174,12 +174,12 @@ public class DatabaseAdd extends Base {
                 }
                 try {
                     count++;
-                    environment.console().info.println(item.origin);
+                    environment.console().info.println(item);
                     return item.createPom(environment);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new IOException("error processing " + item.origin + ": " + e.getMessage(), e);
+                    throw new IOException("error processing " + item + ": " + e.getMessage(), e);
                 }
             }
         }
