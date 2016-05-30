@@ -6,15 +6,15 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 
-public class ComposerType extends Type {
-    public static ComposerType probe(Node node) {
+public class ComposerProject extends Project {
+    public static ComposerProject probe(Node node) {
         if (node.getName().equals("composer.json")) {
-            return new ComposerType(node);
+            return new ComposerProject(node);
         }
         return null;
     }
 
-    public ComposerType(Node node) {
+    public ComposerProject(Node node) {
         super(node);
     }
 

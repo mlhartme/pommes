@@ -23,7 +23,7 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
-import net.oneandone.pommes.project.Type;
+import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -159,7 +159,7 @@ public class Environment implements Variables {
 
     /** @return null if not a working copy; or url without "svn:" prefix, but with tailing slash */
     public Pom scanPomOpt(FileNode directory) throws IOException {
-        Type type;
+        Project type;
         String url;
         int idx;
 
@@ -167,7 +167,7 @@ public class Environment implements Variables {
             return null;
         }
         for (Node child : directory.list()) {
-            type = Type.probe(child);
+            type = Project.probe(child);
             if (type != null) {
                 url = directory.launcher("svn", "info").exec();
                 idx = url.indexOf("URL: ") + 5;

@@ -16,7 +16,7 @@
 package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.project.Type;
+import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -69,13 +69,13 @@ public class NodeSource implements Source {
     }
 
     @Override
-    public void scan(BlockingQueue<Type> dest) throws IOException, InterruptedException, SVNException {
+    public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException, SVNException {
         scan(node, true, dest);
     }
 
-    public void scan(Node root, boolean recurse, BlockingQueue<Type> dest) throws IOException, InterruptedException, SVNException {
+    public void scan(Node root, boolean recurse, BlockingQueue<Project> dest) throws IOException, InterruptedException, SVNException {
         List<? extends Node> children;
-        Type type;
+        Project type;
         Node trunk;
         Node branches;
         List<? extends Node> grandChildren;
@@ -89,7 +89,7 @@ public class NodeSource implements Source {
             return;
         }
         for (Node node : children) {
-            type = Type.probe(node);
+            type = Project.probe(node);
             if (type != null) {
                 if (node instanceof SvnNode) {
                     revision = ((SvnNode) node).getLatestRevision();

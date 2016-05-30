@@ -8,23 +8,22 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class MavenType extends Type {
-    public static MavenType probe(Node node) {
+public class MavenProject extends Project {
+    public static MavenProject probe(Node node) {
         String name;
 
         name = node.getName();
         if (name.equals("pom.xml") || name.endsWith(".pom")) {
-            return new MavenType(node);
+            return new MavenProject(node);
         }
         return null;
     }
 
-    public MavenType(Node node) {
+    public MavenProject(Node node) {
         super(node);
     }
 
@@ -33,7 +32,7 @@ public class MavenType extends Type {
     @Override
     public Pom createPom(Environment environment) throws IOException {
         FileNode local;
-        MavenProject project;
+        org.apache.maven.project.MavenProject project;
         Artifact pa;
         Gav paGav;
         Pom pom;
@@ -66,7 +65,7 @@ public class MavenType extends Type {
         }
     }
 
-    private static String scm(MavenProject project) {
+    private static String scm(org.apache.maven.project.MavenProject project) {
         String scm;
 
         if (project.getScm() != null) {

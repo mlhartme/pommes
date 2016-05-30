@@ -8,22 +8,22 @@ import net.oneandone.sushi.fs.Node;
 import java.io.IOException;
 
 /** Factory for Poms */
-public abstract class Type {
-    public static final Type END_OF_QUEUE = new Type(null) {
+public abstract class Project {
+    public static final Project END_OF_QUEUE = new Project(null) {
         @Override
         public Pom createPom(Environment environment) throws IOException {
             throw new IllegalStateException();
         }
     };
 
-    public static Type probe(Node node) {
-        Type result;
+    public static Project probe(Node node) {
+        Project result;
 
-        result = MavenType.probe(node);
+        result = MavenProject.probe(node);
         if (result != null) {
             return result;
         }
-        result = ComposerType.probe(node);
+        result = ComposerProject.probe(node);
         if (result != null) {
             return result;
         }
@@ -37,7 +37,7 @@ public abstract class Type {
 
     protected final Node node;
 
-    protected Type(Node node) {
+    protected Project(Node node) {
         this.node = node;
     }
 

@@ -16,7 +16,7 @@
 package net.oneandone.pommes.source;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.project.Type;
+import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.util.Strings;
@@ -72,7 +72,7 @@ public class ArtifactorySource implements Source {
     }
 
     @Override
-    public void scan(BlockingQueue<Type> dest) throws IOException, URISyntaxException {
+    public void scan(BlockingQueue<Project> dest) throws IOException, URISyntaxException {
         Node listing;
         Node root;
 
@@ -107,14 +107,14 @@ public class ArtifactorySource implements Source {
     public static class Parser implements AutoCloseable {
         private static final SimpleDateFormat FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-        public static void run(Node listing, Node root, BlockingQueue<Type> dest) throws Exception {
+        public static void run(Node listing, Node root, BlockingQueue<Project> dest) throws Exception {
             String uri;
             long size;
             Date lastModified;
             String sha1;
             int count;
             Node node;
-            Type type;
+            Project type;
 
             count = 0;
             try (InputStream is = listing.newInputStream(); Parser parser = new Parser(Json.createParser(is))) {
@@ -134,7 +134,7 @@ public class ArtifactorySource implements Source {
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
                     node = root.join(Strings.removeLeft(uri, "/"));
-                    type = Type.probe(node);
+                    type = Project.probe(node);
                     if (type != null) {
                         type.setOrigin("artifactory:" + node.getURI().toString());
                         type.setRevision(sha1);

@@ -20,7 +20,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.source.Source;
-import net.oneandone.pommes.project.Type;
+import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -72,7 +72,7 @@ public class DatabaseAdd extends Base {
                 source.scan(indexer.src);
             }
         } finally {
-            indexer.src.put(Type.END_OF_QUEUE);
+            indexer.src.put(Project.END_OF_QUEUE);
         }
         indexer.join();
         if (indexer.exception != null) {
@@ -84,7 +84,7 @@ public class DatabaseAdd extends Base {
         private final boolean dryrun;
         private final Environment environment;
 
-        public final BlockingQueue<Type> src;
+        public final BlockingQueue<Project> src;
         private final Database database;
         private Exception exception;
 
@@ -166,11 +166,11 @@ public class DatabaseAdd extends Base {
         }
 
         private Pom iterUnchecked() throws IOException, InterruptedException {
-            Type type;
+            Project type;
 
             while (true) {
                 type = src.take();
-                if (type == Type.END_OF_QUEUE) {
+                if (type == Project.END_OF_QUEUE) {
                     return null;
                 }
                 try {
