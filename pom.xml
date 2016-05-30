@@ -59,7 +59,14 @@
     <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
       <artifactId>svnkit</artifactId>
-      <version>1.8.5</version>
+      <version>1.8.12</version>
+      <exclusions>
+        <exclusion>
+          <!-- looks like a bug in svnkit dependencies - they depend on net.java.dev.jna:jna-platform:4.1.0, but don't exclude this: -->
+          <groupId>net.java.dev.jna</groupId>
+          <artifactId>platform</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.oneandone.maven</groupId>

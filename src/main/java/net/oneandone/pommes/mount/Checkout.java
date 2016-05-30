@@ -22,6 +22,7 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
+import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
 
@@ -52,7 +53,20 @@ public class Checkout extends Action {
     }
 
     public void run(Console console) throws MkdirException, Failure {
+        Launcher launcher;
+
         directory.getParent().mkdirsOpt();
-        scm.checkout(directory, url, console);
+        launcher = scm.checkout(directory, url);
+        if (console.getVerbose()) {
+            console.verbose.println(launcher.toString());
+        } else {
+            console.info.println("svn co " + url + " " + directory.getAbsolute());
+        }
+        if (console.getVerbose()) {
+            launcher.exec(console.verbose);
+        } else {
+            // exec into string (and ignore it) - otherwise, Failure Exceptions cannot contains the output
+            launcher.exec();
+        }
     }
 }

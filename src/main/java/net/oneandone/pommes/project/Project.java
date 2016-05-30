@@ -58,4 +58,8 @@ public abstract class Project {
     public void setRevision(String revision) {
         this.overrideRevision = revision;
     }
+
+    public String toString() {
+        return getOrigin();
+    }
 }

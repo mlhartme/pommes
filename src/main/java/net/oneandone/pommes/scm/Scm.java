@@ -1,10 +1,9 @@
 package net.oneandone.pommes.scm;
 
-import net.oneandone.inline.Console;
-import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
+import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,5 +60,5 @@ public abstract class Scm {
     public abstract boolean isCommitted(FileNode checkout) throws IOException;
     public abstract String getUrl(FileNode checkout) throws Failure;
 
-    public abstract void checkout(FileNode dest, String url, Console console) throws Failure;
+    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
 }

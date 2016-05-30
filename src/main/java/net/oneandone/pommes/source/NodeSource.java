@@ -92,7 +92,9 @@ public class NodeSource implements Source {
             project = Project.probe(node);
             if (project != null) {
                 if (node instanceof SvnNode) {
-                    revision = ((SvnNode) node).getLatestRevision();
+                    //                     revision = ((SvnNode) node).getLatestRevision();
+                    // TODO
+                    revision = node.getLastModified();
                 } else {
                     revision = node.getLastModified();
                 }

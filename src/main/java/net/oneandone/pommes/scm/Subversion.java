@@ -1,7 +1,6 @@
 package net.oneandone.pommes.scm;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.model.Database;
 import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -44,23 +43,11 @@ public class Subversion extends Scm {
     }
 
     @Override
-    public void checkout(FileNode directory, String fullurl, Console console) throws Failure {
+    public Launcher checkout(FileNode directory, String fullurl) throws Failure {
         String url;
-        Launcher svn;
 
         url = Strings.removeLeft(fullurl, PROTOCOL);
-        svn = Subversion.svn(directory.getParent(), "co", url, directory.getName());
-        if (console.getVerbose()) {
-            console.verbose.println(svn.toString());
-        } else {
-            console.info.println("svn co " + url + " " + directory.getAbsolute());
-        }
-        if (console.getVerbose()) {
-            svn.exec(console.verbose);
-        } else {
-            // exec into string (and ignore it) - otherwise, Failure Exceptions cannot contains the output
-            svn.exec();
-        }
+        return Subversion.svn(directory.getParent(), "co", url, directory.getName());
     }
 
     @Override
