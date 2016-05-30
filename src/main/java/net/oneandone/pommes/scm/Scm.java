@@ -53,10 +53,13 @@ public abstract class Scm {
 
     //--
 
-    public abstract boolean isCheckout(FileNode directory) throws IOException;
-    public abstract boolean isCommitted(FileNode checkout) throws IOException;
-    public abstract boolean exists(World world, String url) throws IOException;
     public abstract boolean isUrl(String url);
+    public abstract boolean exists(World world, String url) throws IOException;
+
+    public abstract boolean isCheckout(FileNode directory) throws IOException;
+
+    public abstract boolean isCommitted(FileNode checkout) throws IOException;
     public abstract String getUrl(FileNode checkout) throws Failure;
-    public abstract void checkout(FileNode dir, String url, Console console) throws Failure;
+
+    public abstract void checkout(FileNode dest, String url, Console console) throws Failure;
 }

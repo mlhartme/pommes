@@ -43,8 +43,8 @@ public class MavenProject extends Project {
                 local = (FileNode) file;
             } else {
                 local = environment.world().getTemp().createTempFile();
+                file.copyFile(local);
             }
-            file.copyFile(local);
             try {
                 project = environment.maven().loadPom(local);
             } catch (ProjectBuildingException e) {

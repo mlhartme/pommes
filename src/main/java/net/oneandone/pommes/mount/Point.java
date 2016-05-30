@@ -34,10 +34,16 @@ public class Point {
         FileNode directory;
 
         parts = Separator.SPACE.split(line);
-        if (parts.size() != 2) {
-            throw new IllegalArgumentException(line);
+        switch (parts.size()) {
+            case 1:
+                group = "";
+                break;
+            case 2:
+                group = parts.remove(0);
+                break;
+            default:
+                throw new IllegalArgumentException(line);
         }
-        group = parts.remove(0);
         directory = world.file(parts.remove(0));
         directory.checkDirectory();
         return new Point(group, directory, parts);
@@ -76,10 +82,23 @@ public class Point {
 
     public FileNode directoryOpt(Pom pom) {
         String ga;
+        String remaining;
 
         ga = pom.coordinates.groupId + "." + pom.coordinates.artifactId;
-        if ((ga + ".").startsWith(groupPrefix + ".")) {
-            return directory.join(fold(ga.substring(groupPrefix.length() + 1).replace('.', '/')));
+        if (ga.startsWith(groupPrefix)) {
+            remaining = ga.substring(groupPrefix.length());
+            if (!remaining.isEmpty()) {
+                if (groupPrefix.isEmpty()) {
+                    // nothing to do
+                } else {
+                    if (remaining.charAt(0) != '.') {
+                        return null;
+                    }
+                    remaining = remaining.substring(1);
+                }
+                remaining = remaining.replace('.', '/');
+            }
+            return directory.join(fold(remaining));
         } else {
             return null;
         }
