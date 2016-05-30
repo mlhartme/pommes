@@ -24,6 +24,7 @@ import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -163,7 +164,7 @@ public class Environment implements Variables {
         String url;
         int idx;
 
-        if (!directory.join(".svn").exists()) {
+        if (!Scm.isCheckout(directory)) {
             return null;
         }
         for (Node child : directory.list()) {

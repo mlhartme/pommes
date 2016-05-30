@@ -1,5 +1,7 @@
 package net.oneandone.pommes.scm;
 
+import net.oneandone.sushi.fs.ExistsException;
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Separator;
@@ -7,6 +9,10 @@ import net.oneandone.sushi.util.Separator;
 import java.io.IOException;
 
 public class Subversion {
+    public static boolean isCheckout(Node directory) throws ExistsException {
+        return directory.join(".svn").isDirectory();
+    }
+
     public static Launcher svn(FileNode dir, String ... args) {
         Launcher launcher;
 
