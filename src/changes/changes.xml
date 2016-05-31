@@ -37,7 +37,7 @@
       <action date="2016-05-25" dev="mlhartme" type="update">
         database-add: Added artifactory support - specify urls prefixed with 'artifactory:'.
         Added file support - speficy file urls.
-        Subversion urls have to be prefixed with 'svn': now; -noBranches changed to %NO_BRANCHES.
+        Subversion urls have to be prefixed with 'svn:' now; -noBranches changed to %branches; also added %tags
         Added -dryrun option.
       </action>
     </release>

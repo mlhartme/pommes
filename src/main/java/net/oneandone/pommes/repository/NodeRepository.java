@@ -42,19 +42,27 @@ public class NodeRepository implements Repository {
     //--
 
     private final Node node;
-    private boolean withBranches;
+    private boolean branches;
+    private boolean tags;
     private final Filter exclude;
 
     public NodeRepository(Node node) {
+        this(node, false, false);
+    }
+
+    public NodeRepository(Node node, boolean branches, boolean tags) {
         this.node = node;
         this.exclude = new Filter();
-        this.withBranches = true;
+        this.branches = branches;
+        this.tags = tags;
     }
 
     @Override
     public void addOption(String option) {
-        if (option.equals("NO_BRANCHES")) {
-            withBranches = false;
+        if (option.equals("branches")) {
+            branches = true;
+        } else if (option.equals("tags")) {
+            tags = true;
         }
     }
 
@@ -74,8 +82,9 @@ public class NodeRepository implements Repository {
     public void scan(Node root, boolean recurse, BlockingQueue<Project> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
         Project project;
-        Node trunk;
-        Node branches;
+        Node trunkNode;
+        Node branchesNode;
+        Node tagsNode;
         List<? extends Node> grandChildren;
 
         if (exclude.matches(root.getPath())) {
@@ -93,20 +102,30 @@ public class NodeRepository implements Repository {
                 return;
             }
         }
-        trunk = child(children, "trunk");
-        if (trunk != null) {
-            scan(trunk, false, dest);
+        trunkNode = child(children, "trunk");
+        if (trunkNode != null) {
+            scan(trunkNode, false, dest);
         }
-        branches = child(children, "branches");
-        if (branches != null && withBranches) {
-            grandChildren = branches.list();
+        branchesNode = child(children, "branches");
+        if (branchesNode != null && branches) {
+            grandChildren = branchesNode.list();
             if (grandChildren != null) {
                 for (Node grandChild : grandChildren) {
                     scan(grandChild, false, dest);
                 }
             }
         }
-        if (trunk != null || branches != null) {
+        tagsNode = child(children, "tags");
+        if (tagsNode != null && tags) {
+            grandChildren = tagsNode.list();
+            if (grandChildren != null) {
+                for (Node grandChild : grandChildren) {
+                    scan(grandChild, false, dest);
+                }
+            }
+        }
+        if (trunkNode != null || branchesNode != null || tagsNode != null) {
+            // found project with standard svn layout; no need for further recursion
             return;
         }
 

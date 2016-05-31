@@ -40,14 +40,24 @@ public class GithubRepository implements Repository {
 
     private final World world;
     private final String user;
+    private boolean branches;
+    private boolean tags;
 
     public GithubRepository(World world, String user) {
         this.world = world;
         this.user = user;
+        this.branches = false;
+        this.tags = false;
     }
 
     public void addOption(String option) {
-        throw new ArgumentException(user + ": unknown option: " + option);
+        if (option.equals("branches")) {
+            branches = true;
+        } else if (option.equals("tags")) {
+            tags = true;
+        } else {
+            throw new ArgumentException(user + ": unknown option: " + option);
+        }
     }
 
     public void addExclude(String exclude) {
@@ -69,7 +79,7 @@ public class GithubRepository implements Repository {
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
-            repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name));
+            repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags);
             repository.scan(dest);
         }
     }
