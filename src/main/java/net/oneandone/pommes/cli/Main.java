@@ -39,7 +39,7 @@ public class Main {
                 + "                        print projects matching this query;\n"
                 + "                        json prints results in json, dump without pretty-printing;\n"
                 + "                        format string supports the following place holder:\n"
-                + "                        %g gav  %p parent %s scm  %o origin  %d dependencies  %c checkouts;\n"
+                + "                        %g gav  %p parent  %s scm  %o origin  %r revision  %url  %d dependencies  %c checkouts;\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
                 + "                        the enclosed substring or variables;\n"
                 + "                        target is a file or URL to write results to, default is the console\n"

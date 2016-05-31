@@ -28,9 +28,12 @@ public class Pom {
     public final Gav coordinates;
     /** may be null */
     public final String scm;
+    /** may be null */
+    public final String url;
+
     public final List<Gav> dependencies;
 
-    public Pom(String origin, String revision, Gav parent, Gav coordinates, String scm) {
+    public Pom(String origin, String revision, Gav parent, Gav coordinates, String scm, String url) {
         if (origin == null) {
             throw new IllegalArgumentException(origin);
         }
@@ -39,6 +42,7 @@ public class Pom {
         this.parent = parent;
         this.coordinates = coordinates;
         this.scm = scm;
+        this.url = url;
         this.dependencies = new ArrayList<>();
     }
 

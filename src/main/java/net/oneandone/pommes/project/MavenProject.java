@@ -53,7 +53,7 @@ public class MavenProject extends Project {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Pom(getOrigin(), getRevision(), paGav, Gav.forArtifact(project.getArtifact()), scm(project));
+            pom = new Pom(getOrigin(), getRevision(), paGav, Gav.forArtifact(project.getArtifact()), scm(project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pom.dependencies.add(Gav.forDependency(dependency));
             }

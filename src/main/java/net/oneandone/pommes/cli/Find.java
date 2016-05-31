@@ -141,6 +141,12 @@ public class Find extends Base {
                         result.append(c);
                         values.add(Character.toString(c));
                         break;
+                    case 'o':
+                        values.add(pom.origin);
+                        break;
+                    case 'r':
+                        values.add(pom.revision);
+                        break;
                     case 'p':
                         values.add(pom.parent.toGavString());
                         break;
@@ -150,8 +156,8 @@ public class Find extends Base {
                     case 's':
                         values.add(pom.scm);
                         break;
-                    case 'o':
-                        values.add(pom.origin);
+                    case 'u':
+                        values.add(pom.url);
                         break;
                     case 'd':
                         for (Gav d : pom.dependencies) {

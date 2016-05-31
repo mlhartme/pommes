@@ -21,6 +21,8 @@ public class Schema {
     public static final String SCM = "scm";
     /** List. */
     public static final String DEP = "dep";
+    /** Optional. */
+    public static final String URL = "url";
 
     //--
 
@@ -31,7 +33,7 @@ public class Schema {
         parent = document.get(PARENT);
         result = new Pom(document.get(ORIGIN), document.get(REVISION),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(document.get(GAV)),
-                document.get(SCM));
+                document.get(SCM), document.get(URL));
         for (String dep : document.getValues(DEP)) {
             result.dependencies.add(Gav.forGav(dep));
         }
@@ -53,6 +55,9 @@ public class Schema {
         }
         if (pom.scm != null) {
             add(doc, SCM, pom.scm);
+        }
+        if (pom.url != null) {
+            add(doc, URL, pom.url);
         }
         return doc;
     }
