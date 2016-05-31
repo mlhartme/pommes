@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.source;
+package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.project.Project;

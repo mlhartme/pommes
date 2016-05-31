@@ -1,11 +1,10 @@
-package net.oneandone.pommes.source;
+package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import org.tmatesoft.svn.core.SVNException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

@@ -2,11 +2,14 @@
   <body>
     <release date="2016-02-xx" version="2.5.0">
       <action date="2016-05-31" dev="mlhartme" type="add">
-        Add support for git.
+        Add support for github repositories.
+      </action>
+      <action date="2016-05-31" dev="mlhartme" type="add">
+        Add support for git scm.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="remove">
         Dumped -svnuser and -svnpassword options. Specify credentials in the url instead.
-        (I've removed them because I don't want special handling for Subversion source authentication.)
+        (I've removed them because I don't want special handling for Subversion repository authentication.)
       </action>
       <action date="2016-05-31" dev="mlhartme" type="update">
         Improved query syntax: added :_ to search dependencies only; added ^ to search parents.
