@@ -1,16 +1,13 @@
 package net.oneandone.pommes.scm;
 
-import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
-import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class Git extends Scm {
     private static final String PROTOCOL = "git:";
@@ -45,8 +42,18 @@ public class Git extends Scm {
     }
 
     @Override
-    public boolean isCommitted(FileNode directory) throws IOException {
-        throw new IllegalStateException();
+    public boolean isCommitted(FileNode checkout) throws IOException {
+        try {
+            git(checkout, "diff", "--quiet").execNoOutput();
+        } catch (Failure e) {
+            return false;
+        }
+        try {
+            git(checkout, "diff", "--cached", "--quiet").execNoOutput();
+        } catch (Failure e) {
+            return false;
+        }
+        return true;
     }
 
     private static Launcher git(FileNode dir, String ... args) {
