@@ -24,13 +24,14 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
-import org.apache.maven.artifact.InvalidArtifactRTException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -93,6 +94,8 @@ public class DatabaseAdd extends Base {
         private int count;
         private int errors;
 
+        private final Map<String, String> existing;
+
         public Indexer(boolean dryrun, Environment environment, Database database) {
             super("Indexer");
 
@@ -107,10 +110,15 @@ public class DatabaseAdd extends Base {
 
             this.count = 0;
             this.errors = 0;
+
+            this.existing = new HashMap<>();
         }
 
         public void run() {
             try {
+                environment.console().verbose.println("scanning existing revisions");
+                database.list(existing);
+                environment.console().verbose.println("done");
                 current = iter();
                 database.index(this);
                 summary();
@@ -145,7 +153,7 @@ public class DatabaseAdd extends Base {
         private Document iter() {
             Pom pom;
             Console console;
-            Document document;
+            String existingRevision;
 
             console = environment.console();
             while (true) {
@@ -160,9 +168,14 @@ public class DatabaseAdd extends Base {
                 if (pom == null) {
                     return null;
                 }
-                document = Schema.document(pom);
+                existingRevision = existing.get(pom.origin);
+                if (pom.revision.equals(existingRevision)) {
+                    console.info.println("  " + pom.origin);
+                    continue;
+                }
+                console.info.println((existingRevision == null ? "A " : "U ") + pom.origin);
                 if (!dryrun) {
-                    return document;
+                    return Schema.document(pom);
                 }
             }
         }
@@ -177,7 +190,6 @@ public class DatabaseAdd extends Base {
                 }
                 try {
                     count++;
-                    environment.console().info.println(project);
                     return project.load(environment);
                 } catch (RuntimeException e) {
                     throw e;

@@ -44,6 +44,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Database implements AutoCloseable {
     public static Database load(World world) throws NodeInstantiationException {
@@ -166,6 +167,15 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         writer.deleteDocuments(pommesQuery(query, variables));
         writer.close();
+    }
+
+    public void list(Map<String, String> result) throws IOException {
+        Query query;
+
+        query = new WildcardQuery(new Term(Schema.ORIGIN, "*"));
+        for (Pom pom : query(query)) {
+            result.put(pom.origin, pom.revision);
+        }
     }
 
     public void index(Iterator<Document> iterator) throws IOException {
