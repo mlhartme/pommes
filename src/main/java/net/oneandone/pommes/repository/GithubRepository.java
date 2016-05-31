@@ -61,7 +61,7 @@ public class GithubRepository implements Repository {
         JsonArray repositories;
         JsonObject r;
         String name;
-        Repository source;
+        Repository repository;
 
         str = world.validNode("https://api.github.com/users/" + user + "/repos").readString();
         parser = new JsonParser();
@@ -69,8 +69,8 @@ public class GithubRepository implements Repository {
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
-            source = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name));
-            source.scan(dest);
+            repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name));
+            repository.scan(dest);
         }
     }
 }

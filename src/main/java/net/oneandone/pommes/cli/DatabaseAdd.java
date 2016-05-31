@@ -37,12 +37,12 @@ import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAdd extends Base {
     private final boolean dryrun;
-    private final List<Repository> sources;
+    private final List<Repository> repositories;
 
     public DatabaseAdd(Environment environment, boolean dryrun) {
         super(environment);
         this.dryrun = dryrun;
-        this.sources = new ArrayList<>();
+        this.repositories = new ArrayList<>();
     }
 
     public void add(String str) throws URISyntaxException, NodeInstantiationException {
@@ -51,15 +51,15 @@ public class DatabaseAdd extends Base {
         } else if (str.startsWith("%")) {
             previous(str).addOption(str.substring(1));
         } else {
-            sources.add(Repository.create(world, str));
+            repositories.add(Repository.create(world, str));
         }
     }
 
     private Repository previous(String str) {
-        if (sources.isEmpty()) {
+        if (repositories.isEmpty()) {
             throw new ArgumentException("missing url before '" + str + "'");
         }
-        return sources.get(sources.size() - 1);
+        return repositories.get(repositories.size() - 1);
     }
 
     @Override
@@ -69,8 +69,8 @@ public class DatabaseAdd extends Base {
         indexer = new Indexer(dryrun, environment, database);
         indexer.start();
         try {
-            for (Repository source : sources) {
-                source.scan(indexer.src);
+            for (Repository repository : repositories) {
+                repository.scan(indexer.src);
             }
         } finally {
             indexer.src.put(Project.END_OF_QUEUE);

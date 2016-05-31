@@ -13,26 +13,26 @@ import java.util.concurrent.BlockingQueue;
 /** A location to search for projects */
 public interface Repository {
     static Repository create(World world, String url) throws URISyntaxException, NodeInstantiationException {
-        Repository source;
+        Repository repository;
         FileNode file;
 
-        source = ArtifactoryRepository.createOpt(world, url);
-        if (source != null) {
-            return source;
+        repository = ArtifactoryRepository.createOpt(world, url);
+        if (repository != null) {
+            return repository;
         }
-        source = NodeRepository.createOpt(world, url);
-        if (source != null) {
-            return source;
+        repository = NodeRepository.createOpt(world, url);
+        if (repository != null) {
+            return repository;
         }
-        source = GithubRepository.createOpt(world, url);
-        if (source != null) {
-            return source;
+        repository = GithubRepository.createOpt(world, url);
+        if (repository != null) {
+            return repository;
         }
         file = world.file(url);
         if (file.exists()) {
             return new NodeRepository(file);
         }
-        throw new ArgumentException("unknown source type: " + url);
+        throw new ArgumentException("unknown repository type: " + url);
     }
 
     void addOption(String option);
