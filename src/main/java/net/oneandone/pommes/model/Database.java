@@ -170,11 +170,18 @@ public class Database implements AutoCloseable {
     }
 
     public void list(Map<String, String> result) throws IOException {
+        TopDocs search;
+        Document document;
         Query query;
 
+        if (searcher == null) {
+            searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
+        }
         query = new WildcardQuery(new Term(Schema.ORIGIN, "*"));
-        for (Pom pom : query(query)) {
-            result.put(pom.origin, pom.revision);
+        search = searcher.search(query, Integer.MAX_VALUE);
+        for (ScoreDoc scoreDoc : search.scoreDocs) {
+            document = searcher.getIndexReader().document(scoreDoc.doc);
+            result.put(document.get(Schema.ORIGIN), document.get(Schema.REVISION));
         }
     }
 
@@ -328,7 +335,7 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        search = searcher.search(query, 100000);
+        search = searcher.search(query, Integer.MAX_VALUE);
         list = new ArrayList<>();
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             list.add(searcher.getIndexReader().document(scoreDoc.doc));
