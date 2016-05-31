@@ -176,11 +176,11 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(Schema.Field.ORIGIN.term("*"));
+        query = new WildcardQuery(Field.ORIGIN.term("*"));
         search = searcher.search(query, Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
-            result.put(Schema.Field.ORIGIN.get(document), Schema.Field.REVISION.get(document));
+            result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));
         }
     }
 
@@ -196,7 +196,7 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(Schema.Field.ORIGIN.term(Schema.Field.ORIGIN.get(doc)), doc);
+            writer.updateDocument(Field.ORIGIN.term(Field.ORIGIN.get(doc)), doc);
         }
         writer.close();
     }
@@ -219,7 +219,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Schema.Field.GAV.dbname());
+            return new StandardQueryParser().parse(queryString.substring(1), Field.GAV.dbname());
         } else {
             query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
@@ -232,31 +232,31 @@ public class Database implements AutoCloseable {
                     case ':':
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
                             string = variables(termString.substring(2), variables);
-                            term = or(Schema.Field.PARENT.substring(string), Schema.Field.DEP.substring(string));
+                            term = or(Field.PARENT.substring(string), Field.DEP.substring(string));
                         } else if (termString.length() > 1 && termString.charAt(1) == '_') {
                             string = variables(termString.substring(2), variables);
-                            term = Schema.Field.DEP.substring(string);
+                            term = Field.DEP.substring(string);
                         } else {
                             string = variables(termString.substring(1), variables);
-                            term = Schema.Field.GAV.substring(string);
+                            term = Field.GAV.substring(string);
                         }
                         break;
                     case '^':
                         string = variables(termString.substring(1), variables);
-                        term = Schema.Field.PARENT.substring(string);
+                        term = Field.PARENT.substring(string);
                         break;
                     case '@':
                         string = variables(termString.substring(1), variables);
-                        term = Schema.Field.SCM.substring(string);
+                        term = Field.SCM.substring(string);
                         break;
                     case '§':
                         string = variables(termString.substring(1), variables);
-                        term = Schema.Field.ORIGIN.substring(string);
+                        term = Field.ORIGIN.substring(string);
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(Schema.Field.GAV.substring(string), Schema.Field.SCM.substring(string),
-                                Schema.Field.PARENT.substring(string));
+                        term = or(Field.GAV.substring(string), Field.SCM.substring(string),
+                                Field.PARENT.substring(string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
@@ -319,7 +319,7 @@ public class Database implements AutoCloseable {
 
         result = new ArrayList<>();
         for (Document document : doQuery(query)) {
-            result.add(Schema.Field.toPom(document));
+            result.add(Field.toPom(document));
         }
         return result;
     }

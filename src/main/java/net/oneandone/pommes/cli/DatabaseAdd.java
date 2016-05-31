@@ -18,8 +18,8 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.model.Schema;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -177,7 +177,7 @@ public class DatabaseAdd extends Base {
                 }
                 console.info.println((existingRevision == null ? "A " : "U ") + pom.origin);
                 if (!dryrun) {
-                    return Schema.Field.document(pom);
+                    return Field.document(pom);
                 }
             }
         }
