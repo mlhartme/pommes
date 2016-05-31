@@ -53,6 +53,13 @@ public class Git extends Scm {
         } catch (Failure e) {
             return false;
         }
+
+        //  TODO: check all branches
+        try {
+            git(checkout, "diff", "origin/master..HEAD", "--quiet").execNoOutput();
+        } catch (Failure e) {
+            return false;
+        }
         return true;
     }
 
