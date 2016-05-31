@@ -27,13 +27,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class NodeSource implements Source {
+public class NodeRepository implements Repository {
     public static final String FILE = "file:";
     public static final String SVN = "svn:";
 
-    public static NodeSource createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
+    public static NodeRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeSource(world.node(url));
+            return new NodeRepository(world.node(url));
         } else {
             return null;
         }
@@ -45,7 +45,7 @@ public class NodeSource implements Source {
     private boolean withBranches;
     private final Filter exclude;
 
-    public NodeSource(Node node) {
+    public NodeRepository(Node node) {
         this.node = node;
         this.exclude = new Filter();
         this.withBranches = true;

@@ -31,12 +31,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 
-public class ArtifactorySource implements Source {
+public class ArtifactoryRepository implements Repository {
     private static final String PROTOCOL = "artifactory:";
 
-    public static ArtifactorySource createOpt(World world, String url) {
+    public static ArtifactoryRepository createOpt(World world, String url) {
         if (url.startsWith(PROTOCOL)) {
-            return new ArtifactorySource(world, url.substring(PROTOCOL.length()));
+            return new ArtifactoryRepository(world, url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
@@ -46,7 +46,7 @@ public class ArtifactorySource implements Source {
     private final World world;
     private String contextPath;
 
-    public ArtifactorySource(World world, String url) {
+    public ArtifactoryRepository(World world, String url) {
         this.world = world;
         this.url = url;
         this.contextPath = "/artifactory/";

@@ -21,7 +21,7 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Schema;
 import net.oneandone.pommes.project.Project;
-import net.oneandone.pommes.repository.Source;
+import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -37,7 +37,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAdd extends Base {
     private final boolean dryrun;
-    private final List<Source> sources;
+    private final List<Repository> sources;
 
     public DatabaseAdd(Environment environment, boolean dryrun) {
         super(environment);
@@ -51,11 +51,11 @@ public class DatabaseAdd extends Base {
         } else if (str.startsWith("%")) {
             previous(str).addOption(str.substring(1));
         } else {
-            sources.add(Source.create(world, str));
+            sources.add(Repository.create(world, str));
         }
     }
 
-    private Source previous(String str) {
+    private Repository previous(String str) {
         if (sources.isEmpty()) {
             throw new ArgumentException("missing url before '" + str + "'");
         }
@@ -69,7 +69,7 @@ public class DatabaseAdd extends Base {
         indexer = new Indexer(dryrun, environment, database);
         indexer.start();
         try {
-            for (Source source : sources) {
+            for (Repository source : sources) {
                 source.scan(indexer.src);
             }
         } finally {

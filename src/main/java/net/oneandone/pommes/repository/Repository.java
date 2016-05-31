@@ -11,26 +11,26 @@ import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
 /** A location to search for projects */
-public interface Source {
-    static Source create(World world, String url) throws URISyntaxException, NodeInstantiationException {
-        Source source;
+public interface Repository {
+    static Repository create(World world, String url) throws URISyntaxException, NodeInstantiationException {
+        Repository source;
         FileNode file;
 
-        source = ArtifactorySource.createOpt(world, url);
+        source = ArtifactoryRepository.createOpt(world, url);
         if (source != null) {
             return source;
         }
-        source = NodeSource.createOpt(world, url);
+        source = NodeRepository.createOpt(world, url);
         if (source != null) {
             return source;
         }
-        source = GithubSource.createOpt(world, url);
+        source = GithubRepository.createOpt(world, url);
         if (source != null) {
             return source;
         }
         file = world.file(url);
         if (file.exists()) {
-            return new NodeSource(file);
+            return new NodeRepository(file);
         }
         throw new ArgumentException("unknown source type: " + url);
     }

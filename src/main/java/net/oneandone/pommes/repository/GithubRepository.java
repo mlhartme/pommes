@@ -27,12 +27,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
-public class GithubSource implements Source {
+public class GithubRepository implements Repository {
     private static final String PROTOCOL = "github:";
 
-    public static GithubSource createOpt(World world, String url) {
+    public static GithubRepository createOpt(World world, String url) {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubSource(world, url.substring(PROTOCOL.length()));
+            return new GithubRepository(world, url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
@@ -41,7 +41,7 @@ public class GithubSource implements Source {
     private final World world;
     private final String user;
 
-    public GithubSource(World world, String user) {
+    public GithubRepository(World world, String user) {
         this.world = world;
         this.user = user;
     }
@@ -61,7 +61,7 @@ public class GithubSource implements Source {
         JsonArray repositories;
         JsonObject r;
         String name;
-        Source source;
+        Repository source;
 
         str = world.validNode("https://api.github.com/users/" + user + "/repos").readString();
         parser = new JsonParser();
@@ -69,7 +69,7 @@ public class GithubSource implements Source {
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
-            source = new NodeSource(world.validNode("svn:https://github.com/" + user + "/" + name));
+            source = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name));
             source.scan(dest);
         }
     }
