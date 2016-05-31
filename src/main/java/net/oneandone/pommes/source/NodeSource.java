@@ -21,8 +21,6 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.filter.Filter;
-import net.oneandone.sushi.fs.svn.SvnNode;
-import org.tmatesoft.svn.core.SVNException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -69,11 +67,11 @@ public class NodeSource implements Source {
     }
 
     @Override
-    public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException, SVNException {
+    public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException {
         scan(node, true, dest);
     }
 
-    public void scan(Node root, boolean recurse, BlockingQueue<Project> dest) throws IOException, InterruptedException, SVNException {
+    public void scan(Node root, boolean recurse, BlockingQueue<Project> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
         Project project;
         Node trunk;

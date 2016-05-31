@@ -25,6 +25,10 @@ public interface Source {
         if (source != null) {
             return source;
         }
+        source = GithubSource.createOpt(world, url);
+        if (source != null) {
+            return source;
+        }
         file = world.file(url);
         if (file.exists()) {
             return new NodeSource(file);
@@ -34,5 +38,5 @@ public interface Source {
 
     void addOption(String option);
     void addExclude(String exclude);
-    void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException, URISyntaxException, SVNException;
+    void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException, URISyntaxException;
 }
