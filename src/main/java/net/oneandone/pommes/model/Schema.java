@@ -2,6 +2,9 @@ package net.oneandone.pommes.model;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.WildcardQuery;
 
 /** Defines database fields and pom/document conversion */
 public class Schema {
@@ -30,7 +33,7 @@ public class Schema {
         /** Optional. */
         URL;
 
-        public String dbname = name().toLowerCase();
+        private String dbname = name().toLowerCase();
 
         public void add(Document document, String value) {
             document.add(new StringField(dbname, value, org.apache.lucene.document.Field.Store.YES));
@@ -48,6 +51,19 @@ public class Schema {
         public String[] getList(Document document) {
             return document.getValues(dbname);
         }
+
+        public Query substring(String substring) {
+            return new WildcardQuery(new Term(dbname, "*" + substring + "*"));
+        }
+
+        public String dbname() {
+            return dbname;
+        }
+
+        public Term term(String str) {
+            return new Term(dbname, str);
+        }
+
     }
 
     //--

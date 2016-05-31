@@ -26,7 +26,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.BooleanClause;
@@ -177,7 +176,7 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(new Term(Schema.Field.ORIGIN.dbname, "*"));
+        query = new WildcardQuery(Schema.Field.ORIGIN.term("*"));
         search = searcher.search(query, Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
@@ -197,7 +196,7 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(new Term(Schema.Field.ORIGIN.dbname, Schema.Field.ORIGIN.get(doc)), doc);
+            writer.updateDocument(Schema.Field.ORIGIN.term(Schema.Field.ORIGIN.get(doc)), doc);
         }
         writer.close();
     }
@@ -220,7 +219,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Schema.Field.GAV.dbname);
+            return new StandardQueryParser().parse(queryString.substring(1), Schema.Field.GAV.dbname());
         } else {
             query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
@@ -233,31 +232,31 @@ public class Database implements AutoCloseable {
                     case ':':
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
                             string = variables(termString.substring(2), variables);
-                            term = or(substring(Schema.Field.PARENT.dbname, string), substring(Schema.Field.DEP.dbname, string));
+                            term = or(Schema.Field.PARENT.substring(string), Schema.Field.DEP.substring(string));
                         } else if (termString.length() > 1 && termString.charAt(1) == '_') {
                             string = variables(termString.substring(2), variables);
-                            term = substring(Schema.Field.DEP.dbname, string);
+                            term = Schema.Field.DEP.substring(string);
                         } else {
                             string = variables(termString.substring(1), variables);
-                            term = substring(Schema.Field.GAV.dbname, string);
+                            term = Schema.Field.GAV.substring(string);
                         }
                         break;
                     case '^':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Schema.Field.PARENT.dbname, string);
+                        term = Schema.Field.PARENT.substring(string);
                         break;
                     case '@':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Schema.Field.SCM.dbname, string);
+                        term = Schema.Field.SCM.substring(string);
                         break;
                     case '§':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Schema.Field.ORIGIN.dbname, string);
+                        term = Schema.Field.ORIGIN.substring(string);
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(substring(Schema.Field.GAV.dbname, string), substring(Schema.Field.SCM.dbname, string),
-                                substring(Schema.Field.PARENT.dbname, string));
+                        term = or(Schema.Field.GAV.substring(string), Schema.Field.SCM.substring(string),
+                                Schema.Field.PARENT.substring(string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
@@ -313,10 +312,6 @@ public class Database implements AutoCloseable {
             result.add(right, BooleanClause.Occur.SHOULD);
         }
         return result.build();
-    }
-
-    private static Query substring(String field, String substring) {
-        return new WildcardQuery(new Term(field, "*" + substring + "*"));
     }
 
     public List<Pom> query(Query query) throws IOException {
