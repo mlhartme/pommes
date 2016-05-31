@@ -72,24 +72,9 @@ public class Database implements AutoCloseable {
         }
     }
 
-    //-- field names
-
-    /**
-     * The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch.
-     * SCM tags cannot be use instead because they are not always specified and you often forget to adjust them when creating
-     * branches. And they only point to the directory containing the pom.
-     */
-    public static final String ORIGIN = "origin";
-    public static final String REVISION = "revision";
-
-    public static final String GAV = "gav";
-    public static final String SCM = "scm";
-    public static final String DEP = "dep";
-    public static final String PARENT = "parent";
-
     //--
 
-    /** lucene index directory */
+    /** Lucene index directory */
     private final FileNode directory;
 
     /** zipped lucene index directory; null to disable global database. */
@@ -197,7 +182,7 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(new Term(ORIGIN, doc.get(ORIGIN)), doc);
+            writer.updateDocument(new Term(Schema.ORIGIN, doc.get(Schema.ORIGIN)), doc);
         }
         writer.close();
     }
@@ -220,7 +205,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Database.GAV);
+            return new StandardQueryParser().parse(queryString.substring(1), Schema.GAV);
         } else {
             query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
@@ -233,23 +218,23 @@ public class Database implements AutoCloseable {
                     case ':':
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
                             string = variables(termString.substring(2), variables);
-                            term = or(substring(Database.PARENT, string), substring(Database.DEP, string));
+                            term = or(substring(Schema.PARENT, string), substring(Schema.DEP, string));
                         } else {
                             string = variables(termString.substring(1), variables);
-                            term = substring(Database.GAV, string);
+                            term = substring(Schema.GAV, string);
                         }
                         break;
                     case '@':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Database.SCM, string);
+                        term = substring(Schema.SCM, string);
                         break;
                     case '§':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Database.ORIGIN, string);
+                        term = substring(Schema.ORIGIN, string);
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(substring(Database.GAV, string), substring(Database.ORIGIN, string));
+                        term = or(substring(Schema.GAV, string), substring(Schema.ORIGIN, string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
@@ -314,7 +299,7 @@ public class Database implements AutoCloseable {
 
         result = new ArrayList<>();
         for (Document document : doQuery(query)) {
-            result.add(toPom(document));
+            result.add(Schema.toPom(document));
         }
         return result;
     }
@@ -332,38 +317,5 @@ public class Database implements AutoCloseable {
             list.add(searcher.getIndexReader().document(scoreDoc.doc));
         }
         return list;
-    }
-
-    //--
-
-    public static Pom toPom(Document document) {
-        Pom result;
-        String parent;
-
-        parent = document.get(Database.PARENT);
-        result = new Pom(document.get(Database.ORIGIN), document.get(Database.REVISION),
-                parent == null ? null : Gav.forGav(parent), Gav.forGav(document.get(Database.GAV)),
-                document.get(Database.SCM));
-        for (String dep : document.getValues(Database.DEP)) {
-            result.dependencies.add(Gav.forGav(dep));
-        }
-        return result;
-    }
-
-    public static Document document(Pom pom) {
-        Document doc;
-
-        doc = new Document();
-        doc.add(new StringField(ORIGIN, pom.origin, Field.Store.YES));
-        doc.add(new StringField(REVISION, pom.revision, Field.Store.YES));
-        if (pom.parent != null) {
-            doc.add(new StringField(PARENT, pom.parent.toGavString(), Field.Store.YES));
-        }
-        doc.add(new StringField(GAV, pom.coordinates.toGavString(), Field.Store.YES));
-        for (Gav dep : pom.dependencies) {
-            doc.add(new StringField(DEP, dep.toGavString(), Field.Store.YES));
-        }
-        doc.add(new StringField(SCM, pom.scm, Field.Store.YES));
-        return doc;
     }
 }

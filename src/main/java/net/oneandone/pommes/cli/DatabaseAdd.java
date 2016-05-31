@@ -19,6 +19,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.model.Schema;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.source.Source;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -73,8 +74,8 @@ public class DatabaseAdd extends Base {
             }
         } finally {
             indexer.src.put(Project.END_OF_QUEUE);
+            indexer.join();
         }
-        indexer.join();
         if (indexer.exception != null) {
             throw indexer.exception;
         }
@@ -102,7 +103,7 @@ public class DatabaseAdd extends Base {
             this.database = database;
             this.exception = null;
 
-            // CAUTION: current is not defined until this thread is started!
+            // CAUTION: current is not defined until this thread is started (because it would block this constructor)!
 
             this.count = 0;
             this.errors = 0;
@@ -116,7 +117,7 @@ public class DatabaseAdd extends Base {
             } catch (Exception e) {
                 exception = e;
                 try {
-                    // consume remaining to avoid dead-lock
+                    // consume remaining to avoid blocking scans
                     while (iter() != null);
                 } catch (Exception e2) {
                     e.addSuppressed(e2);
@@ -153,7 +154,7 @@ public class DatabaseAdd extends Base {
                     if (pom == null) {
                         return null;
                     }
-                    document = Database.document(pom);
+                    document = Schema.document(pom);
                     if (!dryrun) {
                         return document;
                     }
