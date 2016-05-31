@@ -151,21 +151,18 @@ public class DatabaseAdd extends Base {
             while (true) {
                 try {
                     pom = iterPom();
-                    if (pom == null) {
-                        return null;
-                    }
-                    document = Schema.document(pom);
-                    if (!dryrun) {
-                        return document;
-                    }
-                } catch (InterruptedException | InvalidArtifactRTException | IOException e) {
-                    if (e.getCause() == null) {
-                        console.verbose.println("(unknown cause)");
-                    } else {
-                        e.getCause().printStackTrace(console.verbose);
-                    }
+                } catch (IOException | InterruptedException e) {
+                    console.error.println(e.getMessage());
+                    e.printStackTrace(console.verbose);
                     errors++;
-                    // fall-through
+                    continue;
+                }
+                if (pom == null) {
+                    return null;
+                }
+                document = Schema.document(pom);
+                if (!dryrun) {
+                    return document;
                 }
             }
         }
