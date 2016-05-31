@@ -98,7 +98,7 @@ public enum Field {
         return doc;
     }
 
-    public static Pom toPom(Document document) {
+    public static Pom pom(Document document) {
         Pom result;
         String parent;
 

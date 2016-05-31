@@ -319,7 +319,7 @@ public class Database implements AutoCloseable {
 
         result = new ArrayList<>();
         for (Document document : doQuery(query)) {
-            result.add(Field.toPom(document));
+            result.add(Field.pom(document));
         }
         return result;
     }
