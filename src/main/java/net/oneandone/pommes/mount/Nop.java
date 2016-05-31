@@ -16,7 +16,6 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public class Nop extends Action {

@@ -1,8 +1,6 @@
 package net.oneandone.pommes.scm;
 
-import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.ExistsException;
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
