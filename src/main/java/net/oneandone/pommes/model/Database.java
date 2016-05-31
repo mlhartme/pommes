@@ -205,7 +205,7 @@ public class Database implements AutoCloseable {
 
     private static final Separator PLUS = Separator.on('+');
 
-    public List<Pom> query(String queryString, Variables variables) throws IOException, QueryNodeException {
+    public List<Document> query(String queryString, Variables variables) throws IOException, QueryNodeException {
         return query(pommesQuery(queryString, variables));
     }
 
@@ -314,17 +314,7 @@ public class Database implements AutoCloseable {
         return result.build();
     }
 
-    public List<Pom> query(Query query) throws IOException {
-        List<Pom> result;
-
-        result = new ArrayList<>();
-        for (Document document : doQuery(query)) {
-            result.add(Field.pom(document));
-        }
-        return result;
-    }
-
-    private List<Document> doQuery(Query query) throws IOException {
+    public List<Document> query(Query query) throws IOException {
         TopDocs search;
         List<Document> list;
 

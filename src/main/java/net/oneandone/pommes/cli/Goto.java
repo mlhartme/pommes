@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
@@ -51,7 +52,7 @@ public class Goto extends Base {
 
         fstab = Fstab.load(world);
         actions = new ArrayList<>();
-        for (Pom pom : database.query(query, environment)) {
+        for (Pom pom : Field.poms(database.query(query, environment))) {
             directories = fstab.directories(pom);
             if (directories.isEmpty()) {
                 console.info.println("ignored (no mount points): " + pom);

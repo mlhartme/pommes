@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
@@ -43,7 +44,7 @@ public class Mount extends Base {
 
         adds = new ArrayList<>();
         problems = 0;
-        for (Pom pom : database.query(query, environment)) {
+        for (Pom pom : Field.poms(database.query(query, environment))) {
             directories = environment.fstab().directories(pom);
             if (directories.isEmpty()) {
                 console.error.println("no mount point for " + pom);

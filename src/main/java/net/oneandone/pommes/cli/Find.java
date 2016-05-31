@@ -19,12 +19,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Gav;
+import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import org.apache.lucene.document.Document;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -80,26 +81,26 @@ public class Find extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        List<Pom> matches;
+        List<Document> documents;
 
-        matches = database.query(query, environment);
-        console.verbose.println("Matching documents: " + matches.size());
+        documents = database.query(query, environment);
+        console.verbose.println("Matching documents: " + documents.size());
         try (Writer dest = target.newWriter()) {
             if (json || dump) {
-                json(matches, dest);
+                json(Field.poms(documents), dest);
             } else {
-                text(matches, dest);
+                text(documents, dest);
             }
         }
     }
 
-    private void text(List<Pom> matches, Writer dest) throws IOException {
+    private void text(List<Document> documents, Writer dest) throws IOException {
         List<String> done;
         String line;
 
         done = new ArrayList<>();
-        for (Pom pom : matches) {
-            line = format(pom);
+        for (Document document : documents) {
+            line = format(document);
             if (!done.contains(line)) {
                 done.add(line);
                 dest.write(line);
@@ -120,7 +121,7 @@ public class Find extends Base {
         gson.toJson(matches, dest);
     }
 
-    private String format(Pom pom) throws IOException {
+    private String format(Document document) throws IOException {
         char c;
         StringBuilder result;
         int end;
@@ -141,38 +142,15 @@ public class Find extends Base {
                         result.append(c);
                         values.add(Character.toString(c));
                         break;
-                    case 'o':
-                        values.add(pom.origin);
-                        break;
-                    case 'r':
-                        values.add(pom.revision);
-                        break;
-                    case 'p':
-                        values.add(pom.parent.toGavString());
-                        break;
-                    case 'g':
-                        values.add(pom.coordinates.toGavString());
-                        break;
-                    case 's':
-                        values.add(pom.scm);
-                        break;
-                    case 'u':
-                        values.add(pom.url);
-                        break;
-                    case 'd':
-                        for (Gav d : pom.dependencies) {
-                            values.add(d.toGavString());
-                        }
-                        break;
                     case 'c':
-                        for (FileNode directory : environment.fstab().directories(pom)) {
+                        for (FileNode directory : environment.fstab().directories(Field.pom(document))) {
                             if (directory.exists()) {
                                 values.add(directory.getAbsolute());
                             }
                         }
                         break;
                     default:
-                        throw new IllegalStateException("invalid format character: " + c);
+                        Field.forLetter(c).copy(document, values);
                 }
                 if (i + 1 < max && format.charAt(i + 1) == '[') {
                     end = format.indexOf(']', i + 2);
