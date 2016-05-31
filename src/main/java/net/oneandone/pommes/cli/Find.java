@@ -73,6 +73,9 @@ public class Find extends Base {
                         result.append(c);
                         values.add(Character.toString(c));
                         break;
+                    case 'p':
+                        values.add(pom.parent.toGavString());
+                        break;
                     case 'g':
                         values.add(pom.coordinates.toGavString());
                         break;

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
     <release date="2016-02-xx" version="2.5.0">
+      <action date="2016-05-31" dev="mlhartme" type="update">
+        Improved query syntax: added :_ to search dependencies only; added ^ to search parents.
+      </action>
       <action date="2016-05-30" dev="mlhartme" type="update">
-        find: merge suplicate lines.
+        find: merge duplicate lines.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
         Added goto choice parameter.

@@ -219,10 +219,17 @@ public class Database implements AutoCloseable {
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
                             string = variables(termString.substring(2), variables);
                             term = or(substring(Schema.PARENT, string), substring(Schema.DEP, string));
+                        } else if (termString.length() > 1 && termString.charAt(1) == '_') {
+                            string = variables(termString.substring(2), variables);
+                            term = substring(Schema.DEP, string);
                         } else {
                             string = variables(termString.substring(1), variables);
                             term = substring(Schema.GAV, string);
                         }
+                        break;
+                    case '^':
+                        string = variables(termString.substring(1), variables);
+                        term = substring(Schema.PARENT, string);
                         break;
                     case '@':
                         string = variables(termString.substring(1), variables);
@@ -234,7 +241,7 @@ public class Database implements AutoCloseable {
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(substring(Schema.GAV, string), substring(Schema.ORIGIN, string));
+                        term = or(substring(Schema.GAV, string), substring(Schema.SCM, string), substring(Schema.PARENT, string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
@@ -281,12 +288,14 @@ public class Database implements AutoCloseable {
         }
     }
 
-    private static Query or(Query left, Query right) {
+    private static Query or(Query left, Query ... rights) {
         BooleanQuery.Builder result;
 
         result = new BooleanQuery.Builder();
         result.add(left, BooleanClause.Occur.SHOULD);
-        result.add(right, BooleanClause.Occur.SHOULD);
+        for (Query right : rights) {
+            result.add(right, BooleanClause.Occur.SHOULD);
+        }
         return result.build();
     }
 
