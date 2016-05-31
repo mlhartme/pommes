@@ -28,16 +28,12 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.fs.svn.SvnFilesystem;
 
 import java.io.IOException;
 
 public class Environment implements Variables {
     private final Console console;
     private final World world;
-
-    private String svnuser;
-    private String svnpassword;
 
     private boolean download;
     private boolean noDownload;
@@ -47,15 +43,12 @@ public class Environment implements Variables {
     private Pom lazyCurrentPom;
     private Fstab lazyFstab;
 
-    public Environment(Console console, World world, String svnuser, String svnpassword,
-                       boolean download, boolean noDownload, boolean upload) throws IOException {
+    public Environment(Console console, World world, boolean download, boolean noDownload, boolean upload) throws IOException {
         if (download && noDownload) {
             throw new ArgumentException("incompatible load options");
         }
         this.console = console;
         this.world = world;
-        this.svnuser = svnuser;
-        this.svnpassword = svnpassword;
         this.download = download;
         this.noDownload = noDownload;
         this.upload = upload;
@@ -87,11 +80,6 @@ public class Environment implements Variables {
     }
 
     public Console console() {
-        if (svnuser != null && svnpassword != null) {
-            SvnFilesystem filesystem = (SvnFilesystem) world.getFilesystem("svn");
-            filesystem.setDefaultCredentials(svnuser, svnpassword);
-            console.verbose.println("Using credentials from cli.");
-        }
         return console;
     }
 

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Scm {
-    private static final Subversion[] SCMS = {
-        new Subversion()
+    private static final Scm[] SCMS = {
+        new Subversion(), new Git()
     };
 
     public static void scanCheckouts(FileNode directory, Map<FileNode, Scm> result) throws IOException {

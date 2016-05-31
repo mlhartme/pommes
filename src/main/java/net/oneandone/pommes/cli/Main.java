@@ -118,7 +118,7 @@ public class Main {
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
-        cli.begin(Environment.class, "-svnuser -svnpassword -download -no-download -upload");
+        cli.begin(Environment.class, "-download -no-download -upload");
           cli.add(Mount.class, "mount query");
           cli.add(Umount.class, "umount -stale root?=.");
 

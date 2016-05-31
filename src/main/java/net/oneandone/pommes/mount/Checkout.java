@@ -40,6 +40,9 @@ public class Checkout extends Action {
             }
         } else {
             scm = Scm.probeUrl(pom.scm);
+            if (scm == null) {
+                throw new IOException("unknown scm: " + pom.scm);
+            }
             return new Checkout(scm, directory, pom.scm);
         }
     }
@@ -57,11 +60,7 @@ public class Checkout extends Action {
 
         directory.getParent().mkdirsOpt();
         launcher = scm.checkout(directory, url);
-        if (console.getVerbose()) {
-            console.verbose.println(launcher.toString());
-        } else {
-            console.info.println("svn co " + url + " " + directory.getAbsolute());
-        }
+        console.verbose.println(launcher.toString());
         if (console.getVerbose()) {
             launcher.exec(console.verbose);
         } else {

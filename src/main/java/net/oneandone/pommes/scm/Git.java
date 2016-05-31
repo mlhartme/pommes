@@ -28,20 +28,12 @@ public class Git extends Scm {
 
     @Override
     public String getUrl(FileNode checkout) throws Failure {
-        throw new UnsupportedOperationException(checkout.toString());
-        /*
-        String url;
-        int idx;
-
-        url = checkout.launcher("svn", "info").exec();
-        idx = url.indexOf("URL: ") + 5;
-        return withSlash(url.substring(idx, url.indexOf("\n", idx)));*/
+        return git(checkout, "config", "--get", "remote.origin.url").exec().trim();
     }
 
     @Override
     public Launcher checkout(FileNode directory, String fullurl) throws Failure {
         String url;
-        Launcher git;
 
         url = Strings.removeLeft(fullurl, PROTOCOL);
         return git(directory.getParent(), "clone", url, directory.getName());
