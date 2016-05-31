@@ -64,41 +64,38 @@ public class Schema {
             return new Term(dbname, str);
         }
 
-    }
+        //--
 
-    //--
+        public static Document document(Pom pom) {
+            Document doc;
 
-    public static Pom toPom(Document document) {
-        Pom result;
-        String parent;
-
-        parent = Field.PARENT.get(document);
-        result = new Pom(Field.ORIGIN.get(document), Field.REVISION.get(document),
-                parent == null ? null : Gav.forGav(parent), Gav.forGav(Field.GAV.get(document)),
-                Field.SCM.get(document), Field.URL.get(document));
-        for (String dep : Field.DEP.getList(document)) {
-            result.dependencies.add(Gav.forGav(dep));
+            doc = new Document();
+            ORIGIN.add(doc, pom.origin);
+            REVISION.add(doc, pom.revision);
+            if (pom.parent != null) {
+                PARENT.add(doc, pom.parent.toGavString());
+            }
+            GAV.add(doc, pom.coordinates.toGavString());
+            for (Gav dep : pom.dependencies) {
+                DEP.add(doc, dep.toGavString());
+            }
+            SCM.addOpt(doc, pom.scm);
+            URL.addOpt(doc, pom.url);
+            return doc;
         }
-        return result;
-    }
 
-    public static Document document(Pom pom) {
-        Document doc;
+        public static Pom toPom(Document document) {
+            Pom result;
+            String parent;
 
-        doc = new Document();
-        Field.ORIGIN.add(doc, pom.origin);
-        Field.REVISION.add(doc, pom.revision);
-        if (pom.parent != null) {
-            Field.PARENT.add(doc, pom.parent.toGavString());
+            parent = PARENT.get(document);
+            result = new Pom(ORIGIN.get(document), REVISION.get(document),
+                    parent == null ? null : Gav.forGav(parent), Gav.forGav(GAV.get(document)),
+                    SCM.get(document), URL.get(document));
+            for (String dep : DEP.getList(document)) {
+                result.dependencies.add(Gav.forGav(dep));
+            }
+            return result;
         }
-        Field.GAV.add(doc, pom.coordinates.toGavString());
-        for (Gav dep : pom.dependencies) {
-            Field.DEP.add(doc, dep.toGavString());
-        }
-        Field.SCM.addOpt(doc, pom.scm);
-        Field.URL.addOpt(doc, pom.url);
-        return doc;
     }
-
-
 }

@@ -177,7 +177,7 @@ public class DatabaseAdd extends Base {
                 }
                 console.info.println((existingRevision == null ? "A " : "U ") + pom.origin);
                 if (!dryrun) {
-                    return Schema.document(pom);
+                    return Schema.Field.document(pom);
                 }
             }
         }
