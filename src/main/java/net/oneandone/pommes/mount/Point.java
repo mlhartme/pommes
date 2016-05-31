@@ -119,7 +119,11 @@ public class Point {
         String scm;
         int idx;
         String branchName;
+        String projectName;
 
+        if (base.endsWith("/")) {
+            throw new IllegalArgumentException(base);
+        }
         scm = pom.scm;
         if (scm == null) {
             return base;
@@ -129,7 +133,12 @@ public class Point {
             return base;
         }
         branchName = Strings.removeRightOpt(scm.substring(idx + BRANCHES.length()), "/");
-        return base + "-" + branchName;
+        projectName = base.substring(base.lastIndexOf('/') + 1); // ok if not found
+        if (common(projectName, branchName) > 2) {
+            return base.substring(0, base.length() - projectName.length()) + branchName;
+        } else {
+            return base + "-" + branchName;
+        }
     }
 
     private static int common(String left, String right) {

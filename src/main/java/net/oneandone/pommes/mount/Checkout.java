@@ -60,7 +60,7 @@ public class Checkout extends Action {
 
         directory.getParent().mkdirsOpt();
         launcher = scm.checkout(directory, url);
-        console.verbose.println(launcher.toString());
+        console.info.println(launcher.toString());
         if (console.getVerbose()) {
             launcher.exec(console.verbose);
         } else {
