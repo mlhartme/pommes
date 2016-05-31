@@ -16,10 +16,12 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Cli;
+import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -33,12 +35,14 @@ public class Main {
                 + "  'pommes' ['-v'|'-e'] command sync-options args*\n"
                 + "\n"
                 + "search commands\n"
-                + "  'find' ('-format' str)? query\n"
+                + "  'find' ('-json' | -dump' | '-format' str)? query target?\n"
                 + "                        print projects matching this query;\n"
+                + "                        json prints results in json, dump without pretty-printing;\n"
                 + "                        format string supports the following place holder:\n"
                 + "                        %g gav  %p parent %s scm  %o origin  %d dependencies  %c checkouts;\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
-                + "                        the enclosed substring or variables\n"
+                + "                        the enclosed substring or variables;\n"
+                + "                        target is a file or URL to write results to, default is the console\n"
                 + "  'users'\n"
                 + "                        print projects that have a dependency to the current project;\n"
                 + "                        same as 'pommes find -format \"%g @ %s -> %d[%ga]\" :-=ga=+@trunk\n"
@@ -65,8 +69,6 @@ public class Main {
                 + "                        url is a svn url, artifactory url, an option (prefixed with '%') or an exclude (prefixed with '-')"
                 + "  'database-remove' query\n"
                 + "                        remove all matching documents\n"
-                + "  'database-dump' '-pp'? query? target?\n"
-                + "                        writes a filtered list of matching (default: all) documents in json-format to the target (or console)\n"
                 + "\n"
                 + "other commands\n"
                 + "  'fstab-add' url directory\n"
@@ -128,17 +130,16 @@ public class Main {
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
-          cli.add(DatabaseDump.class, "database-dump -pp query? target?");
 
-          cli.add(Find.class, "find -format=%g§20@§20%s§20%c query");
+          cli.add(Find.class, "find -json -dump -format=null query target?");
           cli.add(FindUsers.class, "users -format=%g§20@§20%o§20->§20%d[%ga]");
 
         System.exit(cli.run(args));
     }
 
     public static class FindUsers extends Find {
-        public FindUsers(Environment environment, String format) {
-            super(environment, format, ":-=ga=+@trunk");
+        public FindUsers(Environment environment, String format) throws URISyntaxException, NodeInstantiationException {
+            super(environment, false, false, format, ":-=ga=+@trunk", "");
         }
     }
 }

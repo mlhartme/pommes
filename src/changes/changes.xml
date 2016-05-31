@@ -18,9 +18,8 @@
         Renamed =svn= variable to =scm=.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
-        database-export: renamed to database-dump; added -pp option for pretty-printing;
-        replaced scmPrefix argument by optional query;
-        target argument is optional now.
+        Merged database-export into find. Find now has an optional target argument (which also accepts files now) and -json and -dump options
+        to print pretty-printed or raw json.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
         database-remove with arbitrary queries.

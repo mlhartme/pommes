@@ -15,41 +15,109 @@
  */
 package net.oneandone.pommes.cli;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
+import java.io.Writer;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Find extends Base {
+    private final boolean json;
+    private final boolean dump;
     private final String format;
     private final String query;
+    private final Node target;
 
-    public Find(Environment environment, String format, String query) {
+    public Find(Environment environment, boolean json, boolean dump, String format, String query, String target)
+            throws URISyntaxException, NodeInstantiationException {
         super(environment);
-        this.format = format;
+
+        if (count(json, dump, format != null) > 1) {
+            throw new ArgumentException("ambiguous output options; you cannot mix -json, -dump and -format options");
+        }
+
+        this.json = json;
+        this.dump = dump;
+        this.format = format == null ? "%g @ %s %c" : format;
         this.query = query;
+        this.target = target.isEmpty() ? world.node("console:///") : fileOrNode(world, target);
     }
 
+    private static Node fileOrNode(World world, String target) throws URISyntaxException, NodeInstantiationException {
+        FileNode file;
+
+        if (!target.contains(":")) {
+            file = world.file(target);
+            if (file.getParent().isDirectory()) {
+                return file;
+            }
+        }
+        return world.node(target);
+    }
+
+    private static int count(boolean ... booleans) {
+        int count;
+
+        count = 0;
+        for (boolean b : booleans) {
+            if (b) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     @Override
     public void run(Database database) throws Exception {
         List<Pom> matches;
+
+        matches = database.query(query, environment);
+        console.verbose.println("Matching documents: " + matches.size());
+        try (Writer dest = target.newWriter()) {
+            if (json || dump) {
+                json(matches, dest);
+            } else {
+                text(matches, dest);
+            }
+        }
+    }
+
+    private void text(List<Pom> matches, Writer dest) throws IOException {
         List<String> done;
         String line;
 
         done = new ArrayList<>();
-        matches = database.query(query, environment);
         for (Pom pom : matches) {
             line = format(pom);
             if (!done.contains(line)) {
-                console.info.println(line);
                 done.add(line);
+                dest.write(line);
+                dest.write('\n');
             }
         }
+    }
+
+    private void json(List<Pom> matches, Writer dest) throws Exception {
+        GsonBuilder builder;
+        Gson gson;
+
+        builder = new GsonBuilder();
+        if (json) {
+            builder.setPrettyPrinting();
+        }
+        gson = builder.create();
+        gson.toJson(matches, dest);
     }
 
     private String format(Pom pom) throws IOException {
