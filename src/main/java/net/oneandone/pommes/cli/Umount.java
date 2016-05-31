@@ -53,7 +53,6 @@ public class Umount extends Base {
         FileNode configuredDirectory;
         FileNode directory;
         Scm scm;
-        String url;
 
         fstab = Fstab.load(world);
         checkouts = new HashMap<>();
@@ -67,8 +66,7 @@ public class Umount extends Base {
             directory = entry.getKey();
             scm = entry.getValue();
             if (stale) {
-                url = scm.getUrl(directory);
-                if (scm.exists(world, url)) {
+                if (scm.isAlive(directory)) {
                     continue;
                 }
             }

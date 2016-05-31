@@ -44,12 +44,12 @@ public class Subversion extends Scm {
     }
 
     @Override
-    public boolean exists(World world, String url) throws IOException {
+    public boolean isAlive(FileNode checkout) {
         try {
-            // TODO: could also be a network error ...
-            svn(world.getWorking(), "ls", Strings.removeLeft(url, PROTOCOL)).exec();
+            svn(checkout, "status", "--show-updates").exec();
             return true;
-        } catch (IOException e) {
+        } catch (Failure e) {
+            // TODO: could also be a network error ...
             return false;
         }
     }

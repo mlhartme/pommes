@@ -53,10 +53,8 @@ public abstract class Scm {
     //--
 
     public abstract boolean isUrl(String url);
-    public abstract boolean exists(World world, String url) throws IOException;
-
     public abstract boolean isCheckout(FileNode directory) throws IOException;
-
+    public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isCommitted(FileNode checkout) throws IOException;
     public abstract String getUrl(FileNode checkout) throws Failure;
 

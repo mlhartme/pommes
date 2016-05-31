@@ -37,8 +37,14 @@ public class Git extends Scm {
     }
 
     @Override
-    public boolean exists(World world, String url) throws IOException {
-        throw new IllegalStateException();
+    public boolean isAlive(FileNode checkout) throws IOException {
+        try {
+            git(checkout, "fetch", "--dry-run").exec();
+            return true;
+        } catch (Failure e) {
+            // TODO: detect other failures
+            return false;
+        }
     }
 
     @Override
