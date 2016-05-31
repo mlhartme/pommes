@@ -115,10 +115,12 @@ public class DatabaseAdd extends Base {
         }
 
         public void run() {
+            long started;
+
             try {
-                environment.console().verbose.println("scanning existing revisions");
+                started = System.currentTimeMillis();
                 database.list(existing);
-                environment.console().verbose.println("done");
+                environment.console().verbose.println("scanned existing revisions: " + (System.currentTimeMillis() - started) + " ms");
                 current = iter();
                 database.index(this);
                 summary();
