@@ -6,7 +6,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.WildcardQuery;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public enum Field {
     ORIGIN,
     REVISION,
     PARENT(true, false),
-    GAV,
+    ARTIFACT,
     SCM(true, false),
     DEP(true, true),
     URL(true, false);
@@ -105,7 +104,7 @@ public enum Field {
         if (pom.parent != null) {
             PARENT.add(doc, pom.parent.toGavString());
         }
-        GAV.add(doc, pom.coordinates.toGavString());
+        ARTIFACT.add(doc, pom.coordinates.toGavString());
         for (Gav dep : pom.dependencies) {
             DEP.add(doc, dep.toGavString());
         }
@@ -120,7 +119,7 @@ public enum Field {
 
         parent = PARENT.get(document);
         result = new Pom(ORIGIN.get(document), REVISION.get(document),
-                parent == null ? null : Gav.forGav(parent), Gav.forGav(GAV.get(document)),
+                parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
                 SCM.get(document), URL.get(document));
         for (String dep : DEP.getList(document)) {
             result.dependencies.add(Gav.forGav(dep));

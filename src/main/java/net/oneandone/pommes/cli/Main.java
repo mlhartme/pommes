@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Cli;
+import net.oneandone.pommes.model.Field;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -39,7 +40,7 @@ public class Main {
                 + "                        print projects matching this query;\n"
                 + "                        json prints results in json, dump without pretty-printing;\n"
                 + "                        format string supports the following place holder:\n"
-                + "                        %g gav  %p parent  %s scm  %o origin  %r revision  %url  %d dependencies  %c checkouts;\n"
+                + "                        %<field letter> %c checkouts;\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
                 + "                        the enclosed substring or variables;\n"
                 + "                        target is a file or URL to write results to, default is the console\n"
@@ -74,6 +75,8 @@ public class Main {
                 + "  'fstab-add' url directory\n"
                 + "                        add an entry to fstab; create directory if it does not exist\n"
                 + "\n"
+                + "fields:\n"
+                + fieldList()
                 + "sync options            how to sync between global and local database\n"
                 + "  default behavior      download global database once a day; no uploads\n"
                 + "  '-download'           download global database before command execution\n"
@@ -135,6 +138,16 @@ public class Main {
           cli.add(FindUsers.class, "users -format=%g§20@§20%o§20->§20%d[%ga]");
 
         System.exit(cli.run(args));
+    }
+
+    private static String fieldList() {
+        StringBuilder result;
+
+        result = new StringBuilder();
+        for (Field field : Field.values()) {
+            result.append("    " + field.dbname() + "\n");
+        }
+        return result.toString();
     }
 
     public static class FindUsers extends Find {

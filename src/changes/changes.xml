@@ -24,8 +24,9 @@
         Added goto choice parameter.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
-        Database changes (CAUTION: you have to rebuild your's): updated from Lucene 4.9.1 to 6.0.0. Added revision and scm field.
-        Removed g, a, v, ga, dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renamed dep-gav to dep and par-gav to parent.
+        Database changes (CAUTION: you have to rebuild your's): updated from Lucene 4.9.1 to 6.0.0. Added revision, scm and urls field.
+        Removed g, a, v, ga, dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renamed dep-gav to dep, par-gav to parent,
+        and gav to artifact.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
         Renamed =svn= variable to =scm=.

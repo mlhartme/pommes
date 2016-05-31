@@ -219,7 +219,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Field.GAV.dbname());
+            return new StandardQueryParser().parse(queryString.substring(1), Field.ARTIFACT.dbname());
         } else {
             query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
@@ -238,7 +238,7 @@ public class Database implements AutoCloseable {
                             term = Field.DEP.substring(string);
                         } else {
                             string = variables(termString.substring(1), variables);
-                            term = Field.GAV.substring(string);
+                            term = Field.ARTIFACT.substring(string);
                         }
                         break;
                     case '^':
@@ -255,7 +255,7 @@ public class Database implements AutoCloseable {
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(Field.GAV.substring(string), Field.SCM.substring(string),
+                        term = or(Field.ARTIFACT.substring(string), Field.SCM.substring(string),
                                 Field.PARENT.substring(string));
                         break;
                 }
