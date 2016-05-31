@@ -98,7 +98,7 @@ public class Point {
                 }
                 remaining = remaining.replace('.', '/');
             }
-            return directory.join(fold(remaining));
+            return directory.join(withBranch(remaining, pom));
         } else {
             return null;
         }
@@ -113,41 +113,23 @@ public class Point {
     //--
 
 
-    private static final String TRUNK = "/trunk/";
     private static final String BRANCHES = "/branches/";
 
-    public static String fold(String path) {
-        return path;
-    }
-
-    public static String TODOfold(String path) {
-        int beforeBranches;
-        int beforeProjectName;
-        // with tailing slash:
-        String projectName;
-        // with tailing slash:
+    public static String withBranch(String base, Pom pom) {
+        String scm;
+        int idx;
         String branchName;
 
-        if (!path.endsWith("/")) {
-            throw new IllegalArgumentException(path);
+        scm = pom.scm;
+        if (scm == null) {
+            return base;
         }
-        beforeBranches = path.indexOf(BRANCHES);
-        if (beforeBranches == -1) {
-            if (path.endsWith(TRUNK)) {
-                path = path.substring(0, path.length() - TRUNK.length() + 1);
-            }
-        } else {
-            branchName = path.substring(beforeBranches + BRANCHES.length());
-            beforeProjectName = path.lastIndexOf('/', beforeBranches - 1);
-            // -1 ok, we'll add +1 anyway
-            projectName = path.substring(beforeProjectName + 1, beforeBranches + 1);
-            path = path.substring(0, beforeProjectName + 1) +
-                    ((common(projectName, branchName) >= 3) ? branchName : Strings.removeRight(projectName, "/") + "-" + branchName);
+        idx = scm.indexOf(BRANCHES);
+        if (idx == -1) {
+            return base;
         }
-        if (!path.endsWith("/")) {
-            throw new IllegalStateException(path);
-        }
-        return path;
+        branchName = Strings.removeRightOpt(scm.substring(idx + BRANCHES.length()), "/");
+        return base + "-" + branchName;
     }
 
     private static int common(String left, String right) {

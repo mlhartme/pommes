@@ -79,7 +79,6 @@ public class NodeSource implements Source {
         Node trunk;
         Node branches;
         List<? extends Node> grandChildren;
-        long revision;
 
         if (exclude.matches(root.getPath())) {
             return;
@@ -91,14 +90,7 @@ public class NodeSource implements Source {
         for (Node node : children) {
             project = Project.probe(node);
             if (project != null) {
-                if (node instanceof SvnNode) {
-                    //                     revision = ((SvnNode) node).getLatestRevision();
-                    // TODO
-                    revision = node.getLastModified();
-                } else {
-                    revision = node.getLastModified();
-                }
-                project.setRevision(Long.toString(revision));
+                project.setRevision(Long.toString(node.getLastModified()));
                 dest.put(project);
                 return;
             }
