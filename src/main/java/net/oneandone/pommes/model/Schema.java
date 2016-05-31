@@ -1,28 +1,54 @@
 package net.oneandone.pommes.model;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 
 /** Defines database fields and pom/document conversion */
 public class Schema {
-    /**
-     * Mandatory. The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
-     * Used as a unique identifier for the document.
-     */
-    public static final String ORIGIN = "origin";
-    /** Mandatory. */
-    public static final String REVISION = "revision";
-    /** Optional */
-    public static final String PARENT = "parent";
-    /** Mandatory. */
-    public static final String GAV = "gav";
-    /** Optional. */
-    public static final String SCM = "scm";
-    /** List. */
-    public static final String DEP = "dep";
-    /** Optional. */
-    public static final String URL = "url";
+    public enum Field {
+        /**
+         * Mandatory. The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
+         * Used as a unique identifier for the document.
+         */
+        ORIGIN,
+
+        /** Mandatory. */
+        REVISION,
+
+        /** Optional */
+        PARENT,
+
+        /** Mandatory. */
+        GAV,
+
+        /** Optional. */
+        SCM,
+
+        /** List. */
+        DEP,
+
+        /** Optional. */
+        URL;
+
+        public String dbname = name().toLowerCase();
+
+        public void add(Document document, String value) {
+            document.add(new StringField(dbname, value, org.apache.lucene.document.Field.Store.YES));
+        }
+
+        public void addOpt(Document document, String value) {
+            if (value != null) {
+                add(document, value);
+            }
+        }
+
+        public String get(Document document) {
+            return document.get(dbname);
+        }
+        public String[] getList(Document document) {
+            return document.getValues(dbname);
+        }
+    }
 
     //--
 
@@ -30,11 +56,11 @@ public class Schema {
         Pom result;
         String parent;
 
-        parent = document.get(PARENT);
-        result = new Pom(document.get(ORIGIN), document.get(REVISION),
-                parent == null ? null : Gav.forGav(parent), Gav.forGav(document.get(GAV)),
-                document.get(SCM), document.get(URL));
-        for (String dep : document.getValues(DEP)) {
+        parent = Field.PARENT.get(document);
+        result = new Pom(Field.ORIGIN.get(document), Field.REVISION.get(document),
+                parent == null ? null : Gav.forGav(parent), Gav.forGav(Field.GAV.get(document)),
+                Field.SCM.get(document), Field.URL.get(document));
+        for (String dep : Field.DEP.getList(document)) {
             result.dependencies.add(Gav.forGav(dep));
         }
         return result;
@@ -44,26 +70,19 @@ public class Schema {
         Document doc;
 
         doc = new Document();
-        add(doc, ORIGIN, pom.origin);
-        add(doc, REVISION, pom.revision);
+        Field.ORIGIN.add(doc, pom.origin);
+        Field.REVISION.add(doc, pom.revision);
         if (pom.parent != null) {
-            add(doc, PARENT, pom.parent.toGavString());
+            Field.PARENT.add(doc, pom.parent.toGavString());
         }
-        add(doc, GAV, pom.coordinates.toGavString());
+        Field.GAV.add(doc, pom.coordinates.toGavString());
         for (Gav dep : pom.dependencies) {
-            add(doc, DEP, dep.toGavString());
+            Field.DEP.add(doc, dep.toGavString());
         }
-        if (pom.scm != null) {
-            add(doc, SCM, pom.scm);
-        }
-        if (pom.url != null) {
-            add(doc, URL, pom.url);
-        }
+        Field.SCM.addOpt(doc, pom.scm);
+        Field.URL.addOpt(doc, pom.url);
         return doc;
     }
 
-    private static void add(Document doc, String field, String value) {
-        doc.add(new StringField(field, value, Field.Store.YES));
-    }
 
 }

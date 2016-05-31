@@ -177,11 +177,11 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(new Term(Schema.ORIGIN, "*"));
+        query = new WildcardQuery(new Term(Schema.Field.ORIGIN.dbname, "*"));
         search = searcher.search(query, Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
-            result.put(document.get(Schema.ORIGIN), document.get(Schema.REVISION));
+            result.put(Schema.Field.ORIGIN.get(document), Schema.Field.REVISION.get(document));
         }
     }
 
@@ -197,7 +197,7 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(new Term(Schema.ORIGIN, doc.get(Schema.ORIGIN)), doc);
+            writer.updateDocument(new Term(Schema.Field.ORIGIN.dbname, Schema.Field.ORIGIN.get(doc)), doc);
         }
         writer.close();
     }
@@ -220,7 +220,7 @@ public class Database implements AutoCloseable {
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
             // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Schema.GAV);
+            return new StandardQueryParser().parse(queryString.substring(1), Schema.Field.GAV.dbname);
         } else {
             query = new BooleanQuery.Builder();
             terms = PLUS.split(queryString);
@@ -233,30 +233,31 @@ public class Database implements AutoCloseable {
                     case ':':
                         if (termString.length() > 1 && termString.charAt(1) == '-') {
                             string = variables(termString.substring(2), variables);
-                            term = or(substring(Schema.PARENT, string), substring(Schema.DEP, string));
+                            term = or(substring(Schema.Field.PARENT.dbname, string), substring(Schema.Field.DEP.dbname, string));
                         } else if (termString.length() > 1 && termString.charAt(1) == '_') {
                             string = variables(termString.substring(2), variables);
-                            term = substring(Schema.DEP, string);
+                            term = substring(Schema.Field.DEP.dbname, string);
                         } else {
                             string = variables(termString.substring(1), variables);
-                            term = substring(Schema.GAV, string);
+                            term = substring(Schema.Field.GAV.dbname, string);
                         }
                         break;
                     case '^':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Schema.PARENT, string);
+                        term = substring(Schema.Field.PARENT.dbname, string);
                         break;
                     case '@':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Schema.SCM, string);
+                        term = substring(Schema.Field.SCM.dbname, string);
                         break;
                     case '§':
                         string = variables(termString.substring(1), variables);
-                        term = substring(Schema.ORIGIN, string);
+                        term = substring(Schema.Field.ORIGIN.dbname, string);
                         break;
                     default:
                         string = variables(termString, variables);
-                        term = or(substring(Schema.GAV, string), substring(Schema.SCM, string), substring(Schema.PARENT, string));
+                        term = or(substring(Schema.Field.GAV.dbname, string), substring(Schema.Field.SCM.dbname, string),
+                                substring(Schema.Field.PARENT.dbname, string));
                         break;
                 }
                 query.add(term, BooleanClause.Occur.MUST);
