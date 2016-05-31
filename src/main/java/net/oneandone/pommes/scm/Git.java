@@ -54,9 +54,9 @@ public class Git extends Scm {
             return false;
         }
 
-        //  TODO: check all branches
+        //  TODO: other branches
         try {
-            git(checkout, "diff", "origin/master..HEAD", "--quiet").execNoOutput();
+            git(checkout, "diff", "@{u}..HEAD", "--quiet").execNoOutput();
         } catch (Failure e) {
             return false;
         }
