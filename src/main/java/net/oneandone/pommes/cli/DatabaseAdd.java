@@ -193,9 +193,9 @@ public class DatabaseAdd extends Base {
                 try {
                     count++;
                     return project.load(environment);
-                } catch (RuntimeException e) {
-                    throw e;
                 } catch (Exception e) {
+                    // CAUTION: I do catch RuntimeExceptions, because I've seen Maven 3.3.9 throw them for invalid poms
+                    // (e.g. InvalidArtifactRTException)
                     throw new IOException("error processing " + project + ": " + e.getMessage(), e);
                 }
             }

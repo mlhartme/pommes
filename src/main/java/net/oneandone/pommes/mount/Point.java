@@ -27,16 +27,6 @@ public class Point {
         this.directory = directory;
     }
 
-    public String group(FileNode childDirectory) {
-        if (childDirectory.equals(directory)) {
-            return "";
-        } else if (!childDirectory.hasAnchestor(directory)) {
-            return null;
-        } else {
-            return childDirectory.getRelative(directory).replace('/', '.');
-        }
-    }
-
     public FileNode directory(Pom pom) {
         String ga;
         String path;
