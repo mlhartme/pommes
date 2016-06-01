@@ -6,21 +6,30 @@
 
 Download the latest application file from Maven Central and add it to your path.
 
-Optionally, you can define a shell function =pg= to invoke =pommes goto= and actually cd into the resulting directory:<verbatim>
-function pg {
-  pommes goto "$@" && . ~/.pommes.goto
-}
-</verbatim>
+Optionally, you can define a shell function =pg= to invoke =pommes goto= and actually cd into the resulting directory:
 
-## First steps
+   function pg {
+     pommes goto "$@" && . ~/.pommes.goto
+   }
+
+## Create a database
+
+   pommes database-add github:mlhartme
+
+The first fills your database with all projects of the specified user.
+
+TODO artifactory and not repositories
+TODO credentials
+
+## Searching
+
+## Mounting
 
 <verbatim>
-pommes database-add github:mlhartme
 pg sushi
 </verbatim>
 
-The first fills your database with all projects of the specified user.
-The second checks out sushi.
+Checks out sushi.
 
 Other examples:
 
