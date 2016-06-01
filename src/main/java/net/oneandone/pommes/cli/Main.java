@@ -146,7 +146,7 @@ public class Main {
 
     public static class FindUsers extends Find {
         public FindUsers(Environment environment, String format) throws URISyntaxException, NodeInstantiationException {
-            super(environment, false, false, format, ":-=ga=+@trunk", "");
+            super(environment, false, false, format, "dp:=ga=", "");
         }
     }
 }
