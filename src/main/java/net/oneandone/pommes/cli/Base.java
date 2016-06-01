@@ -70,7 +70,6 @@ public abstract class Base {
             console.info.println("[return] quit");
             selection = console.readline("Selection(s): ");
             if (selection.isEmpty()) {
-                console.info.println("quit");
                 actions.clear();
             } else if ("a".equals(selection)) {
                 problems = 0;
