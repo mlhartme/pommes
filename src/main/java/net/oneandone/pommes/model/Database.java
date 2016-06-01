@@ -41,6 +41,7 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +155,7 @@ public class Database implements AutoCloseable {
         close();
         directory.deleteTreeOpt();
         directory.mkdir();
+        index(Collections.emptyIterator());
     }
 
     public void remove(String query, Variables variables) throws IOException, QueryNodeException {
