@@ -20,12 +20,11 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.mount.Problem;
 import net.oneandone.pommes.mount.Remove;
-import net.oneandone.pommes.mount.StatusException;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,6 @@ public class Umount extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        int problems;
         Map<FileNode, Scm> checkouts;
         Pom scannedPom;
         List<Action> removes;
@@ -56,7 +54,6 @@ public class Umount extends Base {
             throw new ArgumentException("no checkouts under " + root);
         }
         removes = new ArrayList<>();
-        problems = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             directory = entry.getKey();
             scm = entry.getValue();
@@ -69,19 +66,10 @@ public class Umount extends Base {
             point = environment.mount();
             configuredDirectory = point.directory(scannedPom);
             if (directory.equals(configuredDirectory)) {
-                try {
-                    removes.add(Remove.create(directory, scannedPom));
-                } catch (StatusException e) {
-                    console.error.println(e.getMessage());
-                    problems++;
-                }
+                removes.add(Remove.create(directory, scannedPom));
             } else {
-                console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
-                problems++;
+                removes.add(new Problem(directory, directory + ": checkout expected at " + configuredDirectory));
             }
-        }
-        if (problems > 0) {
-            throw new IOException("aborted - fix the above problem(s) first: " + problems);
         }
         runAll(removes);
     }

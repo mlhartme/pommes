@@ -20,10 +20,8 @@ import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
-import net.oneandone.pommes.mount.StatusException;
 import net.oneandone.sushi.fs.file.FileNode;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,27 +37,17 @@ public class Mount extends Base {
     public void run(Database database) throws Exception {
         List<Action> adds;
         Action action;
-        int problems;
         FileNode directory;
 
         adds = new ArrayList<>();
-        problems = 0;
         for (Pom pom : Field.poms(database.query(query, environment))) {
             directory = environment.mount().directory(pom);
-            try {
-                action = Checkout.createOpt(environment, directory, pom);
-                if (action != null) {
-                    adds.add(action);
-                } else {
-                    console.verbose.println("already mounted: " + directory);
-                }
-            } catch (StatusException e) {
-                console.error.println(e.getMessage());
-                problems++;
+            action = Checkout.createOpt(environment, directory, pom);
+            if (action != null) {
+                adds.add(action);
+            } else {
+                console.verbose.println("already mounted: " + directory);
             }
-        }
-        if (problems > 0) {
-            throw new IOException("aborted - fix the above problem(s) first: " + problems);
         }
         runAll(adds);
     }

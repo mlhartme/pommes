@@ -36,15 +36,15 @@ public class Checkout extends Action {
             if (scannedPom.scm.equals(pom.scm)) {
                 return null;
             } else {
-                throw new StatusException("C " + directory + " (" + pom.scm + " vs " + scannedPom.scm + ")");
+                return new Problem(directory, directory + ": checkout conflict: " + pom.scm + " vs " + scannedPom.scm);
             }
         } else {
             if (pom.scm == null) {
-                return new Error(directory, pom.scm, new IOException("missing scm: " + pom.scm));
+                return new Problem(directory, pom.origin + ": missing scm: " + pom.scm);
             }
             scm = Scm.probeUrl(pom.scm);
             if (scm == null) {
-                return new Error(directory, pom.scm, new IOException("unknown scm: " + pom.scm));
+                return new Problem(directory, pom.origin + ": unknown scm: " + pom.scm);
             } else {
                 return new Checkout(scm, directory, pom.scm);
             }

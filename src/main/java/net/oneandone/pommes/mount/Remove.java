@@ -25,14 +25,15 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 
 public class Remove extends Action {
-    public static Remove create(FileNode directory, Pom pom) throws IOException {
+    public static Action create(FileNode directory, Pom pom) throws IOException {
         Scm scm;
 
         scm = Scm.probeCheckout(directory);
-        if (!scm.isCommitted(directory)) {
-            throw new StatusException("M " + directory + " (" + pom + ")");
+        if (scm.isCommitted(directory)) {
+            return new Remove(scm, directory, pom.scm);
+        } else {
+            return new Problem(directory, directory + ": checkout is not committed.");
         }
-        return new Remove(scm, directory, pom.scm);
     }
 
     public Remove(Scm scm, FileNode directory, String url) {

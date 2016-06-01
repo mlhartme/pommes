@@ -15,10 +15,26 @@
  */
 package net.oneandone.pommes.mount;
 
+import net.oneandone.inline.Console;
+import net.oneandone.sushi.fs.file.FileNode;
+
 import java.io.IOException;
 
-public class StatusException extends IOException {
-    public StatusException(String status) {
-        super(status);
+public class Problem extends Action {
+    private final Exception error;
+
+    public Problem(FileNode directory, String message) {
+        super(null, directory, null);
+        this.error = new IOException(message);
+    }
+
+    @Override
+    public char status() {
+        return '1';
+    }
+
+    @Override
+    public void run(Console console) throws Exception {
+        throw error;
     }
 }
