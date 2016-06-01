@@ -88,13 +88,13 @@ public enum Field {
 
     //--
 
-    public static Field forLetter(char c) {
+    public static Field forId(char c) {
         for (Field field : values()) {
             if (field.dbname.charAt(0) == c) {
                 return field;
             }
         }
-        throw new IllegalStateException("unknown field letter: " + c);
+        throw new IllegalStateException("unknown field id: " + c);
     }
 
     public static Document document(Pom pom) {

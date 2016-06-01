@@ -50,7 +50,7 @@ public class Find extends Base {
 
         this.json = json;
         this.dump = dump;
-        this.format = format == null ? "%g @ %s %c" : format;
+        this.format = format == null ? "%a @ %s %c" : format;
         this.query = query;
         this.target = target.isEmpty() ? world.node("console:///") : fileOrNode(world, target);
     }
@@ -150,7 +150,7 @@ public class Find extends Base {
                         }
                         break;
                     default:
-                        Field.forLetter(c).copy(document, values);
+                        Field.forId(c).copy(document, values);
                 }
                 if (i + 1 < max && format.charAt(i + 1) == '[') {
                     end = format.indexOf(']', i + 2);

@@ -41,13 +41,13 @@ public class Main {
                 + "                        print projects matching this query;\n"
                 + "                        json prints results in json, dump without pretty-printing;\n"
                 + "                        format string supports the following place holder:\n"
-                + "                        %<field letter> %c checkouts;\n"
+                + "                        %FIELD_ID %c checkouts;\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
                 + "                        the enclosed substring or variables;\n"
                 + "                        target is a file or URL to write results to, default is the console\n"
                 + "  'users'\n"
                 + "                        print projects that have a dependency to the current project;\n"
-                + "                        same as 'pommes find -format \"%g @ %s -> %d[%ga]\" :-=ga=+@trunk\n"
+                + "                        same as 'pommes find -format \"%a @ %s -> %d[%ga]\" :-=ga=+@trunk\n"
                 + "\n"
                 + "mount commands\n"
                 + "  'mount' query         checkout matching projects; skips existing checkouts;\n"
@@ -78,6 +78,7 @@ public class Main {
                 + "\n"
                 + "fields:\n"
                 + fieldList()
+                + "  (field id is the first letter of the field name.)\n"
                 + "\n"
                 + "sync options            how to sync between global and local database\n"
                 + "  default behavior      download global database once a day; no uploads\n"
@@ -87,15 +88,10 @@ public class Main {
                 + "\n"
                 + "query syntax\n"
                 + "  query     = term ('+' term)* | lucene\n"
-                + "  term      = substring | gav | dp | dep | parent | origin\n"
-                + "  substring = STR             ; substring in gav OR origin\n"
-                + "  gav       = ':' STR         ; substring match in groupId:artifactId:version\n"
-                + "  dp        = ':-' STR        ; substring match in dependency or parent\n"
-                + "  dep       = ':_' STR        ; substring match in dependency\n"
-                + "  parent    = '^' STR         ; substring match in parent"
-                + "  scm       = '@' STR         ; substring match in scm\n"
-                + "  origin    = '§' STR         ; substring match in origin\n"
-                + "  lucene    = '%' STR         ; STR in Lucene Query Syntax\n"
+                + "  term      = substring | field\n"
+                + "  substring = STR                    ; substring in gav OR origin\n"
+                + "  field     = FIELD_LETTER* ':' STR  ; substring match at least on of the specified fields (or all if not specified)\n"
+                + "  lucene    = '%' STR                ; STR in Lucene Query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html\n"
                 + "and STR may contain the following variables:\n"
                 + "  =gav=     = coordinates for current project\n"
                 + "  =ga=      = group and artifact of current project\n"
@@ -104,7 +100,7 @@ public class Main {
                 + "examples:\n"
                 + "  pommes find :foo+@trunk                   # projects with foo in they gav and trunk in their scm\n"
                 + "  pommes find :-slf4j                       # projects with a dependency to slf4j\n"
-                + "  pommes find -format %g :-slf4j            # same, but only print gav of the matches\n"
+                + "  pommes find -format %a :-slf4j            # same, but only print gav of the matches\n"
                 + "  pommes find -format %d[slf4j] :-slf4j     # same, but only print the matched dependency\n"
                 + "\n"
                 + "  # add poms to the database:\n"
@@ -137,7 +133,7 @@ public class Main {
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
           cli.add(Find.class, "find -json -dump -format=null query target?");
-          cli.add(FindUsers.class, "users -format=%g§20@§20%o§20->§20%d[%ga]");
+          cli.add(FindUsers.class, "users -format=%a§20@§20%o§20->§20%d[%a]");
 
         System.exit(cli.run(args));
     }

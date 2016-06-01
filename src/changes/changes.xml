@@ -2,6 +2,9 @@
   <body>
     <release date="2016-02-xx" version="3.0.0">
       <action date="2016-05-31" dev="mlhartme" type="add">
+        New query syntax: address fields with their id.
+      </action>
+      <action date="2016-05-31" dev="mlhartme" type="add">
         Store urls in database.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="add">

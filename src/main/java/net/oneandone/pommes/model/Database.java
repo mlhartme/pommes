@@ -41,6 +41,7 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -215,8 +216,9 @@ public class Database implements AutoCloseable {
         BooleanQuery.Builder query;
         List<String> terms;
         Query term;
-        char marker;
+        int idx;
         String string;
+        List<Field> selected;
 
         queryString = variables(queryString, variables);
         if (queryString.startsWith("%")) {
@@ -229,38 +231,18 @@ public class Database implements AutoCloseable {
                 terms.add("");
             }
             for (String termString : terms) {
-                marker = termString.isEmpty() ? ' ' : termString.charAt(0);
-                switch (marker) {
-                    case ':':
-                        if (termString.length() > 1 && termString.charAt(1) == '-') {
-                            string = variables(termString.substring(2), variables);
-                            term = or(Field.PARENT.substring(string), Field.DEP.substring(string));
-                        } else if (termString.length() > 1 && termString.charAt(1) == '_') {
-                            string = variables(termString.substring(2), variables);
-                            term = Field.DEP.substring(string);
-                        } else {
-                            string = variables(termString.substring(1), variables);
-                            term = Field.ARTIFACT.substring(string);
-                        }
-                        break;
-                    case '^':
-                        string = variables(termString.substring(1), variables);
-                        term = Field.PARENT.substring(string);
-                        break;
-                    case '@':
-                        string = variables(termString.substring(1), variables);
-                        term = Field.SCM.substring(string);
-                        break;
-                    case '§':
-                        string = variables(termString.substring(1), variables);
-                        term = Field.ORIGIN.substring(string);
-                        break;
-                    default:
-                        string = variables(termString, variables);
-                        term = or(Field.ARTIFACT.substring(string), Field.SCM.substring(string),
-                                Field.PARENT.substring(string));
-                        break;
+                idx = termString.indexOf(':');
+                if (idx >= 1) {
+                    selected = new ArrayList<>();
+                    for (int i = 0; i < idx; i++) {
+                        selected.add(Field.forId(termString.charAt(i)));
+                    }
+                } else {
+                    selected = Arrays.asList(Field.values());
                 }
+                string = termString.substring(idx + 1); // ok for -1
+                string = variables(string, variables);
+                term = or(selected, string);
                 query.add(term, BooleanClause.Occur.MUST);
             }
             return query.build();
@@ -305,13 +287,12 @@ public class Database implements AutoCloseable {
         }
     }
 
-    private static Query or(Query left, Query ... rights) {
+    private static Query or(List<Field> fields, String string) {
         BooleanQuery.Builder result;
 
         result = new BooleanQuery.Builder();
-        result.add(left, BooleanClause.Occur.SHOULD);
-        for (Query right : rights) {
-            result.add(right, BooleanClause.Occur.SHOULD);
+        for (Field field : fields) {
+            result.add(field.substring(string), BooleanClause.Occur.SHOULD);
         }
         return result.build();
     }
