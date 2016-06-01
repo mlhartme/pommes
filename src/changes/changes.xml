@@ -2,6 +2,9 @@
   <body>
     <release date="2016-02-xx" version="3.0.0">
       <action date="2016-06-01" dev="mlhartme" type="update">
+        Added ~/.pommes.properties to define query and format macros.
+      </action>
+      <action date="2016-06-01" dev="mlhartme" type="update">
         Added a M flag to the list command.
       </action>
       <action date="2016-06-01" dev="mlhartme" type="update">
@@ -13,6 +16,7 @@
       </action>
       <action date="2016-05-31" dev="mlhartme" type="add">
         New query syntax: address fields with their id; alternatives, separated with blanks; lucene escape starts with '!' now.
+        Added query and format macros.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="add">
         Store urls in database.
@@ -26,9 +30,6 @@
       <action date="2016-05-31" dev="mlhartme" type="remove">
         Dumped -svnuser and -svnpassword options. Specify credentials in the url instead.
         (I've removed them because I don't want special handling for Subversion repository authentication.)
-      </action>
-      <action date="2016-05-31" dev="mlhartme" type="update">
-        Improved query syntax: added :_ to search dependencies only; added ^ to search parents.
       </action>
       <action date="2016-05-30" dev="mlhartme" type="update">
         find: merge duplicate lines.

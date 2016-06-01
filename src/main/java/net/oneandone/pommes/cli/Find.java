@@ -17,6 +17,7 @@ package net.oneandone.pommes.cli;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
@@ -61,7 +62,11 @@ public class Find extends Base {
                 return;
             default:
                 if (formatBuilder == null) {
-                    query.add(arg);
+                    if (arg.startsWith("-")) {
+                        formatBuilder = new StringBuilder(arg);
+                    } else {
+                        query.add(arg);
+                    }
                 } else {
                     if (formatBuilder.length() > 0) {
                         formatBuilder.append(' ');
@@ -87,22 +92,60 @@ public class Find extends Base {
     public void run(Database database) throws Exception {
         List<Document> documents;
         String format;
+        String macroName;
+        List<String> macro;
+        String tmpFormat;
 
-        documents = database.query(query, environment);
-        console.verbose.println("Matching documents: " + documents.size());
-        format =  formatBuilder != null ? formatBuilder.toString() : "%a @ %s %c";
-        console.verbose.println("format: " + format);
-        try (Writer dest = target.newWriter()) {
-            switch (format) {
-                case JSON:
-                    json(Field.poms(documents), true, dest);
-                    break;
-                case DUMP:
-                    json(Field.poms(documents), false, dest);
-                    break;
-                default:
-                    text(documents, format, dest);
+        try {
+            if (query.size() > 0 && query.get(0).startsWith("§")) {
+                for (int i = 1; i < query.size(); i++) {
+                    environment.defineArgument(i, query.get(i));
+                }
+                macroName = query.get(0).substring(1);
+                macro = environment.lookupQuery(macroName);
+                if (macro == null) {
+                    throw new ArgumentException("query macro not found: " + macroName);
+                }
+                query.clear();
+                query.addAll(macro);
+            } else {
+                macroName = null;
             }
+            documents = database.query(query, environment);
+            console.verbose.println("Matching documents: " + documents.size());
+            if (formatBuilder != null) {
+                format = formatBuilder.toString();
+                if (format.startsWith("-")) {
+                    tmpFormat = environment.lookup(format.substring(1));
+                    if (tmpFormat != null) {
+                        format = tmpFormat;
+                    }
+                }
+            } else {
+                if (macroName == null) {
+                    macroName = "default";
+                }
+                format = environment.lookupFormat(macroName);
+                if (format == null) {
+                    format = "%o";
+                }
+            }
+            console.verbose.println("query: " + query);
+            console.verbose.println("format: " + format);
+            try (Writer dest = target.newWriter()) {
+                switch (format) {
+                    case JSON:
+                        json(Field.poms(documents), true, dest);
+                        break;
+                    case DUMP:
+                        json(Field.poms(documents), false, dest);
+                        break;
+                    default:
+                        text(documents, format, dest);
+                }
+            }
+        } finally {
+            environment.clearArguments();
         }
     }
 

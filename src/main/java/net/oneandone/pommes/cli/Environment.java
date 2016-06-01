@@ -27,8 +27,13 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.util.Separator;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class Environment implements Variables {
     private final Console console;
@@ -42,6 +47,8 @@ public class Environment implements Variables {
 
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
+    private Map<String, List<String>> lazyQueries;
+    private Map<String, String> lazyFormats;
 
     public Environment(Console console, World world, boolean download, boolean noDownload, boolean upload) throws IOException {
         String m;
@@ -60,6 +67,8 @@ public class Environment implements Variables {
 
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
+        this.lazyQueries = null;
+        this.lazyFormats = null;
     }
 
     public void begin(Database database) throws IOException {
@@ -111,6 +120,16 @@ public class Environment implements Variables {
 
     //-- Variables interface
 
+    private Map<String, String> arguments = new HashMap<>();
+
+    public void defineArgument(int i, String argument) {
+        arguments.put(Integer.toString(i), argument);
+    }
+
+    public void clearArguments() {
+        arguments.clear();
+    }
+
     public String lookup(String name) throws IOException {
         switch (name) {
             case "scm":
@@ -120,9 +139,53 @@ public class Environment implements Variables {
             case "ga":
                 return currentPom().coordinates.toGaString();
             default:
-                return null;
+                return arguments.get(name);
         }
     }
+
+    public List<String> lookupQuery(String name) throws IOException {
+        lazyMacros();
+        return lazyQueries.get(name);
+    }
+
+    public String lookupFormat(String name) throws IOException {
+        lazyMacros();
+        return lazyFormats.get(name);
+    }
+
+    private void lazyMacros() throws IOException {
+        String queryPrefix = "query.";
+        String formatPrefix = "format.";
+        FileNode file;
+        Properties props;
+
+        if (lazyQueries == null) {
+            if (lazyFormats != null) {
+                throw new IllegalStateException();
+            }
+            lazyQueries = new HashMap<>();
+            lazyFormats = new HashMap<>();
+            file = (FileNode) world.getHome().join(".pommes.properties");
+            if (!file.exists()) {
+                file.writeLines(
+                        "query.users=d:=ga=",
+                        "format.default=%a",
+                        "format.users=%a -> %d[=ga=]");
+                console.info.println("create default configuration at " + file);
+            }
+            props = file.readProperties();
+            for (String key : props.stringPropertyNames()) {
+                if (key.startsWith(queryPrefix)) {
+                    lazyQueries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
+                } else if (key.startsWith(formatPrefix)) {
+                    lazyFormats.put(key.substring(formatPrefix.length()), props.getProperty(key));
+                } else {
+                    throw new IOException("unknown property");
+                }
+            }
+        }
+    }
+
 
     //--
 

@@ -84,7 +84,7 @@ public class Main {
                 + "  '-upload'             upload local database after command execution\n"
                 + "\n"
                 + "query syntax\n"
-                + "  query     = or\n"
+                + "  query     = '§' MACRO | or\n"
                 + "  or        = (and (' ' and)*)? \n"
                 + "  and       = term ('+' term)*\n"
                 + "  term      = substring | field | lucene\n"
