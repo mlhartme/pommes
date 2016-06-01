@@ -111,6 +111,7 @@ public class Main {
                 + "\n"
                 + "environment:\n"
                 + "  POMMES_MOUNT          directory where to mount projects\n"
+                + "  POMMES_LOCAL          where to store the local (copy of the) database\n"
                 + "  POMMES_GLOBAL         url pointing to global database zip file\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");

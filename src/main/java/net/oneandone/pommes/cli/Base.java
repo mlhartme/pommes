@@ -66,10 +66,13 @@ public abstract class Base {
                 console.info.println("[" + no + "] " + action);
                 no++;
             }
-            console.info.println("[d]      done without actions");
-            console.info.println("[return] all");
+            console.info.println("[a]      all");
+            console.info.println("[return] quit");
             selection = console.readline("Selection(s): ");
             if (selection.isEmpty()) {
+                console.info.println("quit");
+                actions.clear();
+            } else if ("a".equals(selection)) {
                 problems = 0;
                 for (Action action : actions) {
                     try {
@@ -86,20 +89,15 @@ public abstract class Base {
                     throw new IOException(problems + " actions failed");
                 }
             } else for (String one : Separator.SPACE.split(selection)) {
-                if (one.equals("d")) {
-                    console.info.println("done");
-                    actions.clear();
-                } else {
-                    try {
-                        no = Integer.parseInt(one);
-                        if (no > 0 && no <= actions.size()) {
-                            actions.remove(no - 1).run(console);
-                        } else {
-                            console.info.println("action not found: " + one);
-                        }
-                    } catch (NumberFormatException e) {
+                try {
+                    no = Integer.parseInt(one);
+                    if (no > 0 && no <= actions.size()) {
+                        actions.remove(no - 1).run(console);
+                    } else {
                         console.info.println("action not found: " + one);
                     }
+                } catch (NumberFormatException e) {
+                    console.info.println("action not found: " + one);
                 }
             }
         } while (!actions.isEmpty());

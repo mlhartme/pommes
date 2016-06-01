@@ -27,7 +27,6 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +51,7 @@ public class Umount extends Base {
         FileNode directory;
         Scm scm;
 
-        checkouts = new HashMap<>();
-        Scm.scanCheckouts(root, checkouts);
+        checkouts = Scm.scanCheckouts(root);
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }

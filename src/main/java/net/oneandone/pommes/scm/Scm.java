@@ -5,6 +5,7 @@ import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,15 @@ public abstract class Scm {
         new Subversion(), new Git()
     };
 
-    public static void scanCheckouts(FileNode directory, Map<FileNode, Scm> result) throws IOException {
+    public static Map<FileNode, Scm> scanCheckouts(FileNode directory) throws IOException {
+        Map<FileNode, Scm> result;
+
+        result = new LinkedHashMap<>();
+        scanCheckouts(directory, result);
+        return result;
+    }
+
+    private static void scanCheckouts(FileNode directory, Map<FileNode, Scm> result) throws IOException {
         List<FileNode> children;
         Scm probed;
 

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
     <release date="2016-02-xx" version="3.0.0">
-      <action date="2016-05-31" dev="mlhartme" type="add">
+      <action date="2016-06-01" dev="mlhartme" type="update">
+        Added a M flag to the list command.
+      </action>
+      <action date="2016-06-01" dev="mlhartme" type="update">
+        Improved action selection: return quits without actions now, a applies all actions.
+      </action>
+      <action date="2016-06-01" dev="mlhartme" type="add">
         Dumped fstab, all projects are mounted according to their groupId. You can configure the root directory with the POMMES_MOUNT
         environment variable, default is ~/Pommes.
       </action>

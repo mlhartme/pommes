@@ -41,23 +41,26 @@ public class Ls extends Base {
     @Override
     public void run(Database notUsed) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Pom scannedPom;
-        FileNode configuredDirectory;
         Point point;
+        FileNode found;
+        FileNode configured;
+        Pom foundPom;
+        Scm scm;
 
-        checkouts = new HashMap<>();
-        Scm.scanCheckouts(root, checkouts);
+        checkouts = Scm.scanCheckouts(root);
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + root);
         }
-        for (FileNode directory : checkouts.keySet()) {
-            scannedPom = environment.scanPom(directory);
+        for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
+            found = entry.getKey();
+            scm = entry.getValue();
+            foundPom = environment.scanPom(found);
             point = environment.mount();
-            configuredDirectory = point.directory(scannedPom);
-            if (directory.equals(configuredDirectory)) {
-                console.info.println("  " + directory + " (" + scannedPom + ")");
+            configured = point.directory(foundPom);
+            if (found.equals(configured)) {
+                console.info.println((scm.isCommitted(found) ? ' ' : 'M') + "  " + found + " (" + foundPom + ")");
             } else {
-                console.info.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
+                console.info.println("C " + found + " vs " + configured + " (" + foundPom + ")");
             }
         }
         for (FileNode directory : unknown(root, checkouts.keySet())) {
