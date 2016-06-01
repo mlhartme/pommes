@@ -207,7 +207,7 @@ public class DatabaseAdd extends Base {
         }
 
         public void summary() {
-            environment.console().info.println("Added " + (count - errors) + "/" + count + " poms successfully.");
+            environment.console().info.println((count - errors) + "/" + count + " poms processed successfully.");
         }
     }
 }
