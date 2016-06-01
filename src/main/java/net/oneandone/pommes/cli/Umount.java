@@ -19,7 +19,6 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
-import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.mount.Remove;
 import net.oneandone.pommes.mount.StatusException;
@@ -45,7 +44,6 @@ public class Umount extends Base {
     @Override
     public void run(Database database) throws Exception {
         int problems;
-        Fstab fstab;
         Map<FileNode, Scm> checkouts;
         Pom scannedPom;
         List<Action> removes;
@@ -54,7 +52,6 @@ public class Umount extends Base {
         FileNode directory;
         Scm scm;
 
-        fstab = Fstab.load(world);
         checkouts = new HashMap<>();
         Scm.scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {
@@ -71,23 +68,18 @@ public class Umount extends Base {
                 }
             }
             scannedPom = environment.scanPom(directory);
-            point = fstab.pointOpt(directory);
-            if (point == null) {
-                console.error.println("? " + directory + " (" + scannedPom + ")");
-                problems++;
-            } else {
-                configuredDirectory = point.directory(scannedPom);
-                if (directory.equals(configuredDirectory)) {
-                    try {
-                        removes.add(Remove.create(directory, scannedPom));
-                    } catch (StatusException e) {
-                        console.error.println(e.getMessage());
-                        problems++;
-                    }
-                } else {
-                    console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
+            point = environment.mount();
+            configuredDirectory = point.directory(scannedPom);
+            if (directory.equals(configuredDirectory)) {
+                try {
+                    removes.add(Remove.create(directory, scannedPom));
+                } catch (StatusException e) {
+                    console.error.println(e.getMessage());
                     problems++;
                 }
+            } else {
+                console.error.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
+                problems++;
             }
         }
         if (problems > 0) {

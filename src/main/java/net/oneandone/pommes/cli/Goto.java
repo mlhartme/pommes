@@ -20,7 +20,6 @@ import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
-import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Nop;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -44,24 +43,16 @@ public class Goto extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        Fstab fstab;
         List<Action> actions;
-        List<FileNode> directories;
+        FileNode directory;
         Action action;
         String result;
 
-        fstab = Fstab.load(world);
         actions = new ArrayList<>();
         for (Pom pom : Field.poms(database.query(query, environment))) {
-            directories = fstab.directories(pom);
-            if (directories.isEmpty()) {
-                console.info.println("ignored (no mount points): " + pom);
-            } else {
-                for (FileNode directory : directories) {
-                    action = Checkout.createOpt(environment, directory, pom);
-                    actions.add(action != null ? action : new Nop(directory, pom.scm));
-                }
-            }
+            directory = environment.mount().directory(pom);
+            action = Checkout.createOpt(environment, directory, pom);
+            actions.add(action != null ? action : new Nop(directory, pom.scm));
         }
         action = runSingle(actions);
         if (action == null) {

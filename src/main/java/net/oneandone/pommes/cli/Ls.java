@@ -18,7 +18,6 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
@@ -41,13 +40,11 @@ public class Ls extends Base {
 
     @Override
     public void run(Database notUsed) throws Exception {
-        Fstab fstab;
         Map<FileNode, Scm> checkouts;
         Pom scannedPom;
         FileNode configuredDirectory;
         Point point;
 
-        fstab = Fstab.load(world);
         checkouts = new HashMap<>();
         Scm.scanCheckouts(root, checkouts);
         if (checkouts.isEmpty()) {
@@ -55,16 +52,12 @@ public class Ls extends Base {
         }
         for (FileNode directory : checkouts.keySet()) {
             scannedPom = environment.scanPom(directory);
-            point = fstab.pointOpt(directory);
-            if (point == null) {
-                console.info.println("? " + directory + " (" + scannedPom + ")");
+            point = environment.mount();
+            configuredDirectory = point.directory(scannedPom);
+            if (directory.equals(configuredDirectory)) {
+                console.info.println("  " + directory + " (" + scannedPom + ")");
             } else {
-                configuredDirectory = point.directory(scannedPom);
-                if (directory.equals(configuredDirectory)) {
-                    console.info.println("  " + directory + " (" + scannedPom + ")");
-                } else {
-                    console.info.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
-                }
+                console.info.println("C " + directory + " vs " + configuredDirectory + " (" + scannedPom + ")");
             }
         }
         for (FileNode directory : unknown(root, checkouts.keySet())) {

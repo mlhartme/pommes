@@ -40,27 +40,22 @@ public class Mount extends Base {
         List<Action> adds;
         Action action;
         int problems;
-        List<FileNode> directories;
+        FileNode directory;
 
         adds = new ArrayList<>();
         problems = 0;
         for (Pom pom : Field.poms(database.query(query, environment))) {
-            directories = environment.fstab().directories(pom);
-            if (directories.isEmpty()) {
-                console.error.println("no mount point for " + pom);
-                problems++;
-            } else for (FileNode directory : directories) {
-                try {
-                    action = Checkout.createOpt(environment, directory, pom);
-                    if (action != null) {
-                        adds.add(action);
-                    } else {
-                        console.verbose.println("already mounted: " + directory);
-                    }
-                } catch (StatusException e) {
-                    console.error.println(e.getMessage());
-                    problems++;
+            directory = environment.mount().directory(pom);
+            try {
+                action = Checkout.createOpt(environment, directory, pom);
+                if (action != null) {
+                    adds.add(action);
+                } else {
+                    console.verbose.println("already mounted: " + directory);
                 }
+            } catch (StatusException e) {
+                console.error.println(e.getMessage());
+                problems++;
             }
         }
         if (problems > 0) {

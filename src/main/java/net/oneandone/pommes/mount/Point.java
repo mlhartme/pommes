@@ -16,102 +16,37 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.sushi.fs.DirectoryNotFoundException;
-import net.oneandone.sushi.fs.ExistsException;
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
-
-import java.io.IOException;
-import java.util.List;
 
 /** mount point in fstab */
 public class Point {
-    public static Point parse(World world, String line) throws ExistsException, DirectoryNotFoundException {
-        List<String> parts;
-        String group;
-        FileNode directory;
-
-        parts = Separator.SPACE.split(line);
-        switch (parts.size()) {
-            case 1:
-                group = "";
-                break;
-            case 2:
-                group = parts.remove(0);
-                break;
-            default:
-                throw new IllegalArgumentException(line);
-        }
-        directory = world.file(parts.remove(0));
-        directory.checkDirectory();
-        return new Point(group, directory, parts);
-    }
-
-    public final String groupPrefix;
     public final FileNode directory;
-    public final List<String> defaults; // TODO: unused
 
-    public Point(String groupPrefix, FileNode directory, List<String> defaults) {
-        this.groupPrefix = groupPrefix;
+    public Point(FileNode directory) {
         this.directory = directory;
-        this.defaults = defaults;
     }
 
     public String group(FileNode childDirectory) {
         if (childDirectory.equals(directory)) {
-            // to avoid "." returned by get relative
-            return groupPrefix;
+            return "";
         } else if (!childDirectory.hasAnchestor(directory)) {
             return null;
         } else {
-            return groupPrefix + "." + childDirectory.getRelative(directory).replace('/', '.');
+            return childDirectory.getRelative(directory).replace('/', '.');
         }
     }
 
     public FileNode directory(Pom pom) {
-        FileNode result;
-
-        result = directoryOpt(pom);
-        if (result == null) {
-            throw new IllegalStateException(pom.toLine());
-        }
-        return result;
-    }
-
-    public FileNode directoryOpt(Pom pom) {
         String ga;
-        String remaining;
+        String path;
 
         ga = pom.coordinates.groupId + "." + pom.coordinates.artifactId;
-        if (ga.startsWith(groupPrefix)) {
-            remaining = ga.substring(groupPrefix.length());
-            if (!remaining.isEmpty()) {
-                if (groupPrefix.isEmpty()) {
-                    // nothing to do
-                } else {
-                    if (remaining.charAt(0) != '.') {
-                        return null;
-                    }
-                    remaining = remaining.substring(1);
-                }
-                remaining = remaining.replace('.', '/');
-            }
-            return directory.join(withBranch(remaining, pom));
-        } else {
-            return null;
-        }
-    }
-
-    public void checkConflict(Point existing) throws IOException {
-        if (directory.hasAnchestor(existing.directory) || existing.directory.hasAnchestor(directory)) {
-            throw new IOException("conflicting mount points: " + directory + " vs " + existing.directory);
-        }
+        path = ga.replace('.', '/');
+        return directory.join(withBranch(path, pom));
     }
 
     //--
-
 
     private static final String BRANCHES = "/branches/";
 
@@ -151,19 +86,5 @@ public class Point {
             }
         }
         return max;
-    }
-
-    public String toLine() {
-        StringBuilder result;
-
-        result = new StringBuilder();
-        result.append(groupPrefix);
-        result.append(' ');
-        result.append(directory.getAbsolute());
-        for (String dflt : defaults) {
-            result.append(' ');
-            result.append(dflt);
-        }
-        return result.toString();
     }
 }

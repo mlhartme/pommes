@@ -21,7 +21,6 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
-import net.oneandone.pommes.mount.Fstab;
 import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.scm.Scm;
@@ -39,11 +38,14 @@ public class Environment implements Variables {
     private boolean noDownload;
     private boolean upload;
 
+    private Point mount;
+
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
-    private Fstab lazyFstab;
 
     public Environment(Console console, World world, boolean download, boolean noDownload, boolean upload) throws IOException {
+        String m;
+
         if (download && noDownload) {
             throw new ArgumentException("incompatible load options");
         }
@@ -53,9 +55,11 @@ public class Environment implements Variables {
         this.noDownload = noDownload;
         this.upload = upload;
 
+        m = System.getenv("POMMES_MOUNT");
+        this.mount = new Point(m == null ? (FileNode) world.getHome().join("Pommes") : world.file(m));
+
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
-        this.lazyFstab = null;
     }
 
     public void begin(Database database) throws IOException {
@@ -87,18 +91,15 @@ public class Environment implements Variables {
         return world;
     }
 
+    public Point mount() {
+        return mount;
+    }
+
     public Maven maven() throws IOException {
         if (lazyMaven == null) {
             lazyMaven = Maven.withSettings(world);
         }
         return lazyMaven;
-    }
-
-    public Fstab fstab() throws IOException {
-        if (lazyFstab == null) {
-            lazyFstab = Fstab.load(world);
-        }
-        return lazyFstab;
     }
 
     public Pom currentPom() throws IOException {
@@ -113,16 +114,11 @@ public class Environment implements Variables {
     public String lookup(String name) throws IOException {
         Pom p;
         FileNode here;
-        Point point;
 
         switch (name) {
             case "scm":
                 here = world.getWorking();
-                point = fstab().pointOpt(here);
-                if (point == null) {
-                    throw new IllegalArgumentException("no mount point for directory " + here.getAbsolute());
-                }
-                return point.group(here);
+                return mount.group(here);
             case "gav":
                 p = currentPom();
                 return p.coordinates.toGavString();

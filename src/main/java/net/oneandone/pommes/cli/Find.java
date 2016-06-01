@@ -143,10 +143,9 @@ public class Find extends Base {
                         values.add(Character.toString(c));
                         break;
                     case 'c':
-                        for (FileNode directory : environment.fstab().directories(Field.pom(document))) {
-                            if (directory.exists()) {
-                                values.add(directory.getAbsolute());
-                            }
+                        FileNode directory = environment.mount().directory(Field.pom(document));
+                        if (directory.exists()) {
+                            values.add(directory.getAbsolute());
                         }
                         break;
                     default:
