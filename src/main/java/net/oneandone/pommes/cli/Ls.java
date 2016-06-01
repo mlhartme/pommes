@@ -58,7 +58,7 @@ public class Ls extends Base {
             point = environment.mount();
             configured = point.directory(foundPom);
             if (found.equals(configured)) {
-                console.info.println((scm.isCommitted(found) ? ' ' : 'M') + "  " + found + " (" + foundPom + ")");
+                console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
             } else {
                 console.info.println("C " + found + " vs " + configured + " (" + foundPom + ")");
             }

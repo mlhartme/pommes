@@ -27,7 +27,7 @@ import net.oneandone.sushi.launcher.Launcher;
 import java.io.IOException;
 
 public class Checkout extends Action {
-    public static Checkout createOpt(Environment environment, FileNode directory, Pom pom) throws IOException {
+    public static Action createOpt(Environment environment, FileNode directory, Pom pom) throws IOException {
         Pom scannedPom;
         Scm scm;
 
@@ -39,11 +39,15 @@ public class Checkout extends Action {
                 throw new StatusException("C " + directory + " (" + pom.scm + " vs " + scannedPom.scm + ")");
             }
         } else {
+            if (pom.scm == null) {
+                return new Error(directory, pom.scm, new IOException("missing scm: " + pom.scm));
+            }
             scm = Scm.probeUrl(pom.scm);
             if (scm == null) {
-                throw new IOException("unknown scm: " + pom.scm);
+                return new Error(directory, pom.scm, new IOException("unknown scm: " + pom.scm));
+            } else {
+                return new Checkout(scm, directory, pom.scm);
             }
-            return new Checkout(scm, directory, pom.scm);
         }
     }
 
