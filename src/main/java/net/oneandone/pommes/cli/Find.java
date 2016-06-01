@@ -25,6 +25,7 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
@@ -37,10 +38,10 @@ public class Find extends Base {
     private final boolean json;
     private final boolean dump;
     private final String format;
-    private final String query;
+    private final List<String> query;
     private final Node target;
 
-    public Find(Environment environment, boolean json, boolean dump, String format, String query, String target)
+    public Find(Environment environment, boolean json, boolean dump, String format, String target, List<String> query)
             throws URISyntaxException, NodeInstantiationException {
         super(environment);
 
@@ -51,8 +52,8 @@ public class Find extends Base {
         this.json = json;
         this.dump = dump;
         this.format = format == null ? "%a @ %s %c" : format;
+        this.target = target == null ? world.node("console:///") : fileOrNode(world, target);
         this.query = query;
-        this.target = target.isEmpty() ? world.node("console:///") : fileOrNode(world, target);
     }
 
     private static Node fileOrNode(World world, String target) throws URISyntaxException, NodeInstantiationException {

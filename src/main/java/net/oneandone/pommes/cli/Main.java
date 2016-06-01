@@ -24,6 +24,7 @@ import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -37,7 +38,7 @@ public class Main {
                 + "  'pommes' ['-v'|'-e'] command sync-options args*\n"
                 + "\n"
                 + "search commands\n"
-                + "  'find' ('-json' | -dump' | '-format' str)? query target?\n"
+                + "  'find' ('-json' | -dump' | '-format' str)? ('-target' str)? query\n"
                 + "                        print projects matching this query;\n"
                 + "                        json prints results in json, dump without pretty-printing;\n"
                 + "                        format string supports the following place holder:\n"
@@ -60,7 +61,7 @@ public class Main {
                 + "  'list' root?          print all checkouts under the specified directory with status markers:\n"
                 + "                        C - checkout url does not match url configured by fstab\n"
                 + "                        ? - checkout has no configured url configured by fstab\n"
-                + "  'goto' query choice?  offer selection of matching project, check it out when necessary,\n"
+                + "  'goto' query          offer selection of matching project, check it out when necessary,\n"
                 + "                        and cds into the checkout directory\n"
                 + "\n"
                 + "commands that modify the database\n"
@@ -83,11 +84,13 @@ public class Main {
                 + "  '-upload'             upload local database after command execution\n"
                 + "\n"
                 + "query syntax\n"
-                + "  query     = term ('+' term)* | lucene\n"
-                + "  term      = substring | field\n"
+                + "  query     = or\n"
+                + "  or        = (and (' ' and)*)? \n"
+                + "  and       = term ('+' term)*\n"
+                + "  term      = substring | field | lucene\n"
                 + "  substring = STR                    ; substring in gav OR origin\n"
                 + "  field     = FIELD_LETTER* ':' STR  ; substring match on one of the specified fields (or 'ao' if not specified)\n"
-                + "  lucene    = '%' STR                ; STR in Lucene Query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html\n"
+                + "  lucene    = '!' STR                ; STR in Lucene query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html\n"
                 + "and STR may contain the following variables:\n"
                 + "  =gav=     = coordinates for current project\n"
                 + "  =ga=      = group and artifact of current project\n"
@@ -118,17 +121,17 @@ public class Main {
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
         cli.begin(Environment.class, "-download -no-download -upload");
-          cli.add(Mount.class, "mount query");
+          cli.add(Mount.class, "mount query*");
           cli.add(Umount.class, "umount -stale root?=.");
 
           cli.add(Ls.class, "list root?=.");
-          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query goto?");
+          cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query*");
 
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
-          cli.add(Find.class, "find -json -dump -format=null query target?");
+          cli.add(Find.class, "find -json -dump -format=null -target=null query*");
           cli.add(FindUsers.class, "users -format=%a§20@§20%o§20->§20%d[%a]");
 
         System.exit(cli.run(args));
@@ -146,7 +149,7 @@ public class Main {
 
     public static class FindUsers extends Find {
         public FindUsers(Environment environment, String format) throws URISyntaxException, NodeInstantiationException {
-            super(environment, false, false, format, "dp:=ga=", "");
+            super(environment, false, false, format, null, Collections.singletonList("dp:=ga="));
         }
     }
 }

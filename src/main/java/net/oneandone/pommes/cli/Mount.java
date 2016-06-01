@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Mount extends Base {
-    private final String query;
+    private final List<String> query;
 
-    public Mount(Environment environment, String query) {
+    public Mount(Environment environment, List<String> query) {
         super(environment);
         this.query = query;
     }

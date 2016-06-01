@@ -20,16 +20,12 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.io.OS;
-import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -41,7 +37,6 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -159,7 +154,7 @@ public class Database implements AutoCloseable {
         index(Collections.emptyIterator());
     }
 
-    public void remove(String query, Variables variables) throws IOException, QueryNodeException {
+    public void remove(List<String> query, Variables variables) throws IOException, QueryNodeException {
         IndexWriter writer;
         IndexWriterConfig config;
 
@@ -167,7 +162,7 @@ public class Database implements AutoCloseable {
         config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
-        writer.deleteDocuments(pommesQuery(query, variables));
+        writer.deleteDocuments(PommesQuery.build(query, variables));
         writer.close();
     }
 
@@ -204,91 +199,8 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    //-- query
-
-    private static final Separator PLUS = Separator.on('+');
-
-    public List<Document> query(String queryString, Variables variables) throws IOException, QueryNodeException {
-        return query(pommesQuery(queryString, variables));
-    }
-
-    private Query pommesQuery(String queryString, Variables variables) throws IOException, QueryNodeException {
-        BooleanQuery.Builder query;
-        List<String> terms;
-        Query term;
-        int idx;
-        String string;
-        List<Field> selected;
-
-        queryString = variables(queryString, variables);
-        if (queryString.startsWith("%")) {
-            // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-            return new StandardQueryParser().parse(queryString.substring(1), Field.ARTIFACT.dbname());
-        } else {
-            query = new BooleanQuery.Builder();
-            terms = PLUS.split(queryString);
-            if (terms.isEmpty()) {
-                terms.add("");
-            }
-            for (String termString : terms) {
-                idx = termString.indexOf(':');
-                // search origin, not trunk. Because scm url is regularly not adjusted
-                selected = Field.forIds(idx < 1 ? "ao" : termString.substring(0, idx));
-                string = termString.substring(idx + 1); // ok for -1
-                string = variables(string, variables);
-                term = or(selected, string);
-                query.add(term, BooleanClause.Occur.MUST);
-            }
-            return query.build();
-        }
-    }
-
-    private static final String prefix = "=";
-    private static final String suffix = "=";
-
-    private static String variables(String string, Variables variables) throws IOException {
-        StringBuilder builder;
-        int start;
-        int end;
-        int last;
-        String var;
-        String replaced;
-
-        builder = new StringBuilder();
-        last = 0;
-        while (true) {
-            start = string.indexOf(prefix, last);
-            if (start == -1) {
-                if (last == 0) {
-                    return string;
-                } else {
-                    builder.append(string.substring(last));
-                    return builder.toString();
-                }
-            }
-            end = string.indexOf(suffix, start + prefix.length());
-            if (end == -1) {
-                throw new IllegalArgumentException("missing end marker");
-            }
-            var = string.substring(start + prefix.length(), end);
-            replaced = variables.lookup(var);
-            if (replaced == null) {
-                throw new IOException("undefined variable: " + var);
-            }
-            builder.append(string.substring(last, start));
-            builder.append(replaced);
-            last = end + suffix.length();
-        }
-    }
-
-    private static Query or(List<Field> fields, String string) {
-        BooleanQuery.Builder result;
-
-        result = new BooleanQuery.Builder();
-        for (Field field : fields) {
-            result.add(field.substring(string), BooleanClause.Occur.SHOULD);
-        }
-        return result.build();
+    public List<Document> query(List<String> query, Variables variables) throws IOException, QueryNodeException {
+        return query(PommesQuery.build(query, variables));
     }
 
     public List<Document> query(Query query) throws IOException {

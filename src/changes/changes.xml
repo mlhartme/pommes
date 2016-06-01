@@ -12,7 +12,7 @@
         environment variable, default is ~/Pommes.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="add">
-        New query syntax: address fields with their id.
+        New query syntax: address fields with their id; alternatives, separated with blanks; lucene escape starts with '!' now.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="add">
         Store urls in database.

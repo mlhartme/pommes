@@ -30,15 +30,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class Goto extends Base {
-    private final String query;
+    private final List<String> query;
     private final FileNode shellFile;
-    private final int choice;
 
-    public Goto(Environment environment, FileNode shellFile, String query, int choice) {
+    public Goto(Environment environment, FileNode shellFile, List<String> query) {
         super(environment);
         this.shellFile = shellFile;
         this.query = query;
-        this.choice = choice;
     }
 
     @Override
@@ -78,15 +76,6 @@ public class Goto extends Base {
             last = actions.get(0);
             last.run(console);
             return last;
-        }
-        if (choice != 0) {
-            if (choice <= actions.size()) {
-                last = actions.get(choice - 1);
-                last.run(console);
-                return last;
-            } else {
-                console.info.print("choice action not found - ignored: " + choice);
-            }
         }
         Collections.sort(actions);
         last = null;

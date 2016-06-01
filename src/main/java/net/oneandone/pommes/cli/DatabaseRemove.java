@@ -17,11 +17,13 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
 
+import java.util.List;
+
 
 public class DatabaseRemove extends Base {
-    private final String query;
+    private final List<String> query;
 
-    public DatabaseRemove(Environment environment, String query) {
+    public DatabaseRemove(Environment environment, List<String> query) {
         super(environment);
         this.query = query;
     }
