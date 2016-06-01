@@ -112,19 +112,13 @@ public class Environment implements Variables {
     //-- Variables interface
 
     public String lookup(String name) throws IOException {
-        Pom p;
-        FileNode here;
-
         switch (name) {
             case "scm":
-                here = world.getWorking();
-                return mount.group(here);
+                return currentPom().scm;
             case "gav":
-                p = currentPom();
-                return p.coordinates.toGavString();
+                return currentPom().coordinates.toGavString();
             case "ga":
-                p = currentPom();
-                return p.coordinates.toGaString();
+                return currentPom().coordinates.toGaString();
             default:
                 return null;
         }

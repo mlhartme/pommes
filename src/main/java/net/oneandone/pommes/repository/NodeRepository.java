@@ -20,6 +20,7 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
@@ -45,6 +46,7 @@ public class NodeRepository implements Repository {
     private boolean branches;
     private boolean tags;
     private final Filter exclude;
+    private FileNode log;
 
     public NodeRepository(Node node) {
         this(node, false, false);
@@ -55,6 +57,7 @@ public class NodeRepository implements Repository {
         this.exclude = new Filter();
         this.branches = branches;
         this.tags = tags;
+        this.log = null;
     }
 
     @Override
@@ -63,6 +66,8 @@ public class NodeRepository implements Repository {
             branches = true;
         } else if (option.equals("tags")) {
             tags = true;
+        } else if (option.startsWith("trace=")) {
+            log = node.getWorld().file(option.substring(6));
         }
     }
 
@@ -93,6 +98,9 @@ public class NodeRepository implements Repository {
         children = root.list();
         if (children == null) {
             return;
+        }
+        if (log != null) {
+            log.appendString(root.getPath() + "\n");
         }
         for (Node node : children) {
             project = Project.probe(node);
