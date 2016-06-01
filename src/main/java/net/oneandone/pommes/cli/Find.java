@@ -17,7 +17,6 @@ package net.oneandone.pommes.cli;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
@@ -25,7 +24,6 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
@@ -35,25 +33,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Find extends Base {
-    private final boolean json;
-    private final boolean dump;
-    private final String format;
-    private final List<String> query;
-    private final Node target;
+    private static final String JSON = "-json";
+    private static final String DUMP = "-dump";
 
-    public Find(Environment environment, boolean json, boolean dump, String format, String target, List<String> query)
-            throws URISyntaxException, NodeInstantiationException {
+    private final Node target;
+    private final List<String> query;
+    private StringBuilder formatBuilder;
+
+    public Find(Environment environment, String target) throws URISyntaxException, NodeInstantiationException {
         super(environment);
 
-        if (count(json, dump, format != null) > 1) {
-            throw new ArgumentException("ambiguous output options; you cannot mix -json, -dump and -format options");
-        }
-
-        this.json = json;
-        this.dump = dump;
-        this.format = format == null ? "%a @ %s %c" : format;
         this.target = target == null ? world.node("console:///") : fileOrNode(world, target);
-        this.query = query;
+        this.query = new ArrayList<>();
+        this.formatBuilder = null;
+    }
+
+    public void arg(String arg) {
+        switch (arg) {
+            case "-":
+                formatBuilder = new StringBuilder();
+                return;
+            case JSON:
+                formatBuilder = new StringBuilder(JSON);
+                return;
+            case DUMP:
+                formatBuilder = new StringBuilder(DUMP);
+                return;
+            default:
+                if (formatBuilder == null) {
+                    query.add(arg);
+                } else {
+                    if (formatBuilder.length() > 0) {
+                        formatBuilder.append(' ');
+                    }
+                    formatBuilder.append(arg);
+                }
+        }
     }
 
     private static Node fileOrNode(World world, String target) throws URISyntaxException, NodeInstantiationException {
@@ -68,40 +83,36 @@ public class Find extends Base {
         return world.node(target);
     }
 
-    private static int count(boolean ... booleans) {
-        int count;
-
-        count = 0;
-        for (boolean b : booleans) {
-            if (b) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     @Override
     public void run(Database database) throws Exception {
         List<Document> documents;
+        String format;
 
         documents = database.query(query, environment);
         console.verbose.println("Matching documents: " + documents.size());
+        format =  formatBuilder != null ? formatBuilder.toString() : "%a @ %s %c";
+        console.verbose.println("format: " + format);
         try (Writer dest = target.newWriter()) {
-            if (json || dump) {
-                json(Field.poms(documents), dest);
-            } else {
-                text(documents, dest);
+            switch (format) {
+                case JSON:
+                    json(Field.poms(documents), true, dest);
+                    break;
+                case DUMP:
+                    json(Field.poms(documents), false, dest);
+                    break;
+                default:
+                    text(documents, format, dest);
             }
         }
     }
 
-    private void text(List<Document> documents, Writer dest) throws IOException {
+    private void text(List<Document> documents, String format, Writer dest) throws IOException {
         List<String> done;
         String line;
 
         done = new ArrayList<>();
         for (Document document : documents) {
-            line = format(document);
+            line = format(document, format);
             if (!done.contains(line)) {
                 done.add(line);
                 dest.write(line);
@@ -110,19 +121,19 @@ public class Find extends Base {
         }
     }
 
-    private void json(List<Pom> matches, Writer dest) throws Exception {
+    private void json(List<Pom> matches, boolean prettyprint, Writer dest) throws Exception {
         GsonBuilder builder;
         Gson gson;
 
         builder = new GsonBuilder();
-        if (json) {
+        if (prettyprint) {
             builder.setPrettyPrinting();
         }
         gson = builder.create();
         gson.toJson(matches, dest);
     }
 
-    private String format(Document document) throws IOException {
+    private String format(Document document, String format) throws IOException {
         char c;
         StringBuilder result;
         int end;

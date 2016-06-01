@@ -38,11 +38,11 @@ public class Main {
                 + "  'pommes' ['-v'|'-e'] command sync-options args*\n"
                 + "\n"
                 + "search commands\n"
-                + "  'find' ('-json' | -dump' | '-format' str)? ('-target' str)? query\n"
+                + "  'find' ('-target' str)? query ('-' format* | '-json' | '-dump')? \n"
                 + "                        print projects matching this query;\n"
-                + "                        json prints results in json, dump without pretty-printing;\n"
-                + "                        format string supports the following place holder:\n"
-                + "                        %FIELD_ID %c checkouts;\n"
+                + "                        append '-json' to print json, '-dump' to print json without formatting;\n"
+                + "                        format is a string with placeholders: %c is replace be the current checkout\n"
+                + "                        and %FIELD_ID replaced by the respective field\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
                 + "                        the enclosed substring or variables;\n"
                 + "                        target is a file or URL to write results to, default is the console\n"
@@ -131,8 +131,7 @@ public class Main {
           cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
-          cli.add(Find.class, "find -json -dump -format=null -target=null query*");
-          cli.add(FindUsers.class, "users -format=%a§20@§20%o§20->§20%d[%a]");
+          cli.add(Find.class, "find -target=null queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));
     }
@@ -147,9 +146,4 @@ public class Main {
         return result.toString();
     }
 
-    public static class FindUsers extends Find {
-        public FindUsers(Environment environment, String format) throws URISyntaxException, NodeInstantiationException {
-            super(environment, false, false, format, null, Collections.singletonList("dp:=ga="));
-        }
-    }
 }
