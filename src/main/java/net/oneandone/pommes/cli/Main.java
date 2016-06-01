@@ -63,7 +63,7 @@ public class Main {
                 + "  'goto' query choice?  offer selection of matching project, check it out when necessary,\n"
                 + "                        and cds into the checkout directory\n"
                 + "\n"
-                + "database commands\n"
+                + "commands that modify the database\n"
                 + "  'database-clear'      creates a new empty database\n"
                 + "  'database-add' '-dryrun? url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
@@ -72,11 +72,7 @@ public class Main {
                 + "  'database-remove' query\n"
                 + "                        remove all matching documents\n"
                 + "\n"
-                + "other commands\n"
-                + "  'fstab-add' url directory\n"
-                + "                        add an entry to fstab; create directory if it does not exist\n"
-                + "\n"
-                + "fields:\n"
+                + "fields in the database:\n"
                 + fieldList()
                 + "  (field id is the first letter of the field name.)\n"
                 + "\n"
@@ -114,6 +110,7 @@ public class Main {
                 + "  pommes database-add file:///path/to/my/projects\n"
                 + "\n"
                 + "environment:\n"
+                + "  POMMES_MOUNT          directory where to mount projects\n"
                 + "  POMMES_GLOBAL         url pointing to global database zip file\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
@@ -125,8 +122,6 @@ public class Main {
 
           cli.add(Ls.class, "list root?=.");
           cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query goto?");
-
-          cli.add(FstabAdd.class, "fstab-add url directory");
 
           cli.add(DatabaseClear.class, "database-clear");
           cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
