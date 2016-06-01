@@ -86,7 +86,7 @@ public class Main {
                 + "  query     = term ('+' term)* | lucene\n"
                 + "  term      = substring | field\n"
                 + "  substring = STR                    ; substring in gav OR origin\n"
-                + "  field     = FIELD_LETTER* ':' STR  ; substring match at least on of the specified fields (or all if not specified)\n"
+                + "  field     = FIELD_LETTER* ':' STR  ; substring match on one of the specified fields (or 'ao' if not specified)\n"
                 + "  lucene    = '%' STR                ; STR in Lucene Query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html\n"
                 + "and STR may contain the following variables:\n"
                 + "  =gav=     = coordinates for current project\n"

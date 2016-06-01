@@ -232,14 +232,8 @@ public class Database implements AutoCloseable {
             }
             for (String termString : terms) {
                 idx = termString.indexOf(':');
-                if (idx >= 1) {
-                    selected = new ArrayList<>();
-                    for (int i = 0; i < idx; i++) {
-                        selected.add(Field.forId(termString.charAt(i)));
-                    }
-                } else {
-                    selected = Arrays.asList(Field.values());
-                }
+                // search origin, not trunk. Because scm url is regularly not adjusted
+                selected = Field.forIds(idx < 1 ? "ao" : termString.substring(0, idx));
                 string = termString.substring(idx + 1); // ok for -1
                 string = variables(string, variables);
                 term = or(selected, string);

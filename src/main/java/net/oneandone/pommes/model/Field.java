@@ -97,6 +97,16 @@ public enum Field {
         throw new IllegalStateException("unknown field id: " + c);
     }
 
+    public static List<Field> forIds(String str) {
+        List<Field> result;
+
+        result = new ArrayList<>();
+        for (int i = 0, max = str.length(); i < max; i++) {
+            result.add(Field.forId(str.charAt(i)));
+        }
+        return result;
+    }
+
     public static Document document(Pom pom) {
         Document doc;
 
