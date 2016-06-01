@@ -17,25 +17,27 @@ public enum Field {
      * Mandatory. The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ORIGIN,
-    REVISION,
-    PARENT(true, false),
-    ARTIFACT,
-    SCM(true, false),
-    DEP(true, true),
-    URL(true, false);
+    ORIGIN("Where this pom comes from."),
+    REVISION("Last modified timestamp or content hash"),
+    PARENT(true, false, "Parent pom."),
+    ARTIFACT("Coordinates of this pom."),
+    SCM(true, false, "Scm connection."),
+    DEP(true, true, "Dependencies."),
+    URL(true, false, "Url.");
 
     private final boolean optional;
     private final boolean list;
+    public final String description;
     private final String dbname;
 
-    Field() {
-        this(false, false);
+    Field(String description) {
+        this(false, false, description);
     }
 
-    Field(boolean optional, boolean list) {
+    Field(boolean optional, boolean list, String description) {
         this.optional = optional;
         this.list = list;
+        this.description = description;
         this.dbname = name().toLowerCase();
     }
 

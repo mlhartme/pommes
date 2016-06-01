@@ -20,6 +20,7 @@ import net.oneandone.pommes.model.Field;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -77,6 +78,7 @@ public class Main {
                 + "\n"
                 + "fields:\n"
                 + fieldList()
+                + "\n"
                 + "sync options            how to sync between global and local database\n"
                 + "  default behavior      download global database once a day; no uploads\n"
                 + "  '-download'           download global database before command execution\n"
@@ -145,7 +147,7 @@ public class Main {
 
         result = new StringBuilder();
         for (Field field : Field.values()) {
-            result.append("    " + field.dbname() + "\n");
+            result.append("  " + Strings.padRight(field.dbname(), 12) + field.description + "\n");
         }
         return result.toString();
     }
