@@ -11,8 +11,8 @@
         Improved action selection: return quits without actions now, a applies all actions.
       </action>
       <action date="2016-06-01" dev="mlhartme" type="add">
-        Dumped fstab, all projects are mounted according to their groupId. You can configure the root directory with the POMMES_MOUNT
-        environment variable, default is ~/Pommes.
+        Dumped fstab, all projects are mounted according to root/server/groupId/artifactId. You can configure the root directory with the
+        POMMES_MOUNT environment variable, default is ~/Pommes.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="add">
         New query syntax: address fields with their id; alternatives, separated with blanks; lucene escape starts with '!' now.
@@ -55,6 +55,7 @@
       <action date="2016-05-25" dev="mlhartme" type="update">
         database-add: Added artifactory support - specify urls prefixed with 'artifactory:'.
         Added file support - specify file urls.
+        Added json support - specify fil prefixed with 'json:'.
         Subversion urls have to be prefixed with 'svn:' now; -noBranches changed to %branches; also added %tags (default is false for both)
         Added -dryrun option.
       </action>

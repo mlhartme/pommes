@@ -7,6 +7,10 @@ import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class Git extends Scm {
     private static final String PROTOCOL = "git:";
@@ -20,6 +24,11 @@ public class Git extends Scm {
 
     public boolean isUrl(String url) {
         return url.startsWith(PROTOCOL);
+    }
+
+    public String server(String url) throws URISyntaxException {
+        url = Strings.removeLeft(url, PROTOCOL);
+        return new URI(url).getHost();
     }
 
     @Override

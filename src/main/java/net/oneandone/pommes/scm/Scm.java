@@ -5,6 +5,8 @@ import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,10 +63,12 @@ public abstract class Scm {
     //--
 
     public abstract boolean isUrl(String url);
+    public abstract String server(String url) throws URISyntaxException;
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isCommitted(FileNode checkout) throws IOException;
     public abstract String getUrl(FileNode checkout) throws Failure;
 
     public abstract Launcher checkout(FileNode dest, String url) throws Failure;
+
 }

@@ -76,7 +76,7 @@ public class Find extends Base {
         }
     }
 
-    private static Node fileOrNode(World world, String target) throws URISyntaxException, NodeInstantiationException {
+    public static Node fileOrNode(World world, String target) throws URISyntaxException, NodeInstantiationException {
         FileNode file;
 
         if (!target.contains(":")) {

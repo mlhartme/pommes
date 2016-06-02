@@ -16,6 +16,7 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -34,7 +35,7 @@ public class NodeRepository implements Repository {
 
     public static NodeRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeRepository(world.node(url));
+            return new NodeRepository(Find.fileOrNode(world, url));
         } else {
             return null;
         }

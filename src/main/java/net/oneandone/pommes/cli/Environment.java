@@ -15,6 +15,8 @@
  */
 package net.oneandone.pommes.cli;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
@@ -45,6 +47,7 @@ public class Environment implements Variables {
 
     private Point mount;
 
+    private Gson lazyGson;
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
     private Map<String, List<String>> lazyQueries;
@@ -65,6 +68,7 @@ public class Environment implements Variables {
         m = System.getenv("POMMES_MOUNT");
         this.mount = new Point(m == null ? (FileNode) world.getHome().join("Pommes") : world.file(m));
 
+        this.lazyGson = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyQueries = null;
@@ -217,5 +221,12 @@ public class Environment implements Variables {
             }
         }
         return null;
+    }
+
+    public Gson gson() {
+        if (lazyGson == null) {
+            lazyGson = new GsonBuilder().create();
+        }
+        return lazyGson;
     }
 }

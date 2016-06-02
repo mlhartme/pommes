@@ -16,8 +16,12 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /** mount point in fstab */
 public class Point {
@@ -27,13 +31,29 @@ public class Point {
         this.directory = directory;
     }
 
-    public FileNode directory(Pom pom) {
+    public FileNode directory(Pom pom) throws IOException {
         String ga;
         String path;
+        Scm scm;
+        String server;
 
         ga = pom.coordinates.groupId + "." + pom.coordinates.artifactId;
         path = ga.replace('.', '/');
-        return directory.join(withBranch(path, pom));
+        if (pom.scm != null) {
+            scm = Scm.probeUrl(pom.scm);
+            if (scm != null) {
+                try {
+                    server = scm.server(pom.scm);
+                } catch (URISyntaxException e) {
+                    throw new IOException(pom.scm + ": invalid uri", e);
+                }
+            } else {
+                server = "unknown-scm";
+            }
+        } else {
+            server = "missing-scm";
+        }
+        return directory.join(server, withBranch(path, pom));
     }
 
     //--

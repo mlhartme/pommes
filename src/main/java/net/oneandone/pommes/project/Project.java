@@ -16,7 +16,7 @@ public abstract class Project {
         }
     };
 
-    public static Project probe(Node node) {
+    public static Project probe(Node node) throws IOException {
         Project result;
 
         result = MavenProject.probe(node);
@@ -24,6 +24,10 @@ public abstract class Project {
             return result;
         }
         result = ComposerProject.probe(node);
+        if (result != null) {
+            return result;
+        }
+        result = JsonProject.probe(node);
         if (result != null) {
             return result;
         }

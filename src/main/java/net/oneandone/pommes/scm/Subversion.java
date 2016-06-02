@@ -8,6 +8,10 @@ import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class Subversion extends Scm {
     private static final String PROTOCOL = "svn:";
@@ -21,6 +25,10 @@ public class Subversion extends Scm {
 
     public boolean isUrl(String url) {
         return url.startsWith(PROTOCOL);
+    }
+
+    public String server(String url) throws URISyntaxException {
+        return new URI(Strings.removeLeft(url, PROTOCOL)).getHost();
     }
 
     @Override
