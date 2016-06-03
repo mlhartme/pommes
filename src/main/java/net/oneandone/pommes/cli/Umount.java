@@ -62,13 +62,17 @@ public class Umount extends Base {
                     continue;
                 }
             }
-            scannedPom = environment.scanPom(checkout);
-            root = environment.properties().root;
-            configuredDirectory = root.directory(scannedPom);
-            if (checkout.equals(configuredDirectory)) {
-                removes.add(Remove.create(checkout, scannedPom));
+            scannedPom = environment.scanPomOpt(checkout);
+            if (scannedPom == null) {
+                removes.add(new Problem(checkout, checkout + ": unknown project"));
             } else {
-                removes.add(new Problem(checkout, checkout + ": checkout expected at " + configuredDirectory));
+                root = environment.properties().root;
+                configuredDirectory = root.directory(scannedPom);
+                if (checkout.equals(configuredDirectory)) {
+                    removes.add(Remove.create(checkout, scannedPom));
+                } else {
+                    removes.add(new Problem(checkout, checkout + ": checkout expected at " + configuredDirectory));
+                }
             }
         }
         runAll(removes);

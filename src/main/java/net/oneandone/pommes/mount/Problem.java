@@ -30,7 +30,7 @@ public class Problem extends Action {
 
     @Override
     public char status() {
-        return '1';
+        return '!';
     }
 
     @Override
