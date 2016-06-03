@@ -102,7 +102,7 @@ public class Find extends Base {
                     environment.defineArgument(i, query.get(i));
                 }
                 macroName = query.get(0).substring(1);
-                macro = environment.lookupQuery(macroName);
+                macro = environment.properties().lookupQuery(macroName);
                 if (macro == null) {
                     throw new ArgumentException("query macro not found: " + macroName);
                 }
@@ -125,7 +125,7 @@ public class Find extends Base {
                 if (macroName == null) {
                     macroName = "default";
                 }
-                format = environment.lookupFormat(macroName);
+                format = environment.properties().lookupFormat(macroName);
                 if (format == null) {
                     format = "%o";
                 }
