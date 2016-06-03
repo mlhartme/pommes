@@ -42,7 +42,7 @@ public class Status extends Base {
         Map<FileNode, Scm> checkouts;
         Root root;
         FileNode found;
-        FileNode configured;
+        FileNode expected;
         Pom foundPom;
         Scm scm;
 
@@ -55,19 +55,19 @@ public class Status extends Base {
             scm = entry.getValue();
             foundPom = environment.scanPomOpt(found);
             if (foundPom == null) {
-                console.info.println("- " + found);
+                console.info.println("? " + found + " (unknown project)");
             } else {
                 root = environment.properties().root;
-                configured = root.directory(foundPom);
-                if (found.equals(configured)) {
+                expected = root.directory(foundPom);
+                if (found.equals(expected)) {
                     console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
                 } else {
-                    console.info.println("C " + found + " vs " + configured + " (" + foundPom + ")");
+                    console.info.println("C " + found + " (expected at " + expected + ")");
                 }
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet())) {
-            console.info.println("? " + u);
+            console.info.println("? " + u + " (unknown scm)");
         }
     }
 
