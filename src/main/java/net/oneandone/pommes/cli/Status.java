@@ -29,10 +29,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class Ls extends Base {
+public class Status extends Base {
     private final FileNode directory;
 
-    public Ls(Environment environment, FileNode directory) {
+    public Status(Environment environment, FileNode directory) {
         super(environment);
         this.directory = directory;
     }
@@ -53,13 +53,17 @@ public class Ls extends Base {
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
             scm = entry.getValue();
-            foundPom = environment.scanPom(found);
-            root = environment.properties().root;
-            configured = root.directory(foundPom);
-            if (found.equals(configured)) {
-                console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
+            foundPom = environment.scanPomOpt(found);
+            if (foundPom == null) {
+                console.info.println("- " + found);
             } else {
-                console.info.println("C " + found + " vs " + configured + " (" + foundPom + ")");
+                root = environment.properties().root;
+                configured = root.directory(foundPom);
+                if (found.equals(configured)) {
+                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
+                } else {
+                    console.info.println("C " + found + " vs " + configured + " (" + foundPom + ")");
+                }
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet())) {

@@ -17,14 +17,11 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Cli;
 import net.oneandone.pommes.model.Field;
-import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Collections;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -58,7 +55,7 @@ public class Main {
                 + "                        a checkout is stale if the project has been removed from the database;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checks for uncommitted changes before selection\n"
-                + "  'list' root?          print all checkouts under the specified directory with status markers:\n"
+                + "  'status' root?        print all checkouts under the specified directory with status markers:\n"
                 + "                        C - checkout url does not match url configured by fstab\n"
                 + "                        ? - checkout has no configured url configured by fstab\n"
                 + "  'goto' query          offer selection of matching project, check it out when necessary,\n"
@@ -122,7 +119,7 @@ public class Main {
           cli.add(Mount.class, "mount query*");
           cli.add(Umount.class, "umount -stale root?=.");
 
-          cli.add(Ls.class, "list root?=.");
+          cli.add(Status.class, "status root?=.");
           cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query*");
 
           cli.add(DatabaseClear.class, "database-clear");

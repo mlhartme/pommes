@@ -2,6 +2,9 @@
   <body>
     <release date="2016-02-xx" version="3.0.0">
       <action date="2016-06-01" dev="mlhartme" type="update">
+        Renamed list command to status.
+      </action>
+      <action date="2016-06-01" dev="mlhartme" type="update">
         ~/.pommes.properties to define query and format macros. Remove POMMES_LOCAL and POMMES_GLOBAL variables, this is defined
         by the properties file now. You can change the default location of this file with the new POMMES_PROPERTIES variable.
       </action>
