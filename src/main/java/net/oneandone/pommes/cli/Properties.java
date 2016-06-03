@@ -42,13 +42,17 @@ public class Properties {
             local = world.getTemp().join("pommes-" + System.getProperty("user.name"));
         }
         file.writeLines(
-                "# where to store the database locally",
+                "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
+                "",
+                "",
+                "# directory where to store the database locally",
                 "database.local=" + local.getAbsolute(),
                 "",
+                "# url where to initialize database from; comment-out to use to local database only",
                 "#database.global=",
                 "",
-                "# directory where to checkout",
-                "mount=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),
+                "# directory where to place checkouts",
+                "mount.root=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),
                 "",
                 "# query macros",
                 "query.users=d:=ga=",
@@ -81,7 +85,7 @@ public class Properties {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
-            } else if (key.equals("root")) {
+            } else if (key.equals("mount.root")) {
                 root = new Root(world.file(props.getProperty(key)));
             } else if (key.equals("database.local")) {
                 databaseLocal = world.file(props.getProperty(key));

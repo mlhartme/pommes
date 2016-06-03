@@ -135,7 +135,6 @@ public class Environment implements Variables {
     public Properties properties() throws IOException {
         String path;
         FileNode file;
-        FileNode local;
 
         if (lazyProperties == null) {
             path = System.getenv("POMMES_PROPERTIES");
