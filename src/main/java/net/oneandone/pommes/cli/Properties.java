@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.pommes.mount.Point;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
@@ -28,9 +29,11 @@ public class Properties {
         String queryPrefix = "query.";
         String formatPrefix = "format.";
         java.util.Properties props;
+        Point mount;
         Map<String, List<String>> queries;
         Map<String, String> formats;
 
+        mount = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
         props = file.readProperties();
@@ -39,19 +42,26 @@ public class Properties {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
+            } else if (key.equals("mount")) {
+                mount = new Point(file.getWorld().file(props.getProperty(key)));
             } else {
                 throw new IOException("unknown property: " + key);
             }
         }
-        return new Properties(queries, formats);
+        if (mount == null) {
+            throw new IOException(file + ": missing property: mount");
+        }
+        return new Properties(mount, queries, formats);
     }
 
     //--
 
+    public final Point mount;
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    public Properties(Map<String, List<String>> queries, Map<String, String> formats) throws IOException {
+    public Properties(Point mount, Map<String, List<String>> queries, Map<String, String> formats) throws IOException {
+        this.mount = mount;
         this.queries = queries;
         this.formats = formats;
     }

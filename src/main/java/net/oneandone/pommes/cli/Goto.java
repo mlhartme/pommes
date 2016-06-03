@@ -48,7 +48,7 @@ public class Goto extends Base {
 
         actions = new ArrayList<>();
         for (Pom pom : Field.poms(database.query(query, environment))) {
-            directory = environment.mount().directory(pom);
+            directory = environment.properties().mount.directory(pom);
             action = Checkout.createOpt(environment, directory, pom);
             actions.add(action != null ? action : new Nop(directory, pom.scm));
         }

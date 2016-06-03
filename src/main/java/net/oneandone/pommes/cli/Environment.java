@@ -42,8 +42,6 @@ public class Environment implements Variables {
     private boolean noDownload;
     private boolean upload;
 
-    private Point mount;
-
     private Gson lazyGson;
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
@@ -60,10 +58,6 @@ public class Environment implements Variables {
         this.download = download;
         this.noDownload = noDownload;
         this.upload = upload;
-
-        m = System.getenv("POMMES_MOUNT");
-        this.mount = new Point(m == null ? (FileNode) world.getHome().join("Pommes") : world.file(m));
-
         this.lazyGson = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
@@ -97,10 +91,6 @@ public class Environment implements Variables {
 
     public World world() {
         return world;
-    }
-
-    public Point mount() {
-        return mount;
     }
 
     public Maven maven() throws IOException {
@@ -155,7 +145,13 @@ public class Environment implements Variables {
             }
             if (!file.exists()) {
                 file.writeLines(
+                        "# directory where to checkout",
+                        "mount=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),
+                        "",
+                        "# query macros",
                         "query.users=d:=ga=",
+                        "",
+                        "# format macros",
                         "format.default=%a",
                         "format.users=%a -> %d[=ga=]");
                 console.info.println("create default configuration at " + file);

@@ -198,7 +198,7 @@ public class Find extends Base {
                         values.add(Character.toString(c));
                         break;
                     case 'c':
-                        FileNode directory = environment.mount().directory(Field.pom(document));
+                        FileNode directory = environment.properties().mount.directory(Field.pom(document));
                         if (directory.exists()) {
                             values.add(directory.getAbsolute());
                         }

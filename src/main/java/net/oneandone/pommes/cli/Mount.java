@@ -41,7 +41,7 @@ public class Mount extends Base {
 
         adds = new ArrayList<>();
         for (Pom pom : Field.poms(database.query(query, environment))) {
-            directory = environment.mount().directory(pom);
+            directory = environment.properties().mount.directory(pom);
             action = Checkout.createOpt(environment, directory, pom);
             if (action != null) {
                 adds.add(action);

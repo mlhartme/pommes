@@ -63,7 +63,7 @@ public class Umount extends Base {
                 }
             }
             scannedPom = environment.scanPom(directory);
-            point = environment.mount();
+            point = environment.properties().mount;
             configuredDirectory = point.directory(scannedPom);
             if (directory.equals(configuredDirectory)) {
                 removes.add(Remove.create(directory, scannedPom));
