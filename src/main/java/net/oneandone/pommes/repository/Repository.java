@@ -28,6 +28,10 @@ public interface Repository {
         if (repository != null) {
             return repository;
         }
+        repository = BitbucketRepository.createOpt(world, url);
+        if (repository != null) {
+            return repository;
+        }
         repository = JsonRepository.createOpt(world, url);
         if (repository != null) {
             return repository;

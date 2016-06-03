@@ -156,7 +156,7 @@ public class Environment implements Variables {
                         "# where to store the database locally",
                         "database.local=" + local.getAbsolute(),
                         "",
-                        "#database.remote=",
+                        "#database.global=",
                         "",
                         "# directory where to checkout",
                         "mount=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),

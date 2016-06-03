@@ -56,7 +56,7 @@ public class Properties {
                 mount = new Point(world.file(props.getProperty(key)));
             } else if (key.equals("database.local")) {
                 databaseLocal = world.file(props.getProperty(key));
-            } else if (key.equals("database.remote")) {
+            } else if (key.equals("database.global")) {
                 try {
                     databaseGlobal = world.node(props.getProperty(key));
                 } catch (URISyntaxException e) {
@@ -77,17 +77,17 @@ public class Properties {
 
     //--
 
-    public final Node databaseRemote;
     public final FileNode databaseLocal;
+    public final Node databaseGlobal;
 
     public final Point mount;
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    public Properties(FileNode databaseLocal, Node databaseRemote,
+    public Properties(FileNode databaseLocal, Node databaseGlobal,
                       Point mount, Map<String, List<String>> queries, Map<String, String> formats) throws IOException {
         this.databaseLocal = databaseLocal;
-        this.databaseRemote = databaseRemote;
+        this.databaseGlobal = databaseGlobal;
         this.mount = mount;
         this.queries = queries;
         this.formats = formats;
@@ -102,7 +102,7 @@ public class Properties {
     }
 
     public Database loadDatabase() {
-        return new Database(databaseLocal, databaseRemote);
+        return new Database(databaseLocal, databaseGlobal);
     }
 
 }
