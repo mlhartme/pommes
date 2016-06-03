@@ -136,7 +136,7 @@ public class ArtifactoryRepository implements Repository {
                     node = root.join(Strings.removeLeft(uri, "/"));
                     project = Project.probe(node);
                     if (project != null) {
-                        project.setOrigin("artifactory:" + node.getURI().toString());
+                        project.setOrigin("artifactory:" + node.getUri().toString());
                         project.setRevision(sha1);
                         dest.put(project);
                     }

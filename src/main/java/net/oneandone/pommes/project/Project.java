@@ -52,7 +52,7 @@ public abstract class Project {
     }
 
     public String getOrigin() {
-        return overrideOrigin == null ? file.getURI().toString() : overrideOrigin;
+        return overrideOrigin == null ? file.getUri().toString() : overrideOrigin;
     }
 
     public String getRevision() throws GetLastModifiedException {

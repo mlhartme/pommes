@@ -81,7 +81,7 @@ public class Environment implements Variables {
 
         if (upload) {
             node = database.upload();
-            console.info.println("uploaded global pommes database: " + node.getURI() + ", " + (node.size() / 1024) + "k");
+            console.info.println("uploaded global pommes database: " + node.getUri() + ", " + (node.size() / 1024) + "k");
         }
     }
 

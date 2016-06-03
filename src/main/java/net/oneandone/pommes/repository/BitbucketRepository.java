@@ -23,7 +23,6 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.http.HttpNode;
 
 import java.io.IOException;
@@ -57,11 +56,11 @@ public class BitbucketRepository implements Repository {
     }
 
     public void addOption(String option) {
-        throw new ArgumentException(bitbucket.getURI() + ": unknown option: " + option);
+        throw new ArgumentException(bitbucket.getUri() + ": unknown option: " + option);
     }
 
     public void addExclude(String exclude) {
-        throw new ArgumentException(bitbucket.getURI() + ": excludes not supported: " + exclude);
+        throw new ArgumentException(bitbucket.getUri() + ": excludes not supported: " + exclude);
     }
 
     @Override
