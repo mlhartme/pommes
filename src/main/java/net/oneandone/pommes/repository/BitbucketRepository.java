@@ -23,17 +23,19 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.http.HttpNode;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
+/** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class BitbucketRepository implements Repository {
     public static void main(String[] args) throws IOException, URISyntaxException {
         HttpNode node;
         node = (HttpNode) World.create().node("https://bitbucket.1and1.org:443");
-        node = node.getRoot().node("rest/api/1.0/projects/CISOOPS/repos", "limit=1&start=0");
+        node = node.getRoot().node("projects/CISOOPS/repos/change/browse/src/main/java/com/oneandone/sales/tools/change/Change.java", "raw");
         System.out.println(node);
         System.out.println(node.readString());
 
@@ -70,6 +72,8 @@ public class BitbucketRepository implements Repository {
         Node node;
         JsonParser parser;
         JsonObject paged;
+        Node pom;
+        Project project;
 
         path = "rest/api/1.0/projects/CISOOPS/repos";
         if (!bitbucket.getPath().isEmpty()) {
@@ -81,11 +85,19 @@ public class BitbucketRepository implements Repository {
             str = node.readString();
             paged = parser.parse(str).getAsJsonObject();
             for (JsonElement repo : paged.get("values").getAsJsonArray()) {
-                System.out.println(i + ": " + repo.getAsJsonObject().get("slug").getAsString() + " - " + repo.getAsJsonObject().get("name").getAsString());
+                String name = repo.getAsJsonObject().get("slug").getAsString();
 
-                //                 name = r.get("name").getAsString();
-                // repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags);
-                // repository.scan(dest);
+                // TODO: offer all files, not only poms. Recursion.
+                // https://bitbucket.1and1.org:443/rest/api/1.0/projects/CISOOPS/repos/change/files/
+
+                // TODO:
+                // curl https://bitbucket.1and1.org:443/rest/api/1.0/projects/CISOOPS/repos/change/browse/pom.xml
+                pom = node.getRoot().node("projects/CISOOPS/repos/" + name + "/browse/pom.xml", "raw");
+                System.out.println("pom: " + pom);
+                project = Project.probe(pom);
+                if (project != null) {
+                    dest.put(project);
+                }
             }
             if (paged.get("isLastPage").getAsBoolean()) {
                 break;
