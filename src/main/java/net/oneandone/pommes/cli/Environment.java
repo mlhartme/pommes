@@ -29,6 +29,7 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.io.OS;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -135,6 +136,7 @@ public class Environment implements Variables {
     public Properties properties() throws IOException {
         String path;
         FileNode file;
+        FileNode local;
 
         if (lazyProperties == null) {
             path = System.getenv("POMMES_PROPERTIES");
@@ -144,7 +146,18 @@ public class Environment implements Variables {
                 file = world.file(path);
             }
             if (!file.exists()) {
+                if (OS.CURRENT == OS.MAC) {
+                    // see https://developer.apple.com/library/mac/qa/qa1170/_index.html
+                    local = (FileNode) world.getHome().join("Library/Caches/pommes");
+                } else {
+                    local = world.getTemp().join("pommes-" + System.getProperty("user.name"));
+                }
                 file.writeLines(
+                        "# where to store the database locally",
+                        "database.local=" + local.getAbsolute(),
+                        "",
+                        "#database.remote=",
+                        "",
                         "# directory where to checkout",
                         "mount=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),
                         "",

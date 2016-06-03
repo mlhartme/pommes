@@ -15,11 +15,15 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.mount.Point;
+import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +32,17 @@ public class Properties {
     public static Properties load(FileNode file) throws IOException {
         String queryPrefix = "query.";
         String formatPrefix = "format.";
+        World world;
         java.util.Properties props;
+        FileNode databaseLocal;
+        Node databaseGlobal;
         Point mount;
         Map<String, List<String>> queries;
         Map<String, String> formats;
 
+        world = file.getWorld();
+        databaseLocal = null;
+        databaseGlobal = null;
         mount = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
@@ -43,24 +53,41 @@ public class Properties {
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
             } else if (key.equals("mount")) {
-                mount = new Point(file.getWorld().file(props.getProperty(key)));
+                mount = new Point(world.file(props.getProperty(key)));
+            } else if (key.equals("database.local")) {
+                databaseLocal = world.file(props.getProperty(key));
+            } else if (key.equals("database.remote")) {
+                try {
+                    databaseGlobal = world.node(props.getProperty(key));
+                } catch (URISyntaxException e) {
+                    throw new IOException(file + ": invalid uri: " + props.getProperty(key), e);
+                }
             } else {
                 throw new IOException("unknown property: " + key);
             }
         }
+        if (databaseLocal == null) {
+            throw new IOException(file + ": missing property: database.local");
+        }
         if (mount == null) {
             throw new IOException(file + ": missing property: mount");
         }
-        return new Properties(mount, queries, formats);
+        return new Properties(databaseLocal, databaseGlobal, mount, queries, formats);
     }
 
     //--
+
+    public final Node databaseRemote;
+    public final FileNode databaseLocal;
 
     public final Point mount;
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    public Properties(Point mount, Map<String, List<String>> queries, Map<String, String> formats) throws IOException {
+    public Properties(FileNode databaseLocal, Node databaseRemote,
+                      Point mount, Map<String, List<String>> queries, Map<String, String> formats) throws IOException {
+        this.databaseLocal = databaseLocal;
+        this.databaseRemote = databaseRemote;
         this.mount = mount;
         this.queries = queries;
         this.formats = formats;
@@ -73,4 +100,9 @@ public class Properties {
     public String lookupFormat(String name) throws IOException {
         return formats.get(name);
     }
+
+    public Database loadDatabase() {
+        return new Database(databaseLocal, databaseRemote);
+    }
+
 }

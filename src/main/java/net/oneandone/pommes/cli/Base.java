@@ -39,7 +39,7 @@ public abstract class Base {
     }
 
     public void run() throws Exception {
-        try (Database database = Database.load(world)) {
+        try (Database database = environment.properties().loadDatabase()) {
             environment.begin(database);
             run(database);
             environment.end(database);
