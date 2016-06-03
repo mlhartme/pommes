@@ -97,7 +97,7 @@ public class Find extends Base {
         String tmpFormat;
 
         try {
-            if (query.size() > 0 && query.get(0).startsWith("§")) {
+            if (query.size() > 0 && query.get(0).startsWith("@")) {
                 for (int i = 1; i < query.size(); i++) {
                     environment.defineArgument(i, query.get(i));
                 }
