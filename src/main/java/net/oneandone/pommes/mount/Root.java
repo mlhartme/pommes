@@ -23,11 +23,11 @@ import net.oneandone.sushi.util.Strings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-/** mount point in fstab */
-public class Point {
+/** Root directory for mounting. */
+public class Root {
     public final FileNode directory;
 
-    public Point(FileNode directory) {
+    public Root(FileNode directory) {
         this.directory = directory;
     }
 

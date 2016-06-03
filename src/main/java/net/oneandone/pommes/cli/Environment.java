@@ -23,7 +23,6 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
-import net.oneandone.pommes.mount.Point;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
@@ -146,27 +145,7 @@ public class Environment implements Variables {
                 file = world.file(path);
             }
             if (!file.exists()) {
-                if (OS.CURRENT == OS.MAC) {
-                    // see https://developer.apple.com/library/mac/qa/qa1170/_index.html
-                    local = (FileNode) world.getHome().join("Library/Caches/pommes");
-                } else {
-                    local = world.getTemp().join("pommes-" + System.getProperty("user.name"));
-                }
-                file.writeLines(
-                        "# where to store the database locally",
-                        "database.local=" + local.getAbsolute(),
-                        "",
-                        "#database.global=",
-                        "",
-                        "# directory where to checkout",
-                        "mount=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),
-                        "",
-                        "# query macros",
-                        "query.users=d:=ga=",
-                        "",
-                        "# format macros",
-                        "format.default=%a",
-                        "format.users=%a -> %d[=ga=]");
+                Properties.writeDefaults(file);
                 console.info.println("create default configuration at " + file);
             }
             lazyProperties = Properties.load(file);

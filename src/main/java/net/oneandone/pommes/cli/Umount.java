@@ -19,7 +19,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Action;
-import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.mount.Root;
 import net.oneandone.pommes.mount.Problem;
 import net.oneandone.pommes.mount.Remove;
 import net.oneandone.pommes.scm.Scm;
@@ -31,12 +31,12 @@ import java.util.Map;
 
 public class Umount extends Base {
     private final boolean stale;
-    private final FileNode root;
+    private final FileNode directory;
 
-    public Umount(Environment environment, boolean stale, FileNode root) {
+    public Umount(Environment environment, boolean stale, FileNode directory) {
         super(environment);
         this.stale = stale;
-        this.root = root;
+        this.directory = directory;
     }
 
     @Override
@@ -44,31 +44,31 @@ public class Umount extends Base {
         Map<FileNode, Scm> checkouts;
         Pom scannedPom;
         List<Action> removes;
-        Point point;
+        Root root;
         FileNode configuredDirectory;
-        FileNode directory;
+        FileNode checkout;
         Scm scm;
 
-        checkouts = Scm.scanCheckouts(root);
+        checkouts = Scm.scanCheckouts(directory);
         if (checkouts.isEmpty()) {
-            throw new ArgumentException("no checkouts under " + root);
+            throw new ArgumentException("no checkouts under " + directory);
         }
         removes = new ArrayList<>();
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
-            directory = entry.getKey();
+            checkout = entry.getKey();
             scm = entry.getValue();
             if (stale) {
                 if (scm.isAlive(directory)) {
                     continue;
                 }
             }
-            scannedPom = environment.scanPom(directory);
-            point = environment.properties().mount;
-            configuredDirectory = point.directory(scannedPom);
-            if (directory.equals(configuredDirectory)) {
-                removes.add(Remove.create(directory, scannedPom));
+            scannedPom = environment.scanPom(checkout);
+            root = environment.properties().root;
+            configuredDirectory = root.directory(scannedPom);
+            if (checkout.equals(configuredDirectory)) {
+                removes.add(Remove.create(checkout, scannedPom));
             } else {
-                removes.add(new Problem(directory, directory + ": checkout expected at " + configuredDirectory));
+                removes.add(new Problem(checkout, checkout + ": checkout expected at " + configuredDirectory));
             }
         }
         runAll(removes);

@@ -18,7 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.mount.Point;
+import net.oneandone.pommes.mount.Root;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
@@ -26,45 +26,44 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Ls extends Base {
-    private final FileNode root;
+    private final FileNode directory;
 
-    public Ls(Environment environment, FileNode root) {
+    public Ls(Environment environment, FileNode directory) {
         super(environment);
-        this.root = root;
+        this.directory = directory;
     }
 
     @Override
     public void run(Database notUsed) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Point point;
+        Root root;
         FileNode found;
         FileNode configured;
         Pom foundPom;
         Scm scm;
 
-        checkouts = Scm.scanCheckouts(root);
+        checkouts = Scm.scanCheckouts(directory);
         if (checkouts.isEmpty()) {
-            throw new ArgumentException("no checkouts under " + root);
+            throw new ArgumentException("no checkouts in " + directory);
         }
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
             scm = entry.getValue();
             foundPom = environment.scanPom(found);
-            point = environment.properties().mount;
-            configured = point.directory(foundPom);
+            root = environment.properties().root;
+            configured = root.directory(foundPom);
             if (found.equals(configured)) {
                 console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
             } else {
                 console.info.println("C " + found + " vs " + configured + " (" + foundPom + ")");
             }
         }
-        for (FileNode directory : unknown(root, checkouts.keySet())) {
-            console.info.println("? " + directory);
+        for (FileNode u : unknown(directory, checkouts.keySet())) {
+            console.info.println("? " + u);
         }
     }
 
