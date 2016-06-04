@@ -13,7 +13,7 @@ public class JsonProject extends Project {
         String name;
 
         name = node.getName();
-        if (name.equals("pommes.json")) {
+        if (name.equals(".pommes.json") || name.equals("pommes.json")) {
             return new JsonProject(new JsonParser().parse(node.readString()).getAsJsonObject());
         }
         return null;
