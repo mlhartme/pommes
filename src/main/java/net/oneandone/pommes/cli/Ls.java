@@ -29,10 +29,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class Status extends Base {
+public class Ls extends Base {
     private final FileNode directory;
 
-    public Status(Environment environment, FileNode directory) {
+    public Ls(Environment environment, FileNode directory) {
         super(environment);
         this.directory = directory;
     }
@@ -55,7 +55,7 @@ public class Status extends Base {
             scm = entry.getValue();
             foundPom = environment.scanPomOpt(found);
             if (foundPom == null) {
-                console.info.println("? " + found + " (unknown project)");
+                console.info.println("X " + found + " (unknown project)");
             } else {
                 root = environment.properties().root;
                 expected = root.directory(foundPom);

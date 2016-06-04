@@ -55,7 +55,7 @@ public class Main {
                 + "                        a checkout is stale if the project has been removed from the database;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checks for uncommitted changes before selection\n"
-                + "  'status' root?        print all checkouts under the specified directory with status markers:\n"
+                + "  'ls' root?            print all checkouts under the specified directory with status markers:\n"
                 + "                        C - checkout url does not match url configured by fstab\n"
                 + "                        ? - checkout has no configured url configured by fstab\n"
                 + "  'goto' query          offer selection of matching project, check it out when necessary,\n"
@@ -119,7 +119,7 @@ public class Main {
           cli.add(Mount.class, "mount query*");
           cli.add(Umount.class, "umount -stale root?=.");
 
-          cli.add(Status.class, "status root?=.");
+          cli.add(Ls.class, "ls root?=.");
           cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query*");
 
           cli.add(DatabaseClear.class, "database-clear");
