@@ -22,8 +22,9 @@ Install the application
          pommes goto "$@" && . ~/.pommes.goto
        }
 * test it by running `pommes`, you should get a usage message listing available commands
-* inspect the configuration file at `~/.pommes.properties` and adjust them to your needs.
-
+* inspect the configuration file at `~/.pommes.properties`. This file defines various properties that configure Pommes, adjust them 
+to your needs.
+ 
 Current Limitations
 * multi-module projects are not handles properly: only the top-level pom is added to the database.
 
@@ -95,55 +96,111 @@ Next, you can combine queries with `+` to list projects matching both conditions
 Finally, you can combine queries with blanks to list projects matching one of the conditions. I.e. blank means or.
 * `pommes find d:puc d:pommes` lists projects depending on either `puc` or `pommes`.
 
+TODO: Macros; formats
+
 ## Mount commands
 
-You can use mount commands to perform bulk-svn operations like checking out all trunks.
-
-### fstab 
-
-Before you can use mount commands, you have to create a file `~/.pommes.fstab` in your home directory. This file contains a list of mount points to configure where you want checkouts to show up on your disk. For example
-
-    https://svn.first.org/some/path` /home/foo/pommes/first
-    https://svn.second.com/other/path` /home/foo/pommes/second
-
-configures Pommes to checkout projects from `https://svn.first.org/some/path` into the `first` directory, and checkouts from `https://svn.second.com/other/path` into the `second` directory. For example, a project in 'https://svn.first.org/some/path/apps/foo' would be checked out to `/home/foo/pommes/first/apps/foo`
-
-You can edit this file manually, or – if you just want to add a new mount point – you can use `pommes fstab-add url directory`.
-
-Pommes allows to have multiple mount points for that same svn url, as long as they point to different directories. However, it's forbidden to use the same directory or (direct or indirect) subdirectories already used in other mount points.
+You can use mount commands to scn operations one the projects that match a query. The `mount.root` property defines the root directory
+where you want checkouts to show up on your disk. 
 
 ### Mount
 
-`pommes mount @/trunk/` checks out all trunks. Note that you'll get an error message if you have matches without a mount point configured.
+`pommes mount s:/trunk/` checks out all trunks.
 
-Before changing anything on your disk, the mount command presents a selection of the checkouts to perform, and you can pick one, multiple (separated with blanks) or all of them. Or you can abort.
+Before changing anything on your disk, the mount command presents a selection of the checkouts to perform, and you can pick one, multiple 
+(separated with blanks) or all of them. Or you can quit without doing anything.
 
-If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your mount command.
+If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your 
+mount command.
 
 ### Umount
 
-The `umount` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before changing anything. Similar the 'mount' command, it asks before changing anything on your disk.
+The `umount` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before 
+changing anything. Similar the `mount` command, it asks before changing anything on your disk.
 
-In addition, you can use the `-stale` option to remove only checkouts that have been removed from the database. For example, if you have all trunks checked out under `/home/foo/trunk`, you can run `pommes umount -stale /home/foo/trunk` to remove checkouts that are no longer used.
+In addition, you can use the `-stale` option to remove only checkouts that have been removed from the database. For example, if you have 
+all trunks checked out, you can run `pommes umount -stale` to remove checkouts that are no longer used.
 
+
+### Ls
+
+TODO
+
+### Goto
+
+Same as mount, but also cd's into the resulting directory.
+
+
+## Usage Message
+
+    Project database tool.
     
-
-
-
-
-
-
-
-## Mounting
-
-<verbatim>
-pg sushi
-</verbatim>
-
-Checks out sushi.
-
-Other examples:
-
-   * =pommes find :-sushi+@/trunk/= to list all trunks with a sushi dependency
-   * =pommes mount @/apps/+@/trunk/= to checkout all trunk apps in sales repository
-
+    Usage:
+      'pommes' ['-v'|'-e'] command sync-options args*
+    
+    search commands
+      'find' ('-target' str)? query ('-' format* | '-json' | '-dump' | '-'MACRO)? 
+                            print projects matching this query;
+                            append '-json' to print json, '-dump' to print json without formatting;
+                            format is a string with placeholders: %c is replace be the current checkout
+                            and %FIELD_ID is replaced by the respective field;
+                            place holders can be followed by angle brackets to filter for
+                            the enclosed substring or variables;
+                            target is a file or URL to write results to, default is the console.
+    
+    mount commands
+      'mount' query         checkout matching projects; skips existing checkouts;
+                            offers selection before changing anything on disk;
+      'umount' '-stale'? root?
+                            remove (optional: stale) checkouts under the specified root directory;
+                            a checkout is stale if the project has been removed from the database;
+                            offers selection before changing anything on disk;
+                            checks for uncommitted changes before selection
+      'ls' root?            print all checkouts under the specified directory with status markers:
+                            M - checkout has modifications or is not pushed
+                            C - checkout url does not match the directory pommes would place it in
+                            X - checkout has is unknown to pommes
+                            ? - directory is not a checkout
+      'goto' query          offer selection of matching project, check it out when necessary,
+                            and cds into the checkout directory
+    
+    commands that modify the database
+      'database-clear'      deletes the current database and creates a new empty one.
+      'database-add' '-dryrun? url*
+                            add projects found under the specified urls to the database;
+                            overwrites projects with same origin;
+                            url is a svn url, artifactory url, an option (prefixed with '%') or an exclude (prefixed with '-')  'database-remove' query
+                            remove all matching documents
+    
+    fields in the database:
+      origin      Where this pom comes from.
+      revision    Last modified timestamp or content hash of this pom.
+      parent      Coordinates of the parent project.
+      artifact    Coordinates of this project.
+      scm         Scm location for this project.
+      dep         Coordinates of project dependencies.
+      url         Url for this project.
+      (field id is the first letter of the field name.)
+    
+    sync options            how to sync between global and local database
+      default behavior      download global database once a day; no uploads
+      '-download'           download global database before command execution
+      '-no-download'        no download of global database
+      '-upload'             upload local database after command execution
+    
+    query syntax
+      query     = '@' MACRO | or
+      or        = (and (' ' and)*)? 
+      and       = term ('+' term)*
+      term      = field | lucene
+      field     = (FIELD_LETTER* ':')? STR ; substring match on one of the specified fields (or 'ao' if not specified)
+      lucene    = '!' STR                  ; STR in Lucene query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html
+    and STR may contain the following variables:
+      =gav=     = coordinates for current project
+      =ga=      = group and artifact of current project
+      =svn=     = svn location for current directory (according to fstab)
+    
+    environment:
+      POMMES_PROPERTIES     where to find the properties file
+    
+    Home: https://github.com/mlhartme/pommes
