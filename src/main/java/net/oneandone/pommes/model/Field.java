@@ -9,21 +9,18 @@ import org.apache.lucene.search.WildcardQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by mhm on 31.05.16.
- */
 public enum Field {
     /**
      * Mandatory. The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
     ORIGIN("Where this pom comes from."),
-    REVISION("Last modified timestamp or content hash"),
-    PARENT(true, false, "Parent pom."),
-    ARTIFACT("Coordinates of this pom."),
-    SCM(true, false, "Scm connection."),
-    DEP(true, true, "Dependencies."),
-    URL(true, false, "Url.");
+    REVISION("Last modified timestamp or content hash of this pom."),
+    PARENT(true, false, "Coordinates of the parent project."),
+    ARTIFACT("Coordinates of this project."),
+    SCM(true, false, "Scm location for this project."),
+    DEP(true, true, "Coordinates of project dependencies."),
+    URL(true, false, "Url for this project.");
 
     private final boolean optional;
     private final boolean list;
