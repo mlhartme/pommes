@@ -1,25 +1,36 @@
-# pommes
+# Pommes
 
-Pommes is project database tool. It's a command line tool to create a database of Maven projects, search for artifacts 
-or dependencies, and maintain project checkouts on your disk.
+Pommes is a project database tool. It's a command line tool with commands to
+* crawl directories, svn, git, artifactory and add matching projects to the database
+* search the database by coordinates, dependencies or scm location 
+* perform bulk-svn operations, e.g. checkout all trunks
+
+Pommes supports Maven projects with a pom.xml file and php projects with a composer.json file. Note that php support is very basic. The name Pommes stands for "many poms".
 
 ## Setup
 
-Download the latest application file from Maven Central, rename it to `pommes`, and add it to your path.
+Prerequisites
+* Java 8 or higher
+* Linux or Mac
 
-Optionally, you can also define a shell function =pg= to invoke =pommes goto= and actually cd into the resulting 
-directory:
+Install the application
+* download the latest`application.sh` file from [maven central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22) 
+* rename it to `pommes` and add it to your path.
+* Optionally, you can define a shell function =pg= to invoke =pommes goto= and actually cd into the resulting directory:
+       function pg {
+         pommes goto "$@" && . ~/.pommes.goto
+       }
+* test it by running `pommes`, you should get a usage message listing available commands
+* inspect the configuration file at `~/.pommes.properties` and adjust them to your needs.
 
-    function pg {
-      pommes goto "$@" && . ~/.pommes.goto
-    }
+Current Limitations
+* multi-module projects are not handles properly: only the top-level pom is added to the database.
 
-(The following assumes you've defined this function)
+## Database commands
 
-## Create a database
-
-Pommes uses Lucense to store Projects. Initially, the database it empty. You can use the `pommes database-clear` command
-to get back to an empty database.
+Pommes uses Lucense to store Projects. Initially, the database it empty. Pommes provides three commands to modify the database: 
+`database-add` and `database-remove` to add/remove projects, and `database-clear` to reset the database to the initial state.
+                                                                         
 
 Use the `pommes database-add` command to add projects to your database. You can feed it from various repositories:
 
@@ -47,7 +58,74 @@ Github:
 
 adds all Maven Projects of `mlhartme` to your database.
 
-## Searching
+Note that `database-add` overwrites projects already in the database, so you don't get duplicate projects from duplicate add commands.
+
+By default, database commands modify your local database only. In addition, you can setup a global database, so others can use it, too. 
+In this case, define the `database.global` property and point it to a zip file in a webdav location. Then run your database commands 
+with the `-upload` option to modify both the local and the global database. Other users on other machines – with the same `database.global` 
+property - automatically initialize their local database from the global one.
+
+You might want to setup a cron job to fill your database automatically every night. Alternatively, you can setup post-commit hooks to 
+trigger `database-add` and `database-remove` calls after each committed pom.xml modification.
+
+## Find Command
+
+Pommes stores 7 fields for every project added to the database:
+* `origin` - where the project was imported from
+* `revision` - last modified timestamp or content hash (to detect changes when re-adding a project)
+* `parent` - parent pom coordinates
+* `artifact` - coordinates of this project
+* `scm` - where to find this probject in scm
+* `dep` - coordinates of dependencies
+* `url` - project url
+
+Start with `pommes find foo`, it lists all projects that have a `foo` substring in their scm or artifact.
+
+Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name
+* `pommes find d:bar` lists projects with a `bar` substring in their dependencies
+* `pommes find dp:baz` lists projects with a `baz` substring in their dependency or parent
+
+Next, you can combine queries with `+` to list projects matching both conditions. I.e. + means and.
+Finally, you can combine queries with ` ` to list projects matching one of the conditions. I.e. blank means or.
+
+## Mount commands
+
+You can use mount commands to perform bulk-svn operations like checking out all trunks.
+
+### fstab 
+
+Before you can use mount commands, you have to create a file `~/.pommes.fstab` in your home directory. This file contains a list of mount points to configure where you want checkouts to show up on your disk. For example
+
+    https://svn.first.org/some/path` /home/foo/pommes/first
+    https://svn.second.com/other/path` /home/foo/pommes/second
+
+configures Pommes to checkout projects from `https://svn.first.org/some/path` into the `first` directory, and checkouts from `https://svn.second.com/other/path` into the `second` directory. For example, a project in 'https://svn.first.org/some/path/apps/foo' would be checked out to `/home/foo/pommes/first/apps/foo`
+
+You can edit this file manually, or – if you just want to add a new mount point – you can use `pommes fstab-add url directory`.
+
+Pommes allows to have multiple mount points for that same svn url, as long as they point to different directories. However, it's forbidden to use the same directory or (direct or indirect) subdirectories already used in other mount points.
+
+### Mount
+
+`pommes mount @/trunk/` checks out all trunks. Note that you'll get an error message if you have matches without a mount point configured.
+
+Before changing anything on your disk, the mount command presents a selection of the checkouts to perform, and you can pick one, multiple (separated with blanks) or all of them. Or you can abort.
+
+If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your mount command.
+
+### Umount
+
+The `umount` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before changing anything. Similar the 'mount' command, it asks before changing anything on your disk.
+
+In addition, you can use the `-stale` option to remove only checkouts that have been removed from the database. For example, if you have all trunks checked out under `/home/foo/trunk`, you can run `pommes umount -stale /home/foo/trunk` to remove checkouts that are no longer used.
+
+    
+
+
+
+
+
+
 
 ## Mounting
 
