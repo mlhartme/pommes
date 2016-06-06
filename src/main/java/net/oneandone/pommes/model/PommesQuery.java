@@ -38,7 +38,7 @@ public class PommesQuery {
                 } else {
                     idx = term.indexOf(':');
                     // search origin, not trunk. Because scm url is regularly not adjusted
-                    selected = Field.forIds(idx < 1 ? "ao" : term.substring(0, idx));
+                    selected = Field.forIds(idx < 1 ? "as" : term.substring(0, idx));
                     string = term.substring(idx + 1); // ok for -1
                     string = variables(string, variables);
                     termQuery = or(selected, string);

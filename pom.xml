@@ -10,7 +10,7 @@
   </parent>
 
   <name>Pommes</name>
-  <description>Database for pom files. You can search it and perform bulk-svn operations.</description>
+  <description>Project database tool.</description>
 
   <groupId>net.oneandone</groupId>
   <artifactId>pommes</artifactId>
