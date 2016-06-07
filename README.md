@@ -26,6 +26,7 @@ Install the application
 to your needs.
  
 Current Limitations
+* git branches ...
 * multi-module projects are not handles properly: only the top-level pom is added to the database.
 
 ## Database commands
