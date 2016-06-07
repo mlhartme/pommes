@@ -37,7 +37,7 @@ public class Properties {
         world = file.getWorld();
         if (OS.CURRENT == OS.MAC) {
             // see https://developer.apple.com/library/mac/qa/qa1170/_index.html
-            local = (FileNode) world.getHome().join("Library/Caches/pommes");
+            local = world.getHome().join("Library/Caches/pommes");
         } else {
             local = world.getTemp().join("pommes-" + System.getProperty("user.name"));
         }
@@ -52,7 +52,7 @@ public class Properties {
                 "#database.global=",
                 "",
                 "# directory where to place checkouts",
-                "mount.root=" + ((FileNode) world.getHome().join("Pommes")).getAbsolute(),
+                "mount.root=" + world.getHome().join("Pommes").getAbsolute(),
                 "",
                 "# query macros",
                 "query.users=d:=ga=",
