@@ -20,10 +20,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.project.Project;
+import net.oneandone.sushi.fs.NewInputStreamException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.http.HttpNode;
+import net.oneandone.sushi.fs.http.MovedTemporarilyException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -73,6 +75,8 @@ public class BitbucketRepository implements Repository {
         JsonObject paged;
         Node pom;
         Project project;
+        String tmp;
+        String location;
 
         path = "rest/api/1.0/projects/CISOOPS/repos";
         if (!bitbucket.getPath().isEmpty()) {
@@ -89,12 +93,26 @@ public class BitbucketRepository implements Repository {
                 // TODO: offer all files, not only poms. Recursion.
                 // https://bitbucket.1and1.org:443/rest/api/1.0/projects/CISOOPS/repos/change/files/
 
-                // TODO:
-                // curl https://bitbucket.1and1.org:443/rest/api/1.0/projects/CISOOPS/repos/change/browse/pom.xml
                 pom = node.getRoot().node("projects/CISOOPS/repos/" + name + "/browse/pom.xml", "raw");
-                System.out.println("pom: " + pom);
+                while (true) {
+                    System.out.println("pom: " + pom);
+                    try {
+                        tmp = pom.readString();
+                        break;
+                    } catch (NewInputStreamException e) {
+                        if (e.getCause() instanceof MovedTemporarilyException) {
+                            location = ((MovedTemporarilyException) e.getCause()).location;
+                            pom = bitbucket.getWorld().node(location);
+                            continue;
+                        } else {
+                            throw e;
+                        }
+                    }
+                }
                 project = Project.probe(pom);
                 if (project != null) {
+                    project.setRevision("todo");
+                    project.setOrigin("todo");
                     dest.put(project);
                 }
             }
