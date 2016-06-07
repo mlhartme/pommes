@@ -16,11 +16,12 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public class Nop extends Action {
-    public Nop(FileNode directory, String url) {
-        super(null, directory, url);
+    public Nop(FileNode directory, Gav artifact) {
+        super(null, directory, artifact);
     }
 
     @Override

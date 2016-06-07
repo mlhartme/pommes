@@ -16,6 +16,7 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DeleteException;
@@ -30,14 +31,14 @@ public class Remove extends Action {
 
         scm = Scm.probeCheckout(directory);
         if (scm.isCommitted(directory)) {
-            return new Remove(scm, directory, pom.scm);
+            return new Remove(scm, directory, pom.coordinates);
         } else {
             return new Problem(directory, directory + ": checkout is not committed.");
         }
     }
 
-    public Remove(Scm scm, FileNode directory, String url) {
-        super(scm, directory, url);
+    public Remove(Scm scm, FileNode directory, Gav gav) {
+        super(scm, directory, gav);
     }
 
     public char status() {

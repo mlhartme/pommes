@@ -16,18 +16,19 @@
 package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public abstract class Action implements Comparable<Action> {
     public final Scm scm;
     public final FileNode directory;
-    public final String url;
+    public final Gav artifact;
 
-    protected Action(Scm scm, FileNode directory, String url) {
+    protected Action(Scm scm, FileNode directory, Gav artifact) {
         this.scm = scm;
         this.directory = directory;
-        this.url = url;
+        this.artifact = artifact;
     }
 
     public abstract char status();
@@ -35,7 +36,7 @@ public abstract class Action implements Comparable<Action> {
     public abstract void run(Console console) throws Exception;
 
     public String toString() {
-        return status() + " " + directory + " (" + url + ")";
+        return status() + " " + directory + " (" + artifact + ")";
     }
 
     @Override

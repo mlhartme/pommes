@@ -17,6 +17,7 @@ package net.oneandone.pommes.mount;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.MkdirException;
@@ -46,13 +47,16 @@ public class Checkout extends Action {
             if (scm == null) {
                 return new Problem(directory, pom.origin + ": unknown scm: " + pom.scm);
             } else {
-                return new Checkout(scm, directory, pom.scm);
+                return new Checkout(scm, directory, pom.coordinates, pom.scm);
             }
         }
     }
 
-    public Checkout(Scm scm, FileNode directory, String url) {
-        super(scm, directory, url);
+    private final String url;
+
+    public Checkout(Scm scm, FileNode directory, Gav artifact, String url) {
+        super(scm, directory, artifact);
+        this.url = url;
     }
 
     public char status() {
