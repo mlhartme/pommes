@@ -33,17 +33,21 @@ public class Pom {
 
     public final List<Gav> dependencies;
 
-    public Pom(String origin, String revision, Gav parent, Gav coordinates, String scm, String url) {
+    public Pom(String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
         if (origin == null) {
             throw new IllegalArgumentException(origin);
         }
         this.origin = origin;
         this.revision = revision;
         this.parent = parent;
-        this.coordinates = coordinates;
+        this.coordinates = artifact;
         this.scm = scm;
         this.url = url;
         this.dependencies = new ArrayList<>();
+    }
+
+    public Pom clone(String newScm) {
+        return new Pom(origin, revision, parent, coordinates, newScm, url);
     }
 
     public String toLine() {

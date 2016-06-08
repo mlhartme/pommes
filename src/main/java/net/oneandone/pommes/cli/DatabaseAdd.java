@@ -39,12 +39,14 @@ import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAdd extends Base {
     private final boolean dryrun;
+    private final boolean fixscm;
     private final List<Repository> repositories;
     private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean dryrun) throws IOException {
+    public DatabaseAdd(Environment environment, boolean dryrun, boolean fixscm) throws IOException {
         super(environment);
         this.dryrun = dryrun;
+        this.fixscm = fixscm;
         this.repositories = new ArrayList<>();
         this.log = new PrintWriter(environment.world().getTemp().join("pommes.log").newWriter());
     }
@@ -71,7 +73,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(dryrun, environment, database);
+            indexer = new Indexer(dryrun, fixscm, environment, database);
             indexer.start();
             try {
                 for (Repository repository : repositories) {
@@ -91,6 +93,7 @@ public class DatabaseAdd extends Base {
 
     public static class Indexer extends Thread implements Iterator<Document> {
         private final boolean dryrun;
+        private final boolean fixscm;
         private final Environment environment;
 
         public final BlockingQueue<Project> src;
@@ -103,10 +106,11 @@ public class DatabaseAdd extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(boolean dryrun, Environment environment, Database database) {
+        public Indexer(boolean dryrun, boolean fixscm, Environment environment, Database database) {
             super("Indexer");
 
             this.dryrun = dryrun;
+            this.fixscm = fixscm;
             this.environment = environment;
 
             this.src = new ArrayBlockingQueue<>(25);
@@ -191,6 +195,8 @@ public class DatabaseAdd extends Base {
 
         private Pom iterPom() throws IOException, InterruptedException {
             Project project;
+            Pom pom;
+            String fixed;
 
             while (true) {
                 project = src.take();
@@ -199,7 +205,19 @@ public class DatabaseAdd extends Base {
                 }
                 try {
                     count++;
-                    return project.load(environment);
+                    pom = project.load(environment);
+                    if (fixscm) {
+                        fixed = pom.origin;
+                        if (fixed.endsWith("/")) {
+                            throw new IllegalStateException(fixed);
+                        }
+                        fixed = fixed.substring(0, fixed.lastIndexOf('/'));
+                        if (!pom.scm.equals(fixed)) {
+                            environment.console().info.println("WARNING: fixing scm " + pom.scm + " -> " + fixed);
+                            pom = pom.clone(fixed);
+                        }
+                    }
+                    return pom;
                 } catch (Exception e) {
                     // CAUTION: I do catch RuntimeExceptions, because I've seen Maven 3.3.9 throw them for invalid poms
                     // (e.g. InvalidArtifactRTException)

@@ -62,7 +62,7 @@ public class Main {
                 + "\n"
                 + "commands that modify the database\n"
                 + "  'database-clear'      deletes the current database and creates a new empty one.\n"
-                + "  'database-add' '-dryrun? url*\n"
+                + "  'database-add' '-dryrun'? '-fixscm'? url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
                 + "                        overwrites projects with same origin;\n"
                 + "                        url is a svn url, artifactory url, an option (prefixed with '%') or an exclude (prefixed with '-')"
@@ -105,7 +105,7 @@ public class Main {
           cli.add(Goto.class, "goto -shellFile=" + ((FileNode) world.getHome().join(".pommes.goto")).getAbsolute() + " query*");
 
           cli.add(DatabaseClear.class, "database-clear");
-          cli.add(DatabaseAdd.class, "database-add -dryrun url* { add*(url) }");
+          cli.add(DatabaseAdd.class, "database-add -dryrun -fixscm url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
           cli.add(Find.class, "find -target=null queryOrFormat* { arg*(queryOrFormat)}");
