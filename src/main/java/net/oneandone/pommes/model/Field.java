@@ -56,6 +56,21 @@ public enum Field {
         return document.getValues(dbname);
     }
 
+    public Query query(Match match, String str) {
+        switch (match) {
+            case SUBSTRING:
+                return new WildcardQuery(new Term(dbname, "*" + str + "*"));
+            case PREFIX:
+                return new WildcardQuery(new Term(dbname, str + "*"));
+            case SUFFIX:
+                return new WildcardQuery(new Term(dbname, "*" + str));
+            case STRING:
+                return new WildcardQuery(new Term(dbname, str));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
     public Query substring(String substring) {
         return new WildcardQuery(new Term(dbname, "*" + substring + "*"));
     }

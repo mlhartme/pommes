@@ -19,9 +19,11 @@ public class PommesQuery {
         BooleanQuery.Builder andBuilder;
         Query termQuery;
         List<String> terms;
+        Match match;
         int idx;
         String string;
-        List<Field> selected;
+        List<Field> fields;
+        Object[] tmp;
 
         orBuilder= new BooleanQuery.Builder();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
@@ -36,12 +38,19 @@ public class PommesQuery {
                     // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
                     termQuery = new StandardQueryParser().parse(and.substring(1), Field.ARTIFACT.dbname());
                 } else {
-                    idx = term.indexOf(':');
+                    tmp = Match.locate(term);
+                    if (tmp == null) {
+                        match = Match.SUBSTRING;
+                        idx = -1;
+                    } else {
+                        match = (Match) tmp[0];
+                        idx = (Integer) tmp[1];
+                    }
                     // search origin, not trunk. Because scm url is regularly not adjusted
-                    selected = Field.forIds(idx < 1 ? "as" : term.substring(0, idx));
+                    fields = Field.forIds(idx < 1 ? "as" : term.substring(0, idx));
                     string = term.substring(idx + 1); // ok for -1
                     string = variables(string, variables);
-                    termQuery = or(selected, string);
+                    termQuery = or(fields, match, string);
                 }
                 andBuilder.add(termQuery, BooleanClause.Occur.MUST);
             }
@@ -88,12 +97,12 @@ public class PommesQuery {
         }
     }
 
-    private static Query or(List<Field> fields, String string) {
+    private static Query or(List<Field> fields, Match match, String string) {
         BooleanQuery.Builder result;
 
         result = new BooleanQuery.Builder();
         for (Field field : fields) {
-            result.add(field.substring(string), BooleanClause.Occur.SHOULD);
+            result.add(field.query(match, string), BooleanClause.Occur.SHOULD);
         }
         return result.build();
     }
