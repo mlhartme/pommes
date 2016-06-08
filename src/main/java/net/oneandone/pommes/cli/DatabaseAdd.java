@@ -48,7 +48,8 @@ public class DatabaseAdd extends Base {
         this.dryrun = dryrun;
         this.fixscm = fixscm;
         this.repositories = new ArrayList<>();
-        this.log = new PrintWriter(environment.world().getTemp().join("pommes.log").newWriter());
+        // TODO: getTemp() is a strange tmp directory on macos
+        this.log = new PrintWriter(environment.world().file("/tmp/pommes.log").newWriter(), true);
     }
 
     public void add(String str) throws URISyntaxException, NodeInstantiationException {

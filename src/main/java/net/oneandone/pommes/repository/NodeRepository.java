@@ -101,7 +101,7 @@ public class NodeRepository implements Repository {
         if (children == null) {
             return;
         }
-        log.println(root.getPath() + "\n");
+        log.println(root.getPath());
         for (Node node : children) {
             project = Project.probe(node);
             if (project != null) {
