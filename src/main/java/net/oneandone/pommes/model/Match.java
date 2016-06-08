@@ -12,7 +12,7 @@ public enum Match {
                     return new Object[] { STRING, i };
                 case '^':
                     return new Object[] { PREFIX, i };
-                case ',':
+                case '%':
                     return new Object[] { SUFFIX, i };
                 default:
                     break;
