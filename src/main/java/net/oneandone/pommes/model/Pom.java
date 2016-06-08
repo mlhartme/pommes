@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pom {
-    /** currently always starts with svn:https:// */
-    public final String origin;
+    public final String id;
     public final String revision;
 
     /** may be null */
@@ -33,11 +32,15 @@ public class Pom {
 
     public final List<Gav> dependencies;
 
-    public Pom(String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
-        if (origin == null) {
-            throw new IllegalArgumentException(origin);
+    public Pom(String zone, String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
+        this(zone + ":" + origin, revision, parent, artifact, scm, url);
+    }
+
+    public Pom(String id, String revision, Gav parent, Gav artifact, String scm, String url) {
+        if (id == null) {
+            throw new IllegalArgumentException(id);
         }
-        this.origin = origin;
+        this.id = id;
         this.revision = revision;
         this.parent = parent;
         this.coordinates = artifact;
@@ -47,7 +50,7 @@ public class Pom {
     }
 
     public Pom clone(String newScm) {
-        return new Pom(origin, revision, parent, coordinates, newScm, url);
+        return new Pom(id, revision, parent, coordinates, newScm, url);
     }
 
     public String toLine() {
@@ -57,5 +60,9 @@ public class Pom {
     @Override
     public String toString() {
         return toLine();
+    }
+
+    public String getOrigin() {
+        return id.substring(0, id.indexOf(':'));
     }
 }

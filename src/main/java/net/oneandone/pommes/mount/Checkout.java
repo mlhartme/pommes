@@ -41,11 +41,11 @@ public class Checkout extends Action {
             }
         } else {
             if (pom.scm == null) {
-                return new Problem(directory, pom.origin + ": missing scm: " + pom.scm);
+                return new Problem(directory, pom.id + ": missing scm: " + pom.scm);
             }
             scm = Scm.probeUrl(pom.scm);
             if (scm == null) {
-                return new Problem(directory, pom.origin + ": unknown scm: " + pom.scm);
+                return new Problem(directory, pom.id + ": unknown scm: " + pom.scm);
             } else {
                 return new Checkout(scm, directory, pom.coordinates, pom.scm);
             }

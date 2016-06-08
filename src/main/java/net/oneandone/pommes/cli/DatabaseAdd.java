@@ -40,13 +40,15 @@ import java.util.concurrent.BlockingQueue;
 public class DatabaseAdd extends Base {
     private final boolean dryrun;
     private final boolean fixscm;
+    private final String zone;
     private final List<Repository> repositories;
     private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean dryrun, boolean fixscm) throws IOException {
+    public DatabaseAdd(Environment environment, boolean dryrun, boolean fixscm, String zone) throws IOException {
         super(environment);
         this.dryrun = dryrun;
         this.fixscm = fixscm;
+        this.zone = zone;
         this.repositories = new ArrayList<>();
         // TODO: getTemp() is a strange tmp directory on macos
         this.log = new PrintWriter(environment.world().file("/tmp/pommes.log").newWriter(), true);
@@ -74,7 +76,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(dryrun, fixscm, environment, database);
+            indexer = new Indexer(dryrun, fixscm, environment, zone, database);
             indexer.start();
             try {
                 for (Repository repository : repositories) {
@@ -96,6 +98,7 @@ public class DatabaseAdd extends Base {
         private final boolean dryrun;
         private final boolean fixscm;
         private final Environment environment;
+        private final String zone;
 
         public final BlockingQueue<Project> src;
         private final Database database;
@@ -107,12 +110,13 @@ public class DatabaseAdd extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(boolean dryrun, boolean fixscm, Environment environment, Database database) {
+        public Indexer(boolean dryrun, boolean fixscm, Environment environment, String zone, Database database) {
             super("Indexer");
 
             this.dryrun = dryrun;
             this.fixscm = fixscm;
             this.environment = environment;
+            this.zone = zone;
 
             this.src = new ArrayBlockingQueue<>(25);
             this.database = database;
@@ -182,12 +186,12 @@ public class DatabaseAdd extends Base {
                 if (pom == null) {
                     return null;
                 }
-                existingRevision = existing.get(pom.origin);
+                existingRevision = existing.get(pom.id);
                 if (pom.revision.equals(existingRevision)) {
-                    console.info.println("  " + pom.origin);
+                    console.info.println("  " + pom.id);
                     continue;
                 }
-                console.info.println((existingRevision == null ? "A " : "U ") + pom.origin);
+                console.info.println((existingRevision == null ? "A " : "U ") + pom.id);
                 if (!dryrun) {
                     return Field.document(pom);
                 }
@@ -206,9 +210,9 @@ public class DatabaseAdd extends Base {
                 }
                 try {
                     count++;
-                    pom = project.load(environment);
+                    pom = project.load(environment, zone);
                     if (fixscm) {
-                        fixed = pom.origin;
+                        fixed = pom.getOrigin();
                         if (fixed.endsWith("/")) {
                             throw new IllegalStateException(fixed);
                         }

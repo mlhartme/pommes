@@ -14,7 +14,7 @@ public enum Field {
      * Mandatory. The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ORIGIN("Where this pom comes from."),
+    ID("Unique identifier for this pom. Zone + ':' + origin."),
     REVISION("Last modified timestamp or content hash of this pom."),
     PARENT(true, false, "Coordinates of the parent project."),
     ARTIFACT("Coordinates of this project."),
@@ -108,7 +108,7 @@ public enum Field {
         Document doc;
 
         doc = new Document();
-        ORIGIN.add(doc, pom.origin);
+        ID.add(doc, pom.id);
         REVISION.add(doc, pom.revision);
         if (pom.parent != null) {
             PARENT.add(doc, pom.parent.toGavString());
@@ -127,7 +127,7 @@ public enum Field {
         String parent;
 
         parent = PARENT.get(document);
-        result = new Pom(ORIGIN.get(document), REVISION.get(document),
+        result = new Pom(ID.get(document), REVISION.get(document),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
                 SCM.get(document), URL.get(document));
         for (String dep : DEP.getList(document)) {

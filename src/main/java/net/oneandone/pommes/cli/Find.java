@@ -174,6 +174,7 @@ public class Find extends Base {
         }
         gson = builder.create();
         gson.toJson(matches, dest);
+        dest.write('\n');
     }
 
     private String format(Document document, String format) throws IOException {

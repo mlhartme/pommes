@@ -30,7 +30,7 @@ public class MavenProject extends Project {
     //--
 
     @Override
-    protected Pom doLoad(Environment environment, String origin, String revision) throws IOException {
+    protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
         FileNode local;
         org.apache.maven.project.MavenProject project;
         Artifact pa;
@@ -53,7 +53,7 @@ public class MavenProject extends Project {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Pom(origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(project), project.getUrl());
+            pom = new Pom(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pom.dependencies.add(Gav.forDependency(dependency));
             }

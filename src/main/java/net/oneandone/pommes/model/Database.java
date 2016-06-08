@@ -148,11 +148,11 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(Field.ORIGIN.term("*"));
+        query = new WildcardQuery(Field.ID.term("*"));
         search = searcher.search(query, Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
-            result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));
+            result.put(Field.ID.get(document), Field.REVISION.get(document));
         }
     }
 
@@ -168,7 +168,7 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(Field.ORIGIN.term(Field.ORIGIN.get(doc)), doc);
+            writer.updateDocument(Field.ID.term(Field.ID.get(doc)), doc);
         }
         writer.close();
     }

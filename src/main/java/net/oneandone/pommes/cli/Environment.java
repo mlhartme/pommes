@@ -179,7 +179,7 @@ public class Environment implements Variables {
             if (project != null) {
                 project.setOrigin(scm.getUrl(directory));
                 project.setRevision("checkout");
-                return project.load(this);
+                return project.load(this, "checkout");
             }
         }
         return null;
