@@ -2,7 +2,8 @@
   <body>
     <release date="2016-02-xx" version="3.0.0">
       <action date="2016-06-08" dev="mlhartme" type="update">
-        Replaced sync mechanism by imports. They are configured in the properties file. Dump -upload option.
+        Replaced sync mechanism by imports. They are configured in the properties file. Dump -upload option, replaced the sync options
+        -download and -noDownload with -import and -noImport.
       </action>
       <action date="2016-06-01" dev="mlhartme" type="update">
         Renamed list command to ls. It prints an 'M' status if the checkout is not fully committed

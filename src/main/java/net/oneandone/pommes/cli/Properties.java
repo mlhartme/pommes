@@ -115,7 +115,7 @@ public class Properties {
     private Map<String, String> formats;
 
     /** maps zones to urls */
-    private Map<String, String> imports;
+    public final Map<String, String> imports;
 
     public Properties(FileNode databaseLocal, Root root, Map<String, List<String>> queries,
                       Map<String, String> formats, Map<String, String> imports) throws IOException {

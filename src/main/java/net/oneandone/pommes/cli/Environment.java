@@ -25,6 +25,7 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -37,37 +38,40 @@ public class Environment implements Variables {
     private final Console console;
     private final World world;
 
-    private boolean download;
-    private boolean noDownload;
+    private boolean import_;
+    private boolean noImport;
 
     private Gson lazyGson;
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
     private Properties lazyProperties;
 
-    public Environment(Console console, World world, boolean download, boolean noDownload) throws IOException {
-        if (download && noDownload) {
-            throw new ArgumentException("incompatible load options");
+    public Environment(Console console, World world, boolean import_, boolean noImport) throws IOException {
+        if (import_ && noImport) {
+            throw new ArgumentException("incompatible imports options");
         }
         this.console = console;
         this.world = world;
-        this.download = download;
-        this.noDownload = noDownload;
+        this.import_ = import_;
+        this.noImport = noImport;
         this.lazyGson = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyProperties = null;
     }
 
-    public void begin(Database database) throws IOException {
-        if (download) {
-            database.download(true);
-            console.verbose.println("database downloaded.");
-        } else if (noDownload) {
-            console.verbose.println("no database download.");
-            // nothing to do
-        } else {
-            database.downloadOpt();
+    public void begin(Database database) throws Exception {
+        DatabaseAdd cmd;
+
+        if (noImport) {
+            console.verbose.println("skip database imports.");
+        } else if (import_ || database.implicitImport()) {
+            for (Map.Entry<String, String> entry : properties().imports.entrySet()) {
+                console.verbose.println("importing " + entry.getKey());
+                cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
+                cmd.add(entry.getValue());
+                cmd.run();
+            }
         }
     }
 

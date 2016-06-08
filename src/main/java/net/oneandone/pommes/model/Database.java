@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
+import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -57,6 +58,16 @@ public class Database implements AutoCloseable {
         this.searcher = null;
     }
 
+    public boolean implicitImport() throws GetLastModifiedException {
+        long ms;
+
+        if (!directory.exists()) {
+            return true;
+        }
+        ms = System.currentTimeMillis() - directory.getLastModified();
+        return ms / 1000 / 3600 >= 24;
+    }
+
     private Directory getIndexLuceneDirectory() throws IOException {
         if (indexLuceneDirectory == null) {
             indexLuceneDirectory = FSDirectory.open(directory.toPath());
@@ -73,28 +84,6 @@ public class Database implements AutoCloseable {
             searcher.getIndexReader().close();
             searcher = null;
         }
-    }
-
-    //--
-
-    public Database downloadOpt() throws IOException {
-        return this;
-    }
-
-    public void download(boolean force) throws IOException {
-        /*
-        FileNode zip;
-
-        if (global == null) {
-            throw new IllegalStateException();
-        }
-        if (force || !directory.exists() || directory.getLastModified() - System.currentTimeMillis() > 1000L * 60 * 60 * 24) {
-            zip = directory.getWorld().getTemp().createTempFile();
-            global.copyFile(zip);
-            clear();
-            zip.unzip(directory);
-            zip.deleteFile();
-        }*/
     }
 
     //-- change the index
