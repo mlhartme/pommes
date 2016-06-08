@@ -28,7 +28,6 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.io.OS;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,16 +39,13 @@ public class Environment implements Variables {
 
     private boolean download;
     private boolean noDownload;
-    private boolean upload;
 
     private Gson lazyGson;
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
     private Properties lazyProperties;
 
-    public Environment(Console console, World world, boolean download, boolean noDownload, boolean upload) throws IOException {
-        String m;
-
+    public Environment(Console console, World world, boolean download, boolean noDownload) throws IOException {
         if (download && noDownload) {
             throw new ArgumentException("incompatible load options");
         }
@@ -57,7 +53,6 @@ public class Environment implements Variables {
         this.world = world;
         this.download = download;
         this.noDownload = noDownload;
-        this.upload = upload;
         this.lazyGson = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
@@ -77,12 +72,6 @@ public class Environment implements Variables {
     }
 
     public void end(Database database) throws IOException {
-        Node node;
-
-        if (upload) {
-            node = database.upload();
-            console.info.println("uploaded global pommes database: " + node.getUri() + ", " + (node.size() / 1024) + "k");
-        }
     }
 
     public Console console() {

@@ -78,7 +78,6 @@ public class Main {
                 + "  default behavior      download global database once a day; no uploads\n"
                 + "  '-download'           download global database before command execution\n"
                 + "  '-no-download'        no download of global database\n"
-                + "  '-upload'             upload local database after command execution\n"
                 + "\n"
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
@@ -98,7 +97,7 @@ public class Main {
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
-        cli.begin(Environment.class, "-download -no-download -upload");
+        cli.begin(Environment.class, "-download -no-download");
           cli.add(Mount.class, "mount query*");
           cli.add(Umount.class, "umount -stale root?=.");
 

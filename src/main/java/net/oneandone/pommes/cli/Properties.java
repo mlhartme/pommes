@@ -48,8 +48,9 @@ public class Properties {
                 "# directory where to store the database locally",
                 "database.local=" + local.getAbsolute(),
                 "",
-                "# url where to initialize database from; comment-out to use to local database only",
-                "#database.global=",
+                "# urls where to import from",
+                "#import.first=url1",
+                "#import.second=url2",
                 "",
                 "# directory where to place checkouts",
                 "mount.root=" + world.getHome().join("Pommes").getAbsolute(),
@@ -65,36 +66,33 @@ public class Properties {
     public static Properties load(FileNode file) throws IOException {
         String queryPrefix = "query.";
         String formatPrefix = "format.";
+        String importsPrefix = "imports.";
         World world;
         java.util.Properties props;
         FileNode databaseLocal;
-        Node databaseGlobal;
         Root root;
         Map<String, List<String>> queries;
         Map<String, String> formats;
+        Map<String, String> imports;
 
         world = file.getWorld();
         databaseLocal = null;
-        databaseGlobal = null;
         root = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
+        imports = new HashMap<>();
         props = file.readProperties();
         for (String key : props.stringPropertyNames()) {
             if (key.startsWith(queryPrefix)) {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
+            } else if (key.equals(importsPrefix)) {
+                imports.put(key.substring(importsPrefix.length()), props.getProperty(key));
             } else if (key.equals("mount.root")) {
                 root = new Root(world.file(props.getProperty(key)));
             } else if (key.equals("database.local")) {
                 databaseLocal = world.file(props.getProperty(key));
-            } else if (key.equals("database.global")) {
-                try {
-                    databaseGlobal = world.node(props.getProperty(key));
-                } catch (URISyntaxException e) {
-                    throw new IOException(file + ": invalid uri: " + props.getProperty(key), e);
-                }
             } else {
                 throw new IOException("unknown property: " + key);
             }
@@ -105,25 +103,27 @@ public class Properties {
         if (root == null) {
             throw new IOException(file + ": missing property: root");
         }
-        return new Properties(databaseLocal, databaseGlobal, root, queries, formats);
+        return new Properties(databaseLocal, root, queries, formats, imports);
     }
 
     //--
 
     public final FileNode databaseLocal;
-    public final Node databaseGlobal;
 
     public final Root root;
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    public Properties(FileNode databaseLocal, Node databaseGlobal,
-                      Root root, Map<String, List<String>> queries, Map<String, String> formats) throws IOException {
+    /** maps zones to urls */
+    private Map<String, String> imports;
+
+    public Properties(FileNode databaseLocal, Root root, Map<String, List<String>> queries,
+                      Map<String, String> formats, Map<String, String> imports) throws IOException {
         this.databaseLocal = databaseLocal;
-        this.databaseGlobal = databaseGlobal;
         this.root = root;
         this.queries = queries;
         this.formats = formats;
+        this.imports = imports;
     }
 
     public List<String> lookupQuery(String name) throws IOException {
@@ -135,6 +135,6 @@ public class Properties {
     }
 
     public Database loadDatabase() {
-        return new Database(databaseLocal, databaseGlobal);
+        return new Database(databaseLocal);
     }
 }

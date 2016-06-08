@@ -15,11 +15,7 @@
  */
 package net.oneandone.pommes.model;
 
-import net.oneandone.sushi.fs.Node;
-import net.oneandone.sushi.fs.NodeInstantiationException;
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.io.OS;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -36,7 +32,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,9 +43,6 @@ public class Database implements AutoCloseable {
     /** Lucene index directory */
     private final FileNode directory;
 
-    /** zipped lucene index directory; null to disable global database. */
-    private final Node global;
-
     /** created on demand */
     private Directory indexLuceneDirectory;
 
@@ -59,11 +51,9 @@ public class Database implements AutoCloseable {
 
     /**
      * @param directory valid lucene directory or none-existing directory
-     * @param global zip file or null
      */
-    public Database(FileNode directory, Node global) {
+    public Database(FileNode directory) {
         this.directory = directory;
-        this.global = global;
         this.searcher = null;
     }
 
@@ -88,13 +78,11 @@ public class Database implements AutoCloseable {
     //--
 
     public Database downloadOpt() throws IOException {
-        if (global != null) {
-            download(false);
-        }
         return this;
     }
 
     public void download(boolean force) throws IOException {
+        /*
         FileNode zip;
 
         if (global == null) {
@@ -106,19 +94,7 @@ public class Database implements AutoCloseable {
             clear();
             zip.unzip(directory);
             zip.deleteFile();
-        }
-    }
-
-    public Node upload() throws IOException {
-        FileNode zip;
-
-        if (global == null) {
-            throw new IllegalStateException();
-        }
-        zip = directory.getWorld().getTemp().createTempFile();
-        directory.zip(zip);
-        zip.copyFile(global);
-        return global;
+        }*/
     }
 
     //-- change the index
