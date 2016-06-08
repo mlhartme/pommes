@@ -31,22 +31,22 @@ import java.util.Map;
 
 public class Properties {
     public static void writeDefaults(FileNode file) throws IOException {
-        FileNode local;
+        FileNode database;
         World world;
 
         world = file.getWorld();
         if (OS.CURRENT == OS.MAC) {
             // see https://developer.apple.com/library/mac/qa/qa1170/_index.html
-            local = world.getHome().join("Library/Caches/pommes");
+            database = world.getHome().join("Library/Caches/pommes");
         } else {
-            local = world.getTemp().join("pommes-" + System.getProperty("user.name"));
+            database = world.getTemp().join("pommes-" + System.getProperty("user.name"));
         }
         file.writeLines(
                 "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
                 "",
                 "",
                 "# directory where to store the database locally",
-                "database.local=" + local.getAbsolute(),
+                "database=" + database.getAbsolute(),
                 "",
                 "# urls where to import from",
                 "#import.first=url1",
@@ -69,14 +69,14 @@ public class Properties {
         String importsPrefix = "import.";
         World world;
         java.util.Properties props;
-        FileNode databaseLocal;
+        FileNode database;
         Root root;
         Map<String, List<String>> queries;
         Map<String, String> formats;
         Map<String, String> imports;
 
         world = file.getWorld();
-        databaseLocal = null;
+        database = null;
         root = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
@@ -91,24 +91,24 @@ public class Properties {
                 imports.put(key.substring(importsPrefix.length()), props.getProperty(key));
             } else if (key.equals("mount.root")) {
                 root = new Root(world.file(props.getProperty(key)));
-            } else if (key.equals("database.local")) {
-                databaseLocal = world.file(props.getProperty(key));
+            } else if (key.equals("database")) {
+                database = world.file(props.getProperty(key));
             } else {
                 throw new IOException("unknown property: " + key);
             }
         }
-        if (databaseLocal == null) {
+        if (database == null) {
             throw new IOException(file + ": missing property: database.local");
         }
         if (root == null) {
             throw new IOException(file + ": missing property: root");
         }
-        return new Properties(databaseLocal, root, queries, formats, imports);
+        return new Properties(database, root, queries, formats, imports);
     }
 
     //--
 
-    public final FileNode databaseLocal;
+    private final FileNode database;
 
     public final Root root;
     private Map<String, List<String>> queries;
@@ -117,9 +117,9 @@ public class Properties {
     /** maps zones to urls */
     public final Map<String, String> imports;
 
-    public Properties(FileNode databaseLocal, Root root, Map<String, List<String>> queries,
+    public Properties(FileNode database, Root root, Map<String, List<String>> queries,
                       Map<String, String> formats, Map<String, String> imports) throws IOException {
-        this.databaseLocal = databaseLocal;
+        this.database = database;
         this.root = root;
         this.queries = queries;
         this.formats = formats;
@@ -135,6 +135,6 @@ public class Properties {
     }
 
     public Database loadDatabase() throws IOException {
-        return Database.load(databaseLocal);
+        return Database.load(database);
     }
 }
