@@ -25,7 +25,6 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.Variables;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.scm.Scm;
-import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -62,17 +61,26 @@ public class Environment implements Variables {
 
     public void begin(Database database) throws Exception {
         DatabaseAdd cmd;
+        FileNode marker;
 
         if (noImport) {
             console.verbose.println("skip database imports.");
-        } else if (import_ || database.implicitImport()) {
-            for (Map.Entry<String, String> entry : properties().imports.entrySet()) {
-                console.verbose.println("importing " + entry.getKey());
-                cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
-                cmd.add(entry.getValue());
-                cmd.run();
+        } else {
+            marker = importMarker();
+            if (import_ || !marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24) {
+                for (Map.Entry<String, String> entry : properties().imports.entrySet()) {
+                    console.info.println("importing " + entry.getKey());
+                    cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
+                    cmd.add(entry.getValue());
+                    cmd.run(database);
+                }
+                marker.writeBytes();
             }
         }
+    }
+
+    private FileNode importMarker() {
+        return world.getHome().join(".pommes.imported");
     }
 
     public void end(Database database) throws IOException {

@@ -41,6 +41,21 @@ import java.util.List;
 import java.util.Map;
 
 public class Database implements AutoCloseable {
+    public static Database load(FileNode directory) throws IOException {
+        boolean create;
+        Database result;
+
+        create = !directory.exists();
+        if (create) {
+            directory.mkdir();
+        }
+        result = new Database(directory);
+        if (create) {
+            result.index(Collections.emptyIterator());
+        }
+        return result;
+    }
+
     /** Lucene index directory */
     private final FileNode directory;
 
@@ -56,16 +71,6 @@ public class Database implements AutoCloseable {
     public Database(FileNode directory) {
         this.directory = directory;
         this.searcher = null;
-    }
-
-    public boolean implicitImport() throws GetLastModifiedException {
-        long ms;
-
-        if (!directory.exists()) {
-            return true;
-        }
-        ms = System.currentTimeMillis() - directory.getLastModified();
-        return ms / 1000 / 3600 >= 24;
     }
 
     private Directory getIndexLuceneDirectory() throws IOException {
@@ -91,8 +96,6 @@ public class Database implements AutoCloseable {
     public void clear() throws IOException {
         close();
         directory.deleteTreeOpt();
-        directory.mkdir();
-        index(Collections.emptyIterator());
     }
 
     public void remove(List<String> query, Variables variables) throws IOException, QueryNodeException {

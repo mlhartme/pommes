@@ -66,7 +66,7 @@ public class Properties {
     public static Properties load(FileNode file) throws IOException {
         String queryPrefix = "query.";
         String formatPrefix = "format.";
-        String importsPrefix = "imports.";
+        String importsPrefix = "import.";
         World world;
         java.util.Properties props;
         FileNode databaseLocal;
@@ -87,7 +87,7 @@ public class Properties {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
-            } else if (key.equals(importsPrefix)) {
+            } else if (key.startsWith(importsPrefix)) {
                 imports.put(key.substring(importsPrefix.length()), props.getProperty(key));
             } else if (key.equals("mount.root")) {
                 root = new Root(world.file(props.getProperty(key)));
@@ -134,7 +134,7 @@ public class Properties {
         return formats.get(name);
     }
 
-    public Database loadDatabase() {
-        return new Database(databaseLocal);
+    public Database loadDatabase() throws IOException {
+        return Database.load(databaseLocal);
     }
 }
