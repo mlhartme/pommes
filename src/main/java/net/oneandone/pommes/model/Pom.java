@@ -63,6 +63,11 @@ public class Pom {
     }
 
     public String getOrigin() {
+        return id.substring(id.indexOf(':') + 1);
+    }
+
+    public String getZone() {
         return id.substring(0, id.indexOf(':'));
     }
+
 }
