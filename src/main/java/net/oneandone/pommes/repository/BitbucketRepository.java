@@ -19,6 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.NewInputStreamException;
 import net.oneandone.sushi.fs.Node;
@@ -43,17 +44,19 @@ public class BitbucketRepository implements Repository {
     }
     private static final String PROTOCOL = "bitbucket:";
 
-    public static BitbucketRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
+    public static BitbucketRepository createOpt(Environment environment, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(PROTOCOL)) {
-            return new BitbucketRepository((HttpNode) world.node(url.substring(PROTOCOL.length())));
+            return new BitbucketRepository(environment, (HttpNode) environment.world().node(url.substring(PROTOCOL.length())));
         } else {
             return null;
         }
     }
 
+    private final Environment environment;
     private final HttpNode bitbucket;
 
-    public BitbucketRepository(HttpNode bitbucket) {
+    public BitbucketRepository(Environment environment, HttpNode bitbucket) {
+        this.environment = environment;
         this.bitbucket = bitbucket;
     }
 
@@ -109,7 +112,7 @@ public class BitbucketRepository implements Repository {
                         }
                     }
                 }
-                project = Project.probe(pom);
+                project = Project.probe(environment, pom);
                 if (project != null) {
                     project.setRevision("todo");
                     project.setOrigin("todo");

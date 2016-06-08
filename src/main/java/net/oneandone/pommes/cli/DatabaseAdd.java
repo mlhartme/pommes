@@ -62,7 +62,7 @@ public class DatabaseAdd extends Base {
         } else if (str.startsWith("%")) {
             previous(str).addOption(str.substring(1));
         } else {
-            repositories.add(Repository.create(world, str, log));
+            repositories.add(Repository.create(environment, str, log));
         }
     }
 

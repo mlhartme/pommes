@@ -1,5 +1,6 @@
 package net.oneandone.pommes.project;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.pommes.cli.Environment;
@@ -9,25 +10,30 @@ import net.oneandone.sushi.fs.Node;
 import java.io.IOException;
 
 public class JsonProject extends Project {
-    public static JsonProject probe(Node node) throws IOException {
+    public static JsonProject probe(Gson gson, Node node) throws IOException {
         String name;
+        JsonObject json;
 
         name = node.getName();
         if (name.equals(".pommes.json") || name.equals("pommes.json")) {
-            return new JsonProject(new JsonParser().parse(node.readString()).getAsJsonObject());
+            json = new JsonParser().parse(node.readString()).getAsJsonObject();
+            return new JsonProject(gson.fromJson(json, Pom.class));
         }
         return null;
     }
 
-    private final JsonObject json;
+    private final Pom orig;
 
-    public JsonProject(JsonObject json) {
-        super(null);
-        this.json = json;
+    public JsonProject(Pom orig) {
+        this.orig = orig;
     }
 
     @Override
     protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
-        return environment.gson().fromJson(json, Pom.class);
+        Pom pom;
+
+        pom = new Pom(zone, origin, revision, orig.parent, orig.coordinates, orig.scm, orig.url);
+        pom.dependencies.addAll(orig.dependencies);
+        return pom;
     }
 }

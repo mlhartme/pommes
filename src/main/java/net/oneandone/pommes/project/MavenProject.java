@@ -12,7 +12,7 @@ import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class MavenProject extends Project {
+public class MavenProject extends NodeProject {
     public static MavenProject probe(Node node) {
         String name;
 

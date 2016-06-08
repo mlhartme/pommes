@@ -16,6 +16,7 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
@@ -34,9 +35,9 @@ public class NodeRepository implements Repository {
     public static final String FILE = "file:";
     public static final String SVN = "svn:";
 
-    public static NodeRepository createOpt(World world, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+    public static NodeRepository createOpt(Environment environment, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeRepository(Find.fileOrNode(world, url), log);
+            return new NodeRepository(environment, Find.fileOrNode(environment.world(), url), log);
         } else {
             return null;
         }
@@ -44,17 +45,19 @@ public class NodeRepository implements Repository {
 
     //--
 
+    private final Environment environment;
     private final PrintWriter log;
     private final Node node;
     private boolean branches;
     private boolean tags;
     private final Filter exclude;
 
-    public NodeRepository(Node node, PrintWriter log) {
-        this(node, false, false, log);
+    public NodeRepository(Environment environment, Node node, PrintWriter log) {
+        this(environment, node, false, false, log);
     }
 
-    public NodeRepository(Node node, boolean branches, boolean tags, PrintWriter log) {
+    public NodeRepository(Environment environment, Node node, boolean branches, boolean tags, PrintWriter log) {
+        this.environment = environment;
         this.node = node;
         this.exclude = new Filter();
         this.branches = branches;
@@ -103,7 +106,7 @@ public class NodeRepository implements Repository {
         }
         log.println(root.getPath());
         for (Node node : children) {
-            project = Project.probe(node);
+            project = Project.probe(environment, node);
             if (project != null) {
                 project.setRevision(Long.toString(node.getLastModified()));
                 dest.put(project);

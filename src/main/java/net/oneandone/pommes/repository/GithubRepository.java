@@ -20,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.World;
 
@@ -31,22 +32,24 @@ import java.util.concurrent.BlockingQueue;
 public class GithubRepository implements Repository {
     private static final String PROTOCOL = "github:";
 
-    public static GithubRepository createOpt(World world, String url, PrintWriter log) {
+    public static GithubRepository createOpt(Environment environment, String url, PrintWriter log) {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(world, url.substring(PROTOCOL.length()), log);
+            return new GithubRepository(environment, url.substring(PROTOCOL.length()), log);
         } else {
             return null;
         }
     }
 
+    private final Environment environment;
     private final World world;
     private final String user;
     private boolean branches;
     private boolean tags;
     private final PrintWriter log;
 
-    public GithubRepository(World world, String user, PrintWriter log) {
-        this.world = world;
+    public GithubRepository(Environment environment, String user, PrintWriter log) {
+        this.environment = environment;
+        this.world = environment.world();
         this.user = user;
         this.branches = false;
         this.tags = false;
@@ -82,7 +85,7 @@ public class GithubRepository implements Repository {
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
-            repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
+            repository = new NodeRepository(environment, world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
             repository.scan(dest);
         }
     }

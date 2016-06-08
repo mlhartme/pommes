@@ -168,7 +168,7 @@ public class Environment implements Variables {
             return null;
         }
         for (Node child : directory.list()) {
-            project = Project.probe(child);
+            project = Project.probe(this, child);
             if (project != null) {
                 project.setOrigin(scm.getUrl(directory));
                 project.setRevision("checkout");

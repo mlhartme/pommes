@@ -16,6 +16,7 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
@@ -34,20 +35,22 @@ import java.util.concurrent.BlockingQueue;
 public class ArtifactoryRepository implements Repository {
     private static final String PROTOCOL = "artifactory:";
 
-    public static ArtifactoryRepository createOpt(World world, String url) {
+    public static ArtifactoryRepository createOpt(Environment environment, String url) {
         if (url.startsWith(PROTOCOL)) {
-            return new ArtifactoryRepository(world, url.substring(PROTOCOL.length()));
+            return new ArtifactoryRepository(environment, url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
     }
 
     private final String url;
+    private final Environment environment;
     private final World world;
     private String contextPath;
 
-    public ArtifactoryRepository(World world, String url) {
-        this.world = world;
+    public ArtifactoryRepository(Environment environment, String url) {
+        this.environment = environment;
+        this.world = environment.world();
         this.url = url;
         this.contextPath = "/artifactory/";
         if (!url.contains(contextPath)) {
@@ -79,7 +82,7 @@ public class ArtifactoryRepository implements Repository {
         root = world.node(url);
         listing = world.node(artifactory() + "api/storage/" + repositoryAndPath() + "?list&deep=1&mdTimestamps=0");
         try {
-            Parser.run(listing, root, dest);
+            Parser.run(environment, listing, root, dest);
         } catch (IOException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -107,7 +110,7 @@ public class ArtifactoryRepository implements Repository {
     public static class Parser implements AutoCloseable {
         private static final SimpleDateFormat FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-        public static void run(Node listing, Node root, BlockingQueue<Project> dest) throws Exception {
+        public static void run(Environment environment, Node listing, Node root, BlockingQueue<Project> dest) throws Exception {
             String uri;
             long size;
             Date lastModified;
@@ -134,7 +137,7 @@ public class ArtifactoryRepository implements Repository {
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
                     node = root.join(Strings.removeLeft(uri, "/"));
-                    project = Project.probe(node);
+                    project = Project.probe(environment, node);
                     if (project != null) {
                         project.setOrigin("artifactory:" + node.getUri().toString());
                         project.setRevision(sha1);

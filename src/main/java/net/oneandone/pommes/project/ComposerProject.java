@@ -6,7 +6,7 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 
-public class ComposerProject extends Project {
+public class ComposerProject extends NodeProject {
     public static ComposerProject probe(Node node) {
         if (node.getName().equals("composer.json")) {
             return new ComposerProject(node);

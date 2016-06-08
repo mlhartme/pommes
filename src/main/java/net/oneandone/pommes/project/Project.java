@@ -9,14 +9,14 @@ import java.io.IOException;
 
 /** Factory for Poms */
 public abstract class Project {
-    public static final Project END_OF_QUEUE = new Project(null) {
+    public static final Project END_OF_QUEUE = new Project() {
         @Override
         protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
             throw new IllegalStateException();
         }
     };
 
-    public static Project probe(Node node) throws IOException {
+    public static Project probe(Environment environment, Node node) throws IOException {
         Project result;
 
         result = MavenProject.probe(node);
@@ -27,43 +27,37 @@ public abstract class Project {
         if (result != null) {
             return result;
         }
-        result = JsonProject.probe(node);
+        result = JsonProject.probe(environment.gson(), node);
         if (result != null) {
             return result;
         }
         return null;
     }
 
-    private String overrideOrigin = null;
-    private String overrideRevision = null;
+    private String origin;
+    private String revision;
 
-    //--
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
 
-    protected final Node file;
-
-    protected Project(Node file) {
-        this.file = file;
+    public void setRevision(String revision) {
+        this.revision = revision;
     }
 
     public Pom load(Environment environment, String zone) throws IOException {
-        return doLoad(environment, zone, getOrigin(), overrideRevision == null ? Long.toString(file.getLastModified()) : overrideRevision);
+        if (origin == null) {
+            throw new IllegalStateException();
+        }
+        if (revision == null) {
+            throw new IllegalStateException();
+        }
+        return doLoad(environment, zone, origin, revision);
     }
 
     protected abstract Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException;
 
-    public void setOrigin(String origin) {
-        this.overrideOrigin = origin;
-    }
-
-    public void setRevision(String revision) {
-        this.overrideRevision = revision;
-    }
-
-    private String getOrigin() {
-        return overrideOrigin == null ? file.getUri().toString() : overrideOrigin;
-    }
-
     public String toString() {
-        return getOrigin();
+        return origin;
     }
 }
