@@ -73,6 +73,10 @@ public class Database implements AutoCloseable {
         this.searcher = null;
     }
 
+    public FileNode importMarker() {
+        return directory.getParent().join(directory.getName() + ".imported");
+    }
+
     private Directory getIndexLuceneDirectory() throws IOException {
         if (indexLuceneDirectory == null) {
             indexLuceneDirectory = FSDirectory.open(directory.toPath());
@@ -96,6 +100,7 @@ public class Database implements AutoCloseable {
     public void clear() throws IOException {
         close();
         directory.deleteTreeOpt();
+        importMarker().deleteFileOpt();
     }
 
     public void remove(List<String> query, Variables variables) throws IOException, QueryNodeException {

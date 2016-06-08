@@ -66,7 +66,7 @@ public class Environment implements Variables {
         if (noImport) {
             console.verbose.println("skip database imports.");
         } else {
-            marker = importMarker();
+            marker = database.importMarker();
             if (import_ || !marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24) {
                 for (Map.Entry<String, String> entry : properties().imports.entrySet()) {
                     console.info.println("importing " + entry.getKey());
@@ -77,10 +77,6 @@ public class Environment implements Variables {
                 marker.writeBytes();
             }
         }
-    }
-
-    private FileNode importMarker() {
-        return world.getHome().join(".pommes.imported");
     }
 
     public void end(Database database) throws IOException {
