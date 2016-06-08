@@ -38,14 +38,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAdd extends Base {
+    private final boolean delete;
     private final boolean dryrun;
     private final boolean fixscm;
     private final String zone;
     private final List<Repository> repositories;
     private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean dryrun, boolean fixscm, String zone) throws IOException {
+    public DatabaseAdd(Environment environment, boolean delete, boolean dryrun, boolean fixscm, String zone) throws IOException {
         super(environment);
+        this.delete = delete;
         this.dryrun = dryrun;
         this.fixscm = fixscm;
         this.zone = zone;
@@ -76,7 +78,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(dryrun, fixscm, environment, zone, database);
+            indexer = new Indexer(delete, dryrun, fixscm, environment, zone, database);
             indexer.start();
             try {
                 for (Repository repository : repositories) {
@@ -95,6 +97,7 @@ public class DatabaseAdd extends Base {
     }
 
     public static class Indexer extends Thread implements Iterator<Document> {
+        private final boolean remove;
         private final boolean dryrun;
         private final boolean fixscm;
         private final Environment environment;
@@ -110,9 +113,10 @@ public class DatabaseAdd extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(boolean dryrun, boolean fixscm, Environment environment, String zone, Database database) {
+        public Indexer(boolean remove, boolean dryrun, boolean fixscm, Environment environment, String zone, Database database) {
             super("Indexer");
 
+            this.remove = remove;
             this.dryrun = dryrun;
             this.fixscm = fixscm;
             this.environment = environment;
@@ -135,10 +139,18 @@ public class DatabaseAdd extends Base {
 
             try {
                 started = System.currentTimeMillis();
-                database.list(existing);
-                environment.console().verbose.println("scanned " + existing.size() + " existing revisions: " + (System.currentTimeMillis() - started) + " ms");
+                database.list(existing, zone);
+                environment.console().verbose.println("scanned " + existing.size() + " existing projects in zone " + zone + ": "
+                        + (System.currentTimeMillis() - started) + " ms");
                 current = iter();
                 database.index(this);
+                if (remove) {
+                    for (String id : existing.keySet()) {
+                        environment.console().info.println("D " + id);
+                    }
+
+                    database.removeIds(existing.keySet());
+                }
                 summary();
             } catch (Exception e) {
                 exception = e;
@@ -186,7 +198,7 @@ public class DatabaseAdd extends Base {
                 if (pom == null) {
                     return null;
                 }
-                existingRevision = existing.get(pom.id);
+                existingRevision = existing.remove(pom.id);
                 if (pom.revision.equals(existingRevision)) {
                     console.info.println("  " + pom.id);
                     continue;

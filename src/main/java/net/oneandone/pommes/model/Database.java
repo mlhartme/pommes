@@ -25,6 +25,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -37,6 +38,7 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -140,7 +142,29 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void list(Map<String, String> result) throws IOException {
+    public void removeIds(Collection<String> ids) throws IOException, QueryNodeException {
+        IndexWriter writer;
+        IndexWriterConfig config;
+        Term[] terms;
+        int i;
+
+        if (ids.isEmpty()) {
+            return;
+        }
+        terms = new Term[ids.size()];
+        i = 0;
+        for (String id : ids) {
+            terms[i++] = Field.ID.term(id);
+        }
+        close();
+        config =  new IndexWriterConfig(new StandardAnalyzer());
+        config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
+        writer = new IndexWriter(getIndexLuceneDirectory(), config);
+        writer.deleteDocuments(terms);
+        writer.close();
+    }
+
+    public void list(Map<String, String> result, String zone) throws IOException {
         TopDocs search;
         Document document;
         Query query;
@@ -148,7 +172,7 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(Field.ID.term("*"));
+        query = new WildcardQuery(Field.ID.term(zone + ":*"));
         search = searcher.search(query, Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);

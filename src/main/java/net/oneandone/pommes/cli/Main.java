@@ -62,7 +62,7 @@ public class Main {
                 + "\n"
                 + "commands that modify the database\n"
                 + "  'database-clear'      deletes the current database and creates a new empty one.\n"
-                + "  'database-add' '-dryrun'? '-fixscm'? ('-zone' zone)?  url*\n"
+                + "  'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
                 + "                        zone is a prefix added to the id, it defaults to local;\n"
                 + "                        overwrites projects with same origin;\n"
@@ -106,7 +106,7 @@ public class Main {
           cli.add(Goto.class, "goto -shellFile=" + world.getHome().join(".pommes.goto").getAbsolute() + " query*");
 
           cli.add(DatabaseClear.class, "database-clear");
-          cli.add(DatabaseAdd.class, "database-add -dryrun -fixscm -zone=local url* { add*(url) }");
+          cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
           cli.add(Find.class, "find -target=null queryOrFormat* { arg*(queryOrFormat)}");
