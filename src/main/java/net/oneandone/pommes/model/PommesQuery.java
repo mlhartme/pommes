@@ -59,8 +59,8 @@ public class PommesQuery {
         return orBuilder.build();
     }
 
-    private static final String prefix = "=";
-    private static final String suffix = "=";
+    private static final String prefix = "{";
+    private static final String suffix = "}";
 
     private static String variables(String string, Variables variables) throws IOException {
         StringBuilder builder;

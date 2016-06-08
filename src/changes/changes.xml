@@ -52,7 +52,7 @@
         and gav to artifact.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
-        Renamed =svn= variable to =scm=.
+        Variables are enclosed in {} now. Renamed {svn} variable to {scm}.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
         Merged database-export into find. Find now has an optional output argument (which also accepts files now) and -json and -dump options
