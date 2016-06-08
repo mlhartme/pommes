@@ -74,10 +74,10 @@ public class Main {
                 + fieldList()
                 + "  (field id is the first letter of the field name.)\n"
                 + "\n"
-                + "sync options            how to sync between global and local database\n"
-                + "  default behavior      download global database once a day; no uploads\n"
-                + "  '-download'           download global database before command execution\n"
-                + "  '-no-download'        no download of global database\n"
+                + "import options          how to handle configured imports\n"
+                + "  default behavior      import once a day\n"
+                + "  '-import'             import before command execution\n"
+                + "  '-no-import'          no import\n"
                 + "\n"
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
@@ -97,7 +97,7 @@ public class Main {
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
-        cli.begin(Environment.class, "-download -no-download");
+        cli.begin(Environment.class, "-import -no-import");
           cli.add(Mount.class, "mount query*");
           cli.add(Umount.class, "umount -stale root?=.");
 
