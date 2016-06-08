@@ -55,7 +55,7 @@
         Renamed =svn= variable to =scm=.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
-        Merged database-export into find. Find now has an optional target argument (which also accepts files now) and -json and -dump options
+        Merged database-export into find. Find now has an optional output argument (which also accepts files now) and -json and -dump options
         to print pretty-printed or raw json.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">

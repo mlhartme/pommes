@@ -28,23 +28,26 @@ import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 public class Find extends Base {
     private static final String JSON = "-json";
     private static final String DUMP = "-dump";
 
-    private final Node target;
+    private final Node output;
     private final List<String> query;
     private StringBuilder formatBuilder;
 
-    public Find(Environment environment, String target) throws URISyntaxException, NodeInstantiationException {
+    public Find(Environment environment, String output) throws URISyntaxException, NodeInstantiationException {
         super(environment);
 
-        this.target = target == null ? world.node("console:///") : fileOrNode(world, target);
+        this.output = output == null ? null : fileOrNode(world, output);
         this.query = new ArrayList<>();
         this.formatBuilder = null;
     }
@@ -95,7 +98,9 @@ public class Find extends Base {
         String macroName;
         List<String> macro;
         String tmpFormat;
+        PrintStream dest;
 
+        dest = null;
         try {
             if (query.size() > 0 && query.get(0).startsWith("@")) {
                 for (int i = 1; i < query.size(); i++) {
@@ -132,24 +137,33 @@ public class Find extends Base {
             }
             console.verbose.println("query: " + query);
             console.verbose.println("format: " + format);
-            try (Writer dest = target.newWriter()) {
-                switch (format) {
-                    case JSON:
-                        json(Field.poms(documents), true, dest);
-                        break;
-                    case DUMP:
-                        json(Field.poms(documents), false, dest);
-                        break;
-                    default:
-                        text(documents, format, dest);
-                }
+
+            if (output == null) {
+                dest = System.out;
+            } else if (output.getName().endsWith(".gz")) {
+                dest = new PrintStream(new GZIPOutputStream(output.newOutputStream()));
+            } else {
+                dest = new PrintStream(output.newOutputStream());
+            }
+            switch (format) {
+                case JSON:
+                    json(Field.poms(documents), true, dest);
+                    break;
+                case DUMP:
+                    json(Field.poms(documents), false, dest);
+                    break;
+                default:
+                    text(documents, format, dest);
             }
         } finally {
+            if (dest != null) {
+                dest.close();
+            }
             environment.clearArguments();
         }
     }
 
-    private void text(List<Document> documents, String format, Writer dest) throws IOException {
+    private void text(List<Document> documents, String format, PrintStream dest) throws IOException {
         List<String> done;
         String line;
 
@@ -158,13 +172,12 @@ public class Find extends Base {
             line = format(document, format);
             if (!done.contains(line)) {
                 done.add(line);
-                dest.write(line);
-                dest.write('\n');
+                dest.println(line);
             }
         }
     }
 
-    private void json(List<Pom> matches, boolean prettyprint, Writer dest) throws Exception {
+    private void json(List<Pom> matches, boolean prettyprint, PrintStream dest) {
         GsonBuilder builder;
         Gson gson;
 
@@ -174,7 +187,7 @@ public class Find extends Base {
         }
         gson = builder.create();
         gson.toJson(matches, dest);
-        dest.write('\n');
+        dest.print('\n');
     }
 
     private String format(Document document, String format) throws IOException {

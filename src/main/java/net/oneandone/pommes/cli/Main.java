@@ -35,14 +35,14 @@ public class Main {
                 + "  'pommes' ['-v'|'-e'] command sync-options args*\n"
                 + "\n"
                 + "search commands\n"
-                + "  'find' ('-target' str)? query ('-' format* | '-json' | '-dump' | '-'MACRO)? \n"
+                + "  'find' ('-output' str)? query ('-' format* | '-json' | '-dump' | '-'MACRO)? \n"
                 + "                        print projects matching this query;\n"
                 + "                        append '-json' to print json, '-dump' to print json without formatting;\n"
                 + "                        format is a string with placeholders: %c is replace be the current checkout\n"
                 + "                        and %FIELD_ID is replaced by the respective field;\n"
                 + "                        place holders can be followed by angle brackets to filter for\n"
                 + "                        the enclosed substring or variables;\n"
-                + "                        target is a file or URL to write results to, default is the console.\n"
+                + "                        output is a file or URL to write results to, default is the console.\n"
                 + "\n"
                 + "mount commands\n"
                 + "  'mount' query         checkout matching projects; skips existing checkouts;\n"
@@ -108,7 +108,7 @@ public class Main {
           cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
-          cli.add(Find.class, "find -target=null queryOrFormat* { arg*(queryOrFormat)}");
+          cli.add(Find.class, "find -output=null queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));
     }
