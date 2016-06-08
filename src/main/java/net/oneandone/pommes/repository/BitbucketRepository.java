@@ -34,14 +34,6 @@ import java.util.concurrent.BlockingQueue;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class BitbucketRepository implements Repository {
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        HttpNode node;
-        node = (HttpNode) World.create().node("https://bitbucket.1and1.org:443");
-        node = node.getRoot().node("projects/CISOOPS/repos/change/browse/src/main/java/com/oneandone/sales/tools/change/Change.java", "raw");
-        System.out.println(node);
-        System.out.println(node.readString());
-
-    }
     private static final String PROTOCOL = "bitbucket:";
 
     public static BitbucketRepository createOpt(Environment environment, String url) throws URISyntaxException, NodeInstantiationException {
@@ -70,6 +62,7 @@ public class BitbucketRepository implements Repository {
 
     @Override
     public void scan(BlockingQueue<Project> dest) throws IOException, URISyntaxException, InterruptedException {
+        String bbProject;
         int perPage = 10;
         String path;
         String str;
@@ -78,13 +71,10 @@ public class BitbucketRepository implements Repository {
         JsonObject paged;
         Node pom;
         Project project;
-        String tmp;
         String location;
 
-        path = "rest/api/1.0/projects/CISOOPS/repos";
-        if (!bitbucket.getPath().isEmpty()) {
-            path = bitbucket.getPath() + "/" + path;
-        }
+        bbProject = bitbucket.getName();
+        path = "rest/api/1.0/projects/" + bbProject + "/repos";
         parser = new JsonParser();
         for (int i = 0; true; i += perPage) {
             node = bitbucket.getRoot().node(path, "limit=" + perPage + "&start=" + i);
@@ -96,11 +86,11 @@ public class BitbucketRepository implements Repository {
                 // TODO: offer all files, not only poms. Recursion.
                 // https://bitbucket.1and1.org:443/rest/api/1.0/projects/CISOOPS/repos/change/files/
 
-                pom = node.getRoot().node("projects/CISOOPS/repos/" + name + "/browse/pom.xml", "raw");
+                pom = node.getRoot().node("projects/" + bbProject + "/repos/" + name + "/browse/pom.xml", "raw");
                 while (true) {
-                    System.out.println("pom: " + pom);
                     try {
-                        tmp = pom.readString();
+                        // try to load. To see if we ne a redirected location
+                        pom.readString();
                         break;
                     } catch (NewInputStreamException e) {
                         if (e.getCause() instanceof MovedTemporarilyException) {

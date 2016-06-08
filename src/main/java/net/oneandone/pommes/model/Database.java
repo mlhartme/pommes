@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.model;
 
-import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
