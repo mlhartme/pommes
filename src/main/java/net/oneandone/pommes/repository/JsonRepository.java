@@ -30,9 +30,12 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
+import java.util.zip.GZIPInputStream;
 
 public class JsonRepository implements Repository {
     private static final String PROTOCOL = "json:";
@@ -67,8 +70,8 @@ public class JsonRepository implements Repository {
         Project project;
         Pom pom;
 
-        try (Reader src = node.newReader()) {
-            array = new JsonParser().parse(src).getAsJsonArray();
+        try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
+            array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
                 pom = gson.fromJson(entry.getAsJsonObject(), Pom.class);
                 project = new JsonProject(pom);
