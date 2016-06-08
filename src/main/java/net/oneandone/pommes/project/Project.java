@@ -11,7 +11,7 @@ import java.io.IOException;
 public abstract class Project {
     public static final Project END_OF_QUEUE = new Project(null) {
         @Override
-        public Pom load(Environment environment) throws IOException {
+        protected Pom doLoad(Environment environment, String origin, String revision) throws IOException {
             throw new IllegalStateException();
         }
     };
@@ -45,22 +45,22 @@ public abstract class Project {
         this.file = file;
     }
 
-    public abstract Pom load(Environment environment) throws IOException;
+    public Pom load(Environment environment) throws IOException {
+        return doLoad(environment, getOrigin(), overrideRevision == null ? Long.toString(file.getLastModified()) : overrideRevision);
+    }
+
+    protected abstract Pom doLoad(Environment environment, String origin, String revision) throws IOException;
 
     public void setOrigin(String origin) {
         this.overrideOrigin = origin;
     }
 
-    public String getOrigin() {
-        return overrideOrigin == null ? file.getUri().toString() : overrideOrigin;
-    }
-
-    public String getRevision() throws GetLastModifiedException {
-        return overrideRevision == null ? Long.toString(file.getLastModified()) : overrideRevision;
-    }
-
     public void setRevision(String revision) {
         this.overrideRevision = revision;
+    }
+
+    private String getOrigin() {
+        return overrideOrigin == null ? file.getUri().toString() : overrideOrigin;
     }
 
     public String toString() {

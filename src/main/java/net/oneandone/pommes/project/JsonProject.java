@@ -27,7 +27,7 @@ public class JsonProject extends Project {
     }
 
     @Override
-    public Pom load(Environment environment) throws IOException {
+    protected Pom doLoad(Environment environment, String origin, String revision) throws IOException {
         return environment.gson().fromJson(json, Pom.class);
     }
 }
