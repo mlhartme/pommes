@@ -24,7 +24,7 @@ public class Pom {
 
     /** may be null */
     public final Gav parent;
-    public final Gav coordinates;
+    public final Gav artifact;
     /** may be null */
     public final String scm;
     /** may be null */
@@ -43,18 +43,18 @@ public class Pom {
         this.id = id;
         this.revision = revision;
         this.parent = parent;
-        this.coordinates = artifact;
+        this.artifact = artifact;
         this.scm = scm;
         this.url = url;
         this.dependencies = new ArrayList<>();
     }
 
     public Pom clone(String newScm) {
-        return new Pom(id, revision, parent, coordinates, newScm, url);
+        return new Pom(id, revision, parent, artifact, newScm, url);
     }
 
     public String toLine() {
-        return coordinates.toGavString() + " @ " + scm;
+        return artifact.toGavString() + " @ " + scm;
     }
 
     @Override

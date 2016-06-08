@@ -31,7 +31,7 @@ public class Remove extends Action {
 
         scm = Scm.probeCheckout(directory);
         if (scm.isCommitted(directory)) {
-            return new Remove(scm, directory, pom.coordinates);
+            return new Remove(scm, directory, pom.artifact);
         } else {
             return new Problem(directory, directory + ": checkout is not committed.");
         }

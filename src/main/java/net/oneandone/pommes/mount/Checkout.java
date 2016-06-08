@@ -47,7 +47,7 @@ public class Checkout extends Action {
             if (scm == null) {
                 return new Problem(directory, pom.id + ": unknown scm: " + pom.scm);
             } else {
-                return new Checkout(scm, directory, pom.coordinates, pom.scm);
+                return new Checkout(scm, directory, pom.artifact, pom.scm);
             }
         }
     }

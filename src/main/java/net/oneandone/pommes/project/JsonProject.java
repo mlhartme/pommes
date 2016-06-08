@@ -32,7 +32,7 @@ public class JsonProject extends Project {
     protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
         Pom pom;
 
-        pom = new Pom(zone, origin, revision, orig.parent, orig.coordinates, orig.scm, orig.url);
+        pom = new Pom(zone, origin, revision, orig.parent, orig.artifact, orig.scm, orig.url);
         pom.dependencies.addAll(orig.dependencies);
         return pom;
     }

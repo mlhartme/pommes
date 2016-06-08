@@ -37,7 +37,7 @@ public class Root {
         Scm scm;
         String server;
 
-        ga = pom.coordinates.groupId + "." + pom.coordinates.artifactId;
+        ga = pom.artifact.groupId + "." + pom.artifact.artifactId;
         path = ga.replace('.', '/');
         if (pom.scm != null) {
             scm = Scm.probeUrl(pom.scm);

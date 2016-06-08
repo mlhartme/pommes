@@ -125,9 +125,9 @@ public class Environment implements Variables {
             case "scm":
                 return currentPom().scm;
             case "gav":
-                return currentPom().coordinates.toGavString();
+                return currentPom().artifact.toGavString();
             case "ga":
-                return currentPom().coordinates.toGaString();
+                return currentPom().artifact.toGaString();
             default:
                 return arguments.get(name);
         }
@@ -140,7 +140,7 @@ public class Environment implements Variables {
         if (lazyProperties == null) {
             path = System.getenv("POMMES_PROPERTIES");
             if (path == null) {
-                file = (FileNode) world.getHome().join(".pommes.properties");
+                file = world.getHome().join(".pommes.properties");
             } else {
                 file = world.file(path);
             }

@@ -113,7 +113,7 @@ public enum Field {
         if (pom.parent != null) {
             PARENT.add(doc, pom.parent.toGavString());
         }
-        ARTIFACT.add(doc, pom.coordinates.toGavString());
+        ARTIFACT.add(doc, pom.artifact.toGavString());
         for (Gav dep : pom.dependencies) {
             DEP.add(doc, dep.toGavString());
         }
