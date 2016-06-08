@@ -25,6 +25,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -33,9 +34,9 @@ public class NodeRepository implements Repository {
     public static final String FILE = "file:";
     public static final String SVN = "svn:";
 
-    public static NodeRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
+    public static NodeRepository createOpt(World world, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeRepository(Find.fileOrNode(world, url));
+            return new NodeRepository(Find.fileOrNode(world, url), log);
         } else {
             return null;
         }
@@ -43,22 +44,22 @@ public class NodeRepository implements Repository {
 
     //--
 
+    private final PrintWriter log;
     private final Node node;
     private boolean branches;
     private boolean tags;
     private final Filter exclude;
-    private FileNode log;
 
-    public NodeRepository(Node node) {
-        this(node, false, false);
+    public NodeRepository(Node node, PrintWriter log) {
+        this(node, false, false, log);
     }
 
-    public NodeRepository(Node node, boolean branches, boolean tags) {
+    public NodeRepository(Node node, boolean branches, boolean tags, PrintWriter log) {
         this.node = node;
         this.exclude = new Filter();
         this.branches = branches;
         this.tags = tags;
-        this.log = null;
+        this.log = log;
     }
 
     @Override
@@ -67,8 +68,8 @@ public class NodeRepository implements Repository {
             branches = true;
         } else if (option.equals("tags")) {
             tags = true;
-        } else if (option.startsWith("trace=")) {
-            log = node.getWorld().file(option.substring(6));
+        } else {
+            throw new ArgumentException("unknown option: " + option);
         }
     }
 
@@ -100,9 +101,7 @@ public class NodeRepository implements Repository {
         if (children == null) {
             return;
         }
-        if (log != null) {
-            log.appendString(root.getPath() + "\n");
-        }
+        log.println(root.getPath() + "\n");
         for (Node node : children) {
             project = Project.probe(node);
             if (project != null) {

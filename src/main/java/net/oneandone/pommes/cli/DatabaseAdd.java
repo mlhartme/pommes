@@ -26,6 +26,7 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +40,13 @@ import java.util.concurrent.BlockingQueue;
 public class DatabaseAdd extends Base {
     private final boolean dryrun;
     private final List<Repository> repositories;
+    private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean dryrun) {
+    public DatabaseAdd(Environment environment, boolean dryrun) throws IOException {
         super(environment);
         this.dryrun = dryrun;
         this.repositories = new ArrayList<>();
+        this.log = new PrintWriter(environment.world().getTemp().join("pommes.log").newWriter());
     }
 
     public void add(String str) throws URISyntaxException, NodeInstantiationException {
@@ -52,7 +55,7 @@ public class DatabaseAdd extends Base {
         } else if (str.startsWith("%")) {
             previous(str).addOption(str.substring(1));
         } else {
-            repositories.add(Repository.create(world, str));
+            repositories.add(Repository.create(world, str, log));
         }
     }
 
@@ -67,18 +70,22 @@ public class DatabaseAdd extends Base {
     public void run(Database database) throws Exception {
         Indexer indexer;
 
-        indexer = new Indexer(dryrun, environment, database);
-        indexer.start();
         try {
-            for (Repository repository : repositories) {
-                repository.scan(indexer.src);
+            indexer = new Indexer(dryrun, environment, database);
+            indexer.start();
+            try {
+                for (Repository repository : repositories) {
+                    repository.scan(indexer.src);
+                }
+            } finally {
+                indexer.src.put(Project.END_OF_QUEUE);
+                indexer.join();
+            }
+            if (indexer.exception != null) {
+                throw indexer.exception;
             }
         } finally {
-            indexer.src.put(Project.END_OF_QUEUE);
-            indexer.join();
-        }
-        if (indexer.exception != null) {
-            throw indexer.exception;
+            log.close();
         }
     }
 

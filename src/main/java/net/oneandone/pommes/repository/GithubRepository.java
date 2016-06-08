@@ -24,15 +24,16 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.World;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
 public class GithubRepository implements Repository {
     private static final String PROTOCOL = "github:";
 
-    public static GithubRepository createOpt(World world, String url) {
+    public static GithubRepository createOpt(World world, String url, PrintWriter log) {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(world, url.substring(PROTOCOL.length()));
+            return new GithubRepository(world, url.substring(PROTOCOL.length()), log);
         } else {
             return null;
         }
@@ -42,12 +43,14 @@ public class GithubRepository implements Repository {
     private final String user;
     private boolean branches;
     private boolean tags;
+    private final PrintWriter log;
 
-    public GithubRepository(World world, String user) {
+    public GithubRepository(World world, String user, PrintWriter log) {
         this.world = world;
         this.user = user;
         this.branches = false;
         this.tags = false;
+        this.log = log;
     }
 
     public void addOption(String option) {
@@ -79,7 +82,7 @@ public class GithubRepository implements Repository {
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
-            repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags);
+            repository = new NodeRepository(world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
             repository.scan(dest);
         }
     }

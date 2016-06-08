@@ -7,12 +7,13 @@ import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
 /** A location to search for projects */
 public interface Repository {
-    static Repository create(World world, String url) throws URISyntaxException, NodeInstantiationException {
+    static Repository create(World world, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         Repository repository;
         FileNode file;
 
@@ -20,11 +21,11 @@ public interface Repository {
         if (repository != null) {
             return repository;
         }
-        repository = NodeRepository.createOpt(world, url);
+        repository = NodeRepository.createOpt(world, url, log);
         if (repository != null) {
             return repository;
         }
-        repository = GithubRepository.createOpt(world, url);
+        repository = GithubRepository.createOpt(world, url, log);
         if (repository != null) {
             return repository;
         }
@@ -38,7 +39,7 @@ public interface Repository {
         }
         file = world.file(url);
         if (file.exists()) {
-            return new NodeRepository(file);
+            return new NodeRepository(file, log);
         }
         throw new ArgumentException("unknown repository type: " + url);
     }
