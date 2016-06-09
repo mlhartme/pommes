@@ -17,8 +17,8 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
 
-public class DatabaseClear extends Base {
-    public DatabaseClear(Environment environment) {
+public class DatabaseReset extends Base {
+    public DatabaseReset(Environment environment) {
         super(environment);
     }
 
