@@ -24,6 +24,8 @@ public class PommesQuery {
         String string;
         List<Field> fields;
         Object[] tmp;
+        boolean not;
+        String term;
 
         orBuilder= new BooleanQuery.Builder();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
@@ -33,8 +35,10 @@ public class PommesQuery {
             if (terms.isEmpty()) {
                 terms.add("");
             }
-            for (String term : terms) {
-                if (term.startsWith("%")) {
+            for (String termWithNot : terms) {
+                not = termWithNot.startsWith("!");
+                term = not ? termWithNot.substring(1) : termWithNot;
+                if (term.startsWith("§")) {
                     // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
                     termQuery = new StandardQueryParser().parse(and.substring(1), Field.ARTIFACT.dbname());
                 } else {
@@ -52,7 +56,7 @@ public class PommesQuery {
                     string = variables(string, variables);
                     termQuery = or(fields, match, string);
                 }
-                andBuilder.add(termQuery, BooleanClause.Occur.MUST);
+                andBuilder.add(termQuery, not ? BooleanClause.Occur.MUST_NOT : BooleanClause.Occur.MUST);
             }
             orBuilder.add(andBuilder.build(), BooleanClause.Occur.SHOULD);
         }
