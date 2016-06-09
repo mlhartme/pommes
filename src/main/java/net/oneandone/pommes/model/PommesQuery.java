@@ -23,7 +23,9 @@ import java.util.List;
 public class PommesQuery {
     private static final Separator PLUS = Separator.on('+');
 
-    public static PommesQuery create(List<String> or, Variables variables) throws IOException, QueryNodeException {
+    public static PommesQuery create(List<String> initialOr, Variables variables) throws IOException, QueryNodeException {
+        int queryIndex;
+        List<String> or;
         BooleanQuery.Builder orBuilder;
         BooleanQuery.Builder andBuilder;
         Query termQuery;
@@ -36,6 +38,18 @@ public class PommesQuery {
         boolean not;
         String term;
 
+        queryIndex = -1;
+        or = initialOr;
+        if (initialOr.size() > 0) {
+            try {
+                queryIndex = Integer.parseInt(initialOr.get(0));
+                queryIndex--;
+                or = new ArrayList<>(initialOr);
+                or.remove(0);
+            } catch (NumberFormatException e) {
+                // fall-through - not and index
+            }
+        }
         orBuilder= new BooleanQuery.Builder();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
             and = variables(and, variables);
@@ -68,7 +82,7 @@ public class PommesQuery {
             }
             orBuilder.add(andBuilder.build(), BooleanClause.Occur.SHOULD);
         }
-        return new PommesQuery(orBuilder.build());
+        return new PommesQuery(queryIndex, orBuilder.build());
     }
 
     private static final String prefix = "{";
@@ -129,9 +143,11 @@ public class PommesQuery {
 
     //--
 
+    private final int idx;
     private final Query query;
 
-    public PommesQuery(Query query) {
+    public PommesQuery(int idx, Query query) {
+        this.idx = idx;
         this.query = query;
     }
 
@@ -141,13 +157,20 @@ public class PommesQuery {
 
         search = searcher.search(query, Integer.MAX_VALUE);
         list = new ArrayList<>();
-        for (ScoreDoc scoreDoc : search.scoreDocs) {
-            list.add(searcher.getIndexReader().document(scoreDoc.doc));
+        if (idx < 0) {
+            for (ScoreDoc scoreDoc : search.scoreDocs) {
+                list.add(searcher.getIndexReader().document(scoreDoc.doc));
+            }
+        } else {
+            list.add(searcher.getIndexReader().document(search.scoreDocs[idx].doc));
         }
         return list;
     }
 
     public void delete(IndexWriter writer) throws IOException {
+        if (idx >= 0) {
+            throw new UnsupportedOperationException();
+        }
         writer.deleteDocuments(query);
     }
 }
