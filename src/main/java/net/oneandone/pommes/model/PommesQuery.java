@@ -5,7 +5,9 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.WildcardQuery;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -31,10 +33,9 @@ public class PommesQuery {
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
             and = variables(and, variables);
             andBuilder = new BooleanQuery.Builder();
+            // make sure we have at least one entry. Because terms might be empty. Or, if it's a single "!", we need another entry to make it work.
+            andBuilder.add(any(), BooleanClause.Occur.MUST);
             terms = PLUS.split(and);
-            if (terms.isEmpty()) {
-                terms.add("");
-            }
             for (String termWithNot : terms) {
                 not = termWithNot.startsWith("!");
                 term = not ? termWithNot.substring(1) : termWithNot;
@@ -99,6 +100,14 @@ public class PommesQuery {
             builder.append(replaced);
             last = end + suffix.length();
         }
+    }
+
+    private static Query any() {
+        BooleanQuery.Builder result;
+
+        result = new BooleanQuery.Builder();
+        result.add(Field.ID.query(Match.SUBSTRING, ""), BooleanClause.Occur.SHOULD);
+        return result.build();
     }
 
     private static Query or(List<Field> fields, Match match, String string) {
