@@ -10,17 +10,22 @@ import net.oneandone.sushi.fs.Node;
 import java.io.IOException;
 
 public class JsonProject extends Project {
-    public static JsonProject probe(Gson gson, Node node) throws IOException {
-        String name;
+    public static boolean matches(String name) throws IOException {
+        return name.equals(".pommes.json") || name.equals("pommes.json");
+    }
+
+    public static JsonProject create(Environment environment, Node node) {
         JsonObject json;
 
-        name = node.getName();
-        if (name.equals(".pommes.json") || name.equals("pommes.json")) {
+        try {
             json = new JsonParser().parse(node.readString()).getAsJsonObject();
-            return new JsonProject(gson.fromJson(json, Pom.class));
+        } catch (IOException e) {
+            throw new RuntimeException("TODO", e);
         }
-        return null;
+        return new JsonProject(environment.gson().fromJson(json, Pom.class));
     }
+
+    //--
 
     private final Pom orig;
 

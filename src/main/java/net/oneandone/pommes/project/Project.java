@@ -6,6 +6,7 @@ import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
+import java.util.function.BiFunction;
 
 /** Factory for Poms */
 public abstract class Project {
@@ -17,19 +18,21 @@ public abstract class Project {
     };
 
     public static Project probe(Environment environment, Node node) throws IOException {
-        Project result;
+        BiFunction<Environment, Node, Project> m;
 
-        result = MavenProject.probe(node);
-        if (result != null) {
-            return result;
+        m = match(node.getName());
+        return m != null ? m.apply(environment, node) : null;
+    }
+
+    public static BiFunction<Environment, Node, Project> match(String name) throws IOException {
+        if (MavenProject.matches(name)) {
+            return MavenProject::create;
         }
-        result = ComposerProject.probe(node);
-        if (result != null) {
-            return result;
+        if (ComposerProject.matches(name)) {
+            return ComposerProject::create;
         }
-        result = JsonProject.probe(environment.gson(), node);
-        if (result != null) {
-            return result;
+        if (JsonProject.matches(name)) {
+            return JsonProject::create;
         }
         return null;
     }

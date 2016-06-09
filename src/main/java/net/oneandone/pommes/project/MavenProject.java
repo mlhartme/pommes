@@ -13,14 +13,12 @@ import org.apache.maven.project.ProjectBuildingException;
 import java.io.IOException;
 
 public class MavenProject extends NodeProject {
-    public static MavenProject probe(Node node) {
-        String name;
+    public static boolean matches(String name) {
+        return name.equals("pom.xml") || name.endsWith(".pom");
+    }
 
-        name = node.getName();
-        if (name.equals("pom.xml") || name.endsWith(".pom")) {
-            return new MavenProject(node);
-        }
-        return null;
+    public static MavenProject create(Environment environment, Node node) {
+        return new MavenProject(node);
     }
 
     public MavenProject(Node node) {
