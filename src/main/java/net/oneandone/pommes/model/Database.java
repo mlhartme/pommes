@@ -102,7 +102,7 @@ public class Database implements AutoCloseable {
         importMarker().deleteFileOpt();
     }
 
-    public void remove(List<String> query, Variables variables) throws IOException, QueryNodeException {
+    public void remove(PommesQuery query) throws IOException, QueryNodeException {
         IndexWriter writer;
         IndexWriterConfig config;
 
@@ -110,7 +110,7 @@ public class Database implements AutoCloseable {
         config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
-        writer.deleteDocuments(PommesQuery.build(query, variables));
+        query.delete(writer);
         writer.close();
     }
 
@@ -169,22 +169,10 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public List<Document> query(List<String> query, Variables variables) throws IOException, QueryNodeException {
-        return query(PommesQuery.build(query, variables));
-    }
-
-    public List<Document> query(Query query) throws IOException {
-        TopDocs search;
-        List<Document> list;
-
+    public List<Document> query(PommesQuery pq) throws IOException {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        search = searcher.search(query, Integer.MAX_VALUE);
-        list = new ArrayList<>();
-        for (ScoreDoc scoreDoc : search.scoreDocs) {
-            list.add(searcher.getIndexReader().document(scoreDoc.doc));
-        }
-        return list;
+        return pq.find(searcher);
     }
 }

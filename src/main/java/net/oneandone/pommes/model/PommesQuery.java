@@ -1,22 +1,29 @@
 package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.util.Separator;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class PommesQuery {
     private static final Separator PLUS = Separator.on('+');
 
-    public static Query build(List<String> or, Variables variables) throws IOException, QueryNodeException {
+    public static PommesQuery create(List<String> or, Variables variables) throws IOException, QueryNodeException {
         BooleanQuery.Builder orBuilder;
         BooleanQuery.Builder andBuilder;
         Query termQuery;
@@ -61,7 +68,7 @@ public class PommesQuery {
             }
             orBuilder.add(andBuilder.build(), BooleanClause.Occur.SHOULD);
         }
-        return orBuilder.build();
+        return new PommesQuery(orBuilder.build());
     }
 
     private static final String prefix = "{";
@@ -120,4 +127,27 @@ public class PommesQuery {
         return result.build();
     }
 
+    //--
+
+    private final Query query;
+
+    public PommesQuery(Query query) {
+        this.query = query;
+    }
+
+    public List<Document> find(IndexSearcher searcher) throws IOException {
+        TopDocs search;
+        List<Document> list;
+
+        search = searcher.search(query, Integer.MAX_VALUE);
+        list = new ArrayList<>();
+        for (ScoreDoc scoreDoc : search.scoreDocs) {
+            list.add(searcher.getIndexReader().document(scoreDoc.doc));
+        }
+        return list;
+    }
+
+    public void delete(IndexWriter writer) throws IOException {
+        writer.deleteDocuments(query);
+    }
 }

@@ -18,6 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.model.PommesQuery;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -40,7 +41,7 @@ public class Mount extends Base {
         FileNode directory;
 
         adds = new ArrayList<>();
-        for (Pom pom : Field.poms(database.query(query, environment))) {
+        for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
             directory = environment.properties().root.directory(pom);
             action = Checkout.createOpt(environment, directory, pom);
             if (action != null) {

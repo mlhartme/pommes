@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.PommesQuery;
 
 import java.util.List;
 
@@ -30,6 +31,6 @@ public class DatabaseRemove extends Base {
 
     @Override
     public void run(Database database) throws Exception {
-        database.remove(query, environment);
+        database.remove(PommesQuery.create(query, environment));
     }
 }

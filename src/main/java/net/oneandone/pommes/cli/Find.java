@@ -21,6 +21,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.model.PommesQuery;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -116,7 +117,7 @@ public class Find extends Base {
             } else {
                 macroName = null;
             }
-            documents = database.query(query, environment);
+            documents = database.query(PommesQuery.create(query, environment));
             console.verbose.println("Matching documents: " + documents.size());
             if (formatBuilder != null) {
                 format = formatBuilder.toString();
