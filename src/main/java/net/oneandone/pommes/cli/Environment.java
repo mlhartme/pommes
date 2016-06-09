@@ -59,7 +59,7 @@ public class Environment implements Variables {
         this.lazyProperties = null;
     }
 
-    public void begin(Database database) throws Exception {
+    public void imports(Database database) throws Exception {
         DatabaseAdd cmd;
         FileNode marker;
 
@@ -77,9 +77,6 @@ public class Environment implements Variables {
                 marker.writeBytes();
             }
         }
-    }
-
-    public void end(Database database) throws IOException {
     }
 
     public Console console() {

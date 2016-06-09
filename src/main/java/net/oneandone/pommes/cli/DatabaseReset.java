@@ -22,7 +22,14 @@ public class DatabaseReset extends Base {
         super(environment);
     }
 
+    public void run() throws Exception {
+        try (Database database = environment.properties().loadDatabase()) {
+            database.clear();
+            environment.imports(database);
+        }
+    }
+
     public void run(Database database) throws Exception {
-        database.clear();
+        throw new RuntimeException();
     }
 }
