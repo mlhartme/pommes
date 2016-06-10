@@ -46,7 +46,7 @@ public class Database implements AutoCloseable {
 
         create = !directory.exists();
         if (create) {
-            directory.mkdir();
+            directory.mkdirs();
         }
         result = new Database(directory);
         if (create) {
