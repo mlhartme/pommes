@@ -26,8 +26,8 @@ Install the application
 
         echo "function pg { pommes goto \"\$@\" && . ~/.pommes.goto }" >> ~/profile
 
-* test it by running `pommes`, you should get a usage message listing available commands
-* inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
+* test it by running `pommes`, you should get a usage message
+* create a default configuration with `pommes find`. Inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
  
 Current Limitations
 * doesn't care about git branches
