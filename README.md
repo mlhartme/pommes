@@ -24,7 +24,7 @@ Install the application
     
 * Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
 
-        echo "function pg { pommes goto \"\$@\" && . ~/.pommes.goto }" >> ~/profile
+        echo -e "\nfunction pg {\n  pommes goto \"\$@\" && . ~/.pommes.goto\n}\n" >> ~/.profile_for_your_shell
 
 * test it by running `pommes`, you should get a usage message
 * create a default configuration with `pommes find`. Inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
