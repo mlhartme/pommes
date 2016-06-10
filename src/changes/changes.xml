@@ -1,73 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?><document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <body>
     <release date="2016-02-xx" version="3.0.0">
-      <action date="2016-06-09" dev="mlhartme" type="update">
-        Renamed database-clear to database-reset.
+      <action date="2016-06-01" dev="mlhartme" type="update">
+        ~/.pommes.properties to configure mount and database directories and to define imports, query macros and format macros.
+        Removed POMMES_LOCAL and POMMES_GLOBAL variables, define properties instead. You can change the default location of this file with the new
+        POMMES_PROPERTIES variable.
+      </action>
+      <action date="2016-06-01" dev="mlhartme" type="add">
+        Dumped ~/.pommes.fstab, all projects are mounted into the configured mount.root property at {scm server}/{ga directory}.
+      </action>
+      <action date="2016-05-31" dev="mlhartme" type="add">
+        Add support for git scm.
+      </action>
+      <action date="2016-05-27" dev="mlhartme" type="update">
+        Database changes (CAUTION: you have to rebuild your's): updated from Lucene 4.9.1 to 6.0.0. Added revision, scm and url fields.
+        Removed g, a, v, ga, dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renamed dep-gav to dep, par-gav to parent,
+        gav to artifact, and origin to id. The id is prefixed with a zone string now.
+      </action>
+      <action date="2016-05-31" dev="mlhartme" type="update">
+        Much improved query syntax: address fields with their first letter now; added alternatives, separated with blanks;
+        added negation starting with '!'; lucene is escape starts with '§' now.
+        Added query and format macros.
       </action>
       <action date="2016-06-08" dev="mlhartme" type="update">
-        Replaced sync mechanism by imports. They are configured in the properties file. Dump -upload option, replaced the sync options
-        -download and -no-download with -import and -no-import.
+        Replaced sync mechanism by imports: imports are defined by properties, you specify the zone to import to and the database-add url
+        to import from. Replaced sync options -download and -no-download with -import and -no-import. Dumped -upload option,
+      </action>
+      <action date="2016-06-09" dev="mlhartme" type="update">
+        Renamed database-clear to database-reset; it also runs imports.
       </action>
       <action date="2016-06-01" dev="mlhartme" type="update">
         Renamed list command to ls. It prints an 'M' status if the checkout is not fully committed
         (and pushed for git projects) now, and it prints an 'X' status if the project is unknwon but in scm.
       </action>
       <action date="2016-06-01" dev="mlhartme" type="update">
-        ~/.pommes.properties to define query and format macros. Remove POMMES_LOCAL and POMMES_GLOBAL variables, this is defined
-        by the properties file now. You can change the default location of this file with the new POMMES_PROPERTIES variable.
-      </action>
-      <action date="2016-06-01" dev="mlhartme" type="update">
-        Added a M flag to the list command.
-      </action>
-      <action date="2016-06-01" dev="mlhartme" type="update">
         Improved action selection: return quits without actions now, a applies all actions.
-      </action>
-      <action date="2016-06-01" dev="mlhartme" type="add">
-        Dumped fstab, all projects are mounted according to root/server/groupId/artifactId. You can configure the root directory in
-        the properties files.
-      </action>
-      <action date="2016-05-31" dev="mlhartme" type="add">
-        New query syntax: address fields with their id; alternatives, separated with blanks; lucene escape starts with '!' now.
-        Added query and format macros.
-      </action>
-      <action date="2016-05-31" dev="mlhartme" type="add">
-        Store urls in database.
-      </action>
-      <action date="2016-05-31" dev="mlhartme" type="add">
-        Add support for github repositories.
-      </action>
-      <action date="2016-05-31" dev="mlhartme" type="add">
-        Add support for git scm.
       </action>
       <action date="2016-05-31" dev="mlhartme" type="remove">
         Dumped -svnuser and -svnpassword options. Specify credentials in the url instead.
         (I've removed them because I don't want special handling for Subversion repository authentication.)
       </action>
       <action date="2016-05-30" dev="mlhartme" type="update">
-        find: merge duplicate lines.
-      </action>
-      <action date="2016-05-27" dev="mlhartme" type="update">
-        Added goto choice parameter.
-      </action>
-      <action date="2016-05-27" dev="mlhartme" type="update">
-        Database changes (CAUTION: you have to rebuild your's): updated from Lucene 4.9.1 to 6.0.0. Added revision, scm and urls field.
-        Removed g, a, v, ga, dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renamed dep-gav to dep, par-gav to parent,
-        and gav to artifact.
+        Improved find argument: use can use query and format macros; the format is appended now; you can merge duplicate lines '-fold'.
+        Merged database-export into find. Find now has an optional output argument (which also accepts files now) and -json and -dump
+        formats to print pretty-printed or raw json.
       </action>
       <action date="2016-05-27" dev="mlhartme" type="update">
         Variables are enclosed in {} now. Renamed {svn} variable to {scm}.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
-        Merged database-export into find. Find now has an optional output argument (which also accepts files now) and -json and -dump options
-        to print pretty-printed or raw json.
-      </action>
-      <action date="2016-05-25" dev="mlhartme" type="update">
         database-remove with arbitrary queries.
       </action>
       <action date="2016-05-25" dev="mlhartme" type="update">
-        database-add: Added artifactory support - specify urls prefixed with 'artifactory:'.
-        Added file support - specify file urls.
-        Added json support - specify fil prefixed with 'json:'.
+        database-add: Added artifactory support - specify urls prefixed with 'artifactory:';
+        Added github support - specify 'github:' + username;
+        Added bitbucket support - specify 'bitbucket:' + url + project
+        Added file support - specify file urls or file names;
+        Added json support - specify file prefixed with 'json:';
         Subversion urls have to be prefixed with 'svn:' now; -noBranches changed to %branches; also added %tags (default is false for both)
         Added -dryrun option.
       </action>
