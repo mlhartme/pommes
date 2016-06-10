@@ -1,0 +1,53 @@
+# Pommes 3.0.0 (2016-06-10)
+
+* Added ~/.pommes.properties to configure various properties: mount and database directories and to define imports, query macros and format macros.
+  Removed POMMES_LOCAL and POMMES_GLOBAL variables, define properties instead. You can change the default location of this file with the new
+  POMMES_PROPERTIES variable.
+* Dumped ~/.pommes.fstab, all projects are mounted into the configured mount.root property at {scm server}/{ga directory}.
+* Added support for git scm.
+* Database changes (CAUTION: you have to rebuild your's): updated from Lucene 4.9.1 to 6.0.0. Added revision, scm and url fields.
+  Removed g, a, v, ga, dep-ga, dep-ga-ranges and par-ga fields, they were unused. Renamed dep-gav to dep, par-gav to parent,
+  gav to artifact, and origin to id. The id is prefixed with a zone string now.
+* Much improved query syntax: address fields with their first letter now; added alternatives, separated with blanks;
+  added negation starting with '!'; lucene is escape starts with '§' now.
+  Added query and format macros.
+* Replaced sync mechanism by imports: imports are defined by properties, you specify the zone to import to and the database-add url
+  to import from. Replaced sync options -download and -no-download with -import and -no-import. Dumped -upload option,
+* Renamed database-clear to database-reset; it also runs imports.
+* Renamed list command to ls. It prints an 'M' status if the checkout is not fully committed
+  (and pushed for git projects) now, and it prints an 'X' status if the project is unknwon but in scm.
+* Improved action selection: return quits without actions now, a applies all actions.
+* Dumped -svnuser and -svnpassword options. Specify credentials in the url instead.
+  (I've removed them because I don't want special handling for Subversion repository authentication.)
+* Improved find argument: use can use query and format macros; the format is appended now; you can merge duplicate lines '-fold'.
+  Merged database-export into find. Find now has an optional output argument (which also accepts files now) and -json and -dump
+  formats to print pretty-printed or raw json.
+* Variables are enclosed in {} now. Renamed {svn} variable to {scm}.
+* database-remove with arbitrary queries.
+* database-add: Added artifactory support - specify urls prefixed with 'artifactory:';
+  * Added github support - specify 'github:' + username;
+  * Added bitbucket support - specify 'bitbucket:' + url + project
+  * Added file support - specify file urls or file names;
+  * Added json support - specify file prefixed with 'json:';
+  * Subversion urls have to be prefixed with 'svn:' now; -noBranches changed to %branches; also added %tags (default is false for both)
+  * Added -dryrun option.
+
+
+# Pommes 2.4.2
+
+* Pommes goto no longer modifies your environment. To get the previous behavior, invoke pommes goto ... && . ~/.pommes.goto.
+  Technically, pommes is a normal shell script now (not a shell function).
+* Internal change: update sushi 2.8.x to 3.0.0 and inline 1.0.0.
+* Added database export command.
+
+# Pommes 2.4.1
+
+* Fix == in launcher script, has to be = instead.
+
+# Pommes 2.4.0
+
+* Added dependencies to pom objects, you can search for them with "find :-substring". (The users command is just a shortcut for this)
+* Configurable output format for find. Also added dependencies to pom objects, so you can output them, too.
+* Query syntax: variables replaced context operator.
+* Improved setup: 'goto' is 'pommes goto'. To implement this, 'pommes' is a shell function now.
+* umount -stale no longer removes active json projects.
