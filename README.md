@@ -8,7 +8,7 @@ Pommes is a project database tool. It's a command line tool to
 Pommes supports Maven projects with a pom.xml file and php projects with a composer.json file. Php support is very basic. 
 The name Pommes stands for "many poms".
 
-(Changes)[https://github.com/mlhartme/pommes/blob/master/CHANGES.md]
+[Changes](https://github.com/mlhartme/pommes/blob/master/CHANGES.md)
 
 ## Setup
 
