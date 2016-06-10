@@ -35,9 +35,9 @@ Current Limitations
 ## Database commands
 
 Pommes uses [Lucene](http://lucene.apache.org) to store projects. You have three commands to modify it: `database-add` and `database-remove` 
-to add/remove projects, and `database-reset` to reset the database to the initial state.
+to add/remove projects, and `database-reset` resets the database to the initial state.
                                                                          
-Use `pommes database-add` to add projects to your database. You can crawl various repositories to for projects.
+Use `pommes database-add` to add projects to your database. You can specify various kinds of repositories to crawl for projects.
 
 Local files:
 
@@ -47,15 +47,15 @@ adds all Maven Poms in your local repository.
 
 Subversion:
 
-    pommes database-add 'svn:https://user:password@svn.yourcompany.com/your/repo/path'
+    pommes database-add svn:https://user:password@svn.yourcompany.com/your/repo/path
 
 adds alls project in the specified Subversion subtree.
 
 Artifactory:
 
-    pommes database-add 'artifactory:https://user:password@artifactory.yourcompany.com/your/repo/path' 
+    pommes database-add artifactory:https://user:password@artifactory.yourcompany.com/your/repo/path
     
-adds all project found in the respective Artifactory repository subtree.
+adds all projects found in the respective Artifactory repository subtree.
 
 Github:
 
@@ -63,8 +63,13 @@ Github:
 
 adds all projects of the specified user (or organization) to your database.
 
-Note that `database-add` overwrites projects already in the database, so you don't get duplicate projects from duplicate add commands.
-The id field is used to detect duplicates, the revision field to detect modifications.  
+Bitbucket:
+
+    pommes database-add bitbucket:https://bitbucket.yourcompany.com/yourproject
+    
+adds all projects found in the respective bitbucket project.
+
+Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from duplicate add commands. The id field is used to detect duplicates, the revision field to detect modifications.  
 
 ## Find Command
 
@@ -77,7 +82,7 @@ Pommes stores 7 fields for every project added to the database:
 * `dep` - coordinates of dependencies
 * `url` - project url
 
-Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. 
+Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print matching projects with their artifact and scm fields. You can append `-json` to see the matching project in json format. 
 
 Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
