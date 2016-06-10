@@ -24,7 +24,7 @@ Install the application
     
 * Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
 
-        echo ´function pg { pommes goto "$@" && . ~/.pommes.goto }´ >> ~/.bash_profile
+        echo "function pg { pommes goto \"\$@\" && . ~/.pommes.goto }" >> ~/profile
 
 * test it by running `pommes`, you should get a usage message listing available commands
 * inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
