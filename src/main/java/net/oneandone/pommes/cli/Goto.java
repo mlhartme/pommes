@@ -78,7 +78,6 @@ public class Goto extends Base {
             last.run(console);
             return last;
         }
-        Collections.sort(actions);
         last = null;
         do {
             no = 1;

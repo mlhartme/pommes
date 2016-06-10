@@ -58,7 +58,6 @@ public abstract class Base {
             console.info.println("nothing to do");
             return;
         }
-        Collections.sort(actions);
         do {
             no = 1;
             for (Action action : actions) {

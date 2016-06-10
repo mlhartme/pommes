@@ -42,13 +42,15 @@ public class Find extends Base {
     private static final String DUMP = "-dump";
 
     private final Node output;
+    private final boolean fold;
     private final List<String> query;
     private StringBuilder formatBuilder;
 
-    public Find(Environment environment, String output) throws URISyntaxException, NodeInstantiationException {
+    public Find(Environment environment, String output, boolean fold) throws URISyntaxException, NodeInstantiationException {
         super(environment);
 
         this.output = output == null ? null : fileOrNode(world, output);
+        this.fold = fold;
         this.query = new ArrayList<>();
         this.formatBuilder = null;
     }
@@ -171,10 +173,13 @@ public class Find extends Base {
         done = new ArrayList<>();
         for (Document document : documents) {
             line = format(document, format);
-            if (!done.contains(line)) {
+            if (fold) {
+                if (done.contains(line)) {
+                    continue;
+                }
                 done.add(line);
-                dest.println(line);
             }
+            dest.println(line);
         }
     }
 

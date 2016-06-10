@@ -42,10 +42,10 @@ public class PommesQuery {
         or = initialOr;
         if (initialOr.size() > 0) {
             try {
-                queryIndex = Integer.parseInt(initialOr.get(0));
+                queryIndex = Integer.parseInt(initialOr.get(initialOr.size() - 1));
                 queryIndex--;
                 or = new ArrayList<>(initialOr);
-                or.remove(0);
+                or.remove(initialOr.size() - 1);
             } catch (NumberFormatException e) {
                 // fall-through - not and index
             }
@@ -162,7 +162,9 @@ public class PommesQuery {
                 list.add(searcher.getIndexReader().document(scoreDoc.doc));
             }
         } else {
-            list.add(searcher.getIndexReader().document(search.scoreDocs[idx].doc));
+            if (idx < search.scoreDocs.length) {
+                list.add(searcher.getIndexReader().document(search.scoreDocs[idx].doc));
+            }
         }
         return list;
     }
