@@ -20,9 +20,9 @@ Install the application
 * download the latest `application.sh` file from [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22) 
 * rename it to `pommes`, make it executable and add it to your path.
 * Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
-       function pg {
+        function pg {
          pommes goto "$@" && . ~/.pommes.goto
-       }
+        }
 * test it by running `pommes`, you should get a usage message listing available commands
 * inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
  
