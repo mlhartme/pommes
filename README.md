@@ -34,7 +34,7 @@ Current Limitations
 
 ## Database commands
 
-Pommes uses (Lucene)[http://lucene.apache.org] to store projects. You have three commands to  modify it: `database-add` and `database-remove` 
+Pommes uses [Lucene](http://lucene.apache.org) to store projects. You have three commands to modify it: `database-add` and `database-remove` 
 to add/remove projects, and `database-reset` to reset the database to the initial state.
                                                                          
 Use `pommes database-add` to add projects to your database. You can crawl various repositories to for projects.
