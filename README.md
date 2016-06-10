@@ -17,8 +17,11 @@ Prerequisites
 * Linux or Mac
 
 Install the application
-* download the latest `application.sh` file from [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22) 
-* rename it to `pommes`, make it executable and add it to your path.
+* download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file and store it as executable `pommes` file in your path
+
+    curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.0.0/pommes-3.0.0-application.sh -o pommes
+    chmod a+x pommes
+    
 * Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
 
         function pg {
