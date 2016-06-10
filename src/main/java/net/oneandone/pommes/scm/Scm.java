@@ -35,7 +35,9 @@ public abstract class Scm {
             children = directory.list();
             if (children != null) {
                 for (FileNode child : children) {
-                    scanCheckouts(child, result);
+                    if (!child.getName().startsWith(".")) {
+                        scanCheckouts(child, result);
+                    }
                 }
             }
         }

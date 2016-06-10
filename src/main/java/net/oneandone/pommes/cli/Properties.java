@@ -45,7 +45,7 @@ public class Properties {
                 "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
                 "",
                 "",
-                "# directory where to store the database locally",
+                "# directory where to store the database",
                 "database=" + database.getAbsolute(),
                 "",
                 "# urls where to import from",
@@ -90,9 +90,9 @@ public class Properties {
             } else if (key.startsWith(importsPrefix)) {
                 imports.put(key.substring(importsPrefix.length()), props.getProperty(key));
             } else if (key.equals("mount.root")) {
-                root = new Root(world.file(props.getProperty(key)));
+                root = new Root(file(world, props.getProperty(key)));
             } else if (key.equals("database")) {
-                database = world.file(props.getProperty(key));
+                database = file(world, props.getProperty(key));
             } else {
                 throw new IOException("unknown property: " + key);
             }
@@ -104,6 +104,14 @@ public class Properties {
             throw new IOException(file + ": missing property: root");
         }
         return new Properties(database, root, queries, formats, imports);
+    }
+
+    private static FileNode file(World world, String path) {
+        if (path.startsWith("~/")) {
+            return world.getHome().join(path.substring(2));
+        } else {
+            return world.file(path);
+        }
     }
 
     //--
