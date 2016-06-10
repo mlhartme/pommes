@@ -19,14 +19,12 @@ Prerequisites
 Install the application
 * download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file and store it as executable `pommes` file in your path
 
-    curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.0.0/pommes-3.0.0-application.sh -o pommes
-    chmod a+x pommes
+        curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.0.0/pommes-3.0.0-application.sh -o pommes
+        chmod a+x pommes
     
 * Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
 
-        function pg {
-         pommes goto "$@" && . ~/.pommes.goto
-        }
+        echo ´function pg { pommes goto "$@" && . ~/.pommes.goto }´ >> ~/.bash_profile
 
 * test it by running `pommes`, you should get a usage message listing available commands
 * inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
