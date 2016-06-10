@@ -82,13 +82,15 @@ Pommes stores 7 fields for every project added to the database:
 * `dep` - coordinates of dependencies
 * `url` - project url
 
-Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print matching projects with their artifact and scm fields. You can append `-json` to see the matching project in json format. 
+You search your database with the `find`command. Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print matching projects with their artifact and scm fields. You can append `-json` to see the matching project in json format. 
 
 Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
 * `pommes find dp:baz` lists projects with a `baz` substring in their dependency or parent
 
 (Technically, `pommes find foo` is a short-hand for `pommes find :foo`, and this in turn is a short-hand for `pommes find as:foo`)
+
+You can also prepend with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell will expand the `!`. Exmaple: `pommes find !d:bar` list all projects that have no dependency with a `bar` substring.
 
 Next, you can combine queries with `+` to list projects matching both conditions. I.e. + means and.
 * `pommes find a:puc+d:httpcore` lists projects with a `puc` substring in it artifact and `httpcore` in its dependencies.
