@@ -110,7 +110,7 @@ public class Main {
           cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
           cli.add(DatabaseRemove.class, "database-remove prefix*");
 
-          cli.add(Find.class, "find -output=null queryOrFormat* { arg*(queryOrFormat)}");
+          cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));
     }
