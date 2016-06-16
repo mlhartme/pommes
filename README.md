@@ -17,16 +17,17 @@ Prerequisites
 * Linux or Mac
 
 Install the application
-* download the latest `application.sh` file from [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22) 
-* rename it to `pommes`, make it executable and add it to your path.
+* download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file and store it as executable `pommes` file in your path
+
+        curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.0.0/pommes-3.0.0-application.sh -o pommes
+        chmod a+x pommes
+    
 * Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
 
-        function pg {
-         pommes goto "$@" && . ~/.pommes.goto
-        }
+        echo -e "\nfunction pg {\n  pommes goto \"\$@\" && . ~/.pommes.goto\n}\n" >> ~/.profile_for_your_shell
 
-* test it by running `pommes`, you should get a usage message listing available commands
-* inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
+* test it by running `pommes`, you should get a usage message
+* create a default configuration with `pommes find`. Inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
  
 Current Limitations
 * doesn't care about git branches
@@ -34,10 +35,10 @@ Current Limitations
 
 ## Database commands
 
-Pommes uses (Lucene)[http://lucene.apache.org] to store projects. You have three commands to  modify it: `database-add` and `database-remove` 
-to add/remove projects, and `database-reset` to reset the database to the initial state.
+Pommes uses [Lucene](http://lucene.apache.org) to store projects. You have three commands to modify it: `database-add` and `database-remove` 
+to add/remove projects, and `database-reset` resets the database to the initial state.
                                                                          
-Use `pommes database-add` to add projects to your database. You can crawl various repositories to for projects.
+Use `pommes database-add` to add projects to your database. You can specify various kinds of repositories to crawl for projects.
 
 Local files:
 
@@ -47,15 +48,15 @@ adds all Maven Poms in your local repository.
 
 Subversion:
 
-    pommes database-add 'svn:https://user:password@svn.yourcompany.com/your/repo/path'
+    pommes database-add svn:https://user:password@svn.yourcompany.com/your/repo/path
 
 adds alls project in the specified Subversion subtree.
 
 Artifactory:
 
-    pommes database-add 'artifactory:https://user:password@artifactory.yourcompany.com/your/repo/path' 
+    pommes database-add artifactory:https://user:password@artifactory.yourcompany.com/your/repo/path
     
-adds all project found in the respective Artifactory repository subtree.
+adds all projects found in the respective Artifactory repository subtree.
 
 Github:
 
@@ -63,8 +64,13 @@ Github:
 
 adds all projects of the specified user (or organization) to your database.
 
-Note that `database-add` overwrites projects already in the database, so you don't get duplicate projects from duplicate add commands.
-The id field is used to detect duplicates, the revision field to detect modifications.  
+Bitbucket:
+
+    pommes database-add bitbucket:https://bitbucket.yourcompany.com/yourproject
+    
+adds all projects found in the respective bitbucket project.
+
+Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from duplicate add commands. The id field is used to detect duplicates, the revision field to detect modifications.  
 
 ## Find Command
 
@@ -77,13 +83,15 @@ Pommes stores 7 fields for every project added to the database:
 * `dep` - coordinates of dependencies
 * `url` - project url
 
-Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. 
+You search your database with the `find`command. Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print matching projects with their artifact and scm fields. You can append `-json` to see the matching project in json format. 
 
 Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
 * `pommes find dp:baz` lists projects with a `baz` substring in their dependency or parent
 
 (Technically, `pommes find foo` is a short-hand for `pommes find :foo`, and this in turn is a short-hand for `pommes find as:foo`)
+
+You can also prepend with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell will expand the `!`. Exmaple: `pommes find !d:bar` list all projects that have no dependency with a `bar` substring.
 
 Next, you can combine queries with `+` to list projects matching both conditions. I.e. + means and.
 * `pommes find a:puc+d:httpcore` lists projects with a `puc` substring in it artifact and `httpcore` in its dependencies.
