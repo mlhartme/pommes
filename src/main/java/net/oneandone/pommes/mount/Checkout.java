@@ -34,6 +34,9 @@ public class Checkout extends Action {
 
         if (directory.exists()) {
             scannedPom = environment.scanPomOpt(directory);
+            if (scannedPom == null) {
+                return new Problem(directory, directory + ": cannot detect project");
+            }
             if (scannedPom.scm.equals(pom.scm)) {
                 return null;
             } else {
