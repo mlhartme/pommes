@@ -4,6 +4,7 @@ Pommes is a project database tool. It's a command line tool to
 * crawl directories, svn, github, bitbucket or artifactory and add matching projects to the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) scm operations, e.g. checkout all projects that match a query.
+* organize checkouts on your disk
   
 Pommes supports Maven projects with a pom.xml file and php projects with a composer.json file. Php support is very basic. 
 The name Pommes stands for "many poms".
@@ -13,8 +14,8 @@ The name Pommes stands for "many poms".
 ## Setup
 
 Prerequisites
-* Java 8 or higher
 * Linux or Mac
+* Java 8 or higher
 
 Install the application
 * download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file and store it as executable `pommes` file in your path
@@ -70,7 +71,7 @@ Bitbucket:
     
 adds all projects found in the respective bitbucket project.
 
-Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from duplicate add commands. The id field is used to detect duplicates, the revision field to detect modifications.  
+Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from repeated add commands. The id field is used to detect duplicates, the revision field to detect modifications.  
 
 ## Find Command
 
@@ -83,15 +84,15 @@ Pommes stores 7 fields for every project added to the database:
 * `dep` - coordinates of dependencies
 * `url` - project url
 
-You search your database with the `find`command. Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print matching projects with their artifact and scm fields. You can append `-json` to see the matching project in json format. 
+You search your database with the `find`command. Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print the artifact field of matching projects. You can append `-json` to see all fields in json format. 
 
-Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name
+Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name:
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
 * `pommes find dp:baz` lists projects with a `baz` substring in their dependency or parent
 
 (Technically, `pommes find foo` is a short-hand for `pommes find :foo`, and this in turn is a short-hand for `pommes find as:foo`)
 
-You can also prepend with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell will expand the `!`. Exmaple: `pommes find !d:bar` list all projects that have no dependency with a `bar` substring.
+You can also prepend fields with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell will expand the `!`. Exmaple: `pommes find !d:bar` list all projects that have no dependency with a `bar` substring.
 
 Next, you can combine queries with `+` to list projects matching both conditions. I.e. + means and.
 * `pommes find a:puc+d:httpcore` lists projects with a `puc` substring in it artifact and `httpcore` in its dependencies.
@@ -99,27 +100,23 @@ Next, you can combine queries with `+` to list projects matching both conditions
 Finally, you can combine queries with blanks to list projects matching one of the conditions. I.e. blank means or.
 * `pommes find d:puc d:pommes` lists projects depending on either `puc` or `pommes`.
 
-TODO: Macros; formats
+TODO: Prefix, suffix, macros; formats
 
 ## Mount commands
 
-You can use mount commands to run scm operations one the projects that match a query. The `mount.root` property defines the root directory
-where you want checkouts to show up on your disk. 
+You can use mount commands ('mount', 'umount', 'ls' and 'goto') to run scm operations one projects that match a query. The `mount.root` property defines the root directory where your want checkouts to show up on your disk. Pommes supports Subversion and Git scms.
 
 ### Mount
 
 `pommes mount s:/trunk` checks out all trunks.
 
-Before changing anything on your disk, the mount command presents a selection of the checkouts to perform, and you can pick one, multiple 
-(separated with blanks) or all of them. Or you can quit without doing anything.
+Before changing anything on your disk, `mount` presents a selection of the checkouts to perform, and you can pick one, multiple (separated with blanks) or all of them. Or you can quit without doing anything.
 
-If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your 
-mount command.
+If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your mount command.
 
 ### Umount
 
-The `umount` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before 
-changing anything. Similar the `mount` command, it asks before changing anything on your disk.
+The `umount` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before changing anything. Similar the `mount` command, it asks before changing anything on your disk.
 
 `umount` has a `-stale` option to remove only checkouts that have been removed from the database. For example, if you have 
 all trunks checked out, you can run `pommes umount -stale` to remove checkouts that are no longer used.
@@ -135,7 +132,7 @@ all trunks checked out, you can run `pommes umount -stale` to remove checkouts t
 
 searches the database for `puc`, offers a selection of matching projects, checks it out and cds into the resulting directory.
 
-Technically, pg is a shell function that invokes `pommes goto`.
+Technically, pg is a shell function that invokes `pommes goto` and, if successfull, sources ~/.pommes.goto
 
 ## Advanced 
 
@@ -147,7 +144,7 @@ instructs pommes auto automatically run
 
    database-add -zone foo baruri
    
-once a day. Or if you invoke it with `-import`. 
+once a day (or if you invoke a command with `-import`). 
 
 This is most usefull with json repositories because they are very fast. To create a json file, run your database-add commands and run
 
