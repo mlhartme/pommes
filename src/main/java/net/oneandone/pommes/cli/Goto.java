@@ -22,6 +22,7 @@ import net.oneandone.pommes.model.PommesQuery;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Nop;
+import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -32,11 +33,9 @@ import java.util.List;
 
 public class Goto extends Base {
     private final List<String> query;
-    private final FileNode shellFile;
 
-    public Goto(Environment environment, FileNode shellFile, List<String> query) {
+    public Goto(Environment environment, List<String> query) {
         super(environment);
-        this.shellFile = shellFile;
         this.query = query;
     }
 
@@ -45,7 +44,6 @@ public class Goto extends Base {
         List<Action> actions;
         FileNode directory;
         Action action;
-        String result;
 
         actions = new ArrayList<>();
         for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
@@ -57,9 +55,7 @@ public class Goto extends Base {
         if (action == null) {
             throw new IOException("nothing selected");
         }
-        result = "cd " + action.directory.getAbsolute();
-        console.info.println(result);
-        shellFile.writeString(result);
+        Setenv.get().cd(action.directory.getAbsolute());
     }
 
     /** @return never null */

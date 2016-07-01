@@ -104,7 +104,7 @@ public class Main {
           cli.add(Umount.class, "umount -stale root?=.");
 
           cli.add(Ls.class, "ls root?=.");
-          cli.add(Goto.class, "goto -shellFile=" + world.getHome().join(".pommes.goto").getAbsolute() + " query*");
+          cli.add(Goto.class, "goto query*");
 
           cli.add(DatabaseReset.class, "database-reset");
           cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
