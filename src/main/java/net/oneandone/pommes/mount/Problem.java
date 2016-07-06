@@ -21,20 +21,12 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 
 public class Problem extends Action {
-    private final Exception error;
-
     public Problem(FileNode directory, String message) {
-        super(directory, null);
-        this.error = new IOException(message);
-    }
-
-    @Override
-    public char status() {
-        return '!';
+        super(directory, "! " + message);
     }
 
     @Override
     public void run(Console console) throws Exception {
-        throw error;
+        throw new IOException(message);
     }
 }

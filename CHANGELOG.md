@@ -2,6 +2,7 @@
 
 ### 3.0.1 (pending)
 
+* Improved mount and goto: common actions are merged.
 * Improved mount and goto output: print the scm url, not the artifact id.
 * Fixed checkout conflict message, it no longer depends on pom.scm.
 * TODO: Import output is only visible in verbose mode now. Because it confused stool.

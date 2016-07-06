@@ -45,7 +45,9 @@ public class Mount extends Base {
             directory = environment.properties().root.directory(pom);
             action = Checkout.createOpt(directory, pom);
             if (action != null) {
-                adds.add(action);
+                if (!adds.contains(action)) {
+                    adds.add(action);
+                }
             } else {
                 console.verbose.println("already mounted: " + directory);
             }

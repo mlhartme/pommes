@@ -21,12 +21,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 public class Nop extends Action {
     public Nop(FileNode directory) {
-        super(directory, "");
-    }
-
-    @Override
-    public char status() {
-        return ' ';
+        super(directory, "  " + directory);
     }
 
     @Override

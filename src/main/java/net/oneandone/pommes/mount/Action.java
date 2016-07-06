@@ -22,19 +22,22 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 public abstract class Action implements Comparable<Action> {
     public final FileNode directory;
-    public final String extra;
+    public final String message;
 
-    protected Action(FileNode directory, String extra) {
+    protected Action(FileNode directory, String message) {
         this.directory = directory;
-        this.extra = extra;
+        this.message = message;
     }
-
-    public abstract char status();
 
     public abstract void run(Console console) throws Exception;
 
     public String toString() {
-        return status() + " " + directory.toString() + " " + extra;
+        return message;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return false;
     }
 
     @Override

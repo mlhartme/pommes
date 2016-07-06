@@ -65,13 +65,9 @@ public class Checkout extends Action {
     private final String url;
 
     public Checkout(Scm scm, FileNode directory, String url) {
-        super(directory, "(" + url + ")");
+        super(directory, "A " + directory + " (" + url + ")");
         this.scm = scm;
         this.url = url;
-    }
-
-    public char status() {
-        return 'A';
     }
 
     public void run(Console console) throws MkdirException, Failure {
@@ -86,5 +82,15 @@ public class Checkout extends Action {
             // exec into string (and ignore it) - otherwise, Failure Exceptions cannot contains the output
             launcher.exec();
         }
+    }
+
+    public boolean equals(Object obj) {
+        Checkout c;
+
+        if (obj instanceof Checkout) {
+            c = (Checkout) obj;
+            return scm.equals(c.scm) && url.equals(c.url);
+        }
+        return false;
     }
 }

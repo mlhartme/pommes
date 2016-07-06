@@ -38,11 +38,7 @@ public class Remove extends Action {
     }
 
     public Remove(FileNode directory) {
-        super(directory, "");
-    }
-
-    public char status() {
-        return 'D';
+        super(directory, "D " + directory);
     }
 
     public void run(Console console) throws NodeNotFoundException, DeleteException {

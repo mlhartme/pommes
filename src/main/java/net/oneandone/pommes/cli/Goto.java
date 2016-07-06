@@ -49,7 +49,12 @@ public class Goto extends Base {
         for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
             directory = environment.properties().root.directory(pom);
             action = Checkout.createOpt(directory, pom);
-            actions.add(action != null ? action : new Nop(directory));
+            if (action == null) {
+                action = new Nop(directory);
+            }
+            if (!actions.contains(action)) {
+                actions.add(action);
+            }
         }
         action = runSingle(actions);
         if (action == null) {
