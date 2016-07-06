@@ -52,7 +52,7 @@ public class Checkout extends Action {
             if (scm == null) {
                 return new Problem(directory, pom.id + ": unknown scm: " + pom.scm);
             } else {
-                return new Checkout(scm, directory, pom.artifact, pom.scm);
+                return new Checkout(scm, directory, pom.scm);
             }
         }
     }
@@ -61,10 +61,12 @@ public class Checkout extends Action {
         return Strings.removeRightOpt(url, "/");
     }
 
+    private final Scm scm;
     private final String url;
 
-    public Checkout(Scm scm, FileNode directory, Gav artifact, String url) {
-        super(scm, directory, artifact);
+    public Checkout(Scm scm, FileNode directory, String url) {
+        super(directory, "(" + url + ")");
+        this.scm = scm;
         this.url = url;
     }
 

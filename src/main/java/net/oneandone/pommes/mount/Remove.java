@@ -26,19 +26,19 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 
 public class Remove extends Action {
-    public static Action create(FileNode directory, Pom pom) throws IOException {
+    public static Action create(FileNode directory) throws IOException {
         Scm scm;
 
         scm = Scm.probeCheckout(directory);
         if (scm.isCommitted(directory)) {
-            return new Remove(scm, directory, pom.artifact);
+            return new Remove(directory);
         } else {
             return new Problem(directory, directory + ": checkout is not committed.");
         }
     }
 
-    public Remove(Scm scm, FileNode directory, Gav gav) {
-        super(scm, directory, gav);
+    public Remove(FileNode directory) {
+        super(directory, "");
     }
 
     public char status() {

@@ -20,8 +20,8 @@ import net.oneandone.pommes.model.Gav;
 import net.oneandone.sushi.fs.file.FileNode;
 
 public class Nop extends Action {
-    public Nop(FileNode directory, Gav artifact) {
-        super(null, directory, artifact);
+    public Nop(FileNode directory) {
+        super(directory, "");
     }
 
     @Override

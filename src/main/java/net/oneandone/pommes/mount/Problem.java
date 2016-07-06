@@ -24,7 +24,7 @@ public class Problem extends Action {
     private final Exception error;
 
     public Problem(FileNode directory, String message) {
-        super(null, directory, null);
+        super(directory, null);
         this.error = new IOException(message);
     }
 

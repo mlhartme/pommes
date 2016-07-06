@@ -69,7 +69,7 @@ public class Umount extends Base {
                 root = environment.properties().root;
                 configuredDirectory = root.directory(scannedPom);
                 if (checkout.equals(configuredDirectory)) {
-                    removes.add(Remove.create(checkout, scannedPom));
+                    removes.add(Remove.create(checkout));
                 } else {
                     removes.add(new Problem(checkout, checkout + ": checkout expected at " + configuredDirectory));
                 }
