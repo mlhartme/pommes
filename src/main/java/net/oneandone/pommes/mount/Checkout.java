@@ -24,6 +24,7 @@ import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 
@@ -38,7 +39,7 @@ public class Checkout extends Action {
                 return new Problem(directory, directory + ": cannot detect checkout");
             }
             scannedUrl = scm.getUrl(directory);
-            if (scannedUrl.equals(pom.scm)) {
+            if (normalize(scannedUrl).equals(normalize(pom.scm))) {
                 return null;
             } else {
                 return new Problem(directory, directory + ": checkout conflict: " + pom.scm + " vs " + scannedUrl);
@@ -54,6 +55,10 @@ public class Checkout extends Action {
                 return new Checkout(scm, directory, pom.artifact, pom.scm);
             }
         }
+    }
+
+    private static String normalize(String url) {
+        return Strings.removeRightOpt(url, "/");
     }
 
     private final String url;
