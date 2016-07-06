@@ -2,6 +2,7 @@
 
 ### 3.0.2 (pending)
 
+* Import output only visible in verbose mode. Because it confused stool.
 * Dumped .pommes.goto by setenv module. 
 
 ### 3.0.1 (2016-06-xx)

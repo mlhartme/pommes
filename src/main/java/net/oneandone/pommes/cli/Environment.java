@@ -69,7 +69,7 @@ public class Environment implements Variables {
             marker = database.importMarker();
             if (import_ || !marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24) {
                 for (Map.Entry<String, String> entry : properties().imports.entrySet()) {
-                    console.info.println("importing " + entry.getKey());
+                    console.verbose.println("importing " + entry.getKey());
                     cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
                     cmd.add(entry.getValue());
                     cmd.run(database);
