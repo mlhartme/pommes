@@ -48,7 +48,7 @@ public class Git extends Scm {
 
     @Override
     public String getUrl(FileNode checkout) throws Failure {
-        return git(checkout, "config", "--get", "remote.origin.url").exec().trim();
+        return PROTOCOL + git(checkout, "config", "--get", "remote.origin.url").exec().trim();
     }
 
     @Override

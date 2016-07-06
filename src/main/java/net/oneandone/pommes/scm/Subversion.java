@@ -53,7 +53,7 @@ public class Subversion extends Scm {
 
         url = checkout.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
-        return Strings.addRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
+        return PROTOCOL + Strings.addRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
     }
 
     @Override

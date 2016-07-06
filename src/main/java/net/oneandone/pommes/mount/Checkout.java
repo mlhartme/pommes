@@ -28,19 +28,20 @@ import net.oneandone.sushi.launcher.Launcher;
 import java.io.IOException;
 
 public class Checkout extends Action {
-    public static Action createOpt(Environment environment, FileNode directory, Pom pom) throws IOException {
-        Pom scannedPom;
+    public static Action createOpt(FileNode directory, Pom pom) throws IOException {
         Scm scm;
+        String scannedUrl;
 
         if (directory.exists()) {
-            scannedPom = environment.scanPomOpt(directory);
-            if (scannedPom == null) {
-                return new Problem(directory, directory + ": cannot detect project");
+            scm = Scm.probeCheckout(directory);
+            if (scm == null) {
+                return new Problem(directory, directory + ": cannot detect checkout");
             }
-            if (scannedPom.scm.equals(pom.scm)) {
+            scannedUrl = scm.getUrl(directory);
+            if (scannedUrl.equals(pom.scm)) {
                 return null;
             } else {
-                return new Problem(directory, directory + ": checkout conflict: " + pom.scm + " vs " + scannedPom.scm);
+                return new Problem(directory, directory + ": checkout conflict: " + pom.scm + " vs " + scannedUrl);
             }
         } else {
             if (pom.scm == null) {
