@@ -1,6 +1,6 @@
 ## Pommes Changelog
 
-### 3.0.1 (pending)
+### 3.0.1 (2016-07-11)
 
 * Improved mount and goto: common actions are merged.
 * Improved mount and goto output: print the scm url, not the artifact id.
@@ -8,7 +8,7 @@
 * Replaced .pommes.goto by setenv module. 
 * Fix npe for checkout actions on a directory without project.
 
-### Pommes 3.0.0 (2016-06-10)
+### 3.0.0 (2016-06-10)
 
 * Added ~/.pommes.properties to configure various properties: mount and database directories and to define imports, query macros and format macros.
   Removed POMMES_LOCAL and POMMES_GLOBAL variables, define properties instead. You can change the default location of this file with the new
@@ -42,20 +42,20 @@
   * Subversion urls have to be prefixed with 'svn:' now; -noBranches changed to %branches; also added %tags (default is false for both)
   * Added -dryrun option.
 
-### Pommes 2.4.3 (2016-03-01)
+### 2.4.3 (2016-03-01)
 
-### Pommes 2.4.2 (2015-10-05)
+### 2.4.2 (2015-10-05)
 
 * Pommes goto no longer modifies your environment. To get the previous behavior, invoke pommes goto ... && . ~/.pommes.goto.
   Technically, pommes is a normal shell script now (not a shell function).
 * Internal change: update sushi 2.8.x to 3.0.0 and inline 1.0.0.
 * Added database export command.
 
-### Pommes 2.4.1 (2015-01-16)
+### 2.4.1 (2015-01-16)
 
 * Fix == in launcher script, has to be = instead.
 
-### Pommes 2.4.0 (2015-01-08)
+### 2.4.0 (2015-01-08)
 
 * Added dependencies to pom objects, you can search for them with "find :-substring". (The users command is just a shortcut for this)
 * Configurable output format for find. Also added dependencies to pom objects, so you can output them, too.
