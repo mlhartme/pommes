@@ -28,7 +28,6 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class Goto extends Base {
@@ -41,6 +40,7 @@ public class Goto extends Base {
 
     @Override
     public void run(Database database) throws Exception {
+        Setenv setenv;
         List<Action> actions;
         FileNode directory;
         Action action;
@@ -60,7 +60,12 @@ public class Goto extends Base {
         if (action == null) {
             throw new IOException("nothing selected");
         }
-        Setenv.get().cd(action.directory.getAbsolute());
+        setenv = Setenv.get();
+        if (setenv.isConfigured()) {
+            setenv.cd(action.directory.getAbsolute());
+        } else {
+            console.info.println("cd " + action.directory.getAbsolute());
+        }
     }
 
     /** @return never null */
