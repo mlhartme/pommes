@@ -27,4 +27,14 @@ public class Nop extends Action {
     @Override
     public void run(Console console) throws Exception {
     }
+
+    public boolean equals(Object obj) {
+        Nop n;
+
+        if (obj instanceof Nop) {
+            n = (Nop) obj;
+            return directory.equals(n.directory);
+        }
+        return false;
+    }
 }

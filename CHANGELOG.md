@@ -5,9 +5,7 @@
 * Improved mount and goto: common actions are merged.
 * Improved mount and goto output: print the scm url, not the artifact id.
 * Fixed checkout conflict message, it no longer depends on pom.scm.
-* TODO: Import output is only visible in verbose mode now. Because it confused stool.
 * Replaced .pommes.goto by setenv module. 
-
 * Fix npe for checkout actions on a directory without project.
 
 ### Pommes 3.0.0 (2016-06-10)
