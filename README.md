@@ -23,11 +23,11 @@ Install the application
         curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.0.0/pommes-3.0.0-application.sh -o pommes
         chmod a+x pommes
     
-* Define a shell function `pg` to invoke `pommes goto` and actually cd into the resulting directory:
-
-        echo -e "\nfunction pg {\n  pommes goto \"\$@\" && . ~/.pommes.goto\n}\n" >> ~/.profile_for_your_shell
-
 * test it by running `pommes`, you should get a usage message
+* if you want to enable `pommes goto` to change your current working directory:
+
+        pommes setup >> ~/.bashrc
+
 * create a default configuration with `pommes find`. Inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
  
 Current Limitations

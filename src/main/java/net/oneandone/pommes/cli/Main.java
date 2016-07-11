@@ -99,18 +99,19 @@ public class Main {
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
-        cli.begin(Environment.class, "-import -no-import");
-          cli.add(Mount.class, "mount query*");
-          cli.add(Umount.class, "umount -stale root?=.");
+          cli.add(Setup.class, "setup");
+          cli.begin(Environment.class, "-import -no-import");
+            cli.add(Mount.class, "mount query*");
+            cli.add(Umount.class, "umount -stale root?=.");
 
-          cli.add(Ls.class, "ls root?=.");
-          cli.add(Goto.class, "goto query*");
+            cli.add(Ls.class, "ls root?=.");
+            cli.add(Goto.class, "goto query*");
 
-          cli.add(DatabaseReset.class, "database-reset");
-          cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
-          cli.add(DatabaseRemove.class, "database-remove prefix*");
+            cli.add(DatabaseReset.class, "database-reset");
+            cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
+            cli.add(DatabaseRemove.class, "database-remove prefix*");
 
-          cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
+            cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));
     }
