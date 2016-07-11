@@ -13,7 +13,7 @@
 
   <groupId>net.oneandone</groupId>
   <artifactId>pommes</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
@@ -27,7 +27,7 @@
     <url>https://github.com/mlhartme/pommes</url>
     <connection>scm:git:ssh://git@github.com/mlhartme/pommes.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mlhartme/pommes.git</developerConnection>
-    <tag>pommes-3.0.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
