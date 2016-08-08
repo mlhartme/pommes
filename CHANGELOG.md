@@ -1,5 +1,9 @@
 ## Pommes Changelog
 
+### 3.0.2 (pending)
+
+* fixed Git.server for git:// urls
+
 ### 3.0.1 (2016-07-11)
 
 * Improved mount and goto: common actions are merged.

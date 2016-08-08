@@ -22,10 +22,8 @@ import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 public class Git extends Scm {
     private static final String PROTOCOL = "git:";
@@ -42,8 +40,29 @@ public class Git extends Scm {
     }
 
     public String server(String url) throws URISyntaxException {
+        String result;
+        int idx;
+
         url = Strings.removeLeft(url, PROTOCOL);
-        return new URI(url).getHost();
+        if (url.startsWith("git://")) {
+            // e.g. in https://github.com/mlhartme/jdeb/blob/binanry_control/pom.xml
+            url = Strings.removeLeft(url, "git://");
+            idx = url.indexOf(':');
+            if (idx != -1) {
+                return url.substring(0, idx);
+            }
+            idx = url.indexOf('/');
+            if (idx == -1) {
+                throw new IllegalStateException(url);
+            }
+            return url.substring(0, idx);
+        } else {
+            result = new URI(url).getHost();
+            if (result == null) {
+                throw new IllegalStateException(url);
+            }
+            return result;
+        }
     }
 
     @Override
