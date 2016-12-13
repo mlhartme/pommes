@@ -11,7 +11,7 @@
 * improved 'database -fixscm': if origin is a file url, check for a checkout
 
 
-### 3.0.1 (2016-07-11)
+### 3.0.1 (2016-07-11, not released to Maven Central)
 
 * Improved mount and goto: common actions are merged.
 * Improved mount and goto output: print the scm url, not the artifact id.
