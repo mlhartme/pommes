@@ -35,7 +35,7 @@
       <name>Michael Hartmeier</name>
       <id>mlhartme</id>
       <url>http://github.com/mlhartme/</url>
-      <organization>1 &amp; 1 Internet AG</organization>
+      <organization>1 &amp;amp; 1 Internet AG</organization>
       <organizationUrl>https://github.com/1and1</organizationUrl>
       <roles>
         <role>developer</role>
@@ -93,6 +93,11 @@
       <version>${lucene.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.6.2</version>
@@ -128,7 +133,7 @@
           <name>pommes</name>
           <main>net.oneandone.pommes.cli.Main</main>
           <remove>META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
-          <concat>META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat, META-INF/services/org.apache.lucene.codecs.DocValuesFormat</concat>
+          <concat>META-INF/services/org.apache.lucene.codecs.Codec, META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat, META-INF/services/org.apache.lucene.codecs.DocValuesFormat</concat>
           <equal>com/jcraft/jsch/agentproxy/**.*</equal>
 
           <!-- for upload -->
