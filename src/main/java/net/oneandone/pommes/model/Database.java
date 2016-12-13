@@ -32,7 +32,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -176,5 +175,12 @@ public class Database implements AutoCloseable {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
         return pq.find(searcher);
+    }
+
+    public boolean contains(Pom pom) throws IOException, QueryNodeException {
+        PommesQuery pq;
+
+        pq = PommesQuery.create("a:" + pom.artifact.toGaString());
+        return !query(pq).isEmpty();
     }
 }

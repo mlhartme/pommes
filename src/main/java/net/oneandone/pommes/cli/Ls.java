@@ -39,7 +39,7 @@ public class Ls extends Base {
     }
 
     @Override
-    public void run(Database notUsed) throws Exception {
+    public void run(Database database) throws Exception {
         Map<FileNode, Scm> checkouts;
         Root root;
         FileNode found;
@@ -57,7 +57,7 @@ public class Ls extends Base {
             foundPom = environment.scanPomOpt(found);
             if (foundPom == null) {
                 console.info.println("X " + found + " (unknown project)");
-            } else {
+            } else if (database.contains(foundPom)) {
                 root = environment.properties().root;
                 try {
                     expected = root.directory(foundPom);
@@ -70,6 +70,8 @@ public class Ls extends Base {
                 } else {
                     console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
                 }
+            } else {
+                console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add -zone manual " + found + "')");
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet())) {

@@ -3,7 +3,9 @@
 ### 3.0.2 (pending)
 
 * dependency updates
-* `ls`: added tip how to fix conflicts
+* `ls` improvements
+  * `?` flag for projects not in database
+  * added tip how to fix conflicts
 * fixed Git.server for git:// urls
 
 ### 3.0.1 (2016-07-11)

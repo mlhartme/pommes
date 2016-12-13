@@ -17,18 +17,15 @@ package net.oneandone.pommes.model;
 
 import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.WildcardQuery;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +33,18 @@ import java.util.Collections;
 import java.util.List;
 
 public class PommesQuery {
+    private static final Variables EMPTY = new Variables() {
+        @Override
+        public String lookup(String var) throws IOException {
+            return null;
+        }
+    };
+
     private static final Separator PLUS = Separator.on('+');
+
+    public static PommesQuery create(String str) throws IOException, QueryNodeException {
+        return create(Collections.singletonList(str), EMPTY);
+    }
 
     public static PommesQuery create(List<String> initialOr, Variables variables) throws IOException, QueryNodeException {
         int queryIndex;
