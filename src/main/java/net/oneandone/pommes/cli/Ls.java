@@ -72,7 +72,7 @@ public class Ls extends Base {
                     console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
                 }
             } else {
-                fix = scm.equals(foundPom.scm) ? "" : "-fix ";
+                fix = scm.equals(foundPom.scm) ? "" : "-fixscm ";
                 console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add " + fix + "-zone manual " + found + "')");
             }
         }

@@ -7,6 +7,8 @@
   * `?` flag for projects not in database
   * added tip how to fix conflicts
 * fixed Git.server for git:// urls
+* improved 'database -fixscm': if origin is a file url, check for a checkout
+
 
 ### 3.0.1 (2016-07-11)
 
