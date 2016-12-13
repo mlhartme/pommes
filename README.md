@@ -108,7 +108,7 @@ Next, you can combine queries with `+` to list projects matching both conditions
 Finally, you can combine queries with blanks to list projects matching one of the conditions. I.e. blank means *or*.
 * `pommes find d:puc d:pommes` lists projects depending on either `puc` or `pommes`.
 
-Invoke `puc` without arguments to see the full formal query syntax
+See the usage message below for the full formal query syntax
 
 TODO: Prefix, suffix, macros; formats
 
