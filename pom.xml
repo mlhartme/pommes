@@ -102,7 +102,7 @@
       <artifactId>gson</artifactId>
       <version>2.8.0</version>
     </dependency>
-    <dependency>
+    <dependency><!-- json event parser -->
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
       <version>1.0.4</version>
