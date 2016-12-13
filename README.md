@@ -1,6 +1,11 @@
 # Pommes
 
-Pommes is a project database tool. It's a command line tool to
+Pommes is a project database tool. 
+
+I use it to keep all the checkouts on my disk organized. Everythings is keep under ~/Pommes with a standardized layout. Pommes can quickly 
+add checkouts and jump to existing ones.
+
+Technically, Pommes is a command line tool to maintain a project data base: 
 * crawl directories, svn, github, bitbucket or artifactory and add matching projects to the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) scm operations, e.g. checkout all projects that match a query.
