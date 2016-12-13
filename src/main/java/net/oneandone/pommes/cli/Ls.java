@@ -62,7 +62,7 @@ public class Ls extends Base {
                 if (found.equals(expected)) {
                     console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
                 } else {
-                    console.info.println("C " + found + " (expected at " + expected + ")");
+                    console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
                 }
             }
         }

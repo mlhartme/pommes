@@ -2,6 +2,7 @@
 
 ### 3.0.2 (pending)
 
+* `ls`: added tip how to fix conflicts
 * fixed Git.server for git:// urls
 
 ### 3.0.1 (2016-07-11)
