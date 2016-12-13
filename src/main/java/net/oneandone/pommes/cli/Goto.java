@@ -22,6 +22,7 @@ import net.oneandone.pommes.model.PommesQuery;
 import net.oneandone.pommes.mount.Action;
 import net.oneandone.pommes.mount.Checkout;
 import net.oneandone.pommes.mount.Nop;
+import net.oneandone.pommes.mount.Problem;
 import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -47,10 +48,14 @@ public class Goto extends Base {
 
         actions = new ArrayList<>();
         for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
-            directory = environment.properties().root.directory(pom);
-            action = Checkout.createOpt(directory, pom);
-            if (action == null) {
-                action = new Nop(directory);
+            try {
+                directory = environment.properties().root.directory(pom);
+                action = Checkout.createOpt(directory, pom);
+                if (action == null) {
+                    action = new Nop(directory);
+                }
+            } catch (IOException e) {
+                action = new Problem(world.getWorking(), pom + ": " + e.getMessage());
             }
             if (!actions.contains(action)) {
                 actions.add(action);

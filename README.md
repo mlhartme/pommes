@@ -41,8 +41,12 @@ Current Limitations
 
 ## Database commands
 
-Pommes uses [Lucene](http://lucene.apache.org) to store projects. You have three commands to modify it: `database-add` and `database-remove` 
-to add/remove projects, and `database-reset` resets the database to the initial empty state.
+Pommes maintains a [Lucene](http://lucene.apache.org) database to store projects. You'll typically feed it with your corporate projects and 
+the open source stuff you regularly use. Once you have projects in the database, you can quickly search for projects or dependencies. And
+easily checkout what you need.
+
+You have three commands to modify the database: `database-add` and `database-remove` to add/remove projects, and `database-reset` resets 
+the database to the initial empty state.
                                                                          
 Use `pommes database-add` to add projects to your database. You can specify various kinds of repositories to crawl for projects.
 
@@ -56,7 +60,7 @@ Subversion:
 
     pommes database-add svn:https://user:password@svn.yourcompany.com/your/repo/path
 
-adds alls project in the specified Subversion subtree.
+adds all project in the specified Subversion subtree.
 
 Artifactory:
 
