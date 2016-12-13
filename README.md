@@ -174,7 +174,7 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
     Project database tool.
     
     Usage:
-      'pommes' ['-v'|'-e'] command sync-options args*
+      'pommes' ['-v'|'-e'] command import-options args*
     
     search commands
       'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)? 
@@ -193,7 +193,7 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
                             remove (optional: stale) checkouts under the specified root directory;
                             a checkout is stale if the project has been removed from the database;
                             offers selection before changing anything on disk;
-                            checks for uncommitted changes before selection
+                            checkouts with uncommitted changes are marked in the list
       'ls' root?            print all checkouts under the specified directory with status markers:
                             M - checkout has modifications or is not pushed
                             C - checkout url does not match the directory pommes would place it in

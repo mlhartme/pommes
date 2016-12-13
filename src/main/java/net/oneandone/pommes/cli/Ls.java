@@ -46,6 +46,7 @@ public class Ls extends Base {
         FileNode expected;
         Pom foundPom;
         Scm scm;
+        String fix;
 
         checkouts = Scm.scanCheckouts(directory);
         if (checkouts.isEmpty()) {
@@ -71,7 +72,8 @@ public class Ls extends Base {
                     console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
                 }
             } else {
-                console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add -zone manual " + found + "')");
+                fix = scm.equals(foundPom.scm) ? "" : "-fix ";
+                console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add " + fix + "-zone manual " + found + "')");
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet())) {

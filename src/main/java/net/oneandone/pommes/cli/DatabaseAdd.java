@@ -229,7 +229,7 @@ public class DatabaseAdd extends Base {
                             throw new IllegalStateException(fixed);
                         }
                         fixed = fixed.substring(0, fixed.lastIndexOf('/'));
-                        if (!pom.scm.equals(fixed)) {
+                        if (!fixed.equals(pom.scm)) {
                             environment.console().info.println("WARNING: fixing scm " + pom.scm + " -> " + fixed);
                             pom = pom.clone(fixed);
                         }
