@@ -22,9 +22,7 @@ import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.repository.Repository;
-import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.NodeInstantiationException;
-import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
@@ -215,9 +213,7 @@ public class DatabaseAdd extends Base {
         private Pom iterPom() throws IOException, InterruptedException {
             Project project;
             Pom pom;
-            String fixed;
-            FileNode checkout;
-            Scm scm;
+            Pom orig;
 
             while (true) {
                 project = src.take();
@@ -228,21 +224,10 @@ public class DatabaseAdd extends Base {
                     count++;
                     pom = project.load(environment, zone);
                     if (fixscm) {
-                        fixed = pom.getOrigin();
-                        if (fixed.endsWith("/")) {
-                            throw new IllegalStateException(fixed);
-                        }
-                        fixed = fixed.substring(0, fixed.lastIndexOf('/'));
-                        if (fixed.startsWith("file:")) {
-                            checkout = (FileNode) environment.world().node(fixed);
-                            scm = Scm.probeCheckout(checkout);
-                            if (scm != null) {
-                                fixed = scm.getUrl(checkout);
-                            }
-                        }
-                        if (!fixed.equals(pom.scm)) {
-                            environment.console().info.println("WARNING: fixing scm " + pom.scm + " -> " + fixed);
-                            pom = pom.clone(fixed);
+                        orig = pom;
+                        pom = pom.fixScm(environment.world());
+                        if (orig != pom) {
+                            environment.console().info.println("WARNING: fixing scm " + orig.scm + " -> " + pom.scm);
                         }
                     }
                     return pom;

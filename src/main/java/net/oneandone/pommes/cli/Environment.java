@@ -30,6 +30,7 @@ import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -163,6 +164,7 @@ public class Environment implements Variables {
     public Pom scanPomOpt(FileNode directory) throws IOException {
         Scm scm;
         Project project;
+        Pom result;
 
         scm = Scm.probeCheckout(directory);
         if (scm == null) {
@@ -171,9 +173,14 @@ public class Environment implements Variables {
         for (Node child : directory.list()) {
             project = Project.probe(this, child);
             if (project != null) {
-                project.setOrigin(scm.getUrl(directory));
+                project.setOrigin(scm.getUrl(directory) + "/" + project.node);
                 project.setRevision("checkout");
-                return project.load(this, "checkout");
+                result = project.load(this, "checkout");
+                try {
+                    return result.fixScm(world);
+                } catch (URISyntaxException e) {
+                    throw new IOException(e);
+                }
             }
         }
         return null;

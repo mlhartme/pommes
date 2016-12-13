@@ -58,22 +58,24 @@ public class Status extends Base {
             foundPom = environment.scanPomOpt(found);
             if (foundPom == null) {
                 console.info.println("X " + found + " (unknown project)");
-            } else if (database.contains(foundPom)) {
-                root = environment.properties().root;
-                try {
-                    expected = root.directory(foundPom);
-                } catch (IOException e) {
-                    console.info.println("! " + found + " " + e.getMessage());
-                    continue;
-                }
-                if (found.equals(expected)) {
-                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
-                } else {
-                    console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
-                }
             } else {
-                fix = scm.equals(foundPom.scm) ? "" : "-fixscm ";
-                console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add " + fix + "-zone manual " + found + "')");
+                if (database.contains(foundPom)) {
+                    root = environment.properties().root;
+                    try {
+                        expected = root.directory(foundPom);
+                    } catch (IOException e) {
+                        console.info.println("! " + found + " " + e.getMessage());
+                        continue;
+                    }
+                    if (found.equals(expected)) {
+                        console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
+                    } else {
+                        console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
+                    }
+                } else {
+                    fix = scm.equals(foundPom.scm) ? "" : "-fixscm ";
+                    console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add " + fix + "-zone manual " + found + "')");
+                }
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet())) {
