@@ -42,7 +42,7 @@ Current Limitations
 ## Database commands
 
 Pommes uses [Lucene](http://lucene.apache.org) to store projects. You have three commands to modify it: `database-add` and `database-remove` 
-to add/remove projects, and `database-reset` resets the database to the initial state.
+to add/remove projects, and `database-reset` resets the database to the initial empty state.
                                                                          
 Use `pommes database-add` to add projects to your database. You can specify various kinds of repositories to crawl for projects.
 
@@ -76,12 +76,13 @@ Bitbucket:
     
 adds all projects found in the respective bitbucket project.
 
-Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from repeated add commands. The id field is used to detect duplicates, the revision field to detect modifications.  
+Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from repeated add commands. 
+The id field is used to detect duplicates, the revision field to detect modifications.  
 
 ## Find Command
 
 Pommes stores 7 fields for every project added to the database:
-* `id` - zone and repository uri where the project was imported from
+* `id` - zone and origin (i.e. repository uri where the project was imported from)
 * `revision` - last modified timestamp or content hash (to detect changes when re-adding a project)
 * `parent` - parent pom coordinates
 * `artifact` - coordinates of this project
@@ -89,7 +90,8 @@ Pommes stores 7 fields for every project added to the database:
 * `dep` - coordinates of dependencies
 * `url` - project url
 
-You search your database with the `find`command. Start with `pommes find foo`, it lists all projects that have a `foo` substring in their artifact or scm field. The default is to print the artifact field of matching projects. You can append `-json` to see all fields in json format. 
+You search your database with the `find` command. First example: `pommes find foo` lists all projects that have a `foo` substring in their artifact or scm field. 
+The default is to print the artifact field of matching projects. You can append `-json` to see all fields in json format. 
 
 Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name:
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
@@ -97,13 +99,16 @@ Next, you can search for specific fields using one or multiple field identifiers
 
 (Technically, `pommes find foo` is a short-hand for `pommes find :foo`, and this in turn is a short-hand for `pommes find as:foo`)
 
-You can also prepend fields with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell will expand the `!`. Exmaple: `pommes find !d:bar` list all projects that have no dependency with a `bar` substring.
+You can also prepend fields with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell 
+will expand the `!`. Exmaple: `pommes find '!d:bar'` list all projects that have no dependency with a `bar` substring.
 
-Next, you can combine queries with `+` to list projects matching both conditions. I.e. + means and.
-* `pommes find a:puc+d:httpcore` lists projects with a `puc` substring in it artifact and `httpcore` in its dependencies.
+Next, you can combine queries with `+` to list projects matching both conditions. I.e. `+` means *and*.
+* `pommes find a:puc+d:httpcore` lists projects with a `puc` substring in its artifact and `httpcore` in its dependencies.
 
-Finally, you can combine queries with blanks to list projects matching one of the conditions. I.e. blank means or.
+Finally, you can combine queries with blanks to list projects matching one of the conditions. I.e. blank means *or*.
 * `pommes find d:puc d:pommes` lists projects depending on either `puc` or `pommes`.
+
+Invoke `puc` without arguments to see the full formal query syntax
 
 TODO: Prefix, suffix, macros; formats
 
