@@ -1,7 +1,8 @@
 ## Pommes Changelog
 
-### 3.0.2 (pending)
+### 3.1.0 (pending)
 
+* renamed `stool ls` to `stool st`
 * dependency updates
 * `ls` improvements
   * `?` flag for projects not in database

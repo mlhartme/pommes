@@ -30,10 +30,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class Ls extends Base {
+public class Status extends Base {
     private final FileNode directory;
 
-    public Ls(Environment environment, FileNode directory) {
+    public Status(Environment environment, FileNode directory) {
         super(environment);
         this.directory = directory;
     }

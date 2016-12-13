@@ -52,11 +52,13 @@ public class Main {
                 + "                        a checkout is stale if the project has been removed from the database;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with uncommitted changes are marked in the list\n"
-                + "  'ls' root?            print all checkouts under the specified directory with status markers:\n"
+                + "  'st' root?            print all checkouts under the specified directory with status markers:\n"
+                + "                        ? - directory is not a checkout\n"
+                + "                        ! - project has no scm\n"
+                + "                        ? - checkout is not in database\n"
                 + "                        M - checkout has modifications or is not pushed\n"
                 + "                        C - checkout url does not match the directory pommes would place it in\n"
                 + "                        X - checkout is unknown to pommes\n"
-                + "                        ? - directory is not a checkout\n"
                 + "  'goto' query          offer selection of matching projects, check it out when necessary,\n"
                 + "                        and cds into the checkout directory\n"
                 + "\n"
@@ -104,7 +106,7 @@ public class Main {
             cli.add(Mount.class, "mount query*");
             cli.add(Umount.class, "umount -stale root?=.");
 
-            cli.add(Ls.class, "ls root?=.");
+            cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto query*");
 
             cli.add(DatabaseReset.class, "database-reset");
