@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.project;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.pommes.cli.Environment;

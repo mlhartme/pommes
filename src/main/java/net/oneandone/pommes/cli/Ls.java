@@ -24,6 +24,7 @@ import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +59,12 @@ public class Ls extends Base {
                 console.info.println("X " + found + " (unknown project)");
             } else {
                 root = environment.properties().root;
-                expected = root.directory(foundPom);
+                try {
+                    expected = root.directory(foundPom);
+                } catch (IOException e) {
+                    console.info.println("! " + found + " " + e.getMessage());
+                    continue;
+                }
                 if (found.equals(expected)) {
                     console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
                 } else {

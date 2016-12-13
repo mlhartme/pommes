@@ -39,19 +39,17 @@ public class Root {
 
         ga = pom.artifact.groupId + "." + pom.artifact.artifactId;
         path = ga.replace('.', '/');
-        if (pom.scm != null) {
-            scm = Scm.probeUrl(pom.scm);
-            if (scm != null) {
-                try {
-                    server = scm.server(pom.scm);
-                } catch (URISyntaxException e) {
-                    throw new IOException(pom.scm + ": invalid uri", e);
-                }
-            } else {
-                server = "unknown-scm";
-            }
-        } else {
-            server = "missing-scm";
+        if (pom.scm == null) {
+            throw new IOException(pom + ": missing scm");
+        }
+        scm = Scm.probeUrl(pom.scm);
+        if (scm == null) {
+            throw new IOException(pom + ": unknown scm: " + pom.scm);
+        }
+        try {
+            server = scm.server(pom.scm);
+        } catch (URISyntaxException e) {
+            throw new IOException(pom.scm + ": invalid uri", e);
         }
         return directory.join(server, withBranch(path, pom));
     }

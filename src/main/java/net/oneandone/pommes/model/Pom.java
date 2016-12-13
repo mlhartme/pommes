@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pom {
+    /** id = zone + ":" + origin */
     public final String id;
     public final String revision;
 
