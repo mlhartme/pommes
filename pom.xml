@@ -4,7 +4,7 @@
   <parent>
     <groupId>net.oneandone.maven.poms</groupId>
     <artifactId>lazy-foss-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <relativePath />
   </parent>
 
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>net.oneandone</groupId>
       <artifactId>sushi</artifactId>
-      <version>3.1.1</version>
+      <version>3.1.2</version>
     </dependency>
     <dependency>
       <groupId>net.oneandone</groupId>
@@ -75,7 +75,7 @@
     <dependency>
       <groupId>net.oneandone.maven</groupId>
       <artifactId>embedded</artifactId>
-      <version>3.12.1</version>
+      <version>3.12.2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
