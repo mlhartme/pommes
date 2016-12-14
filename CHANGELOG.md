@@ -2,10 +2,11 @@
 
 ### 3.1.0 (pending)
 
-* renamed `stool ls` to `stool st`
 * dependency updates
 * `ls` improvements
-  * `?` flag for projects not in database
+  * renamed to `st`
+  * `?` now flags all projects not in database
+  * igore the .database directory and all .idea directories
   * added tip how to fix conflicts
 * fixed Git.server for git:// urls
 * improved 'database -fixscm': if origin is a file url, check for a checkout

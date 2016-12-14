@@ -16,6 +16,7 @@
 package net.oneandone.pommes.scm;
 
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.fs.filter.Filter;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 
@@ -30,18 +31,21 @@ public abstract class Scm {
         new Subversion(), new Git()
     };
 
-    public static Map<FileNode, Scm> scanCheckouts(FileNode directory) throws IOException {
+    public static Map<FileNode, Scm> scanCheckouts(FileNode directory, Filter excludes) throws IOException {
         Map<FileNode, Scm> result;
 
         result = new LinkedHashMap<>();
-        scanCheckouts(directory, result);
+        scanCheckouts(directory, directory, excludes, result);
         return result;
     }
 
-    private static void scanCheckouts(FileNode directory, Map<FileNode, Scm> result) throws IOException {
+    private static void scanCheckouts(FileNode root, FileNode directory, Filter excludes, Map<FileNode, Scm> result) throws IOException {
         List<FileNode> children;
         Scm probed;
 
+        if (excludes.matches(directory.getRelative(root))) {
+            return;
+        }
         probed = probeCheckout(directory);
         if (probed != null) {
             result.put(directory, probed);
@@ -50,7 +54,7 @@ public abstract class Scm {
             if (children != null) {
                 for (FileNode child : children) {
                     if (!child.getName().startsWith(".")) {
-                        scanCheckouts(child, result);
+                        scanCheckouts(root, child, excludes, result);
                     }
                 }
             }

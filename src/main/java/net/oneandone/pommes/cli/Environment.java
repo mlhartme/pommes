@@ -28,6 +28,7 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,6 +46,7 @@ public class Environment implements Variables {
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
     private Properties lazyProperties;
+    private Filter lazyExcludes;
 
     public Environment(Console console, World world, boolean import_, boolean noImport) throws IOException {
         if (import_ && noImport) {
@@ -58,6 +60,7 @@ public class Environment implements Variables {
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyProperties = null;
+        this.lazyExcludes = null;
     }
 
     public void imports(Database database) throws Exception {
@@ -78,6 +81,15 @@ public class Environment implements Variables {
                 marker.writeBytes();
             }
         }
+    }
+
+    public Filter excludes() {
+        if (lazyExcludes == null) {
+            lazyExcludes = new Filter();
+            lazyExcludes.include("**/.idea");
+            lazyExcludes.include(".database");
+        }
+        return lazyExcludes;
     }
 
     public Console console() {

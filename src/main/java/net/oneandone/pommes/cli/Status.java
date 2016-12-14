@@ -23,6 +23,7 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class Status extends Base {
         String fix;
         FileNode parent;
 
-        checkouts = Scm.scanCheckouts(directory);
+        checkouts = Scm.scanCheckouts(directory, environment.excludes());
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts in " + directory);
         }
@@ -81,12 +82,12 @@ public class Status extends Base {
                 }
             }
         }
-        for (FileNode u : unknown(directory, checkouts.keySet())) {
+        for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
             console.info.println("? " + u + " (unknown scm)");
         }
     }
 
-    private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories) throws ListException, DirectoryNotFoundException {
+    private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories, Filter excludes) throws ListException, DirectoryNotFoundException {
         List<FileNode> lst;
         List<FileNode> result;
 
@@ -101,6 +102,8 @@ public class Status extends Base {
                     // ignore
                 } else if (hasAnchestor(directories, node)) {
                     // required sub-directory
+                } else if (excludes.matches(node.getRelative(root))) {
+                    // excluded
                 } else {
                     result.add(node);
                 }

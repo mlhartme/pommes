@@ -49,7 +49,7 @@ public class Umount extends Base {
         FileNode checkout;
         Scm scm;
 
-        checkouts = Scm.scanCheckouts(directory);
+        checkouts = Scm.scanCheckouts(directory, environment.excludes());
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts under " + directory);
         }
