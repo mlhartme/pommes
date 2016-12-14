@@ -173,7 +173,7 @@ public class Environment implements Variables {
         for (Node child : directory.list()) {
             project = Project.probe(this, child);
             if (project != null) {
-                project.setOrigin(scm.getUrl(directory));
+                project.setOrigin(scm.getUrl(directory) + "/" + child.getName());
                 project.setRevision("checkout");
                 result = project.load(this, "checkout");
                 try {

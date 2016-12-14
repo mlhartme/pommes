@@ -19,6 +19,7 @@
 * Replaced .pommes.goto by setenv module. 
 * Fix npe for checkout actions on a directory without project.
 
+
 ### 3.0.0 (2016-06-10)
 
 * Added ~/.pommes.properties to configure various properties: mount and database directories and to define imports, query macros and format macros.
