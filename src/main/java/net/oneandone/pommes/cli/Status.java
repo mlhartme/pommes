@@ -15,8 +15,11 @@
  */
 package net.oneandone.pommes.cli;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.mount.Root;
 import net.oneandone.pommes.scm.Scm;
@@ -59,7 +62,7 @@ public class Status extends Base {
             scm = entry.getValue();
             foundPom = environment.scanPomOpt(found);
             if (foundPom == null) {
-                console.info.println("X " + found + " (unknown project)");
+                console.info.println("? " + found + " (unknown project type, fix with '" + unknownProjectFix(found) + "')");
             } else {
                 if (database.contains(foundPom)) {
                     root = environment.properties().root;
@@ -85,6 +88,21 @@ public class Status extends Base {
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
             console.info.println("? " + u + " (unknown scm)");
         }
+    }
+
+    private String unknownProjectFix(FileNode directory) {
+        Gson gson;
+        FileNode descriptor;
+        Pom pom;
+        String result;
+
+        gson = new GsonBuilder().setPrettyPrinting().create();
+        descriptor = directory.join(".pommes.json");
+        pom = new Pom("manual", descriptor.getUri().toString(), "localfile", null, new Gav("", directory.getName(), "1-SNAPSHOT"),
+                null, null);
+        result = gson.toJson(pom);
+        result = result.replace("\n", "\\n");
+        return "echo -e '" + result + "' >" + descriptor;
     }
 
     private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories, Filter excludes) throws ListException, DirectoryNotFoundException {
