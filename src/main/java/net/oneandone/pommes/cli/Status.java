@@ -15,20 +15,23 @@
  */
 package net.oneandone.pommes.cli;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Gav;
+import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.model.PommesQuery;
 import net.oneandone.pommes.mount.Root;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
+import net.oneandone.sushi.launcher.Failure;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,28 +63,23 @@ public class Status extends Base {
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
             scm = entry.getValue();
-            foundPom = environment.scanPomOpt(found);
+            foundPom = pomByScm(database, scm.getUrl(found));
             if (foundPom == null) {
-                console.info.println("? " + found + " (unknown project type, fix with '" + unknownProjectFix(found) + "')");
+                console.info.println("? " + found + " (unknown project, fix with '" + unknownProjectFix(scm, found) + "')");
             } else {
-                if (database.contains(foundPom)) {
-                    root = environment.properties().root;
-                    try {
-                        expected = root.directory(foundPom);
-                    } catch (IOException e) {
-                        console.info.println("! " + found + " " + e.getMessage());
-                        continue;
-                    }
-                    if (found.equals(expected)) {
-                        console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
-                    } else {
-                        parent = expected.getParent();
-                        fix = parent.exists() ? "" : "mkdir -p " + parent.toString() + " ";
-                        console.info.println("C " + found + " (unexpected location, fix with '" + fix + "; mv " + found + " " + expected + "'}");
-                    }
+                root = environment.properties().root;
+                try {
+                    expected = root.directory(foundPom);
+                } catch (IOException e) {
+                    console.info.println("! " + found + " " + e.getMessage());
+                    continue;
+                }
+                if (found.equals(expected)) {
+                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
                 } else {
-                    fix = scm.equals(foundPom.scm) ? "" : "-fixscm ";
-                    console.info.println("? " + found + " (" + foundPom + ", fix with 'pommes database-add " + fix + "-zone manual " + found + "')");
+                    parent = expected.getParent();
+                    fix = parent.exists() ? "" : "mkdir -p " + parent.toString() + "; ";
+                    console.info.println("C " + found + " (unexpected location, fix with '" + fix + "mv " + found + " " + expected + "'}");
                 }
             }
         }
@@ -90,19 +88,35 @@ public class Status extends Base {
         }
     }
 
-    private String unknownProjectFix(FileNode directory) {
-        Gson gson;
+    private Pom pomByScm(Database database, String url) throws IOException {
+        List<Document> poms;
+
+        try {
+            poms = database.query(PommesQuery.create("s:" + url));
+        } catch (QueryNodeException e) {
+            throw new IllegalStateException();
+        }
+        switch (poms.size()) {
+            case 0:
+                return null;
+            case 1:
+                return Field.pom(poms.get(0));
+            default:
+                throw new IOException("scm ambiguous: " + url);
+        }
+    }
+
+    private String unknownProjectFix(Scm scm, FileNode checkout) throws Failure, URISyntaxException {
+        String scmurl;
         FileNode descriptor;
         Pom pom;
         String result;
 
-        gson = new GsonBuilder().setPrettyPrinting().create();
-        descriptor = directory.join(".pommes.json");
-        pom = new Pom("manual", descriptor.getUri().toString(), "localfile", null, new Gav("", directory.getName(), "1-SNAPSHOT"),
-                null, null);
-        result = gson.toJson(pom);
-        result = result.replace("\n", "\\n");
-        return "echo -e '" + result + "' >" + descriptor;
+        scmurl = scm.getUrl(checkout);
+        descriptor = checkout.join("external.json");
+        pom = new Pom("manual", descriptor.getUri().toString(), "localfile", null, scm.defaultGav(scmurl), scmurl,null);
+        result = environment.gson().toJson(pom);
+        return "pommes database-add 'inline:" + result + "'";
     }
 
     private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories, Filter excludes) throws ListException, DirectoryNotFoundException {

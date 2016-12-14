@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.scm;
 
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -80,6 +81,32 @@ public class Git extends Scm {
     @Override
     public String getUrl(FileNode checkout) throws Failure {
         return PROTOCOL + git(checkout, "config", "--get", "remote.origin.url").exec().trim();
+    }
+
+    @Override
+    public Gav defaultGav(String url) throws Failure {
+        String artifactId;
+        String groupId;
+        int idx;
+
+        idx = url.lastIndexOf('/');
+        if (idx == -1) {
+            throw new IllegalArgumentException(url);
+        }
+        groupId = url.substring(0, idx);
+        artifactId = url.substring(idx + 1);
+        idx = artifactId.lastIndexOf('.');
+        if (idx != -1) {
+            artifactId = artifactId.substring(0, idx);
+        }
+        idx = groupId.lastIndexOf(':');
+        if (idx == -1) {
+            idx = groupId.lastIndexOf('/');
+        }
+        if (idx != -1) {
+            groupId = groupId.substring(idx + 1);
+        }
+        return new Gav("git", artifactId, "1-SNAPSHOT");
     }
 
     @Override

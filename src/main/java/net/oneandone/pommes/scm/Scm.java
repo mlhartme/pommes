@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.scm;
 
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import net.oneandone.sushi.launcher.Failure;
@@ -88,6 +89,8 @@ public abstract class Scm {
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isCommitted(FileNode checkout) throws IOException;
     public abstract String getUrl(FileNode checkout) throws Failure;
+
+    public abstract Gav defaultGav(String url) throws Failure, URISyntaxException;
 
     public abstract Launcher checkout(FileNode dest, String url) throws Failure;
 

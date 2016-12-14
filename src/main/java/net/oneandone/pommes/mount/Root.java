@@ -37,7 +37,11 @@ public class Root {
         Scm scm;
         String server;
 
-        ga = pom.artifact.groupId + "." + pom.artifact.artifactId;
+        if (pom.artifact.groupId.isEmpty()) {
+            ga = pom.artifact.artifactId;
+        } else {
+            ga = pom.artifact.groupId + "." + pom.artifact.artifactId;
+        }
         path = ga.replace('.', '/');
         if (pom.scm == null) {
             throw new IOException(pom + ": missing scm");

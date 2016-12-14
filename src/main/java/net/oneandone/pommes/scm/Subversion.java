@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.scm;
 
+import net.oneandone.pommes.model.Gav;
 import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
@@ -23,10 +24,8 @@ import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 public class Subversion extends Scm {
     private static final String PROTOCOL = "svn:";
@@ -44,6 +43,30 @@ public class Subversion extends Scm {
 
     public String server(String url) throws URISyntaxException {
         return new URI(Strings.removeLeft(url, PROTOCOL)).getHost();
+    }
+
+    @Override
+    public Gav defaultGav(String urlstr) throws Failure, URISyntaxException {
+        String path;
+        int idx;
+        String groupId;
+        String artifactId;
+
+        path = new URI(Strings.removeLeft(urlstr, PROTOCOL)).getHost();
+        idx = path.indexOf("/trunk");
+        if (idx == -1) {
+            idx = path.indexOf("/branches");
+        }
+        if (idx != -1) {
+            path = path.substring(0, idx);
+        }
+        idx = path.lastIndexOf('/');
+        if (idx == -1) {
+            throw new IllegalArgumentException(path);
+        }
+        groupId = path.substring(0, idx);
+        artifactId = path.substring(idx + 1);
+        return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 
     @Override

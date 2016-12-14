@@ -5,12 +5,14 @@
 * dependency updates
 * `ls` improvements
   * renamed to `st`
+  * support external descriptors, ie. lookup projects via scm
   * `?` now flags all projects not in database
-  * igore the .database directory and all .idea directories
+  * ignore the .database directory and all .idea directories
   * added tip how to fix conflicts
 * fixed Git.server for git:// urls
 * improved 'database -fixscm': if origin is a file url, check for a checkout
 * fixed some invalid url exceptions when extracting the git server name
+* pommes-add now supports inline repositories: `inline:`*json*
 
 
 ### 3.0.1 (2016-07-11, not released to Maven Central)
