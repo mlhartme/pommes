@@ -89,7 +89,7 @@ The id field is used to detect duplicates, the revision field to detect modifica
 ## Find Command
 
 Pommes stores 7 fields for every project added to the database:
-* `id` - zone and origin (i.e. repository uri where the project descriptor (usually the pom) was loaded from)
+* `id` - zone and origin (i.e. url where the project descriptor (usually the pom) was loaded from)
 * `revision` - last modified timestamp or content hash (to detect changes when re-adding a project)
 * `parent` - parent pom coordinates
 * `artifact` - coordinates of this project

@@ -44,12 +44,24 @@ public class Git extends Scm {
         int idx;
 
         url = Strings.removeLeft(url, PROTOCOL);
-        if (url.startsWith("git://")) {
-            // e.g. in https://github.com/mlhartme/jdeb/blob/binanry_control/pom.xml
-            url = Strings.removeLeft(url, "git://");
+        idx = url.indexOf("://");
+        if (idx != -1) {
+            idx += 3;
+        } else {
+            idx = url.indexOf('@');
+            if (idx != -1) {
+                idx++;
+            }
+        }
+        if (idx != -1) {
+            url = url.substring(idx);
             idx = url.indexOf(':');
             if (idx != -1) {
                 return url.substring(0, idx);
+            }
+            idx = url.indexOf('@');
+            if (idx != -1) {
+                url = url.substring(idx + 1);
             }
             idx = url.indexOf('/');
             if (idx == -1) {

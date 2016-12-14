@@ -47,6 +47,7 @@ public class Status extends Base {
         Pom foundPom;
         Scm scm;
         String fix;
+        FileNode parent;
 
         checkouts = Scm.scanCheckouts(directory);
         if (checkouts.isEmpty()) {
@@ -70,7 +71,9 @@ public class Status extends Base {
                     if (found.equals(expected)) {
                         console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
                     } else {
-                        console.info.println("C " + found + " (unexpected location, fix with 'mv " + found.getAbsolute() + " " + expected.getAbsolute() + "'}");
+                        parent = expected.getParent();
+                        fix = parent.exists() ? "" : "mkdir -p " + parent.toString() + " ";
+                        console.info.println("C " + found + " (unexpected location, fix with '" + fix + "; mv " + found + " " + expected + "'}");
                     }
                 } else {
                     fix = scm.equals(foundPom.scm) ? "" : "-fixscm ";

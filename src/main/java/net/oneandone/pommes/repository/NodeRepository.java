@@ -21,8 +21,6 @@ import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
-import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
@@ -108,6 +106,7 @@ public class NodeRepository implements Repository {
         for (Node node : children) {
             project = Project.probe(environment, node);
             if (project != null) {
+                project.setOrigin(node.getUri().toString());
                 project.setRevision(Long.toString(node.getLastModified()));
                 dest.put(project);
                 return;

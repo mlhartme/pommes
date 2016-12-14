@@ -9,6 +9,7 @@
   * added tip how to fix conflicts
 * fixed Git.server for git:// urls
 * improved 'database -fixscm': if origin is a file url, check for a checkout
+* fixed some invalid url exceptions when extracting the git server name
 
 
 ### 3.0.1 (2016-07-11, not released to Maven Central)
