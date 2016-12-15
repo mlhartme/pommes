@@ -18,15 +18,30 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
 import net.oneandone.setenv.Setenv;
+import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.file.FileNode;
+
+import java.io.IOException;
 
 public class Setup {
+    private final World world;
     private final Console console;
 
-    public Setup(Console console) {
+    public Setup(World world, Console console) {
+        this.world = world;
         this.console = console;
     }
 
-    public void run() {
-        console.info.println(Setenv.get().setenvBash());
+    public void run() throws IOException {
+        FileNode home;
+
+        home = Home.directory(world);
+        console.info.println("Ready to setup pommes in " + home);
+        console.readline("Press return to continue, ctl-c to abort: ");
+        Home.create(world, console, true);
+        if (!Setenv.create().isConfigured()) {
+            console.info.println("To complete the setup, please add the following to your bash initialization:");
+            console.info.println(Setenv.get().setenvBash());
+        }
     }
 }

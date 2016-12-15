@@ -24,27 +24,45 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 
 public class Home {
-    public static Home create(World world, Console console) throws IOException {
+    public static Home create(World world, Console console, boolean setup) throws IOException {
         FileNode rootHome;
         FileNode internalHome;
+        FileNode dflt;
+        FileNode dest;
+
+        rootHome = directory(world);
+        internalHome = rootHome.join(".pommes");
+        if (!internalHome.isDirectory()) {
+            if (!setup) {
+                throw new IOException("pommes is not set up properly. Please run 'pommes setup'");
+            }
+            console.info.println("creating pommes home: " + rootHome);
+            rootHome.mkdirOpt();
+            internalHome.mkdir();
+            internalHome.join("logs").mkdir();
+            dflt = world.locateClasspathItem(Home.class).getParent().join("pommes.properties.default");
+            dest = internalHome.join("pommes.properties");
+            if (dflt.exists()) {
+                dflt.copy(dest);
+            } else {
+                Properties.writeDefaults(dest);
+            }
+        }
+        return new Home(rootHome);
+    }
+
+    public static FileNode directory(World world) {
         String path;
 
         path = System.getenv("POMMES_HOME");
         if (path == null) {
-            rootHome = world.getHome().join("Pommes");
+            return world.getHome().join("Pommes");
         } else {
-            rootHome = world.file(path);
+            return world.file(path);
         }
-        internalHome = rootHome.join(".pommes");
-        if (!rootHome.isDirectory()) {
-            console.info.println("creating pommes home: " + rootHome);
-            rootHome.mkdir();
-            internalHome.mkdir();
-            internalHome.join("logs").mkdir();
-            Properties.writeDefaults(internalHome.join("pommes.properties"));
-        }
-        return new Home(rootHome);
     }
+
+    //--
 
     private final FileNode rootHome;
     private final FileNode internalHome;

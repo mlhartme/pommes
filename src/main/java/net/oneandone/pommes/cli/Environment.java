@@ -54,7 +54,7 @@ public class Environment implements Variables {
 
         this.console = console;
         this.world = world;
-        this.home = Home.create(world, console);
+        this.home = Home.create(world, console, false);
         this.import_ = import_;
         this.noImport = noImport;
         this.lazyGson = null;
