@@ -38,6 +38,8 @@ import java.util.Map;
 public class Environment implements Variables {
     private final Console console;
     private final World world;
+    private final FileNode rootHome;
+    private final FileNode internalHome;
 
     private boolean import_;
     private boolean noImport;
@@ -49,6 +51,8 @@ public class Environment implements Variables {
     private Filter lazyExcludes;
 
     public Environment(Console console, World world, boolean import_, boolean noImport) throws IOException {
+        String path;
+
         if (import_ && noImport) {
             throw new ArgumentException("incompatible imports options");
         }
@@ -61,6 +65,14 @@ public class Environment implements Variables {
         this.lazyCurrentPom = null;
         this.lazyProperties = null;
         this.lazyExcludes = null;
+
+        path = System.getenv("POMMES_HOME");
+        if (path == null) {
+            rootHome = world.getHome().join("Pommes");
+        } else {
+            rootHome = world.file(path);
+        }
+        internalHome = rootHome.join(".pommes");
     }
 
     public void imports(Database database) throws Exception {
@@ -139,22 +151,34 @@ public class Environment implements Variables {
         }
     }
 
-    public Properties properties() throws IOException {
-        String path;
-        FileNode file;
+    public net.oneandone.pommes.mount.Root root() throws IOException {
+        home();
+        return new net.oneandone.pommes.mount.Root(rootHome);
+    }
 
+    private void home() throws IOException {
+        if (!rootHome.isDirectory()) {
+            console.info.println("creating pommes home: " + rootHome);
+            rootHome.mkdir();
+            internalHome.mkdir();
+            internalHome.join("logs").mkdir();
+            Properties.writeDefaults(internalHome.join("pommes.properties"));
+        }
+    }
+
+    public Database loadDatabase() throws IOException {
+        home();
+        return Database.load(internalHome.join("database"));
+    }
+
+    private FileNode propertiesFile() {
+        return internalHome.join("pommes.properties");
+    }
+
+    public Properties properties() throws IOException {
         if (lazyProperties == null) {
-            path = System.getenv("POMMES_PROPERTIES");
-            if (path == null) {
-                file = world.getHome().join(".pommes.properties");
-            } else {
-                file = world.file(path);
-            }
-            if (!file.exists()) {
-                Properties.writeDefaults(file);
-                console.info.println("create default configuration at " + file);
-            }
-            lazyProperties = Properties.load(file);
+            home();
+            lazyProperties = Properties.load(propertiesFile());
         }
         return lazyProperties;
     }
@@ -166,6 +190,7 @@ public class Environment implements Variables {
         Pom result;
 
         result = scanPomOpt(directory);
+
         if (result == null) {
             throw new IllegalStateException(directory.toString());
         }
@@ -203,5 +228,10 @@ public class Environment implements Variables {
             lazyGson = new GsonBuilder().create();
         }
         return lazyGson;
+    }
+
+    public FileNode logs() throws IOException {
+        home();
+        return internalHome.join("logs");
     }
 }

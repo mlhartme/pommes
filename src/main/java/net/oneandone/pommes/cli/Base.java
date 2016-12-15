@@ -24,7 +24,6 @@ import net.oneandone.sushi.util.Separator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class Base {
@@ -39,7 +38,7 @@ public abstract class Base {
     }
 
     public void run() throws Exception {
-        try (Database database = environment.properties().loadDatabase()) {
+        try (Database database = environment.loadDatabase()) {
             environment.imports(database);
             run(database);
         }

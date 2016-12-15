@@ -66,7 +66,7 @@ public class Umount extends Base {
             if (scannedPom == null) {
                 removes.add(new Problem(checkout, checkout + ": unknown project"));
             } else {
-                root = environment.properties().root;
+                root = environment.root();
                 configuredDirectory = root.directory(scannedPom);
                 if (checkout.equals(configuredDirectory)) {
                     removes.add(Remove.create(checkout));

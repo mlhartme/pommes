@@ -2,6 +2,11 @@
 
 ### 3.1.0 (pending)
 
+* configuration changes
+  * POMMES_PROPERTIES replaced by POMMES_HOME
+  * dumped `mount.root` property, $POMMES_HOME is used instead
+  * properties file always located in $POMMES_HOME/pommes.properties"
+  * database  always located in $POMMES_HOME/database, removed the `database` property
 * dependency updates
 * `ls` improvements
   * renamed to `st`

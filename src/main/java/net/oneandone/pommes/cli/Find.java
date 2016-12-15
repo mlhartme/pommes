@@ -29,9 +29,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Writer;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,7 +216,7 @@ public class Find extends Base {
                         values.add(Character.toString(c));
                         break;
                     case 'c':
-                        FileNode directory = environment.properties().root.directory(Field.pom(document));
+                        FileNode directory = environment.root().directory(Field.pom(document));
                         if (directory.exists()) {
                             values.add(directory.getAbsolute());
                         }

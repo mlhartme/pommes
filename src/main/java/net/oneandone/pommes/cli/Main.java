@@ -96,7 +96,7 @@ public class Main {
                 + "  {scm}     = scm location for current directory\n"
                 + "\n"
                 + "environment:\n"
-                + "  POMMES_PROPERTIES     where to find the properties file\n"
+                + "  POMMES_HOME     home directory for pommes\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
