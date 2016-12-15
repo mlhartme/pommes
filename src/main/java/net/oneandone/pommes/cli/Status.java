@@ -27,6 +27,7 @@ import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import net.oneandone.sushi.launcher.Failure;
+import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
@@ -91,6 +92,8 @@ public class Status extends Base {
     private Pom pomByScm(Database database, String url) throws IOException {
         List<Document> poms;
 
+        // TODO: to normalize subversion urls
+        url = Strings.removeRightOpt(url, "/");
         try {
             poms = database.query(PommesQuery.create("s:" + url));
         } catch (QueryNodeException e) {

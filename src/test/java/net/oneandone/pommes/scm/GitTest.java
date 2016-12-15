@@ -21,7 +21,7 @@ public class GitTest {
     }
 
     @Test
-    public void ssl() throws Failure {
+    public void dflt() throws Failure {
         Git git;
 
         git = new Git();

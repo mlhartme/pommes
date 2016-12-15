@@ -53,6 +53,9 @@ public class Subversion extends Scm {
         String artifactId;
 
         path = new URI(Strings.removeLeft(urlstr, PROTOCOL)).getPath();
+        path = Strings.removeRightOpt(path, "/");
+        path = Strings.removeLeftOpt(path, "/svn");
+        path = Strings.removeLeftOpt(path, "/");
         idx = path.indexOf("/trunk");
         if (idx == -1) {
             idx = path.indexOf("/branches");
@@ -62,10 +65,12 @@ public class Subversion extends Scm {
         }
         idx = path.lastIndexOf('/');
         if (idx == -1) {
-            throw new IllegalArgumentException(path);
+            groupId = "";
+            artifactId = path;
+        } else {
+            groupId = path.substring(0, idx);
+            artifactId = path.substring(idx + 1);
         }
-        groupId = path.substring(0, idx);
-        artifactId = path.substring(idx + 1);
         return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 
