@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/** urls are normalized by removing the tailing slash. */
 public class Subversion extends Scm {
     private static final String PROTOCOL = "svn:";
 
@@ -81,7 +82,7 @@ public class Subversion extends Scm {
 
         url = checkout.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
-        return PROTOCOL + Strings.addRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
+        return PROTOCOL + Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
     }
 
     @Override
