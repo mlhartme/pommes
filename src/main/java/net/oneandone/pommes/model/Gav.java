@@ -19,6 +19,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 
 public class Gav {
+    public static Gav forGavOpt(String gavOpt) {
+        return gavOpt == null ? null : forGav(gavOpt);
+    }
+
     public static Gav forGav(String gav) {
         String[] splitted;
 

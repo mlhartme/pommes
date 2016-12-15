@@ -15,6 +15,10 @@
  */
 package net.oneandone.pommes.model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -25,6 +29,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pom {
+    public static Pom fromJson(JsonObject object) {
+        JsonArray array;
+        Pom result;
+
+        result = new Pom(Json.string(object, "id"),
+                Json.string(object, "revision"),
+                Gav.forGavOpt(Json.stringOpt(object, "parent")),
+                Gav.forGav(Json.string(object, "artifact")),
+                Json.string(object, "scm"),
+                Json.stringOpt(object, "url"));
+        array = object.get("dependencies").getAsJsonArray();
+        for (JsonElement element : array) {
+            result.dependencies.add(Gav.forGav(element.getAsString()));
+        }
+        return result;
+    }
+
+    //--
+
     /** id = zone + ":" + origin */
     public final String id;
     public final String revision;
@@ -100,4 +123,26 @@ public class Pom {
         return id.substring(0, id.indexOf(':'));
     }
 
+    public JsonObject toJson() {
+        JsonObject obj;
+        JsonArray array;
+
+        obj = new JsonObject();
+        obj.add("id", new JsonPrimitive(id));
+        obj.add("revision", new JsonPrimitive(revision));
+        if (parent != null) {
+            obj.add("parent", new JsonPrimitive(parent.toGavString()));
+        }
+        obj.add("artifact", new JsonPrimitive(artifact.toGavString()));
+        obj.add("scm", new JsonPrimitive(scm));
+        if (url != null) {
+            obj.add("url", new JsonPrimitive(url));
+        }
+        array = new JsonArray();
+        for (Gav dep : dependencies) {
+            array.add(new JsonPrimitive(dep.toGavString()));
+        }
+        obj.add("dependencies", array);
+        return obj;
+    }
 }
