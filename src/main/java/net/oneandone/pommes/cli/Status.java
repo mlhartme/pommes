@@ -85,7 +85,7 @@ public class Status extends Base {
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
-            console.info.println("? " + u + " (unknown scm)");
+            console.info.println("? " + u + " (normal directory)");
         }
     }
 
