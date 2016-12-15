@@ -78,7 +78,7 @@ public class Main {
                 + "\n"
                 + "import options          how to handle configured imports\n"
                 + "  default behaviour     no imports\n"
-                + "  '-import-now'         force import\n"
+                + "  '-import-now'         unconditional import\n"
                 + "  '-import-daily'       import if last import is older than one day\n"
                 + "\n"
                 + "query syntax\n"

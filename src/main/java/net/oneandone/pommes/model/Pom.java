@@ -71,6 +71,7 @@ public class Pom {
             throw new IllegalArgumentException("field '" + name + "' is not a string: " + obj);
         }
     }
+
     //--
 
     /** id = zone + ":" + origin */
