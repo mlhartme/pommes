@@ -63,4 +63,20 @@ public class Gav {
     public String toString() {
         return toGavString();
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        Gav gav = (Gav) o;
+
+        if (o instanceof Gav) {
+            return groupId.equals(gav.groupId) && artifactId.equals(gav.artifactId) && version.equals(gav.version);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return artifactId.hashCode();
+    }
 }

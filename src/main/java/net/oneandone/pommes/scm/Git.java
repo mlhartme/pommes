@@ -99,14 +99,11 @@ public class Git extends Scm {
         if (idx != -1) {
             artifactId = artifactId.substring(0, idx);
         }
-        idx = groupId.lastIndexOf(':');
-        if (idx == -1) {
-            idx = groupId.lastIndexOf('/');
-        }
+        idx = Math.max(groupId.lastIndexOf(':'), idx = groupId.lastIndexOf('/'));
         if (idx != -1) {
             groupId = groupId.substring(idx + 1);
         }
-        return new Gav("git", artifactId, "1-SNAPSHOT");
+        return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 
     @Override

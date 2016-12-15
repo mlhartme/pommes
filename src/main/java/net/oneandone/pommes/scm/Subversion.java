@@ -52,7 +52,7 @@ public class Subversion extends Scm {
         String groupId;
         String artifactId;
 
-        path = new URI(Strings.removeLeft(urlstr, PROTOCOL)).getHost();
+        path = new URI(Strings.removeLeft(urlstr, PROTOCOL)).getPath();
         idx = path.indexOf("/trunk");
         if (idx == -1) {
             idx = path.indexOf("/branches");
