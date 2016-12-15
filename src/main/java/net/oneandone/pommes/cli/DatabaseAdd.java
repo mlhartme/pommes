@@ -200,11 +200,11 @@ public class DatabaseAdd extends Base {
                 existingRevision = existing.remove(pom.id);
                 if (pom.revision.equals(existingRevision)) {
                     console.info.println("  " + pom.id);
-                    continue;
-                }
-                console.info.println((existingRevision == null ? "A " : "U ") + pom.id);
-                if (!dryrun) {
-                    return Field.document(pom);
+                } else {
+                    console.info.println((existingRevision == null ? "A " : "U ") + pom.id);
+                    if (!dryrun) {
+                        return Field.document(pom);
+                    }
                 }
             }
         }
