@@ -108,7 +108,7 @@ public class Find extends Base {
                     environment.defineArgument(i, query.get(i));
                 }
                 macroName = query.get(0).substring(1);
-                macro = environment.properties().lookupQuery(macroName);
+                macro = environment.home.properties().lookupQuery(macroName);
                 if (macro == null) {
                     throw new ArgumentException("query macro not found: " + macroName);
                 }
@@ -131,7 +131,7 @@ public class Find extends Base {
                 if (macroName == null) {
                     macroName = "default";
                 }
-                format = environment.properties().lookupFormat(macroName);
+                format = environment.home.properties().lookupFormat(macroName);
                 if (format == null) {
                     format = "%o";
                 }
@@ -216,7 +216,7 @@ public class Find extends Base {
                         values.add(Character.toString(c));
                         break;
                     case 'c':
-                        FileNode directory = environment.root().directory(Field.pom(document));
+                        FileNode directory = environment.home.root().directory(Field.pom(document));
                         if (directory.exists()) {
                             values.add(directory.getAbsolute());
                         }

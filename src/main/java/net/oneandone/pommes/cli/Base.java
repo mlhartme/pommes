@@ -38,7 +38,7 @@ public abstract class Base {
     }
 
     public void run() throws Exception {
-        try (Database database = environment.loadDatabase()) {
+        try (Database database = environment.home.loadDatabase()) {
             environment.imports(database);
             run(database);
         }

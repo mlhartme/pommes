@@ -38,61 +38,29 @@ import java.util.Map;
 public class Environment implements Variables {
     private final Console console;
     private final World world;
-    private final FileNode rootHome;
-    private final FileNode internalHome;
-
-    private boolean import_;
-    private boolean noImport;
+    public final Home home;
+    private final boolean import_;
+    private final boolean noImport;
 
     private Gson lazyGson;
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
-    private Properties lazyProperties;
     private Filter lazyExcludes;
 
     public Environment(Console console, World world, boolean import_, boolean noImport) throws IOException {
-        String path;
-
         if (import_ && noImport) {
-            throw new ArgumentException("incompatible imports options");
+            throw new ArgumentException("conflicting imports options");
         }
+
         this.console = console;
         this.world = world;
+        this.home = Home.create(world, console);
         this.import_ = import_;
         this.noImport = noImport;
         this.lazyGson = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
-        this.lazyProperties = null;
         this.lazyExcludes = null;
-
-        path = System.getenv("POMMES_HOME");
-        if (path == null) {
-            rootHome = world.getHome().join("Pommes");
-        } else {
-            rootHome = world.file(path);
-        }
-        internalHome = rootHome.join(".pommes");
-    }
-
-    public void imports(Database database) throws Exception {
-        DatabaseAdd cmd;
-        FileNode marker;
-
-        if (noImport) {
-            console.verbose.println("skip database imports.");
-        } else {
-            marker = database.importMarker();
-            if (import_ || !marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24) {
-                for (Map.Entry<String, String> entry : properties().imports.entrySet()) {
-                    console.verbose.println("importing " + entry.getKey());
-                    cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
-                    cmd.add(entry.getValue());
-                    cmd.run(database);
-                }
-                marker.writeBytes();
-            }
-        }
     }
 
     public Filter excludes() {
@@ -151,39 +119,6 @@ public class Environment implements Variables {
         }
     }
 
-    public net.oneandone.pommes.mount.Root root() throws IOException {
-        home();
-        return new net.oneandone.pommes.mount.Root(rootHome);
-    }
-
-    private void home() throws IOException {
-        if (!rootHome.isDirectory()) {
-            console.info.println("creating pommes home: " + rootHome);
-            rootHome.mkdir();
-            internalHome.mkdir();
-            internalHome.join("logs").mkdir();
-            Properties.writeDefaults(internalHome.join("pommes.properties"));
-        }
-    }
-
-    public Database loadDatabase() throws IOException {
-        home();
-        return Database.load(internalHome.join("database"));
-    }
-
-    private FileNode propertiesFile() {
-        return internalHome.join("pommes.properties");
-    }
-
-    public Properties properties() throws IOException {
-        if (lazyProperties == null) {
-            home();
-            lazyProperties = Properties.load(propertiesFile());
-        }
-        return lazyProperties;
-    }
-
-
     //--
 
     public Pom scanPom(FileNode directory) throws IOException {
@@ -230,8 +165,24 @@ public class Environment implements Variables {
         return lazyGson;
     }
 
-    public FileNode logs() throws IOException {
-        home();
-        return internalHome.join("logs");
+    public void imports(Database database) throws Exception {
+        DatabaseAdd cmd;
+        FileNode marker;
+
+        if (noImport) {
+            console.verbose.println("skip database imports.");
+        } else {
+            marker = database.importMarker();
+            if (import_ || !marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24) {
+                for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
+                    console.verbose.println("importing " + entry.getKey());
+                    cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
+                    cmd.add(entry.getValue());
+                    cmd.run(database);
+                }
+                marker.writeBytes();
+            }
+        }
     }
+
 }

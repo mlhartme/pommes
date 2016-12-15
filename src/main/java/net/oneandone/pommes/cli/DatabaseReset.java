@@ -24,7 +24,7 @@ public class DatabaseReset extends Base {
 
     @Override
     public void run() throws Exception {
-        try (Database database = environment.loadDatabase()) {
+        try (Database database = environment.home.loadDatabase()) {
             database.reset();
             environment.imports(database);
         }

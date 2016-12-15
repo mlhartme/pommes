@@ -68,7 +68,7 @@ public class Status extends Base {
             if (foundPom == null) {
                 console.info.println("? " + found + " (unknown project, fix with '" + unknownProjectFix(scm, found) + "')");
             } else {
-                root = environment.root();
+                root = environment.home.root();
                 try {
                     expected = root.directory(foundPom);
                 } catch (IOException e) {
