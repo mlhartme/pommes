@@ -33,12 +33,12 @@ public class Pom {
         JsonElement array;
         Pom result;
 
-        result = new Pom(Json.string(object, "id"),
-                Json.string(object, "revision"),
-                Gav.forGavOpt(Json.stringOpt(object, "parent")),
-                Gav.forGav(Json.string(object, "artifact")),
-                Json.string(object, "scm"),
-                Json.stringOpt(object, "url"));
+        result = new Pom(string(object, "id"),
+                string(object, "revision"),
+                Gav.forGavOpt(stringOpt(object, "parent")),
+                Gav.forGav(string(object, "artifact")),
+                string(object, "scm"),
+                stringOpt(object, "url"));
         array = object.get("dependencies");
         if (array != null) {
             for (JsonElement element : array.getAsJsonArray()) {
@@ -48,6 +48,29 @@ public class Pom {
         return result;
     }
 
+    public static String string(JsonObject obj, String name) {
+        String str;
+
+        str = stringOpt(obj, name);
+        if (str == null) {
+            throw new IllegalArgumentException("field '" + name + "' not found: " + obj);
+        }
+        return str;
+    }
+
+    public static String stringOpt(JsonObject obj, String name) {
+        JsonElement e;
+
+        e = obj.get(name);
+        if (e == null) {
+            return null;
+        }
+        if (e.isJsonPrimitive()) {
+            return e.getAsString();
+        } else {
+            throw new IllegalArgumentException("field '" + name + "' is not a string: " + obj);
+        }
+    }
     //--
 
     /** id = zone + ":" + origin */
