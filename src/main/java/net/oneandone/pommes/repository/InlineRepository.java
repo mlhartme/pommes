@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.repository;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.project.JsonProject;
@@ -28,19 +28,17 @@ import java.util.concurrent.BlockingQueue;
 public class InlineRepository implements Repository {
     private static final String PROTOCOL = "inline:";
 
-    public static InlineRepository createOpt(Gson gson, String url) throws URISyntaxException, NodeInstantiationException {
+    public static InlineRepository createOpt(String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(PROTOCOL)) {
-            return new InlineRepository(gson, url.substring(PROTOCOL.length()));
+            return new InlineRepository(url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
     }
 
-    private final Gson gson;
     private final String str;
 
-    public InlineRepository(Gson gson, String str) {
-        this.gson = gson;
+    public InlineRepository(String str) {
         this.str = str;
     }
 
@@ -57,7 +55,7 @@ public class InlineRepository implements Repository {
         Pom pom;
         JsonProject project;
 
-        pom = gson.fromJson(str, Pom.class);
+        pom = Pom.fromJson(new JsonParser().parse(str).getAsJsonObject());
         project = new JsonProject(pom);
         project.setOrigin(pom.getOrigin());
         project.setRevision(pom.revision);

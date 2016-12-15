@@ -36,7 +36,7 @@ public class JsonProject extends Project {
         } catch (IOException e) {
             throw new RuntimeException("TODO", e);
         }
-        return new JsonProject(environment.gson().fromJson(json, Pom.class));
+        return new JsonProject(Pom.fromJson(json));
     }
 
     //--

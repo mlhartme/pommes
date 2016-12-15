@@ -15,12 +15,10 @@
  */
 package net.oneandone.pommes.repository;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.project.JsonProject;
@@ -32,7 +30,6 @@ import net.oneandone.sushi.fs.World;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.GZIPInputStream;
@@ -40,19 +37,17 @@ import java.util.zip.GZIPInputStream;
 public class JsonRepository implements Repository {
     private static final String PROTOCOL = "json:";
 
-    public static JsonRepository createOpt(Gson gson, World world, String url) throws URISyntaxException, NodeInstantiationException {
+    public static JsonRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(PROTOCOL)) {
-            return new JsonRepository(gson, Find.fileOrNode(world, url.substring(PROTOCOL.length())));
+            return new JsonRepository(Find.fileOrNode(world, url.substring(PROTOCOL.length())));
         } else {
             return null;
         }
     }
 
-    private final Gson gson;
     private final Node node;
 
-    public JsonRepository(Gson gson, Node node) {
-        this.gson = gson;
+    public JsonRepository(Node node) {
         this.node = node;
     }
 
@@ -73,7 +68,7 @@ public class JsonRepository implements Repository {
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
             array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
-                pom = gson.fromJson(entry.getAsJsonObject(), Pom.class);
+                pom = Pom.fromJson(entry.getAsJsonObject());
                 project = new JsonProject(pom);
                 project.setOrigin(pom.getOrigin());
                 project.setRevision(pom.revision);

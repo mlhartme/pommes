@@ -118,7 +118,7 @@ public class Status extends Base {
         scmurl = scm.getUrl(checkout);
         descriptor = checkout.join("external.json");
         pom = new Pom("manual", descriptor.getUri().toString(), "localfile", null, scm.defaultGav(scmurl), scmurl,null);
-        result = environment.gson().toJson(pom);
+        result = pom.toJson().toString();
         return "pommes database-add 'inline:" + result + "'";
     }
 

@@ -51,11 +51,11 @@ public interface Repository {
         if (repository != null) {
             return repository;
         }
-        repository = JsonRepository.createOpt(environment.gson(), world, url);
+        repository = JsonRepository.createOpt(world, url);
         if (repository != null) {
             return repository;
         }
-        repository = InlineRepository.createOpt(environment.gson(), url);
+        repository = InlineRepository.createOpt(url);
         if (repository != null) {
             return repository;
         }

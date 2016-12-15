@@ -15,8 +15,8 @@
  */
 package net.oneandone.pommes.cli;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.internal.Streams;
+import com.google.gson.stream.JsonWriter;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
@@ -29,6 +29,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -181,16 +182,30 @@ public class Find extends Base {
         }
     }
 
-    private void json(List<Pom> matches, boolean prettyprint, PrintStream dest) {
-        GsonBuilder builder;
-        Gson gson;
+    private void json(List<Pom> matches, boolean prettyprint, PrintStream dest) throws IOException {
+        JsonWriter jsonWriter;
+        boolean first;
 
-        builder = new GsonBuilder();
+        jsonWriter = new JsonWriter(new OutputStreamWriter(dest));
+        jsonWriter.setLenient(true);
         if (prettyprint) {
-            builder.setPrettyPrinting();
+            jsonWriter.setIndent("  ");
         }
-        gson = builder.create();
-        gson.toJson(matches, dest);
+        try {
+            jsonWriter.beginArray();
+            first = true;
+            for (Pom pom : matches) {
+                if (first) {
+                    first = false;
+                } else {
+                }
+                Streams.write(pom.toJson(), jsonWriter);
+            }
+            jsonWriter.endArray();
+            jsonWriter.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
         dest.print('\n');
     }
 
