@@ -77,9 +77,9 @@ public class Main {
                 + fieldList()
                 + "\n"
                 + "import options          how to handle configured imports\n"
-                + "  default behavior      import once a day\n"
-                + "  '-import'             force import\n"
-                + "  '-no-import'          skip import\n"
+                + "  default behaviour     no imports\n"
+                + "  '-import-now'         force import\n"
+                + "  '-import-daily'       import if last import is older than one day\n"
                 + "\n"
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
@@ -102,7 +102,7 @@ public class Main {
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
           cli.add(Setup.class, "setup");
-          cli.begin(Environment.class, "-import -no-import");
+          cli.begin(Environment.class, "-import-now -import-daily");
             cli.add(Mount.class, "mount query*");
             cli.add(Umount.class, "umount -stale root?=.");
 

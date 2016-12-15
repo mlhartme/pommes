@@ -17,11 +17,10 @@ package net.oneandone.pommes.cli;
 
 
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.model.Database;
 import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-
-import java.io.IOException;
 
 public class Setup {
     private final World world;
@@ -32,13 +31,20 @@ public class Setup {
         this.console = console;
     }
 
-    public void run() throws IOException {
-        FileNode home;
+    public void run() throws Exception {
+        FileNode directory;
+        Environment environment;
 
-        home = Home.directory(world);
-        console.info.println("Ready to setup pommes in " + home.getAbsolute());
+        directory = Home.directory(world);
+        console.info.println("Ready to setup pommes in " + directory.getAbsolute());
         console.readline("Press return to continue, ctl-c to abort: ");
         Home.create(world, console, true);
+        environment = new Environment(console, world, true, false);
+        console.info.println("initial import ...");
+        try (Database database = environment.home.loadDatabase()) {
+            environment.imports(database);
+        }
+        console.info.println("done");
         if (!Setenv.create().isConfigured()) {
             console.info.println("To complete the setup, please add the following to your bash initialization:");
             console.info.println(Setenv.get().setenvBash());

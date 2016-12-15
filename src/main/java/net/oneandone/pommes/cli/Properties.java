@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
@@ -66,14 +65,6 @@ public class Properties {
             }
         }
         return new Properties(queries, formats, imports);
-    }
-
-    private static FileNode file(World world, String path) {
-        if (path.startsWith("~/")) {
-            return world.getHome().join(path.substring(2));
-        } else {
-            return world.file(path);
-        }
     }
 
     //--

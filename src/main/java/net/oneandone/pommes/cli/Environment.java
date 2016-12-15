@@ -39,24 +39,24 @@ public class Environment implements Variables {
     private final Console console;
     private final World world;
     public final Home home;
-    private final boolean import_;
-    private final boolean noImport;
+    private final boolean importNow;
+    private final boolean importDaily;
 
     private Gson lazyGson;
     private Maven lazyMaven;
     private Pom lazyCurrentPom;
     private Filter lazyExcludes;
 
-    public Environment(Console console, World world, boolean import_, boolean noImport) throws IOException {
-        if (import_ && noImport) {
+    public Environment(Console console, World world, boolean importNow, boolean importDaily) throws IOException {
+        if (importNow && importDaily) {
             throw new ArgumentException("conflicting imports options");
         }
 
         this.console = console;
         this.world = world;
         this.home = Home.create(world, console, false);
-        this.import_ = import_;
-        this.noImport = noImport;
+        this.importNow = importNow;
+        this.importDaily = importDaily;
         this.lazyGson = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
@@ -166,23 +166,19 @@ public class Environment implements Variables {
     }
 
     public void imports(Database database) throws Exception {
-        DatabaseAdd cmd;
         FileNode marker;
 
-        if (noImport) {
-            console.verbose.println("skip database imports.");
-        } else {
-            marker = database.importMarker();
-            if (import_ || !marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24) {
-                for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
-                    console.verbose.println("importing " + entry.getKey());
-                    cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
-                    cmd.add(entry.getValue());
-                    cmd.run(database);
-                }
-                marker.writeBytes();
+        marker = database.importMarker();
+        if (importNow || (importDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
+            DatabaseAdd cmd;
+
+            for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
+                console.verbose.println("importing " + entry.getKey());
+                cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
+                cmd.add(entry.getValue());
+                cmd.run(database);
             }
+            marker.writeBytes();
         }
     }
-
 }
