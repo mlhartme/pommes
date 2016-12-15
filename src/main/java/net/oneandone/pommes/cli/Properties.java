@@ -26,18 +26,12 @@ import java.util.Map;
 
 public class Properties {
     public static void writeDefaults(FileNode file) throws IOException {
-        World world;
-
-        world = file.getWorld();
         file.writeLines(
                 "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
                 "",
                 "# urls where to import from",
                 "#import.first=url1",
                 "#import.second=url2",
-                "",
-                "# directory where to place checkouts",
-                "mount.root=" + world.getHome().join("Pommes").getAbsolute(),
                 "",
                 "# query macros",
                 "query.users=d:=ga=",

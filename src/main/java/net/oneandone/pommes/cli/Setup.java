@@ -36,7 +36,7 @@ public class Setup {
         FileNode home;
 
         home = Home.directory(world);
-        console.info.println("Ready to setup pommes in " + home);
+        console.info.println("Ready to setup pommes in " + home.getAbsolute());
         console.readline("Press return to continue, ctl-c to abort: ");
         Home.create(world, console, true);
         if (!Setenv.create().isConfigured()) {

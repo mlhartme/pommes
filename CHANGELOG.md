@@ -2,6 +2,7 @@
 
 ### 3.1.0 (pending)
 
+* home is no longer created explicitly - use `setup` instead
 * configuration changes
   * POMMES_PROPERTIES replaced by POMMES_HOME
   * dumped `mount.root` property, $POMMES_HOME is used instead
