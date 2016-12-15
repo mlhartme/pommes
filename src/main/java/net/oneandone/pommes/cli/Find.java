@@ -30,7 +30,7 @@ import org.apache.lucene.document.Document;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +100,7 @@ public class Find extends Base {
         String macroName;
         List<String> macro;
         String tmpFormat;
-        PrintStream dest;
+        Writer dest;
 
         dest = null;
         try {
@@ -141,11 +141,11 @@ public class Find extends Base {
             console.verbose.println("format: " + format);
 
             if (output == null) {
-                dest = System.out;
+                dest = console.info;
             } else if (output.getName().endsWith(".gz")) {
-                dest = new PrintStream(new GZIPOutputStream(output.newOutputStream()));
+                dest = new OutputStreamWriter(new GZIPOutputStream(output.newOutputStream()));
             } else {
-                dest = new PrintStream(output.newOutputStream());
+                dest = output.newWriter();
             }
             switch (format) {
                 case JSON:
@@ -165,7 +165,7 @@ public class Find extends Base {
         }
     }
 
-    private void text(List<Document> documents, String format, PrintStream dest) throws IOException {
+    private void text(List<Document> documents, String format, Writer dest) throws IOException {
         List<String> done;
         String line;
 
@@ -178,15 +178,16 @@ public class Find extends Base {
                 }
                 done.add(line);
             }
-            dest.println(line);
+            dest.write(line);
+            dest.write("\n");
         }
     }
 
-    private void json(List<Pom> matches, boolean prettyprint, PrintStream dest) throws IOException {
+    private void json(List<Pom> matches, boolean prettyprint, Writer dest) throws IOException {
         JsonWriter jsonWriter;
         boolean first;
 
-        jsonWriter = new JsonWriter(new OutputStreamWriter(dest));
+        jsonWriter = new JsonWriter(dest);
         jsonWriter.setLenient(true);
         if (prettyprint) {
             jsonWriter.setIndent("  ");
@@ -206,7 +207,7 @@ public class Find extends Base {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-        dest.print('\n');
+        dest.write("\n");
     }
 
     private String format(Document document, String format) throws IOException {

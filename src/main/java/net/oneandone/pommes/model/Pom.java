@@ -30,7 +30,7 @@ import java.util.List;
 
 public class Pom {
     public static Pom fromJson(JsonObject object) {
-        JsonArray array;
+        JsonElement array;
         Pom result;
 
         result = new Pom(Json.string(object, "id"),
@@ -39,9 +39,11 @@ public class Pom {
                 Gav.forGav(Json.string(object, "artifact")),
                 Json.string(object, "scm"),
                 Json.stringOpt(object, "url"));
-        array = object.get("dependencies").getAsJsonArray();
-        for (JsonElement element : array) {
-            result.dependencies.add(Gav.forGav(element.getAsString()));
+        array = object.get("dependencies");
+        if (array != null) {
+            for (JsonElement element : array.getAsJsonArray()) {
+                result.dependencies.add(Gav.forGav(element.getAsString()));
+            }
         }
         return result;
     }
@@ -138,11 +140,13 @@ public class Pom {
         if (url != null) {
             obj.add("url", new JsonPrimitive(url));
         }
-        array = new JsonArray();
-        for (Gav dep : dependencies) {
-            array.add(new JsonPrimitive(dep.toGavString()));
+        if (!dependencies.isEmpty()) {
+            array = new JsonArray();
+            for (Gav dep : dependencies) {
+                array.add(new JsonPrimitive(dep.toGavString()));
+            }
+            obj.add("dependencies", array);
         }
-        obj.add("dependencies", array);
         return obj;
     }
 }
