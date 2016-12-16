@@ -23,6 +23,7 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.filter.Filter;
 import net.oneandone.sushi.fs.svn.SvnNode;
+import org.tmatesoft.svn.core.SVNURL;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -164,8 +165,24 @@ public class NodeRepository implements Repository {
     }
 
     public static String nodeScm(Node descriptor) {
+        SvnNode svn;
+        String path;
+        SVNURL root;
+
         if (descriptor instanceof SvnNode) {
-            return "svn:" + descriptor.getUri();
+            svn = (SvnNode) descriptor;
+            // TODO: I currently use svn to crawl github ...
+            // sushi path is only trunk/pom.xml - i need svnkit path instead
+            root = svn.getRoot().getRepository().getLocation();
+            if (root.getHost().equals("github.com")) {
+                path = root.getPath();
+                if (!path.startsWith("/")) {
+                    throw new IllegalStateException(path);
+                }
+                return "git:ssh://git@github.com" + path + ".git";
+            } else {
+                return svn.getUri().toString();
+            }
         } else {
             return null;
         }
