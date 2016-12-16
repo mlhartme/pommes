@@ -88,7 +88,7 @@ public class Pom {
     }
 
     public Pom(String id, String revision, Gav parent, Gav artifact, String scm, String url) {
-        if (id == null || id.endsWith("/")) {
+        if (id == null) {
             throw new IllegalArgumentException("id: " + id);
         }
         if (scm == null || scm.endsWith("/")) { // forbid tailing / to normalize svn urls - some end with / and some not
