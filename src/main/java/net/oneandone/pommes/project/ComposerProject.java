@@ -20,6 +20,7 @@ import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.util.Strings;
 
 public class ComposerProject extends Project {
     public static boolean matches(String name) {
@@ -36,21 +37,27 @@ public class ComposerProject extends Project {
     }
 
     private static Gav artifact(String origin) {
+        String path;
         int last;
         int before;
+        String group;
         String artifact;
 
-        last = origin.lastIndexOf('/');
+        path = Strings.removeRightOpt(origin, "/composer.json");
+        last = path.lastIndexOf('/');
         if (last == -1) {
-            artifact = "unknown";
+            group = "";
+            artifact = path;
         } else {
-            before = origin.lastIndexOf('/', last - 1);
+            before = path.lastIndexOf('/', last - 1);
             if (before == -1) {
+                group = "";
                 artifact = "unknown";
             } else {
-                artifact = origin.substring(before + 1, last);
+                group = path.substring(before + 1, last);
+                artifact = path.substring(last + 1);
             }
         }
-        return new Gav("1and1-sales.php", artifact, "0");
+        return new Gav(group, artifact, "0");
     }
 }

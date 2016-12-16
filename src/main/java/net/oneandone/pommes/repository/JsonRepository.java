@@ -35,14 +35,17 @@ import java.util.concurrent.BlockingQueue;
 import java.util.zip.GZIPInputStream;
 
 public class JsonRepository implements Repository {
-    private static final String PROTOCOL = "json:";
+    private static final String PROTOCOL_JSON = "json:";
+    private static final String PROTOCOL_INLINE = "inline:";
 
     public static JsonRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(PROTOCOL)) {
-            return new JsonRepository(Find.fileOrNode(world, url.substring(PROTOCOL.length())));
-        } else {
-            return null;
+        if (url.startsWith(PROTOCOL_JSON)) {
+            return new JsonRepository(Find.fileOrNode(world, url.substring(PROTOCOL_JSON.length())));
         }
+        if (url.startsWith(PROTOCOL_INLINE)) {
+            return new JsonRepository(world.node(url.substring(PROTOCOL_INLINE.length())));
+        }
+        return null;
     }
 
     private final Node node;
