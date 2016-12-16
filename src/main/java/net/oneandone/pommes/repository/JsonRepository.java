@@ -21,6 +21,7 @@ import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.project.ErrorProject;
 import net.oneandone.pommes.project.JsonProject;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
@@ -63,7 +64,7 @@ public class JsonRepository implements Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Project> dest) throws IOException, URISyntaxException, InterruptedException {
+    public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException {
         JsonArray array;
         Project project;
         Pom pom;
@@ -71,10 +72,15 @@ public class JsonRepository implements Repository {
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
             array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
-                pom = Pom.fromJson(entry.getAsJsonObject());
-                project = new JsonProject(pom);
-                project.setOrigin(pom.getOrigin());
-                project.setRevision(pom.revision);
+                try {
+                    pom = Pom.fromJson(entry.getAsJsonObject());
+                    project = new JsonProject(pom);
+                    project.setOrigin(pom.getOrigin());
+                    project.setRevision(pom.revision);
+                } catch (Exception e) {
+                    project = new ErrorProject(new IOException("json error: " + e.getMessage(), e));
+                    project.setOrigin(node.getUri().toString());
+                }
                 dest.put(project);
             }
         }

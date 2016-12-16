@@ -2,6 +2,7 @@
 
 ### 3.1.0 (pending)
 
+* improved error handling when crawling repositories
 * improved json format
 * change import options: default is now to do nothing, you can trigger imports with '-import-now' or '-import-daily'
 * home is no longer created explicitly - use `setup` instead
