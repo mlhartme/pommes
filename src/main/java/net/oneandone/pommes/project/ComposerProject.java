@@ -21,36 +21,36 @@ import net.oneandone.pommes.model.Pom;
 import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 
-public class ComposerProject extends NodeProject {
+public class ComposerProject extends Project {
     public static boolean matches(String name) {
         return name.equals("composer.json");
     }
 
-    public static ComposerProject create(Environment environment, Node node) {
-        return new ComposerProject(node);
-    }
-
-    public ComposerProject(Node node) {
-        super(node);
+    public static ComposerProject create(Environment environment, Node descriptorCurrentlyNotUsed) {
+        return new ComposerProject();
     }
 
     @Override
     protected Pom doLoad(Environment notUsed, String zone, String origin, String revision, String scm) throws GetLastModifiedException {
-        return new Pom(zone, origin, revision, null, new Gav("1and1-sales.php", artifact(origin), "0"), scm, null);
+        return new Pom(zone, origin, revision, null, artifact(origin), scm, null);
     }
 
-    private static String artifact(String origin) {
+    private static Gav artifact(String origin) {
         int last;
         int before;
+        String artifact;
 
         last = origin.lastIndexOf('/');
         if (last == -1) {
-            return "unknown";
+            artifact = "unknown";
+        } else {
+            before = origin.lastIndexOf('/', last - 1);
+            if (before == -1) {
+                artifact = "unknown";
+            } else {
+                artifact = origin.substring(before + 1, last);
+            }
         }
-        before = origin.lastIndexOf('/', last - 1);
-        if (before == -1) {
-            return "unknown";
-        }
-        return origin.substring(before + 1, last);
+        return new Gav("1and1-sales.php", artifact, "0");
     }
 }

@@ -27,7 +27,9 @@ import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class MavenProject extends NodeProject {
+public class MavenProject extends Project {
+    protected final Node descriptor;
+
     public static boolean matches(String name) {
         return name.equals("pom.xml") || name.endsWith(".pom");
     }
@@ -36,8 +38,8 @@ public class MavenProject extends NodeProject {
         return new MavenProject(node);
     }
 
-    public MavenProject(Node node) {
-        super(node);
+    public MavenProject(Node descriptor) {
+        this.descriptor = descriptor;
     }
 
     //--
@@ -52,16 +54,16 @@ public class MavenProject extends NodeProject {
 
         local = null;
         try {
-            if (file instanceof FileNode) {
-                local = (FileNode) file;
+            if (descriptor instanceof FileNode) {
+                local = (FileNode) descriptor;
             } else {
                 local = environment.world().getTemp().createTempFile();
-                file.copyFile(local);
+                descriptor.copyFile(local);
             }
             try {
                 project = environment.maven().loadPom(local);
             } catch (ProjectBuildingException e) {
-                throw new IOException(file + ": cannot load maven project: " + e.getMessage(), e);
+                throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
             pa = project.getParentArtifact();
@@ -72,7 +74,7 @@ public class MavenProject extends NodeProject {
             }
             return pom;
         } finally {
-            if (local != file) {
+            if (local != descriptor) {
                 local.deleteFile();
             }
         }
