@@ -98,9 +98,9 @@ public class BitbucketRepository implements Repository {
                     project = m.apply(environment, tmp);
                     if (project != null) {
                         hostname = bitbucket.getRoot().getHostname();
-                        project.setOrigin("bitbucket://" + hostname + "/" + bbProject + "/" + repo + "/" + path);
+                        project.setOrigin("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
                         project.setRevision(tmp.sha());
-                        project.setScm("git:ssh://git@" + hostname + "/" + bbProject + "/" + repo + ".git");
+                        project.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");
                         dest.put(project);
                     }
                 }
