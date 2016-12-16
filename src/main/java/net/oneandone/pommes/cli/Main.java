@@ -65,7 +65,7 @@ public class Main {
                 + "commands that modify the database\n"
                 + "  'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
-                + "                        zone is a prefix added to the id (defaults islocal);\n"
+                + "                        zone is a prefix added to the id (defaults is local);\n"
                 + "                        overwrites projects with same id;\n"
                 + "                        url is a svn url, http url, artifactory url, github url or json url,\n"
                 + "                        an option (prefixed with '%') or an exclude (prefixed with '-')"
