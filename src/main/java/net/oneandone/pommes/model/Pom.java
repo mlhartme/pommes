@@ -19,12 +19,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.oneandone.pommes.scm.Scm;
-import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.file.FileNode;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,30 +101,6 @@ public class Pom {
         this.scm = scm;
         this.url = url;
         this.dependencies = new ArrayList<>();
-    }
-
-    public Pom fixScm(World world) throws URISyntaxException, IOException {
-        String fixed;
-        FileNode checkout;
-        Scm newScm;
-        String scmFixed;
-
-        fixed = getOrigin();
-        if (fixed.endsWith("/")) {
-            throw new IllegalStateException(fixed);
-        }
-        fixed = fixed.substring(0, fixed.lastIndexOf('/'));
-        if (fixed.startsWith("file:")) {
-            checkout = (FileNode) world.node(fixed);
-            newScm = Scm.probeCheckout(checkout);
-            if (newScm != null) {
-                scmFixed = newScm.getUrl(checkout);
-                if (scmFixed != null) {
-                    fixed = scmFixed;
-                }
-            }
-        }
-        return fixed.equals(scm) ? this : new Pom(id, revision, parent, artifact, fixed, url);
     }
 
     public String toLine() {

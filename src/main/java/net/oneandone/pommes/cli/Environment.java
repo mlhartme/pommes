@@ -29,7 +29,6 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -132,7 +131,6 @@ public class Environment implements Variables {
     public Pom scanPomOpt(FileNode directory) throws IOException {
         Scm scm;
         Project project;
-        Pom result;
 
         scm = Scm.probeCheckout(directory);
         if (scm == null) {
@@ -144,12 +142,7 @@ public class Environment implements Variables {
                 project.setOrigin(scm.getUrl(directory) + "/" + child.getName());
                 project.setRevision(child.sha());
                 project.setScm(scm.getUrl(directory));
-                result = project.load(this, "checkout");
-                try {
-                    return result.fixScm(world);
-                } catch (URISyntaxException e) {
-                    throw new IOException(e);
-                }
+                return project.load(this, "checkout");
             }
         }
         return null;
@@ -164,7 +157,7 @@ public class Environment implements Variables {
 
             for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
                 console.verbose.println("importing " + entry.getKey());
-                cmd = new DatabaseAdd(this, true, false, false, entry.getKey());
+                cmd = new DatabaseAdd(this, true, false, entry.getKey());
                 cmd.add(entry.getValue());
                 cmd.run(database);
             }

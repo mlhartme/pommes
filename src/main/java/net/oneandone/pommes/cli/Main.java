@@ -110,7 +110,7 @@ public class Main {
             cli.add(Goto.class, "goto query*");
 
             cli.add(DatabaseReset.class, "database-reset");
-            cli.add(DatabaseAdd.class, "database-add -delete -dryrun -fixscm -zone=local url* { add*(url) }");
+            cli.add(DatabaseAdd.class, "database-add -delete -dryrun -zone=local url* { add*(url) }");
             cli.add(DatabaseRemove.class, "database-remove prefix*");
 
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");

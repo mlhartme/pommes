@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.project;
 
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Gav;
 import net.oneandone.pommes.model.Pom;
@@ -68,7 +69,7 @@ public class MavenProject extends Project {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Pom(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(scm, project), project.getUrl());
+            pom = new Pom(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pom.dependencies.add(Gav.forDependency(dependency));
             }
@@ -80,20 +81,27 @@ public class MavenProject extends Project {
         }
     }
 
-    private static String scm(String repositoryScm, org.apache.maven.project.MavenProject project) {
-        String scm;
+    private String scm(Console console, String repositoryScm, org.apache.maven.project.MavenProject project) throws IOException {
+        String pomScm;
 
+        if (project.getScm() != null) {
+            pomScm = project.getScm().getConnection();
+            if (pomScm != null) {
+                // removeOpt because I've seen projects that omit the prefix ...
+                pomScm = Strings.removeLeftOpt(pomScm, "scm:");
+            }
+        } else {
+            pomScm = null;
+        }
         if (repositoryScm != null) {
+            if (pomScm != null && !pomScm.equals(repositoryScm)) {
+                console.error.println("overriding pom scm " + pomScm + " with " + repositoryScm);
+            }
             return repositoryScm;
         }
-        if (project.getScm() != null) {
-            scm = project.getScm().getConnection();
-            if (scm != null) {
-                // removeOpt because I've seen projects that omit the prefix ...
-                scm = Strings.removeLeftOpt(scm, "scm:");
-                return scm;
-            }
+        if (pomScm == null) {
+            throw new IOException("missing scm in pom.xml");
         }
-        return null;
+        return pomScm;
     }
 }

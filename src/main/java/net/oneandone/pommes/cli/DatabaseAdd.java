@@ -40,16 +40,14 @@ import java.util.concurrent.BlockingQueue;
 public class DatabaseAdd extends Base {
     private final boolean delete;
     private final boolean dryrun;
-    private final boolean fixscm;
     private final String zone;
     private final List<Repository> repositories;
     private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean delete, boolean dryrun, boolean fixscm, String zone) throws IOException {
+    public DatabaseAdd(Environment environment, boolean delete, boolean dryrun, String zone) throws IOException {
         super(environment);
         this.delete = delete;
         this.dryrun = dryrun;
-        this.fixscm = fixscm;
         this.zone = zone;
         this.repositories = new ArrayList<>();
         this.log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
@@ -77,7 +75,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(delete, dryrun, fixscm, environment, zone, database);
+            indexer = new Indexer(delete, dryrun, environment, zone, database);
             indexer.start();
             try {
                 for (Repository repository : repositories) {
@@ -98,7 +96,6 @@ public class DatabaseAdd extends Base {
     public static class Indexer extends Thread implements Iterator<Document> {
         private final boolean remove;
         private final boolean dryrun;
-        private final boolean fixscm;
         private final Environment environment;
         private final String zone;
 
@@ -112,12 +109,11 @@ public class DatabaseAdd extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(boolean remove, boolean dryrun, boolean fixscm, Environment environment, String zone, Database database) {
+        public Indexer(boolean remove, boolean dryrun, Environment environment, String zone, Database database) {
             super("Indexer");
 
             this.remove = remove;
             this.dryrun = dryrun;
-            this.fixscm = fixscm;
             this.environment = environment;
             this.zone = zone;
 
@@ -211,8 +207,6 @@ public class DatabaseAdd extends Base {
 
         private Pom iterPom() throws IOException, InterruptedException {
             Project project;
-            Pom pom;
-            Pom orig;
 
             while (true) {
                 project = src.take();
@@ -221,15 +215,7 @@ public class DatabaseAdd extends Base {
                 }
                 try {
                     count++;
-                    pom = project.load(environment, zone);
-                    if (fixscm) {
-                        orig = pom;
-                        pom = pom.fixScm(environment.world());
-                        if (orig != pom) {
-                            environment.console().info.println("WARNING: fixing scm " + orig.scm + " -> " + pom.scm);
-                        }
-                    }
-                    return pom;
+                    return project.load(environment, zone);
                 } catch (Exception e) {
                     // CAUTION: I do catch RuntimeExceptions, because I've seen Maven 3.3.9 throw them for invalid poms
                     // (e.g. InvalidArtifactRTException)

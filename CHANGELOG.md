@@ -2,6 +2,7 @@
 
 ### 3.1.0 (pending)
 
+* dumped -fixscm, Maven projects now issue a warning now
 * improved error handling when crawling repositories
 * improved json format
 * change import options: default is now to do nothing, you can trigger imports with '-import-now' or '-import-daily'
