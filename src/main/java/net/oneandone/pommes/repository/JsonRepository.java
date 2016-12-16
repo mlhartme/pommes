@@ -43,7 +43,7 @@ public class JsonRepository implements Repository {
             return new JsonRepository(Find.fileOrNode(world, url.substring(PROTOCOL_JSON.length())));
         }
         if (url.startsWith(PROTOCOL_INLINE)) {
-            return new JsonRepository(world.node(url.substring(PROTOCOL_INLINE.length())));
+            return new JsonRepository(world.memoryNode("[ " + url.substring(PROTOCOL_INLINE.length()) + " ]"));
         }
         return null;
     }
