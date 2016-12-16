@@ -36,15 +36,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.zip.GZIPInputStream;
 
 public class JsonRepository implements Repository {
-    private static final String PROTOCOL_JSON = "json:";
-    private static final String PROTOCOL_INLINE = "inline:";
+    private static final String JSON = "json:";
+    private static final String INLINE = "inline:";
 
     public static JsonRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(PROTOCOL_JSON)) {
-            return new JsonRepository(Find.fileOrNode(world, url.substring(PROTOCOL_JSON.length())));
+        if (url.startsWith(JSON)) {
+            return new JsonRepository(Find.fileOrNode(world, url.substring(JSON.length())));
         }
-        if (url.startsWith(PROTOCOL_INLINE)) {
-            return new JsonRepository(world.memoryNode("[ " + url.substring(PROTOCOL_INLINE.length()) + " ]"));
+        if (url.startsWith(INLINE)) {
+            return new JsonRepository(world.memoryNode("[ " + url.substring(INLINE.length()) + " ]"));
         }
         return null;
     }

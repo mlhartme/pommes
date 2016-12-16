@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class NodeRepository implements Repository {
-    public static final String FILE = "file:";
-    public static final String SVN = "svn:";
+    private static final String FILE = "file:";
+    private static final String SVN = "svn:";
 
     public static NodeRepository createOpt(Environment environment, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(SVN) || url.startsWith(FILE)) {
