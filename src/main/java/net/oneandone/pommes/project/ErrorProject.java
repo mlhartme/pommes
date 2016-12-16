@@ -21,15 +21,19 @@ import net.oneandone.pommes.model.Pom;
 import java.io.IOException;
 
 public class ErrorProject extends Project {
-    private final IOException exception;
+    private final Exception exception;
 
-    public ErrorProject(IOException exception) {
+    public ErrorProject(Exception exception) {
         this.exception = exception;
     }
 
     @Override
     public Pom load(Environment environment, String zone) throws IOException {
-        throw exception;
+        if (exception instanceof RuntimeException) {
+            throw (RuntimeException) exception;
+        } else {
+            throw (IOException) exception;
+        }
     }
 
     @Override

@@ -137,7 +137,7 @@ public class ArtifactoryRepository implements Repository {
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
                     node = root.join(Strings.removeLeft(uri, "/"));
-                    project = Project.probe(environment, node);
+                    project = Project.probeChecked(environment, node);
                     if (project != null) {
                         project.setOrigin("artifactory:" + node.getUri().toString());
                         project.setRevision(sha1);

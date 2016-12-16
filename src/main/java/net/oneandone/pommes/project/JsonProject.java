@@ -33,10 +33,10 @@ public class JsonProject extends Project {
 
         try {
             json = new JsonParser().parse(node.readString()).getAsJsonObject();
+            return new JsonProject(Pom.fromJson(json));
         } catch (IOException e) {
-            throw new RuntimeException("TODO", e);
+            throw new RuntimeException(node.getUri().toString() + ": cannot create json project", e);
         }
-        return new JsonProject(Pom.fromJson(json));
     }
 
     //--

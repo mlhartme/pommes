@@ -24,7 +24,23 @@ import java.util.function.BiFunction;
 
 /** Factory for Poms */
 public abstract class Project {
-    public static final Project END_OF_QUEUE = new ErrorProject(new IOException());
+    public static final Project END_OF_QUEUE = new ErrorProject(new IOException()) {
+        @Override
+        protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+            throw new IllegalStateException();
+        }
+    };
+
+    public static Project probeChecked(Environment environment, Node node) {
+        BiFunction<Environment, Node, Project> m;
+
+        try {
+            m = match(node.getName());
+            return m != null ? m.apply(environment, node) : null;
+        } catch (IOException | RuntimeException e) {
+            return new ErrorProject(e);
+        }
+    }
 
     public static Project probe(Environment environment, Node node) throws IOException {
         BiFunction<Environment, Node, Project> m;

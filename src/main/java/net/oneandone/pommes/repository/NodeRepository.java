@@ -106,7 +106,7 @@ public class NodeRepository implements Repository {
         }
         log.println(root.getPath());
         for (Node node : children) {
-            project = Project.probe(environment, node);
+            project = Project.probeChecked(environment, node);
             if (project != null) {
                 project.setOrigin(node.getUri().toString());
                 project.setRevision(Long.toString(node.getLastModified()));
@@ -181,7 +181,7 @@ public class NodeRepository implements Repository {
                 }
                 return "git:ssh://git@github.com" + path + ".git";
             } else {
-                return svn.getUri().toString();
+                return svn.getParent().getUri().toString();
             }
         } else {
             return null;
