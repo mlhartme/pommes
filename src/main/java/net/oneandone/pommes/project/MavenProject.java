@@ -43,7 +43,7 @@ public class MavenProject extends NodeProject {
     //--
 
     @Override
-    protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
+    protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
         FileNode local;
         org.apache.maven.project.MavenProject project;
         Artifact pa;
@@ -66,7 +66,7 @@ public class MavenProject extends NodeProject {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Pom(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(project), project.getUrl());
+            pom = new Pom(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(scm, project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pom.dependencies.add(Gav.forDependency(dependency));
             }
@@ -78,13 +78,16 @@ public class MavenProject extends NodeProject {
         }
     }
 
-    private static String scm(org.apache.maven.project.MavenProject project) {
+    private static String scm(String repositoryScm, org.apache.maven.project.MavenProject project) {
         String scm;
 
+        if (repositoryScm != null) {
+            return repositoryScm;
+        }
         if (project.getScm() != null) {
             scm = project.getScm().getConnection();
             if (scm != null) {
-                // removeOpt because I've seen project that omit the prefix ...
+                // removeOpt because I've seen projects that omit the prefix ...
                 scm = Strings.removeLeftOpt(scm, "scm:");
                 return scm;
             }

@@ -48,10 +48,10 @@ public class JsonProject extends Project {
     }
 
     @Override
-    protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
+    protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
         Pom pom;
 
-        pom = new Pom(zone, origin, revision, orig.parent, orig.artifact, orig.scm, orig.url);
+        pom = new Pom(zone, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
         pom.dependencies.addAll(orig.dependencies);
         return pom;
     }

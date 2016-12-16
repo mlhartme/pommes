@@ -35,8 +35,8 @@ public class ComposerProject extends NodeProject {
     }
 
     @Override
-    protected Pom doLoad(Environment notUsed, String zone, String origin, String revision) throws GetLastModifiedException {
-        return new Pom(zone, origin, revision, null, new Gav("1and1-sales.php", artifact(origin), "0"), null, null);
+    protected Pom doLoad(Environment notUsed, String zone, String origin, String revision, String scm) throws GetLastModifiedException {
+        return new Pom(zone, origin, revision, null, new Gav("1and1-sales.php", artifact(origin), "0"), scm, null);
     }
 
     private static String artifact(String origin) {

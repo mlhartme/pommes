@@ -22,6 +22,7 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.filter.Filter;
+import net.oneandone.sushi.fs.svn.SvnNode;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -108,6 +109,7 @@ public class NodeRepository implements Repository {
             if (project != null) {
                 project.setOrigin(node.getUri().toString());
                 project.setRevision(Long.toString(node.getLastModified()));
+                project.setScm(nodeScm(node));
                 dest.put(project);
                 return;
             }
@@ -161,4 +163,11 @@ public class NodeRepository implements Repository {
         return null;
     }
 
+    public static String nodeScm(Node descriptor) {
+        if (descriptor instanceof SvnNode) {
+            return "svn:" + descriptor.getUri();
+        } else {
+            return null;
+        }
+    }
 }

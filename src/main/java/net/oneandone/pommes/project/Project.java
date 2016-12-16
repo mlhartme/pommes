@@ -17,7 +17,6 @@ package net.oneandone.pommes.project;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import java.util.function.BiFunction;
 public abstract class Project {
     public static final Project END_OF_QUEUE = new Project() {
         @Override
-        protected Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException {
+        protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
             throw new IllegalStateException();
         }
     };
@@ -54,6 +53,7 @@ public abstract class Project {
 
     private String origin;
     private String revision;
+    private String scm;
 
     public void setOrigin(String origin) {
         this.origin = origin;
@@ -63,6 +63,10 @@ public abstract class Project {
         this.revision = revision;
     }
 
+    public void setScm(String scm) {
+        this.scm = scm;
+    }
+
     public Pom load(Environment environment, String zone) throws IOException {
         if (origin == null) {
             throw new IllegalStateException();
@@ -70,10 +74,10 @@ public abstract class Project {
         if (revision == null) {
             throw new IllegalStateException();
         }
-        return doLoad(environment, zone, origin, revision);
+        return doLoad(environment, zone, origin, revision, scm);
     }
 
-    protected abstract Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException;
+    protected abstract Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException;
 
     public String toString() {
         return origin;

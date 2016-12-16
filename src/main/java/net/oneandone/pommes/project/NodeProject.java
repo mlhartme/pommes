@@ -17,6 +17,7 @@ package net.oneandone.pommes.project;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
@@ -34,11 +35,13 @@ public abstract class NodeProject extends Project {
         this.file = file;
     }
 
+    @Override
     public Pom load(Environment environment, String zone) throws IOException {
-        return doLoad(environment, zone, getOrigin(), overrideRevision == null ? Long.toString(file.getLastModified()) : overrideRevision);
+        return doLoad(environment, zone, getOrigin(), overrideRevision == null ? Long.toString(file.getLastModified()) : overrideRevision,
+                NodeRepository.nodeScm(file));
     }
 
-    protected abstract Pom doLoad(Environment environment, String zone, String origin, String revision) throws IOException;
+    protected abstract Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException;
 
     public void setOrigin(String origin) {
         this.overrideOrigin = origin;

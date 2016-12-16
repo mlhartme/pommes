@@ -84,6 +84,7 @@ public class BitbucketRepository implements Repository {
         byte[] bytes;
         List<String> lst;
         Node tmp;
+        String hostname;
 
         bb = new Bitbucket(bitbucket.getRoot());
         bbProject = bitbucket.getName();
@@ -96,8 +97,10 @@ public class BitbucketRepository implements Repository {
                     tmp = environment.world().memoryNode(bytes);
                     project = m.apply(environment, tmp);
                     if (project != null) {
-                        project.setOrigin("bitbucket://" + bitbucket.getRoot().getHostname() + "/" + bbProject + "/" + repo + "/" + path);
+                        hostname = bitbucket.getRoot().getHostname();
+                        project.setOrigin("bitbucket://" + hostname + "/" + bbProject + "/" + repo + "/" + path);
                         project.setRevision(tmp.sha());
+                        project.setScm("git:ssh://git@" + hostname + "/" + bbProject + "/" + repo + ".git");
                         dest.put(project);
                     }
                 }
