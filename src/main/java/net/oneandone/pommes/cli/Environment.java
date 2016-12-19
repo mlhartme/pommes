@@ -62,7 +62,7 @@ public class Environment implements Variables {
         if (lazyExcludes == null) {
             lazyExcludes = new Filter();
             lazyExcludes.include("**/.idea");
-            lazyExcludes.include(".database");
+            lazyExcludes.include(".pommes");
         }
         return lazyExcludes;
     }
