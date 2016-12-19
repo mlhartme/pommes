@@ -12,7 +12,7 @@
     e.g. a json file. This is usefull to manage arbitrary checkouts in your pommes directory 
   * ignore the `.database` directory and all `.idea` directories
   * `st` now prints a tip how to fix unknown projects and conflicts
-* dumped -fixscm, it's always on now; Maven projects now issue a warning if the pom scm does not match the checkout
+* dumped `-fixscm`, it's always on now; Maven projects now issue a warning if the pom scm does not match the checkout
 * improved error handling when crawling repositories
 * improved json format: less verbose
 * change import options: default is to do nothing; you can trigger imports with '-import-now' or '-import-daily'
@@ -22,7 +22,7 @@
   * dumped `mount.root` property, `$POMMES_HOME` is used instead
   * dumped `database` property, it's always located in `$POMMES_HOME/.pommes/database` now
   * log files moved from `/tmp/pommes.log` to `$POMMES_HOME/.pommes/logs/pommes.log`
-* pommes-add now supports inline repositories: `inline:`*json*
+* `pommes-add` now supports inline repositories: `inline:`*json*
 * fixed Git.server for `git://` urls
 * fixed some invalid url exceptions when extracting the git server name
 * dependency updates
