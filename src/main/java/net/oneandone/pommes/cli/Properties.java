@@ -29,7 +29,7 @@ public class Properties {
         file.writeLines(
                 "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
                 "",
-                "# where to manage checkouts; defaults is ~/Pommes",
+                "# where to manage checkouts; defaults is ~/Projects",
                 "# checkouts=/some/path",
                 "",
                 "# urls where to import from",
@@ -60,7 +60,7 @@ public class Properties {
         formats = new HashMap<>();
         imports = new HashMap<>();
         props = file.readProperties();
-        checkouts = world.getHome().join("Pommes");
+        checkouts = world.getHome().join("Projects");
         for (String key : props.stringPropertyNames()) {
             if (key.equals("checkouts")) {
                 checkouts = world.file(props.getProperty(key));
