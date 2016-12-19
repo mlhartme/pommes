@@ -27,7 +27,7 @@ import java.util.Map;
 public class Properties {
     public static void writeDefaults(FileNode file) throws IOException {
         file.writeLines(
-                "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
+                "# Pommes configuration file, see https://github.com/mlhartme/pommes",
                 "",
                 "# where to manage checkouts; defaults is ~/Projects",
                 "# checkouts=/some/path",
