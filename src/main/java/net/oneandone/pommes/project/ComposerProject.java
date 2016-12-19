@@ -16,8 +16,8 @@
 package net.oneandone.pommes.project;
 
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.model.Gav;
-import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.database.Gav;
+import net.oneandone.pommes.database.Pom;
 import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;

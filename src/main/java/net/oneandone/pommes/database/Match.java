@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.model;
+package net.oneandone.pommes.database;
 
 public enum Match {
     SUBSTRING, PREFIX, SUFFIX, STRING;

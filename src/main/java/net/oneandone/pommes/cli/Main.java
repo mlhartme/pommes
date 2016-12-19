@@ -16,7 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Cli;
-import net.oneandone.pommes.model.Field;
+import net.oneandone.pommes.database.Field;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;

@@ -20,7 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Find;
-import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.database.Pom;
 import net.oneandone.pommes.project.ErrorProject;
 import net.oneandone.pommes.project.JsonProject;
 import net.oneandone.pommes.project.Project;

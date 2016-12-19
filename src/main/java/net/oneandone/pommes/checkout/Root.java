@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.checkout;
 
-import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.database.Pom;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;

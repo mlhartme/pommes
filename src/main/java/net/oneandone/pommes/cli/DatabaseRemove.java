@@ -15,8 +15,8 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.PommesQuery;
+import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.PommesQuery;
 
 import java.util.List;
 

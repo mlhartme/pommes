@@ -18,7 +18,7 @@ package net.oneandone.pommes.project;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.model.Pom;
+import net.oneandone.pommes.database.Pom;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;

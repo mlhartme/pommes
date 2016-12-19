@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.pommes.model.Database;
+import net.oneandone.pommes.database.Database;
 
 public class DatabaseReset extends Base {
     public DatabaseReset(Environment environment) {

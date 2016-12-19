@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.scm;
 
-import net.oneandone.pommes.model.Gav;
+import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.launcher.Failure;
 import org.junit.Test;
 

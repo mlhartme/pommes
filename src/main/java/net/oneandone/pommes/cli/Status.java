@@ -16,10 +16,10 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.model.Field;
-import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.model.PommesQuery;
+import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.Field;
+import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
