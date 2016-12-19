@@ -17,7 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.model.Database;
-import net.oneandone.pommes.mount.Root;
+import net.oneandone.pommes.checkout.Root;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 

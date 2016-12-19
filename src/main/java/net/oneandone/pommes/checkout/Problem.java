@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.mount;
+package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.model.Gav;
 import net.oneandone.sushi.fs.file.FileNode;
 
-public class Nop extends Action {
-    public Nop(FileNode directory) {
-        super(directory, "  " + directory);
+import java.io.IOException;
+
+public class Problem extends Action {
+    public Problem(FileNode directory, String message) {
+        super(directory, "! " + message);
     }
 
     @Override
     public void run(Console console) throws Exception {
-    }
-
-    public boolean equals(Object obj) {
-        Nop n;
-
-        if (obj instanceof Nop) {
-            n = (Nop) obj;
-            return directory.equals(n.directory);
-        }
-        return false;
+        throw new IOException(message);
     }
 }

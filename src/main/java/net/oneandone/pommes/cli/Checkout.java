@@ -19,17 +19,16 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.PommesQuery;
-import net.oneandone.pommes.mount.Action;
-import net.oneandone.pommes.mount.Checkout;
+import net.oneandone.pommes.checkout.Action;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mount extends Base {
+public class Checkout extends Base {
     private final List<String> query;
 
-    public Mount(Environment environment, List<String> query) {
+    public Checkout(Environment environment, List<String> query) {
         super(environment);
         this.query = query;
     }
@@ -43,7 +42,7 @@ public class Mount extends Base {
         adds = new ArrayList<>();
         for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
             directory = environment.home.root().directory(pom);
-            action = Checkout.createOpt(directory, pom);
+            action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, pom);
             if (action != null) {
                 if (!adds.contains(action)) {
                     adds.add(action);

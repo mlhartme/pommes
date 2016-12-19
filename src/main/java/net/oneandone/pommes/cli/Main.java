@@ -44,25 +44,22 @@ public class Main {
                 + "                        the enclosed substring or variables;\n"
                 + "                        output is a file or URL to write results to, default is the console.\n"
                 + "\n"
-                + "mount commands\n"
-                + "  'mount' query         checkout matching projects; skips existing checkouts;\n"
+                + "checkout commands\n"
+                + "  'st' root?            print all checkouts under the specified directory with status markers:\n"
+                + "                        ? - directory is not an unknown project\n"
+                + "                        M - checkout has untracked files, modifications or is not pushed\n"
+                + "                        C - checkout url does not match the directory pommes would place it in\n"
+                + "  'goto' query          offer selection of matching projects, check it out when necessary,\n"
+                + "                        and cds into the checkout directory\n"
+                + "  'checkout' query      checkout matching projects; skips existing checkouts;\n"
                 + "                        offers selection before changing anything on disk;\n"
-                + "  'umount' '-stale'? root?\n"
+                + "  'remove' '-stale'? root?\n"
                 + "                        remove (optional: stale) checkouts under the specified root directory;\n"
                 + "                        a checkout is stale if the project has been removed from the database;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with uncommitted changes are marked in the list\n"
-                + "  'st' root?            print all checkouts under the specified directory with status markers:\n"
-                + "                        ? - directory is not a checkout\n"
-                + "                        ! - project has no scm\n"
-                + "                        ? - checkout is not in database\n"
-                + "                        M - checkout has modifications or is not pushed\n"
-                + "                        C - checkout url does not match the directory pommes would place it in\n"
-                + "                        X - checkout is unknown to pommes\n"
-                + "  'goto' query          offer selection of matching projects, check it out when necessary,\n"
-                + "                        and cds into the checkout directory\n"
                 + "\n"
-                + "commands that modify the database\n"
+                + "database commands\n"
                 + "  'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
                 + "                        zone is a prefix added to the id (defaults is local);\n"
@@ -103,8 +100,8 @@ public class Main {
         cli.begin(world);
           cli.add(Setup.class, "setup");
           cli.begin(Environment.class, "-import-now -import-daily");
-            cli.add(Mount.class, "mount query*");
-            cli.add(Umount.class, "umount -stale root?=.");
+            cli.add(Checkout.class, "checkout query*");
+            cli.add(Remove.class, "remove -stale root?=.");
 
             cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto query*");

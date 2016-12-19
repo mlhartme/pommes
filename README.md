@@ -2,12 +2,11 @@
 
 # Pommes
 
-Pommes is a project database tool. 
+Pommes is a checkout manager and a project database tool. You can use it to keep all the checkouts on my disk organized. Everything is keep 
+under `~/Pommes` with a standardized layout. You can search for project metadata (esp. scm urls), easily checkout projects and navigate 
+between them.
 
-I use it to keep all the checkouts on my disk organized. Everythings is keep under ~/Pommes with a standardized layout. Pommes can quickly 
-add checkouts and jump to existing ones.
-
-Technically, Pommes is a command line tool to maintain a project data base: 
+Technically, Pommes is a command line tool that maintains a project database: 
 * crawl directories, svn, github, bitbucket or artifactory and add matching projects to the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) scm operations, e.g. checkout all projects that match a query.
@@ -26,21 +25,20 @@ Prerequisites
 * Java 8 or higher
 
 Install the application
-* download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file and store it as executable `pommes` file in your path
+* download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file 
+and store it as executable `pommes` file in your path
 
-        curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.0.0/pommes-3.0.0-application.sh -o pommes
+        cd some-directory-in-your-path
+        curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.1.0/pommes-3.1.0-application.sh -o pommes
         chmod a+x pommes
     
 * test it by running `pommes`, you should get a usage message
-* if you want to enable `pommes goto` to change your current working directory:
-
-        pommes setup >> ~/.bashrc
-
-* create a default configuration with `pommes find`. Inspect the configuration file at `~/.pommes.properties` and adjust it to your needs.
+* run `pommes setup` and follow the instructions
  
-Current Limitations
+Current Limitations:
 * doesn't care about git branches
 * multi-module projects are not handles properly: only the top-level pom is added to the database.
+
 
 ## Database commands
 
@@ -121,7 +119,9 @@ TODO: Prefix, suffix, macros; formats
 
 ## Mount commands
 
-You can use mount commands ('mount', 'umount', 'ls' and 'goto') to run scm operations one projects that match a query. The `mount.root` property defines the root directory where your want checkouts to show up on your disk. Pommes supports Subversion and Git scms.
+You can use mount commands (`mount`, `umount`, `st` and `goto`) to manage checkouts your disk, e.g. run scm operations on projects that 
+match a query. Pommes supports Subversion and Git scms.
+
 
 ### Mount
 

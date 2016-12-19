@@ -20,7 +20,7 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.PommesQuery;
-import net.oneandone.pommes.mount.Root;
+import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;

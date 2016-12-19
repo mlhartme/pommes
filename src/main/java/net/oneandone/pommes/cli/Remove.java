@@ -18,10 +18,9 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Pom;
-import net.oneandone.pommes.mount.Action;
-import net.oneandone.pommes.mount.Root;
-import net.oneandone.pommes.mount.Problem;
-import net.oneandone.pommes.mount.Remove;
+import net.oneandone.pommes.checkout.Action;
+import net.oneandone.pommes.checkout.Root;
+import net.oneandone.pommes.checkout.Problem;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -29,11 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Umount extends Base {
+public class Remove extends Base {
     private final boolean stale;
     private final FileNode directory;
 
-    public Umount(Environment environment, boolean stale, FileNode directory) {
+    public Remove(Environment environment, boolean stale, FileNode directory) {
         super(environment);
         this.stale = stale;
         this.directory = directory;
@@ -69,7 +68,7 @@ public class Umount extends Base {
                 root = environment.home.root();
                 configuredDirectory = root.directory(scannedPom);
                 if (checkout.equals(configuredDirectory)) {
-                    removes.add(Remove.create(checkout));
+                    removes.add(net.oneandone.pommes.checkout.Remove.create(checkout));
                 } else {
                     removes.add(new Problem(checkout, checkout + ": checkout expected at " + configuredDirectory));
                 }

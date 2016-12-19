@@ -13,38 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.mount;
+package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.model.Gav;
-import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
-public abstract class Action implements Comparable<Action> {
-    public final FileNode directory;
-    public final String message;
-
-    protected Action(FileNode directory, String message) {
-        this.directory = directory;
-        this.message = message;
-    }
-
-    public abstract void run(Console console) throws Exception;
-
-    public String toString() {
-        return message;
+public class Nop extends Action {
+    public Nop(FileNode directory) {
+        super(directory, "  " + directory);
     }
 
     @Override
+    public void run(Console console) throws Exception {
+    }
+
     public boolean equals(Object obj) {
+        Nop n;
+
+        if (obj instanceof Nop) {
+            n = (Nop) obj;
+            return directory.equals(n.directory);
+        }
         return false;
     }
-
-    @Override
-    public int compareTo(Action action) {
-        return directory.getPath().compareTo(action.directory.getPath());
-    }
-
-    //--
-
 }

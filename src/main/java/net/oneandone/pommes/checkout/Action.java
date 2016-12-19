@@ -13,20 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.mount;
+package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.file.FileNode;
 
-import java.io.IOException;
+public abstract class Action implements Comparable<Action> {
+    public final FileNode directory;
+    public final String message;
 
-public class Problem extends Action {
-    public Problem(FileNode directory, String message) {
-        super(directory, "! " + message);
+    protected Action(FileNode directory, String message) {
+        this.directory = directory;
+        this.message = message;
+    }
+
+    public abstract void run(Console console) throws Exception;
+
+    public String toString() {
+        return message;
     }
 
     @Override
-    public void run(Console console) throws Exception {
-        throw new IOException(message);
+    public boolean equals(Object obj) {
+        return false;
     }
+
+    @Override
+    public int compareTo(Action action) {
+        return directory.getPath().compareTo(action.directory.getPath());
+    }
+
+    //--
+
 }

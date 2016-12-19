@@ -19,10 +19,10 @@ import net.oneandone.pommes.model.Database;
 import net.oneandone.pommes.model.Field;
 import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.model.PommesQuery;
-import net.oneandone.pommes.mount.Action;
-import net.oneandone.pommes.mount.Checkout;
-import net.oneandone.pommes.mount.Nop;
-import net.oneandone.pommes.mount.Problem;
+import net.oneandone.pommes.checkout.Action;
+import net.oneandone.pommes.checkout.Checkout;
+import net.oneandone.pommes.checkout.Nop;
+import net.oneandone.pommes.checkout.Problem;
 import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.file.FileNode;
 

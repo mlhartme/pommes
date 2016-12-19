@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.mount;
+package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.model.Gav;
-import net.oneandone.pommes.model.Pom;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DeleteException;
 import net.oneandone.sushi.fs.NodeNotFoundException;

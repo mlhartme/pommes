@@ -2,28 +2,30 @@
 
 ### 3.1.0 (pending)
 
-* dumped -fixscm, Maven projects now issue a warning now
-* improved error handling when crawling repositories
-* improved json format
-* change import options: default is now to do nothing, you can trigger imports with '-import-now' or '-import-daily'
-* home is no longer created explicitly - use `setup` instead
-* configuration changes
-  * POMMES_PROPERTIES replaced by POMMES_HOME
-  * dumped `mount.root` property, $POMMES_HOME is used instead
-  * properties file always located in $POMMES_HOME/.pommes/pommes.properties"
-  * log files go to $POMMES_HOME/.pommes/logs
-  * database always located in $POMMES_HOME/.pommes/database, removed the `database` property
-* dependency updates
+* renamed `mount` to `checkout` and `umount` to `remove`
 * `ls` improvements
-  * renamed to `st`
-  * support external descriptors, ie. lookup projects via scm
-  * `?` now flags all projects not in database
-  * ignore the .database directory and all .idea directories
-  * added tip how to fix conflicts
-* fixed Git.server for git:// urls
-* improved 'database -fixscm': if origin is a file url, check for a checkout
-* fixed some invalid url exceptions when extracting the git server name
+  * changed status indicator to be more similar to `svn st`: `?` now flags all projects not in database
+  * renamed to `st` because it works similar to svn st now
+  * external descriptors:
+    `pommes st` now use the `scm` field to match projects with checkouts, previous versions tried to load the project descriptor 
+    from the checkout. This change allow you to define projects from external descriptors (i.e. descriptor not stored in the projects),
+    e.g. a json file. This is usefull to manage arbitrary checkouts in your pommes directory 
+  * ignore the `.database` directory and all `.idea` directories
+  * `st` now prints a tip how to fix unknown projects and conflicts
+* dumped -fixscm, it's always on now; Maven projects now issue a warning if the pom scm does not match the checkout
+* improved error handling when crawling repositories
+* improved json format: less verbose
+* change import options: default is to do nothing; you can trigger imports with '-import-now' or '-import-daily'
+* home is no longer created explicitly - use `pommes setup` instead
+* configuration changes
+  * `$POMMES_PROPERTIES` replaced by `$POMMES_HOME`; the properties file is always located in `$POMMES_HOME/.pommes/pommes.properties`
+  * dumped `mount.root` property, `$POMMES_HOME` is used instead
+  * dumped `database` property, it's always located in `$POMMES_HOME/.pommes/database` now
+  * log files moved from `/tmp/pommes.log` to `$POMMES_HOME/.pommes/logs/pommes.log`
 * pommes-add now supports inline repositories: `inline:`*json*
+* fixed Git.server for `git://` urls
+* fixed some invalid url exceptions when extracting the git server name
+* dependency updates
 
 
 ### 3.0.1 (2016-07-11, not released to Maven Central)
