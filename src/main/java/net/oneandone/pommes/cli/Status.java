@@ -22,6 +22,7 @@ import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Pom;
 import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
@@ -116,7 +117,7 @@ public class Status extends Base {
         Pom pom;
         String result;
 
-        probed = Project.probe(environment, checkout);
+        probed = NodeRepository.probe(environment, checkout);
         if (probed != null) {
             return "pommes database-add " + checkout;
         } else {

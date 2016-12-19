@@ -21,6 +21,7 @@ import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import net.oneandone.sushi.fs.svn.SvnNode;
 import org.tmatesoft.svn.core.SVNURL;
@@ -29,9 +30,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class NodeRepository implements Repository {
+    public static Project probe(Environment environment, FileNode checkout) {
+        NodeRepository repo;
+        BlockingQueue<Project> dest;
+
+        repo = new NodeRepository(environment, checkout, environment.console().info);
+        dest = new ArrayBlockingQueue<Project>();
+        repo.scan(dest);
+
+    }
     private static final String FILE = "file:";
     private static final String SVN = "svn:";
 
