@@ -160,11 +160,11 @@ You can define imports in the properties file:
 
    import.foo=baruri
    
-instructs pommes auto automatically run 
+instructs Pommes auto automatically run 
 
    database-add -zone foo baruri
    
-during `setup`, `database-reset` or if you invoke pommes with `-import-now` or `-import-daily`. 
+during `setup`, `database-reset` or if you invoke Pommes with `-import-now` or `-import-daily`. 
 
 This is most usefull with json repositories. To create a json file, run your database-add commands and run
 
@@ -198,7 +198,7 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
       'st' root?            print all checkouts under the specified directory with status markers:
                             ? - directory is not an unknown project
                             M - checkout has untracked files, modifications or is not pushed
-                            C - checkout url does not match the directory pommes would place it in
+                            C - checkout url does not match the directory Pommes would place it in
       'goto' query          offer selection of matching projects, check it out when necessary,
                             and cds into the checkout directory
       'checkout' query      checkout matching projects; skips existing checkouts;
@@ -248,7 +248,7 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
       {scm}     = scm location for current directory
     
     environment:
-      POMMES_HOME     home directory for pommes
+      POMMES_HOME     home directory for Pommes
     
     Home: https://github.com/mlhartme/pommes
     

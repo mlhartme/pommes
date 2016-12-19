@@ -48,7 +48,7 @@ public class Main {
                 + "  'st' root?            print all checkouts under the specified directory with status markers:\n"
                 + "                        ? - directory is not an unknown project\n"
                 + "                        M - checkout has untracked files, modifications or is not pushed\n"
-                + "                        C - checkout url does not match the directory pommes would place it in\n"
+                + "                        C - checkout url does not match the directory Pommes would place it in\n"
                 + "  'goto' query          offer selection of matching projects, check it out when necessary,\n"
                 + "                        and cds into the checkout directory\n"
                 + "  'checkout' query      checkout matching projects; skips existing checkouts;\n"
@@ -93,12 +93,12 @@ public class Main {
                 + "  {scm}     = scm location for current directory\n"
                 + "\n"
                 + "environment:\n"
-                + "  POMMES_HOME     home directory for pommes\n"
+                + "  POMMES_HOME     home directory for Pommes\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
-          cli.add(Setup.class, "setup");
+          cli.add(Setup.class, "setup -batch");
           cli.begin(Environment.class, "-import-now -import-daily");
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove -stale root?=.");
