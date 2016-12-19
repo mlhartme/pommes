@@ -25,30 +25,27 @@ import java.io.IOException;
 
 public class Home {
     public static Home create(World world, Console console, boolean setup) throws IOException {
-        FileNode rootHome;
-        FileNode internalHome;
+        FileNode home;
         FileNode dflt;
         FileNode dest;
 
-        rootHome = directory(world);
-        internalHome = rootHome.join(".pommes");
-        if (!internalHome.isDirectory()) {
+        home = directory(world);
+        if (!home.isDirectory()) {
             if (!setup) {
-                throw new IOException("pommes is not set up properly. Please run 'pommes setup'");
+                throw new IOException("pommes is not set up. Please run 'pommes setup'");
             }
-            console.info.println("creating pommes home: " + rootHome);
-            rootHome.mkdirOpt();
-            internalHome.mkdir();
-            internalHome.join("logs").mkdir();
+            console.info.println("creating pommes home: " + home);
+            home.mkdir();
+            home.join("logs").mkdir();
             dflt = world.locateClasspathItem(Home.class).getParent().join("pommes.properties.default");
-            dest = internalHome.join("pommes.properties");
+            dest = home.join("pommes.properties");
             if (dflt.exists()) {
                 dflt.copy(dest);
             } else {
                 Properties.writeDefaults(dest);
             }
         }
-        return new Home(rootHome);
+        return new Home(home);
     }
 
     public static FileNode directory(World world) {
@@ -56,7 +53,7 @@ public class Home {
 
         path = System.getenv("POMMES_HOME");
         if (path == null) {
-            return world.getHome().join("Pommes");
+            return world.getHome().join(".pommes");
         } else {
             return world.file(path);
         }
@@ -64,26 +61,24 @@ public class Home {
 
     //--
 
-    private final FileNode rootHome;
-    private final FileNode internalHome;
+    private final FileNode home;
     private final Properties properties;
 
     public Home(FileNode home) throws IOException {
-        this.rootHome = home;
-        this.internalHome = rootHome.join(".pommes").checkDirectory();
+        this.home = home;
         this.properties = Properties.load(propertiesFile());
     }
 
     public Root root() throws IOException {
-        return new Root(rootHome);
+        return new Root(properties.checkouts);
     }
 
     public Database loadDatabase() throws IOException {
-        return Database.load(internalHome.join("database"));
+        return Database.load(home.join("database"));
     }
 
     private FileNode propertiesFile() {
-        return internalHome.join("pommes.properties");
+        return home.join("pommes.properties");
     }
 
     public Properties properties() throws IOException {
@@ -91,6 +86,6 @@ public class Home {
     }
 
     public FileNode logs() throws IOException {
-        return internalHome.join("logs");
+        return home.join("logs");
     }
 }

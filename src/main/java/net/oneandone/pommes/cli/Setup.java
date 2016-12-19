@@ -37,6 +37,7 @@ public class Setup {
 
         directory = Home.directory(world);
         console.info.println("Ready to setup pommes in " + directory.getAbsolute());
+        console.info.println("Nothing outside this directory is touched; to uninstall, simply delete this directory");
         console.readline("Press return to continue, ctl-c to abort: ");
         Home.create(world, console, true);
         environment = new Environment(console, world, true, false);
@@ -45,6 +46,7 @@ public class Setup {
             environment.imports(database);
         }
         console.info.println("done");
+        console.info.println("Have a look at " + directory.join("pommes.properties") + " and adjust pommes to your needs");
         if (!Setenv.create().isConfigured()) {
             console.info.println("To complete the setup, please add the following to your bash initialization:");
             console.info.println(Setenv.get().setenvBash());

@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
@@ -27,6 +28,9 @@ public class Properties {
     public static void writeDefaults(FileNode file) throws IOException {
         file.writeLines(
                 "# Pommes Configuration File, see https://github.com/mlhartme/pommes",
+                "",
+                "# where to manage checkouts; defaults is ~/Pommes",
+                "# checkouts=/some/path",
                 "",
                 "# urls where to import from",
                 "#import.first=url1",
@@ -41,6 +45,7 @@ public class Properties {
     }
 
     public static Properties load(FileNode file) throws IOException {
+        World world;
         String queryPrefix = "query.";
         String formatPrefix = "format.";
         String importsPrefix = "import.";
@@ -48,13 +53,18 @@ public class Properties {
         Map<String, List<String>> queries;
         Map<String, String> formats;
         Map<String, String> imports;
+        FileNode checkouts;
 
+        world = file.getWorld();
         queries = new HashMap<>();
         formats = new HashMap<>();
         imports = new HashMap<>();
         props = file.readProperties();
+        checkouts = world.getHome().join("Pommes");
         for (String key : props.stringPropertyNames()) {
-            if (key.startsWith(queryPrefix)) {
+            if (key.equals("checkouts")) {
+                checkouts = world.file(props.getProperty(key));
+            } else if (key.startsWith(queryPrefix)) {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
@@ -64,19 +74,21 @@ public class Properties {
                 throw new IOException("unknown property: " + key);
             }
         }
-        return new Properties(queries, formats, imports);
+        return new Properties(checkouts, queries, formats, imports);
     }
 
     //--
 
+    public final FileNode checkouts;
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
     /** maps zones to urls */
     public final Map<String, String> imports;
 
-    public Properties(Map<String, List<String>> queries,
+    public Properties(FileNode checkouts, Map<String, List<String>> queries,
                       Map<String, String> formats, Map<String, String> imports) throws IOException {
+        this.checkouts = checkouts;
         this.queries = queries;
         this.formats = formats;
         this.imports = imports;

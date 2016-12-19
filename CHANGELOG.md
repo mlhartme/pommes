@@ -18,11 +18,11 @@
 * change import options: default is to do nothing; you can trigger imports with '-import-now' or '-import-daily'
 * home is no longer created explicitly - use `pommes setup` instead
 * configuration changes
-  * `$POMMES_PROPERTIES` replaced by `$POMMES_HOME`; the properties file is always located in `$POMMES_HOME/.pommes/pommes.properties`
-  * dumped `mount.root` property, `$POMMES_HOME` is used instead
-  * dumped `database` property, it's always located in `$POMMES_HOME/.pommes/database` now
-  * log files moved from `/tmp/pommes.log` to `$POMMES_HOME/.pommes/logs/pommes.log`
-* `pommes-add` now supports inline repositories: `inline:`*json*
+  * `$POMMES_PROPERTIES` replaced by `$POMMES_HOME` (default is `$HOME/.pommes`); the properties file is always located in `$POMMES_HOME/pommes.properties` now
+  * dumped `database` property, it's always located in `$POMMES_HOME/database` now
+  * renamed `mount.root` property to `checkouts`
+  * log files moved from `/tmp/pommes.log` to `$POMMES_HOME/logs/pommes.log`
+* `pommes-add now supports inline repositories: `inline:`*json*
 * fixed Git.server for `git://` urls
 * fixed some invalid url exceptions when extracting the git server name
 * dependency updates
