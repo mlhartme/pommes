@@ -16,17 +16,17 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Pom;
 import net.oneandone.pommes.database.PommesQuery;
-import net.oneandone.pommes.checkout.Root;
+import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
-import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
@@ -109,17 +109,23 @@ public class Status extends Base {
         }
     }
 
-    private String unknownProjectFix(Scm scm, FileNode checkout) throws Failure, URISyntaxException {
+    private String unknownProjectFix(Scm scm, FileNode checkout) throws IOException, URISyntaxException {
+        Project probed;
         String scmurl;
         FileNode descriptor;
         Pom pom;
         String result;
 
-        scmurl = scm.getUrl(checkout);
-        descriptor = checkout.join("external.json");
-        pom = new Pom("manual", descriptor.getUri().toString(), "localfile", null, scm.defaultGav(scmurl), scmurl,null);
-        result = pom.toJson().toString();
-        return "pommes database-add 'inline:" + result + "'";
+        probed = Project.probe(environment, checkout);
+        if (probed != null) {
+            return "pommes database-add " + checkout;
+        } else {
+            scmurl = scm.getUrl(checkout);
+            descriptor = checkout.join("external.json");
+            pom = new Pom("manual", descriptor.getUri().toString(), "0", null, scm.defaultGav(scmurl), scmurl, null);
+            result = pom.toJson().toString();
+            return "pommes database-add 'inline:" + result + "'";
+        }
     }
 
     private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories, Filter excludes) throws ListException, DirectoryNotFoundException {

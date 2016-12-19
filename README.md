@@ -2,18 +2,28 @@
 
 # Pommes
 
-Pommes is a project checkout manager and database tool. You can use it to keep all the checkouts on my disk organized. Everything is keep 
-under `~/Pommes` with a standardized layout. You can search for project metadata (esp. scm urls), easily checkout projects and navigate 
-between them.
+Pommes is a project checkout manager and database tool, you can use it to keep the checkouts on your disk organized. Here's an example:
+    
+    ~/Projects $ pommes goto lavender
+    [1]   Projects/svn.1and1.org/sales/tools/lavender
+    [2] A Projects/github.com/net/oneandone/lavender (git:ssh://git@github.com/mlhartme/lavender.git)
+    Please select: 2
+    [/Users/mhm/Projects/github.com/net/oneandone] git clone ssh://git@github.com/mlhartme/lavender.git lavender
+    ~/Projects/github.com/net/oneandone/lavender $ 
 
-Technically, Pommes is a command line tool that maintains a project database: 
+This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply cd you into an
+already existing checkout, choosing `2` also creates the checkout.
+
+Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
 * crawl directories, svn, github, bitbucket or artifactory and add matching projects to the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) scm operations, e.g. checkout all projects that match a query.
-* organize checkouts on your disk
   
-Pommes supports Maven projects with a pom.xml file and php projects with a composer.json file. Php support is very basic. 
+Pommes supports Maven projects with a pom.xml file, php projects with a composer.json file, and projects defined with by Pommes-Json. 
+Php support is very basic. 
+
 The name Pommes stands for "many poms".
+
 
 [Changes](https://github.com/mlhartme/pommes/blob/master/CHANGELOG.md)
 
@@ -37,14 +47,13 @@ and store it as executable `pommes` file in your path
  
 Current Limitations:
 * doesn't care about git branches
-* multi-module projects are not handles properly: only the top-level pom is added to the database.
+* crawling multi-module projects will only add the top-level pom to the database
 
 
 ## Database commands
 
 Pommes maintains a [Lucene](http://lucene.apache.org) database to store projects. You'll typically feed it with your corporate projects and 
-the open source stuff you regularly use. Once you have projects in the database, you can quickly search for projects or dependencies. And
-easily checkout what you need.
+the open source stuff you regularly use. 
 
 You have three commands to modify the database: `database-add` and `database-remove` to add/remove projects, and `database-reset` resets 
 the database to the initial empty state.
@@ -81,31 +90,32 @@ Bitbucket:
     
 adds all projects found in the respective bitbucket project.
 
-Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from repeated add commands. 
+Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from repeated invokations. 
 The id field is used to detect duplicates, the revision field to detect modifications.  
 
 ## Find Command
 
-Pommes stores 7 fields for every project added to the database:
+Pommes stores the following fields for every project added to the database:
 * `id` - zone and origin (i.e. url where the project descriptor (usually the pom) was loaded from)
 * `revision` - last modified timestamp or content hash (to detect changes when re-adding a project)
-* `parent` - parent pom coordinates
+* `parent` - parent pom coordinates; optional, may be missing
 * `artifact` - coordinates of this project
 * `scm` - where to find this probject in scm
-* `dep` - coordinates of dependencies
-* `url` - project url
+* `dep` - coordinates of dependencies; optional list
+* `url` - project url; optional, may be missing
 
-You search your database with the `find` command. First example: `pommes find foo` lists all projects that have a `foo` substring in their artifact or scm field. 
-The default is to print the artifact field of matching projects. You can append `-json` to see all fields in json format. 
+You search the database with the `find` command. First example: `pommes find foo` lists all projects that have a `foo` substring in their 
+artifact or scm field. The default is to print the artifact field of matching projects. You can append `-json` to get all fields in json 
+format instead. 
 
-Next, you can search for specific fields using one or multiple field identifiers - i.e. the first letter of the field name:
+Next, you can search for specific fields using one or multiple field identifiers. A field identidier is the first letter of the field name:
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
 * `pommes find dp:baz` lists projects with a `baz` substring in their dependency or parent
 
 (Technically, `pommes find foo` is a short-hand for `pommes find :foo`, and this in turn is a short-hand for `pommes find as:foo`)
 
 You can also prepend fields with `!` for negation. In this case, you should enclose the query argument in single quote, otherwise, the shell 
-will expand the `!`. Exmaple: `pommes find '!d:bar'` list all projects that have no dependency with a `bar` substring.
+will expand the `!`. Example: `pommes find '!d:bar'` list all projects that have no dependency with a `bar` substring.
 
 Next, you can combine queries with `+` to list projects matching both conditions. I.e. `+` means *and*.
 * `pommes find a:puc+d:httpcore` lists projects with a `puc` substring in its artifact and `httpcore` in its dependencies.
@@ -113,14 +123,15 @@ Next, you can combine queries with `+` to list projects matching both conditions
 Finally, you can combine queries with blanks to list projects matching one of the conditions. I.e. blank means *or*.
 * `pommes find d:puc d:pommes` lists projects depending on either `puc` or `pommes`.
 
-See the usage message below for the full formal query syntax
+See the usage message below for the full query syntax.
 
 TODO: Prefix, suffix, macros; formats
 
 ## Checkout commands
 
-You can use checkout commands (`checkout`, `remove`, `st` and `goto`) to manage checkouts your disk, e.g. run scm operations on projects that 
-match a query. Pommes supports Subversion and Git scms.
+Checkout commands (`checkout`, `remove`, `st` and `goto`) manage checkouts on your disk, e.g. run scm operations on projects that 
+match a query. Pommes supports Subversion and Git scms. The root directory for all checkouts is specified by the `checkouts` property
+in $POMMES_HOME/pommes.properties.
 
 
 ### Checkout
@@ -135,8 +146,8 @@ checkout command.
 
 ### Remove
 
-The `remove` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before 
-changing anything. Similar the `checkout` command, it asks before changing anything on your disk.
+The `remove` command is equivalent to removing checkouts with `rm -rf`, but it also checks for uncommitted changes. Similar to 
+the `checkout` command, it asks before changing anything on your disk.
 
 `remove` has a `-stale` option to remove only checkouts that have been removed from the database. For example, if you have 
 all trunks checked out, you can run `pommes remove -stale` to remove checkouts that are no longer used.
@@ -145,6 +156,11 @@ all trunks checked out, you can run `pommes remove -stale` to remove checkouts t
 ### Status
 
 `pommes st` lists all checkouts in the current directory, together with a status marker similar to `svn st`. 
+
+This command is useful to cleanup your checkouts. E.g. you can see where you have uncommitted files: run it on a subtree with 
+many checkouts before you run `rm -rf`
+
+If a checkout is not in your database, `st` flags it with `?` and prints the command you can run to get it into your database.
 
 
 ### Goto
