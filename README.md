@@ -144,7 +144,8 @@ all trunks checked out, you can run `pommes remove -stale` to remove checkouts t
 
 ### Status
 
-`pommes st` lists all checkouts in the current directory, together with a status marker similar to `svn st`
+`pommes st` lists all checkouts in the current directory, together with a status marker similar to `svn st`. 
+
 
 ### Goto
 

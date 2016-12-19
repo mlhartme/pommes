@@ -16,7 +16,6 @@
 package net.oneandone.pommes.project;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Pom;
 import net.oneandone.sushi.fs.Node;
@@ -32,7 +31,7 @@ public class JsonProject extends Project {
         JsonObject json;
 
         try {
-            json = new JsonParser().parse(node.readString()).getAsJsonObject();
+            json = environment.jsonParser().parse(node.readString()).getAsJsonObject();
             return new JsonProject(Pom.fromJson(json));
         } catch (IOException e) {
             throw new RuntimeException(node.getUri().toString() + ": cannot create json project", e);

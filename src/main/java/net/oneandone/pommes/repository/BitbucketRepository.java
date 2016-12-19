@@ -45,7 +45,7 @@ public class BitbucketRepository implements Repository {
         Bitbucket bb;
 
         world = World.create();
-        bb = new Bitbucket(((HttpNode) world.validNode("https://bitbucket.1and1.org")).getRoot());
+        bb = new Bitbucket(((HttpNode) world.validNode("https://bitbucket.1and1.org")).getRoot(), new JsonParser());
         System.out.println("rev: " + new String(bb.readBytes("CISOOPS", "puc", "pom.xml")));
     }
 
@@ -86,7 +86,7 @@ public class BitbucketRepository implements Repository {
         Node tmp;
         String hostname;
 
-        bb = new Bitbucket(bitbucket.getRoot());
+        bb = new Bitbucket(bitbucket.getRoot(), environment.jsonParser());
         bbProject = bitbucket.getName();
         for (String repo : bb.listRepos(bbProject)) {
             lst = bb.listRoot(bbProject, repo);
@@ -113,9 +113,9 @@ public class BitbucketRepository implements Repository {
         private final JsonParser parser;
 
 
-        public Bitbucket(HttpRoot root) {
+        public Bitbucket(HttpRoot root, JsonParser parser) {
             this.root = root;
-            this.parser = new JsonParser();
+            this.parser = parser;
         }
 
         // TODO: always fails with 404 error ...
