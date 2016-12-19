@@ -69,7 +69,7 @@ public class Subversion extends Scm {
             groupId = "";
             artifactId = path;
         } else {
-            groupId = path.substring(0, idx);
+            groupId = path.substring(0, idx).replace('/', '.');
             artifactId = path.substring(idx + 1);
         }
         return new Gav(groupId, artifactId, "1-SNAPSHOT");

@@ -65,18 +65,20 @@ public class JsonRepository implements Repository {
 
     @Override
     public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException {
+        String prefix;
         JsonArray array;
         Project project;
         Pom pom;
 
+        prefix = node.getUri().toASCIIString() + ":";
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
             array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
                 try {
                     pom = Pom.fromJson(entry.getAsJsonObject());
                     project = new JsonProject(pom);
-                    project.setOrigin(pom.getOrigin());
-                    project.setRevision(pom.revision);
+                    project.setOrigin(prefix + pom.getOrigin());
+                    project.setRevision(node.getWorld().memoryNode(pom.toJson().toString()).sha());
                 } catch (Exception e) {
                     project = new ErrorProject(new IOException("json error: " + e.getMessage(), e));
                     project.setOrigin(node.getUri().toString());
