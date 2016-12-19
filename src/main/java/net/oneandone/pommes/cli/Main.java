@@ -29,7 +29,7 @@ public class Main {
         Cli cli;
 
         world = World.create();
-        cli = Cli.create("Project database tool.\n"
+        cli = Cli.create("Project checkout manager and database tool.\n"
                 + "\n"
                 + "Usage:\n"
                 + "  'pommes' ['-v'|'-e'] command import-options args*\n"

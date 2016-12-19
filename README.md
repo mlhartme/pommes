@@ -2,7 +2,7 @@
 
 # Pommes
 
-Pommes is a checkout manager and a project database tool. You can use it to keep all the checkouts on my disk organized. Everything is keep 
+Pommes is a project checkout manager and database tool. You can use it to keep all the checkouts on my disk organized. Everything is keep 
 under `~/Pommes` with a standardized layout. You can search for project metadata (esp. scm urls), easily checkout projects and navigate 
 between them.
 
@@ -117,39 +117,41 @@ See the usage message below for the full formal query syntax
 
 TODO: Prefix, suffix, macros; formats
 
-## Mount commands
+## Checkout commands
 
-You can use mount commands (`mount`, `umount`, `st` and `goto`) to manage checkouts your disk, e.g. run scm operations on projects that 
+You can use checkout commands (`checkout`, `remove`, `st` and `goto`) to manage checkouts your disk, e.g. run scm operations on projects that 
 match a query. Pommes supports Subversion and Git scms.
 
 
-### Mount
+### Checkout
 
-`pommes mount s:/trunk` checks out all trunks.
+`pommes checkout s:/trunk` checks out all trunks.
 
-Before changing anything on your disk, `mount` presents a selection of the checkouts to perform, and you can pick one, multiple (separated with blanks) or all of them. Or you can quit without doing anything.
+Before changing anything on your disk, `checkout` presents a selection of the checkouts to perform, and you can pick one, multiple 
+(separated with blanks) or all of them. Or you can quit without doing anything.
 
-If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your mount command.
+If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your 
+checkout command.
 
-### Umount
+### Remove
 
-The `umount` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before changing anything. Similar the `mount` command, it asks before changing anything on your disk.
+The `remove` command is equivalent to removing checkouts from your disk with `rm -rf`, but it also checks for uncommitted changes before 
+changing anything. Similar the `checkout` command, it asks before changing anything on your disk.
 
-`umount` has a `-stale` option to remove only checkouts that have been removed from the database. For example, if you have 
-all trunks checked out, you can run `pommes umount -stale` to remove checkouts that are no longer used.
+`remove` has a `-stale` option to remove only checkouts that have been removed from the database. For example, if you have 
+all trunks checked out, you can run `pommes remove -stale` to remove checkouts that are no longer used.
 
 
-### Ls
+### Status
 
-`pommes ls` lists all checkouts in the current directory, together with a status marker.
+`pommes st` lists all checkouts in the current directory, together with a status marker similar to `svn st`
 
-### Pg
+### Goto
 
-`pg puc`
+`pommes goto puc`
 
-searches the database for `puc`, offers a selection of matching projects, checks it out and cds into the resulting directory.
+searches the database for `puc`, offers a selection of matching projects, checks it out if necessary and cds into the resulting directory.
 
-Technically, pg is a shell function that invokes `pommes goto` and, if successfull, sources ~/.pommes.goto
 
 ## Advanced 
 
@@ -161,20 +163,22 @@ instructs pommes auto automatically run
 
    database-add -zone foo baruri
    
-once a day (or if you invoke a command with `-import`). 
+during `setup`, `database-reset` or if you invoke pommes with `-import-now` or `-import-daily`. 
 
-This is most usefull with json repositories because they are very fast. To create a json file, run your database-add commands and run
+This is most usefull with json repositories. To create a json file, run your database-add commands and run
 
     pommes find -output foo.json "" -json
     
-You can also specify a webdav url to automatically upload the file. It will be compressed if the url ends with .gz.
+to create a json repository `foo.json`. You can also specify a webdav url to automatically upload the file. 
+It will be compressed if the url ends with .gz.
 
 You might want to setup a cron job to run this every night. Alternatively, you can setup post-commit hooks to 
 trigger `database-add` and `database-remove` calls after each committed pom.xml modification.
 
+
 ## Usage Message
 
-    Project database tool.
+    Project checkout manager and database tool.
     
     Usage:
       'pommes' ['-v'|'-e'] command import-options args*
@@ -189,26 +193,25 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
                             the enclosed substring or variables;
                             output is a file or URL to write results to, default is the console.
     
-    mount commands
-      'mount' query         checkout matching projects; skips existing checkouts;
+    checkout commands
+      'st' root?            print all checkouts under the specified directory with status markers:
+                            ? - directory is not an unknown project
+                            M - checkout has untracked files, modifications or is not pushed
+                            C - checkout url does not match the directory pommes would place it in
+      'goto' query          offer selection of matching projects, check it out when necessary,
+                            and cds into the checkout directory
+      'checkout' query      checkout matching projects; skips existing checkouts;
                             offers selection before changing anything on disk;
-      'umount' '-stale'? root?
+      'remove' '-stale'? root?
                             remove (optional: stale) checkouts under the specified root directory;
                             a checkout is stale if the project has been removed from the database;
                             offers selection before changing anything on disk;
                             checkouts with uncommitted changes are marked in the list
-      'ls' root?            print all checkouts under the specified directory with status markers:
-                            M - checkout has modifications or is not pushed
-                            C - checkout url does not match the directory pommes would place it in
-                            X - checkout is unknown to pommes
-                            ? - directory is not a checkout
-      'goto' query          offer selection of matching projects, check it out when necessary,
-                            and cds into the checkout directory
     
-    commands that modify the database
+    database commands
       'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*
                             add projects found under the specified urls to the database;
-                            zone is a prefix added to the id (defaults islocal);
+                            zone is a prefix added to the id (defaults is local);
                             overwrites projects with same id;
                             url is a svn url, http url, artifactory url, github url or json url,
                             an option (prefixed with '%') or an exclude (prefixed with '-')  'database-remove' query
@@ -225,9 +228,9 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
       url         Url for this project.
     
     import options          how to handle configured imports
-      default behavior      import once a day
-      '-import'             force import
-      '-no-import'          skip import
+      default behaviour     no imports
+      '-import-now'         unconditional import
+      '-import-daily'       import if last import is older than one day
     
     query syntax
       query     = '@' MACRO | or
@@ -244,6 +247,7 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
       {scm}     = scm location for current directory
     
     environment:
-      POMMES_PROPERTIES     where to find the properties file
+      POMMES_HOME     home directory for pommes
     
     Home: https://github.com/mlhartme/pommes
+    

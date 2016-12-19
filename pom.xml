@@ -10,7 +10,7 @@
   </parent>
 
   <name>Pommes</name>
-  <description>Project database tool.</description>
+  <description>Project checkout manager and database tool.</description>
 
   <groupId>net.oneandone</groupId>
   <artifactId>pommes</artifactId>
