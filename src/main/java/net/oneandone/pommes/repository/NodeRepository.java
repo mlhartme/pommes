@@ -34,15 +34,23 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class NodeRepository implements Repository {
-    public static Project probe(Environment environment, FileNode checkout) {
+    public static Project probe(Environment environment, FileNode checkout) throws IOException {
         NodeRepository repo;
         BlockingQueue<Project> dest;
 
         repo = new NodeRepository(environment, checkout, environment.console().info);
-        dest = new ArrayBlockingQueue<Project>();
-        repo.scan(dest);
-
+        dest = new ArrayBlockingQueue<>(2);
+        try {
+            repo.scan(checkout, false, dest);
+            if (dest.size() != 1) {
+                return null;
+            }
+            return dest.take();
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
     }
+
     private static final String FILE = "file:";
     private static final String SVN = "svn:";
 
