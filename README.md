@@ -8,10 +8,10 @@ Pommes is a project checkout manager and database tool, you can use it to keep t
     [1]   Projects/svn.1and1.org/sales/tools/lavender
     [2] A Projects/github.com/net/oneandone/lavender (git:ssh://git@github.com/mlhartme/lavender.git)
     Please select: 2
-    [/Users/mhm/Projects/github.com/net/oneandone] git clone ssh://git@github.com/mlhartme/lavender.git lavender
+    [/Projects/github.com/net/oneandone] git clone ssh://git@github.com/mlhartme/lavender.git lavender
     ~/Projects/github.com/net/oneandone/lavender $ 
 
-This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply cd you into an
+This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply into the
 already existing checkout, choosing `2` also creates the checkout.
 
 Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
@@ -42,7 +42,6 @@ and store it as executable `pommes` file in your path
         curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.1.0/pommes-3.1.0-application.sh -o pommes
         chmod a+x pommes
     
-* test it by running `pommes`, you should get a usage message
 * run `pommes setup` and follow the instructions
  
 Current Limitations:
