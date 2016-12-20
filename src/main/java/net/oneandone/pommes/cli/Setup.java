@@ -44,10 +44,10 @@ public class Setup {
             console.readline("Press return to continue, ctl-c to abort: ");
         }
         Home.create(world, console, true);
-        environment = new Environment(console, world, true, false);
+        environment = new Environment(console, world);
         console.info.println("initial import ...");
         try (Database database = environment.home.loadDatabase()) {
-            environment.imports(database);
+            environment.doImports(database);
         }
         console.info.println("done");
         console.info.println("Have a look at " + directory.join("pommes.properties") + " and adjust Pommes to your needs");

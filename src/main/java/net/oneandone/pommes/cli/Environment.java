@@ -45,6 +45,10 @@ public class Environment implements Variables {
     private Pom lazyCurrentPom;
     private Filter lazyExcludes;
 
+    public Environment(Console console, World world) throws IOException {
+        this(console, world, false, false);
+    }
+
     public Environment(Console console, World world, boolean importNow, boolean importDaily) throws IOException {
         if (importNow && importDaily) {
             throw new ArgumentException("conflicting imports options");
@@ -156,16 +160,22 @@ public class Environment implements Variables {
 
         marker = database.importMarker();
         if (importNow || (importDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
-            DatabaseAdd cmd;
-
-            for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
-                console.verbose.println("importing " + entry.getKey());
-                cmd = new DatabaseAdd(this, true, false, entry.getKey());
-                cmd.add(entry.getValue());
-                cmd.run(database);
-            }
-            marker.writeBytes();
+            doImports(database);
         }
+    }
+
+    public void doImports(Database database) throws Exception {
+        DatabaseAdd cmd;
+        FileNode marker;
+
+        marker = database.importMarker();
+        for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
+            console.verbose.println("importing " + entry.getKey());
+            cmd = new DatabaseAdd(this, true, false, entry.getKey());
+            cmd.add(entry.getValue());
+            cmd.run(database);
+        }
+        marker.writeBytes();
     }
 
     public JsonParser jsonParser() {
