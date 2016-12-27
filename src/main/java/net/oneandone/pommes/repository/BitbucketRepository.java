@@ -172,7 +172,7 @@ public class BitbucketRepository implements Repository {
                 all = getPaged("rest/api/1.0/projects/" + project + "/repos/" + repo + "/files/");
             } catch (NewInputStreamException e) {
                 if (e.getCause() instanceof StatusException) {
-                    if (((StatusException) e.getCause()).getStatusLine().statusCode == 401) {
+                    if (((StatusException) e.getCause()).getStatusLine().code == 401) {
                         // happens if the repository is still empty
                         return result;
                     }
