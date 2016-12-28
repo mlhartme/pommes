@@ -1,6 +1,6 @@
 ## Pommes Changelog
 
-### 3.1.0 (pending)
+### 3.1.0 (2016-12-28)
 
 * renamed `mount` to `checkout` and `umount` to `remove`
 * `ls` improvements
