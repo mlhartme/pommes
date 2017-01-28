@@ -1,5 +1,10 @@
 ## Pommes Changelog
 
+### 3.1.1 (pending)
+
+* update lucense 6.3.0 to 6.4.0 to get Java 9 fixes
+
+
 ### 3.1.0 (2016-12-28)
 
 * renamed `mount` to `checkout` and `umount` to `remove`
