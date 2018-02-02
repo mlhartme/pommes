@@ -57,7 +57,7 @@ public class Remove extends Base {
             checkout = entry.getKey();
             scm = entry.getValue();
             if (stale) {
-                if (scm.isAlive(directory)) {
+                if (scm.isAlive(checkout)) {
                     continue;
                 }
             }

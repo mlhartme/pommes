@@ -3,6 +3,7 @@
 ### 3.1.1 (pending)
 
 * fixed log output fixed into `pommes st` output
+* fixed `remove -stale` option (the wrong directory was checked)
 * dependency updates
   * lucene 6.3.0 to 7.2.1
   * svnkit 1.8.12 to 1.9.0
