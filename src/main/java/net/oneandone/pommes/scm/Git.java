@@ -84,7 +84,7 @@ public class Git extends Scm {
     }
 
     @Override
-    public Gav defaultGav(String url) throws Failure {
+    public Gav defaultGav(String url) {
         String artifactId;
         String groupId;
         int idx;
@@ -107,7 +107,7 @@ public class Git extends Scm {
     }
 
     @Override
-    public Launcher checkout(FileNode directory, String fullurl) throws Failure {
+    public Launcher checkout(FileNode directory, String fullurl) {
         String url;
 
         url = Strings.removeLeft(fullurl, PROTOCOL);
@@ -115,7 +115,7 @@ public class Git extends Scm {
     }
 
     @Override
-    public boolean isAlive(FileNode checkout) throws IOException {
+    public boolean isAlive(FileNode checkout) {
         try {
             git(checkout, "fetch", "--dry-run").exec();
             return true;
@@ -126,7 +126,7 @@ public class Git extends Scm {
     }
 
     @Override
-    public boolean isCommitted(FileNode checkout) throws IOException {
+    public boolean isCommitted(FileNode checkout) {
         try {
             git(checkout, "diff", "--quiet").execNoOutput();
         } catch (Failure e) {

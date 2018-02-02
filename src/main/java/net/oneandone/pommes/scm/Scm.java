@@ -71,7 +71,7 @@ public abstract class Scm {
         return null;
     }
 
-    public static Scm probeUrl(String url) throws IOException {
+    public static Scm probeUrl(String url) {
         for (Scm scm : SCMS) {
             if (scm.isUrl(url)) {
                 return scm;
