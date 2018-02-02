@@ -3,8 +3,8 @@
 ### 3.1.1 (pending)
 
 * dependency updates
+  * lucene 6.3.0 to 7.2.1
   * svnkit 1.8.12 to 1.9.0
-  * lucene 6.3.0 to 6.6.2 to get Java 9 fixes
   * sushi 3.1.3 to 3.1.6
   * setenv 1.0.0 to 1.0.2
   * inline 1.1.0 to 1.1.1

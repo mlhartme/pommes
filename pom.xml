@@ -21,7 +21,7 @@
   <url>https://github.com/mlhartme/pommes</url>
 
   <properties>
-    <lucene.version>6.6.2</lucene.version>
+    <lucene.version>7.2.1</lucene.version>
   </properties>
 
   <scm>
