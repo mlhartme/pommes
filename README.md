@@ -99,15 +99,16 @@ Pommes stores the following fields for every project added to the database:
 * `revision` - last modified timestamp or content hash (to detect changes when re-adding a project)
 * `parent` - parent pom coordinates; optional, may be missing
 * `artifact` - coordinates of this project
-* `scm` - where to find this project in scm
+* `scm` - where to find this project in a source code mangement system
 * `dep` - coordinates of dependencies; optional list
 * `url` - project url; optional, may be missing
 
-You search the database with the `find` command. First example: `pommes find foo` lists all projects that have a `foo` substring in their 
-artifact or scm field. The default is to print the artifact field of matching projects. You can append `-json` to get all fields in json 
-format instead. 
+You search the database with the `find` command: `pommes find foo` lists all projects that have a `foo` substring in their 
+artifact or scm field. The default is to print the artifact field of matching projects. You can append `-json` to get all fields 
+in json format instead. 
 
-Next, you can search for specific fields using one or multiple field identifiers. A field identidier is the first letter of the field name:
+Next, you can search for specific fields using one or multiple field identifiers. A field identifier is the first letter of the 
+field name:
 * `pommes find d:bar` lists projects with a `bar` substring in their dependencies
 * `pommes find dp:baz` lists projects with a `baz` substring in their dependency or parent
 
@@ -125,6 +126,7 @@ Finally, you can combine queries with blanks to list projects matching one of th
 See the usage message below for the full query syntax.
 
 TODO: Prefix, suffix, macros; formats
+
 
 ## Checkout commands
 

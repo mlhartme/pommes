@@ -38,7 +38,7 @@ public class NodeRepository implements Repository {
         NodeRepository repo;
         BlockingQueue<Project> dest;
 
-        repo = new NodeRepository(environment, checkout, environment.console().info);
+        repo = new NodeRepository(environment, checkout, environment.console().verbose);
         dest = new ArrayBlockingQueue<>(2);
         try {
             repo.scan(checkout, false, dest);
@@ -123,7 +123,7 @@ public class NodeRepository implements Repository {
         if (children == null) {
             return;
         }
-        log.println(root.getPath());
+        log.println("scan " + root.getPath());
         for (Node node : children) {
             project = Project.probeChecked(environment, node);
             if (project != null) {
