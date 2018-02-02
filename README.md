@@ -11,7 +11,7 @@ Pommes is a project checkout manager and database tool, you can use it to keep t
     [/Projects/github.com/net/oneandone] git clone ssh://git@github.com/mlhartme/lavender.git lavender
     ~/Projects/github.com/net/oneandone/lavender $ 
 
-This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply into the
+This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply cd into the
 already existing checkout, choosing `2` also creates the checkout.
 
 Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
@@ -99,7 +99,7 @@ Pommes stores the following fields for every project added to the database:
 * `revision` - last modified timestamp or content hash (to detect changes when re-adding a project)
 * `parent` - parent pom coordinates; optional, may be missing
 * `artifact` - coordinates of this project
-* `scm` - where to find this probject in scm
+* `scm` - where to find this project in scm
 * `dep` - coordinates of dependencies; optional list
 * `url` - project url; optional, may be missing
 
