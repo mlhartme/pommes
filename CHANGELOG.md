@@ -2,9 +2,14 @@
 
 ### 3.1.1 (pending)
 
-* update lucense 6.3.0 to 6.4.0 to get Java 9 fixes
-
-
+* dependency updates
+  * svnkit 1.8.12 to 1.9.0
+  * lucene 6.3.0 to 6.6.2 to get Java 9 fixes
+  * sushi 3.1.3 to 3.1.6
+  * setenv 1.0.0 to 1.0.2
+  * inline 1.1.0 to 1.1.1
+ 
+ 
 ### 3.1.0 (2016-12-28)
 
 * renamed `mount` to `checkout` and `umount` to `remove`
