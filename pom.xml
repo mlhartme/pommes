@@ -135,6 +135,12 @@
           <!-- for upload -->
           <symlink>${env.CISOTOOLS_HOME}/bin/pommes</symlink>
           <target>${env.CISOTOOLS_HOME}/pommes</target>
+
+          <extensions>
+            <extension>if [ "$JAVA_MODULES" != "false" ] ; then</extension>
+            <extension>  OPTIONS="--illegal-access=deny $OPTIONS"</extension>
+            <extension>fi</extension>
+          </extensions>
         </configuration>
         <executions>
           <execution>

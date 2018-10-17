@@ -1,5 +1,10 @@
 ## Pommes Changelog
 
+### 3.1.2 (pending)
+
+* run with `--illegal-access=deny` unless $JAVA_MODULES is set to `false`
+
+
 ### 3.1.1 (2018-02-13)
 
 * fixed log output going into `pommes st` output
