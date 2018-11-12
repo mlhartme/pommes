@@ -156,7 +156,7 @@ public class Status extends Base {
 
     private static boolean hasAnchestor(Collection<FileNode> directories, FileNode node) {
         for (FileNode directory : directories) {
-            if (directory.hasAnchestor(node)) {
+            if (directory.hasAncestor(node)) {
                 return true;
             }
         }
@@ -166,7 +166,7 @@ public class Status extends Base {
     private static void candicates(FileNode root, FileNode directory, List<FileNode> result) {
         FileNode parent;
 
-        if (directory.hasDifferentAnchestor(root)) {
+        if (directory.hasDifferentAncestor(root)) {
             parent = directory.getParent();
             if (!result.contains(parent)) {
                 result.add(parent);

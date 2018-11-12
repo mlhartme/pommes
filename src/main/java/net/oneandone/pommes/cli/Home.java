@@ -37,7 +37,7 @@ public class Home {
             console.info.println("creating pommes home: " + home);
             home.mkdir();
             home.join("logs").mkdir();
-            dflt = world.locateClasspathItem(Home.class).getParent().join("pommes.properties.default");
+            dflt = world.locateClasspathEntry(Home.class).getParent().join("pommes.properties.default");
             dest = home.join("pommes.properties");
             if (dflt.exists()) {
                 dflt.copy(dest);
