@@ -3,7 +3,9 @@
 ### 3.1.2 (pending)
 
 * run with `--illegal-access=deny` unless $JAVA_MODULES is set to `false`
-* update sushi 3.1.6 to 3.2.0
+* dependency updates
+  * sushi 3.1.6 to 3.2.0
+  * parent 1.0.2 to 1.0.3
 
 
 ### 3.1.1 (2018-02-13)
