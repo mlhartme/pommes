@@ -48,12 +48,6 @@
 
   <dependencyManagement>
     <dependencies>
-    <!-- TODO -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>3.0.24</version>
-    </dependency>
 
       <!-- maven plugin dependencies -->
     <dependency>
