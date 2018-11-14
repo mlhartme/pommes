@@ -1,6 +1,6 @@
 ## Pommes Changelog
 
-### 3.1.2 (pending)
+### 3.1.2 (2018-11-14)
 
 * run with `--illegal-access=deny` unless $JAVA_MODULES is set to `false`
 * dependency updates
