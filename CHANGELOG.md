@@ -1,5 +1,10 @@
 ## Pommes Changelog
 
+### 3.1.3 (pending)
+
+* fixed java version detection if JAVA_TOOL_OPTIONS are set
+
+
 ### 3.1.2 (2018-11-14)
 
 * run with `--illegal-access=deny` unless $JAVA_MODULES is set to `false`
