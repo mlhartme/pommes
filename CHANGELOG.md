@@ -2,6 +2,7 @@
 
 ### 3.2.0 (pending)
 
+* adjust for Java 16: removed --illegal-access=deny from launcher
 * updated lazy-foss-parent 1.0.2 to 1.5.0. CAUTION: this compiles pommes for Java 15
 * updated junit 4 to 5.7.1
 * fixed java version detection if JAVA_TOOL_OPTIONS are set
