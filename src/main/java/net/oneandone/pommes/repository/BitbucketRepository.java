@@ -113,7 +113,7 @@ public class BitbucketRepository implements Repository {
         private final JsonParser parser;
 
 
-        public Bitbucket(HttpRoot root, JsonParser parser) {
+        Bitbucket(HttpRoot root, JsonParser parser) {
             this.root = root;
             this.parser = parser;
         }

@@ -122,7 +122,7 @@ public class Subversion extends Scm {
         return true;
     }
 
-    private static Launcher svn(FileNode dir, String ... args) {
+    private static Launcher svn(FileNode dir, String... args) {
         Launcher launcher;
 
         launcher = new Launcher(dir);

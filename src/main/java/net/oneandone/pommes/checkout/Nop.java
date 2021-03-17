@@ -36,4 +36,8 @@ public class Nop extends Action {
         }
         return false;
     }
+
+    public int hashCode() {
+        return directory.hashCode();
+    }
 }

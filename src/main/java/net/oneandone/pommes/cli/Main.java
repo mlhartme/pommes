@@ -88,7 +88,8 @@ public class Main {
                 + "  term      = field | lucene\n"
                 + "  field     = '!'? (FIELD_ID* match)? STR ; match on one of the specified fields (or 'ao' if not specified)\n"
                 + "  match     = ':' | '^' | '%' | '='     ; substring, prefix, suffix or string match\n"
-                + "  lucene    = '§' STR                   ; STR in Lucene query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html\n"
+                + "  lucene    = '§' STR                   ; STR in Lucene query Syntax: "
+                  + "https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html\n"
                 + "and STR may contain the following variables:\n"
                 + "  {gav}     = coordinates for current project\n"
                 + "  {ga}      = group and artifact of current project\n"
@@ -127,4 +128,6 @@ public class Main {
         return result.toString();
     }
 
+    private Main() {
+    }
 }

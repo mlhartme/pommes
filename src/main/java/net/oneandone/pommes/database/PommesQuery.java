@@ -73,7 +73,7 @@ public class PommesQuery {
                 // fall-through - not and index
             }
         }
-        orBuilder= new BooleanQuery.Builder();
+        orBuilder = new BooleanQuery.Builder();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
             and = variables(and, variables);
             andBuilder = new BooleanQuery.Builder();
@@ -108,8 +108,8 @@ public class PommesQuery {
         return new PommesQuery(queryIndex, orBuilder.build());
     }
 
-    private static final String prefix = "{";
-    private static final String suffix = "}";
+    private static final String PREFIX = "{";
+    private static final String SUFFIX = "}";
 
     private static String variables(String string, Variables variables) throws IOException {
         StringBuilder builder;
@@ -122,7 +122,7 @@ public class PommesQuery {
         builder = new StringBuilder();
         last = 0;
         while (true) {
-            start = string.indexOf(prefix, last);
+            start = string.indexOf(PREFIX, last);
             if (start == -1) {
                 if (last == 0) {
                     return string;
@@ -131,18 +131,18 @@ public class PommesQuery {
                     return builder.toString();
                 }
             }
-            end = string.indexOf(suffix, start + prefix.length());
+            end = string.indexOf(SUFFIX, start + PREFIX.length());
             if (end == -1) {
                 throw new IllegalArgumentException("missing end marker");
             }
-            var = string.substring(start + prefix.length(), end);
+            var = string.substring(start + PREFIX.length(), end);
             replaced = variables.lookup(var);
             if (replaced == null) {
                 throw new IOException("undefined variable: " + var);
             }
             builder.append(string.substring(last, start));
             builder.append(replaced);
-            last = end + suffix.length();
+            last = end + SUFFIX.length();
         }
     }
 

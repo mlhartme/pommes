@@ -19,5 +19,5 @@ import java.io.IOException;
 
 public interface Variables {
     /** @return null when not found */
-    public String lookup(String var) throws IOException;
+    String lookup(String var) throws IOException;
 }

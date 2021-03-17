@@ -199,6 +199,7 @@ public class Find extends Base {
                 if (first) {
                     first = false;
                 } else {
+                    // nop
                 }
                 Streams.write(pom.toJson(), jsonWriter);
             }

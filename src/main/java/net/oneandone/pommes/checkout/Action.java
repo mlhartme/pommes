@@ -38,6 +38,10 @@ public abstract class Action implements Comparable<Action> {
         return false;
     }
 
+    public int hashCode() {
+        return directory.hashCode();
+    }
+
     @Override
     public int compareTo(Action action) {
         return directory.getPath().compareTo(action.directory.getPath());

@@ -91,4 +91,8 @@ public class Checkout extends Action {
         }
         return false;
     }
+
+    public int hashCode() {
+        return url.hashCode();
+    }
 }

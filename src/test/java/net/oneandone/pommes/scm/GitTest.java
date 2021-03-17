@@ -17,11 +17,11 @@ package net.oneandone.pommes.scm;
 
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.launcher.Failure;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitTest {
     @Test

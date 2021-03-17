@@ -88,7 +88,7 @@ public abstract class Project {
         return doLoad(environment, zone, origin, revision, scm);
     }
 
-    protected abstract Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException;
+    protected abstract Pom doLoad(Environment environment, String zone, String withOrigin, String withRevision, String withScm) throws IOException;
 
     public String toString() {
         return origin;

@@ -22,7 +22,6 @@ import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Strings;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -99,7 +98,7 @@ public class Git extends Scm {
         if (idx != -1) {
             artifactId = artifactId.substring(0, idx);
         }
-        idx = Math.max(groupId.lastIndexOf(':'), idx = groupId.lastIndexOf('/'));
+        idx = Math.max(groupId.lastIndexOf(':'), groupId.lastIndexOf('/'));
         if (idx != -1) {
             groupId = groupId.substring(idx + 1);
         }
@@ -147,7 +146,7 @@ public class Git extends Scm {
         return true;
     }
 
-    private static Launcher git(FileNode dir, String ... args) {
+    private static Launcher git(FileNode dir, String... args) {
         Launcher launcher;
 
         launcher = new Launcher(dir);

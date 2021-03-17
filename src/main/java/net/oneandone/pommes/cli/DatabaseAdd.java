@@ -151,7 +151,9 @@ public class DatabaseAdd extends Base {
                 exception = e;
                 try {
                     // consume remaining to avoid blocking scans
-                    while (iter() != null);
+                    while (iter() != null) {
+                        // nop
+                    }
                 } catch (Exception e2) {
                     e.addSuppressed(e2);
                 }

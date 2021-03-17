@@ -84,16 +84,18 @@ public abstract class Base {
                 if (problems > 0) {
                     throw new IOException(problems + " actions failed");
                 }
-            } else for (String one : Separator.SPACE.split(selection)) {
-                try {
-                    no = Integer.parseInt(one);
-                    if (no > 0 && no <= actions.size()) {
-                        actions.remove(no - 1).run(console);
-                    } else {
+            } else {
+                for (String one : Separator.SPACE.split(selection)) {
+                    try {
+                        no = Integer.parseInt(one);
+                        if (no > 0 && no <= actions.size()) {
+                            actions.remove(no - 1).run(console);
+                        } else {
+                            console.info.println("action not found: " + one);
+                        }
+                    } catch (NumberFormatException e) {
                         console.info.println("action not found: " + one);
                     }
-                } catch (NumberFormatException e) {
-                    console.info.println("action not found: " + one);
                 }
             }
         } while (!actions.isEmpty());

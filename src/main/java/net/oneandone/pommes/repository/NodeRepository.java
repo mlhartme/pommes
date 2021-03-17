@@ -124,12 +124,12 @@ public class NodeRepository implements Repository {
             return;
         }
         log.println("scan " + root.getPath());
-        for (Node node : children) {
-            project = Project.probeChecked(environment, node);
+        for (Node child : children) {
+            project = Project.probeChecked(environment, child);
             if (project != null) {
-                project.setOrigin(node.getUri().toString());
-                project.setRevision(Long.toString(node.getLastModified()));
-                project.setScm(nodeScm(node));
+                project.setOrigin(child.getUri().toString());
+                project.setRevision(Long.toString(child.getLastModified()));
+                project.setScm(nodeScm(child));
                 dest.put(project);
                 return;
             }
@@ -168,8 +168,8 @@ public class NodeRepository implements Repository {
 
         if (recurse) {
             // recurse
-            for (Node node : children) {
-                scan(node, true, dest);
+            for (Node child : children) {
+                scan(child, true, dest);
             }
         }
     }
