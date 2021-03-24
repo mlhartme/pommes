@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/mlhartme/pommes.png)](https://travis-ci.org/mlhartme/pommes)  [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.oneandone/pommes/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.oneandone/pommes)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.oneandone/pommes/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.oneandone/pommes)
 
 # Pommes
 
