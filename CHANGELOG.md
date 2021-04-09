@@ -1,6 +1,6 @@
 ## Pommes Changelog
 
-### 3.2.0 (pending)
+### 3.2.0 (2021-04-09)
 
 * adjust for Java 16: removed --illegal-access=deny from launcher
 * updated lazy-foss-parent 1.0.2 to 1.5.0. CAUTION: this compiles pommes for Java 15
