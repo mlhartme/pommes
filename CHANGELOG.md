@@ -1,5 +1,10 @@
 ## Pommes Changelog
 
+### 3.2.1 (pending)
+
+* update lazy-foss-parent 1.5.0 to 1.5.1
+
+
 ### 3.2.0 (2021-04-09)
 
 * adjust for Java 16: removed --illegal-access=deny from launcher
