@@ -88,7 +88,7 @@ public abstract class Scm {
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isCommitted(FileNode checkout) throws IOException;
-    public abstract String getUrl(FileNode checkout) throws Failure;
+    public abstract String getUrl(FileNode checkout) throws IOException;
 
     public abstract Gav defaultGav(String url) throws Failure, URISyntaxException;
 

@@ -2,6 +2,7 @@
 
 ### 3.2.1 (pending)
 
+* improved error message for git.getUrl
 * update lazy-foss-parent 1.5.0 to 1.5.1
 
 

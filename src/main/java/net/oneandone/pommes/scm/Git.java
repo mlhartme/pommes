@@ -22,6 +22,7 @@ import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Strings;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -78,8 +79,15 @@ public class Git extends Scm {
     }
 
     @Override
-    public String getUrl(FileNode checkout) throws Failure {
-        return PROTOCOL + git(checkout, "config", "--get", "remote.origin.url").exec().trim();
+    public String getUrl(FileNode checkout) throws IOException {
+        Launcher launcher;
+
+        launcher = git(checkout, "config", "--get", "remote.origin.url");
+        try {
+            return PROTOCOL + launcher.exec().trim();
+        } catch (Failure e) {
+            throw new IOException(launcher + " failed: " + e.getMessage(), e);
+        }
     }
 
     @Override
