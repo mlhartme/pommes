@@ -100,7 +100,6 @@ public class Git extends Scm {
             if (idx < 0) {
                 throw new IllegalStateException(url);
             }
-            System.out.println("url " + "ssh://" + url.substring(0, idx) + "/" + url.substring(idx + 1));
             return "ssh://" + url.substring(0, idx) + "/" + url.substring(idx + 1);
         } else {
             return url;
