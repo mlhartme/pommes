@@ -84,12 +84,28 @@ public class Git extends Scm {
 
         launcher = git(checkout, "config", "--get", "remote.origin.url");
         try {
-            return PROTOCOL + launcher.exec().trim();
+            return PROTOCOL + withProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
         }
     }
 
+    private static String withProtocol(String url) {
+        int idx;
+
+        idx = url.indexOf("://");
+        if (idx < 0) {
+            // turn into explicit ssh protocol -- see https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols
+            idx = url.indexOf(':');
+            if (idx < 0) {
+                throw new IllegalStateException(url);
+            }
+            System.out.println("url " + "ssh://" + url.substring(0, idx) + "/" + url.substring(idx + 1));
+            return "ssh://" + url.substring(0, idx) + "/" + url.substring(idx + 1);
+        } else {
+            return url;
+        }
+    }
     @Override
     public Gav defaultGav(String url) {
         String artifactId;

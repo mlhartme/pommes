@@ -2,6 +2,7 @@
 
 ### 3.2.1 (pending)
 
+* support shorter scp-like git ssh urls (used by gitea)
 * improved error message for git.getUrl
 * update lazy-foss-parent 1.5.0 to 1.5.1
 
