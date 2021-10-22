@@ -16,7 +16,6 @@
 package net.oneandone.pommes.scm;
 
 import net.oneandone.pommes.database.Gav;
-import net.oneandone.sushi.launcher.Failure;
 import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
@@ -25,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SubversionTest {
     @Test
-    public void serverPath() throws URISyntaxException {
+    public void path() throws URISyntaxException {
         Subversion svn;
 
         svn = new Subversion();
-        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.serverPath("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk"));
-        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.serverPath("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk/"));
-        assertEquals("svn.1and1.org/controlpanel/tools/maven", svn.serverPath("svn:https://svn.1and1.org/controlpanel/tools/maven/branches/demo"));
+        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.path("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk"));
+        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.path("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk/"));
+        assertEquals("svn.1and1.org/controlpanel/tools/maven", svn.path("svn:https://svn.1and1.org/controlpanel/tools/maven/branches/demo"));
     }
 
     @Test

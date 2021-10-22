@@ -16,7 +16,6 @@
 package net.oneandone.pommes.scm;
 
 import net.oneandone.pommes.database.Gav;
-import net.oneandone.sushi.launcher.Failure;
 import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
@@ -25,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitTest {
     @Test
-    public void serverPath() throws URISyntaxException {
+    public void path() throws URISyntaxException {
         Git git;
 
         git = new Git();
-        assertEquals("github.com/pustefix-projects/pustefix-framework", git.serverPath("git:https://github.com/pustefix-projects/pustefix-framework.git"));
-        assertEquals("github.com/mlhartme/maven-active-markdown-plugin", git.serverPath("git:ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git"));
-        assertEquals("github.com/tcurdt/jdeb", git.serverPath("git:git://github.com:tcurdt/jdeb.git"));
-        assertEquals("github.com/jkschoen/jsma", git.serverPath("git:git@github.com:jkschoen/jsma.git"));
+        assertEquals("github.com/pustefix-projects/pustefix-framework", git.path("git:https://github.com/pustefix-projects/pustefix-framework.git"));
+        assertEquals("github.com/mlhartme/maven-active-markdown-plugin", git.path("git:ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git"));
+        assertEquals("github.com/tcurdt/jdeb", git.path("git:git://github.com:tcurdt/jdeb.git"));
+        assertEquals("github.com/jkschoen/jsma", git.path("git:git@github.com:jkschoen/jsma.git"));
     }
 
     @Test

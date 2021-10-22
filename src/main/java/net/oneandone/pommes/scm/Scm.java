@@ -84,7 +84,7 @@ public abstract class Scm {
     //--
 
     public abstract boolean isUrl(String url);
-    public abstract String serverPath(String url) throws URISyntaxException;
+    public abstract String path(String url) throws URISyntaxException;
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isCommitted(FileNode checkout) throws IOException;

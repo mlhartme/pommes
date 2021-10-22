@@ -40,7 +40,7 @@ public class Git extends Scm {
         return url.startsWith(PROTOCOL);
     }
 
-    public String serverPath(String url) throws URISyntaxException {
+    public String path(String url) throws URISyntaxException {
         String result;
         int idx;
         URI obj;

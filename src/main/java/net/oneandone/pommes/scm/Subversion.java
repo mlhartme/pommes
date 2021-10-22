@@ -42,7 +42,7 @@ public class Subversion extends Scm {
         return url.startsWith(PROTOCOL);
     }
 
-    public String serverPath(String url) throws URISyntaxException {
+    public String path(String url) throws URISyntaxException {
         final String trunk = "/trunk";
         final String branches = "/branches/";
         URI obj;
