@@ -17,7 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.checkout.Checkout;
@@ -47,7 +47,7 @@ public class Goto extends Base {
         Action action;
 
         actions = new ArrayList<>();
-        for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
+        for (Project pom : Field.projects(database.query(PommesQuery.create(query, environment)))) {
             try {
                 directory = environment.home.root().directory(pom);
                 action = Checkout.createOpt(directory, pom);

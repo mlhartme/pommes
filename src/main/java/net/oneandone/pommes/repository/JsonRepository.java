@@ -20,7 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Find;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.ErrorDescriptor;
 import net.oneandone.pommes.descriptor.JsonDescriptor;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -68,14 +68,14 @@ public class JsonRepository implements Repository {
         String prefix;
         JsonArray array;
         Descriptor descriptor;
-        Pom pom;
+        Project pom;
 
         prefix = node.getUri().toASCIIString() + ":";
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
             array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
                 try {
-                    pom = Pom.fromJson(entry.getAsJsonObject());
+                    pom = Project.fromJson(entry.getAsJsonObject());
                     descriptor = new JsonDescriptor(pom);
                     descriptor.setOrigin(prefix + pom.getOrigin());
                     descriptor.setRevision(node.getWorld().memoryNode(pom.toJson().toString()).sha());

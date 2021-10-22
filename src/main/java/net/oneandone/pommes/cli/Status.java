@@ -18,7 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
@@ -45,7 +45,7 @@ public class Status extends Base {
         Root root;
         FileNode found;
         FileNode expected;
-        Pom foundPom;
+        Project foundPom;
         Scm scm;
 
         checkouts = Scm.scanCheckouts(directory, environment.excludes());

@@ -17,7 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.checkout.Problem;
@@ -41,7 +41,7 @@ public class Remove extends Base {
     @Override
     public void run(Database database) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Pom scannedPom;
+        Project scannedPom;
         List<Action> removes;
         Root root;
         FileNode configuredDirectory;

@@ -20,7 +20,7 @@ import com.google.gson.stream.JsonWriter;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -149,10 +149,10 @@ public class Find extends Base {
             }
             switch (format) {
                 case JSON:
-                    json(Field.poms(documents), true, dest);
+                    json(Field.projects(documents), true, dest);
                     break;
                 case DUMP:
-                    json(Field.poms(documents), false, dest);
+                    json(Field.projects(documents), false, dest);
                     break;
                 default:
                     text(documents, format, dest);
@@ -183,7 +183,7 @@ public class Find extends Base {
         }
     }
 
-    private void json(List<Pom> matches, boolean prettyprint, Writer dest) throws IOException {
+    private void json(List<Project> matches, boolean prettyprint, Writer dest) throws IOException {
         JsonWriter jsonWriter;
         boolean first;
 
@@ -195,7 +195,7 @@ public class Find extends Base {
         try {
             jsonWriter.beginArray();
             first = true;
-            for (Pom pom : matches) {
+            for (Project pom : matches) {
                 if (first) {
                     first = false;
                 } else {

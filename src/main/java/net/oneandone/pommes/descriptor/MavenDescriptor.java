@@ -18,7 +18,7 @@ package net.oneandone.pommes.descriptor;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
@@ -46,12 +46,12 @@ public class MavenDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+    protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
         FileNode local;
         org.apache.maven.project.MavenProject project;
         Artifact pa;
         Gav paGav;
-        Pom pom;
+        Project pom;
 
         local = null;
         try {
@@ -69,7 +69,7 @@ public class MavenDescriptor extends Descriptor {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Pom(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
+            pom = new Project(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pom.dependencies.add(Gav.forDependency(dependency));
             }

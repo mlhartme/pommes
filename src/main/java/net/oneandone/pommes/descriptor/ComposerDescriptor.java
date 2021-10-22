@@ -17,7 +17,7 @@ package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
@@ -32,8 +32,8 @@ public class ComposerDescriptor extends Descriptor {
     }
 
     @Override
-    protected Pom doLoad(Environment notUsed, String zone, String origin, String revision, String scm) throws GetLastModifiedException {
-        return new Pom(zone, origin, revision, null, artifact(origin), scm, null);
+    protected Project doLoad(Environment notUsed, String zone, String origin, String revision, String scm) throws GetLastModifiedException {
+        return new Project(zone, origin, revision, null, artifact(origin), scm, null);
     }
 
     private static Gav artifact(String origin) {

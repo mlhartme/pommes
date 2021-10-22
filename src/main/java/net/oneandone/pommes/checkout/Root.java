@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.checkout;
 
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -30,21 +30,21 @@ public class Root {
         this.directory = directory;
     }
 
-    public FileNode directory(Pom pom) throws IOException {
+    public FileNode directory(Project project) throws IOException {
         Scm scm;
         String path;
 
-        if (pom.scm == null) {
-            throw new IOException(pom + ": missing scm");
+        if (project.scm == null) {
+            throw new IOException(project + ": missing scm");
         }
-        scm = Scm.probeUrl(pom.scm);
+        scm = Scm.probeUrl(project.scm);
         if (scm == null) {
-            throw new IOException(pom + ": unknown scm: " + pom.scm);
+            throw new IOException(project + ": unknown scm: " + project.scm);
         }
         try {
-            path = scm.path(pom.scm);
+            path = scm.path(project.scm);
         } catch (URISyntaxException e) {
-            throw new IOException(pom.scm + ": invalid scm uri", e);
+            throw new IOException(project.scm + ": invalid scm uri", e);
         }
         return directory.join(path);
     }

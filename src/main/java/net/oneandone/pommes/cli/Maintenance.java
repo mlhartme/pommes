@@ -18,7 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
@@ -96,9 +96,9 @@ public class Maintenance extends Base {
 
     public static class Step {
         public static Step createOpt(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
-            Pom foundPom;
+            Project foundPom;
             String scmUrl;
-            Pom newPom;
+            Project newPom;
             Descriptor probed;
             FileNode expected;
             Relocation relocation;
@@ -126,10 +126,10 @@ public class Maintenance extends Base {
         private final String marker;
         private final FileNode found;
         private final String scmUrl;
-        private final Pom newPom;
+        private final Project newPom;
         private final Relocation relocation;
 
-        public Step(String marker, FileNode found, String scmUrl, Pom newPom, Relocation relocation) {
+        public Step(String marker, FileNode found, String scmUrl, Project newPom, Relocation relocation) {
             this.marker = marker;
             this.found = found;
             this.scmUrl = scmUrl;

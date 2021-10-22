@@ -23,13 +23,13 @@ import com.google.gson.JsonPrimitive;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Meta information pommes holds about projects */
-public class Pom {
-    public static Pom fromJson(JsonObject object) {
+/** This is the core class of pommes. */
+public class Project {
+    public static Project fromJson(JsonObject object) {
         JsonElement array;
-        Pom result;
+        Project result;
 
-        result = new Pom(string(object, "id"),
+        result = new Project(string(object, "id"),
                 string(object, "revision"),
                 Gav.forGavOpt(stringOpt(object, "parent")),
                 Gav.forGav(string(object, "artifact")),
@@ -84,11 +84,11 @@ public class Pom {
 
     public final List<Gav> dependencies;
 
-    public Pom(String zone, String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
+    public Project(String zone, String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
         this(zone + ":" + origin, revision, parent, artifact, scm, url);
     }
 
-    public Pom(String id, String revision, Gav parent, Gav artifact, String scm, String url) {
+    public Project(String id, String revision, Gav parent, Gav artifact, String scm, String url) {
         if (id == null) {
             throw new IllegalArgumentException("id: " + id);
         }

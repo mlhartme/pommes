@@ -21,11 +21,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PomTest {
+public class ProjectTest {
     @Test
     public void json() {
         JsonObject obj;
-        Pom pom;
+        Project pom;
 
         obj = new JsonParser().parse(
                 "  {\n" +
@@ -39,7 +39,7 @@ public class PomTest {
                 "        \"net.oneandone:sushi:3.1.1\"\n" +
                 "    ]\n" +
                 "  }").getAsJsonObject();
-        pom = Pom.fromJson(obj);
+        pom = Project.fromJson(obj);
         assertEquals("zone:origin", pom.id);
         assertEquals("32", pom.revision);
         assertEquals(obj, pom.toJson());

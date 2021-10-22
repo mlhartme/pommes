@@ -19,7 +19,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -178,7 +178,7 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iter() {
-            Pom pom;
+            Project pom;
             Console console;
             String existingRevision;
 
@@ -207,7 +207,7 @@ public class DatabaseAdd extends Base {
             }
         }
 
-        private Pom iterPom() throws IOException, InterruptedException {
+        private Project iterPom() throws IOException, InterruptedException {
             Descriptor descriptor;
 
             while (true) {

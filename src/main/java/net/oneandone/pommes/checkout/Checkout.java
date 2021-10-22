@@ -16,7 +16,7 @@
 package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -27,7 +27,7 @@ import net.oneandone.sushi.util.Strings;
 import java.io.IOException;
 
 public class Checkout extends Action {
-    public static Action createOpt(FileNode directory, Pom pom) throws IOException {
+    public static Action createOpt(FileNode directory, Project project) throws IOException {
         Scm scm;
         String scannedUrl;
 
@@ -37,20 +37,20 @@ public class Checkout extends Action {
                 return new Problem(directory, directory + ": cannot detect checkout");
             }
             scannedUrl = scm.getUrl(directory);
-            if (normalize(scannedUrl).equals(normalize(pom.scm))) {
+            if (normalize(scannedUrl).equals(normalize(project.scm))) {
                 return null;
             } else {
-                return new Problem(directory, directory + ": checkout conflict: " + pom.scm + " vs " + scannedUrl);
+                return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedUrl);
             }
         } else {
-            if (pom.scm == null) {
-                return new Problem(directory, pom.id + ": missing scm: " + pom.scm);
+            if (project.scm == null) {
+                return new Problem(directory, project.id + ": missing scm: " + project.scm);
             }
-            scm = Scm.probeUrl(pom.scm);
+            scm = Scm.probeUrl(project.scm);
             if (scm == null) {
-                return new Problem(directory, pom.id + ": unknown scm: " + pom.scm);
+                return new Problem(directory, project.id + ": unknown scm: " + project.scm);
             } else {
-                return new Checkout(scm, directory, pom.scm);
+                return new Checkout(scm, directory, project.scm);
             }
         }
     }

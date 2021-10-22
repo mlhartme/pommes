@@ -17,7 +17,7 @@ package net.oneandone.pommes.descriptor;
 
 import com.google.gson.JsonObject;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class JsonDescriptor extends Descriptor {
 
         try {
             json = environment.jsonParser().parse(node.readString()).getAsJsonObject();
-            return new JsonDescriptor(Pom.fromJson(json));
+            return new JsonDescriptor(Project.fromJson(json));
         } catch (IOException e) {
             throw new RuntimeException(node.getUri().toString() + ": cannot create json descriptor", e);
         }
@@ -40,17 +40,17 @@ public class JsonDescriptor extends Descriptor {
 
     //--
 
-    private final Pom orig;
+    private final Project orig;
 
-    public JsonDescriptor(Pom orig) {
+    public JsonDescriptor(Project orig) {
         this.orig = orig;
     }
 
     @Override
-    protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
-        Pom pom;
+    protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+        Project pom;
 
-        pom = new Pom(zone, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
+        pom = new Project(zone, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
         pom.dependencies.addAll(orig.dependencies);
         return pom;
     }

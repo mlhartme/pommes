@@ -16,7 +16,7 @@
 package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class ErrorDescriptor extends Descriptor {
     }
 
     @Override
-    public Pom load(Environment environment, String zone) throws IOException {
+    public Project load(Environment environment, String zone) throws IOException {
         if (exception instanceof RuntimeException) {
             throw (RuntimeException) exception;
         } else {
@@ -37,7 +37,7 @@ public class ErrorDescriptor extends Descriptor {
     }
 
     @Override
-    protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+    protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
         throw new IllegalStateException();
     }
 }

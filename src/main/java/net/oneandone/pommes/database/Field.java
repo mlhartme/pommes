@@ -134,7 +134,7 @@ public enum Field {
         return result;
     }
 
-    public static Document document(Pom pom) {
+    public static Document document(Project pom) {
         Document doc;
 
         doc = new Document();
@@ -152,12 +152,12 @@ public enum Field {
         return doc;
     }
 
-    public static Pom pom(Document document) {
-        Pom result;
+    public static Project pom(Document document) {
+        Project result;
         String parent;
 
         parent = PARENT.get(document);
-        result = new Pom(ID.get(document), REVISION.get(document),
+        result = new Project(ID.get(document), REVISION.get(document),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
                 SCM.get(document), URL.get(document));
         for (String dep : DEP.getList(document)) {
@@ -166,8 +166,8 @@ public enum Field {
         return result;
     }
 
-    public static List<Pom> poms(List<Document> documents) {
-        List<Pom> result;
+    public static List<Project> projects(List<Document> documents) {
+        List<Project> result;
 
         result = new ArrayList<>();
         for (Document document : documents) {

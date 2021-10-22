@@ -17,7 +17,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -40,7 +40,7 @@ public class Checkout extends Base {
         FileNode directory;
 
         adds = new ArrayList<>();
-        for (Pom pom : Field.poms(database.query(PommesQuery.create(query, environment)))) {
+        for (Project pom : Field.projects(database.query(PommesQuery.create(query, environment)))) {
             directory = environment.home.root().directory(pom);
             action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, pom);
             if (action != null) {

@@ -16,7 +16,7 @@
 package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ import java.util.function.BiFunction;
 public abstract class Descriptor {
     public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException()) {
         @Override
-        protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+        protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
             throw new IllegalStateException();
         }
     };
@@ -78,7 +78,7 @@ public abstract class Descriptor {
         this.scm = scm;
     }
 
-    public Pom load(Environment environment, String zone) throws IOException {
+    public Project load(Environment environment, String zone) throws IOException {
         if (origin == null) {
             throw new IllegalStateException();
         }
@@ -88,7 +88,7 @@ public abstract class Descriptor {
         return doLoad(environment, zone, origin, revision, scm);
     }
 
-    protected abstract Pom doLoad(Environment environment, String zone, String withOrigin, String withRevision, String withScm) throws IOException;
+    protected abstract Project doLoad(Environment environment, String zone, String withOrigin, String withRevision, String withScm) throws IOException;
 
     public String toString() {
         return origin;

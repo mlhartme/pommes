@@ -20,7 +20,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.Scm;
@@ -42,7 +42,7 @@ public class Environment implements Variables {
 
     private JsonParser lazyParser;
     private Maven lazyMaven;
-    private Pom lazyCurrentPom;
+    private Project lazyCurrentPom;
     private Filter lazyExcludes;
 
     public Environment(Console console, World world) throws IOException {
@@ -89,7 +89,7 @@ public class Environment implements Variables {
         return lazyMaven;
     }
 
-    public Pom currentPom() throws IOException {
+    public Project currentPom() throws IOException {
         if (lazyCurrentPom == null) {
             lazyCurrentPom = scanPom(world.getWorking());
         }
@@ -123,8 +123,8 @@ public class Environment implements Variables {
 
     //--
 
-    public Pom scanPom(FileNode directory) throws IOException {
-        Pom result;
+    public Project scanPom(FileNode directory) throws IOException {
+        Project result;
 
         result = scanPomOpt(directory);
 
@@ -135,7 +135,7 @@ public class Environment implements Variables {
     }
 
     /** @return null if not a checkout */
-    public Pom scanPomOpt(FileNode directory) throws IOException {
+    public Project scanPomOpt(FileNode directory) throws IOException {
         Scm scm;
         Descriptor descriptor;
 

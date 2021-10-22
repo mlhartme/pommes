@@ -17,7 +17,7 @@ package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
-import net.oneandone.pommes.database.Pom;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -50,7 +50,7 @@ public class RawDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Pom doLoad(Environment environment, String zone, String origin, String revision, String foundScm) throws IOException {
+    protected Project doLoad(Environment environment, String zone, String origin, String revision, String foundScm) throws IOException {
         Gav artifact;
 
         if (!foundScm.equals(scm.getUrl(directory))) {
@@ -61,6 +61,6 @@ public class RawDescriptor extends Descriptor {
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-        return new Pom(zone, origin, revision, null, artifact, foundScm, null);
+        return new Project(zone, origin, revision, null, artifact, foundScm, null);
     }
 }
