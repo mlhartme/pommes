@@ -111,11 +111,11 @@ public class NodeRepository implements Repository {
         scan(node, true, dest);
     }
 
-    public void scan(Node root, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
+    public void scan(Node<?> root, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
-        Node trunkNode;
-        Node branchesNode;
-        Node tagsNode;
+        Node<?> trunkNode;
+        Node<?> branchesNode;
+        Node<?> tagsNode;
         List<? extends Node> grandChildren;
 
         if (exclude.matches(root.getPath())) {
