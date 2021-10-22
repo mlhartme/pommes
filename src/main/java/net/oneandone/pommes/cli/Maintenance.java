@@ -17,12 +17,14 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Pom;
 import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class Maintenance extends Base {
@@ -64,9 +66,7 @@ public class Maintenance extends Base {
                 if (probed == null) {
                     throw new IllegalStateException();
                 }
-                add = new DatabaseAdd(environment, false, false, "local");
-                add.add(found.toString());
-                add.run();
+                database.index(Collections.singleton(Field.document(probed.load(environment, "local"))).iterator());
             }
         }
     }
