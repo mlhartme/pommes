@@ -2,7 +2,7 @@
 
 ### 3.3.0 (pending)
 
-* added `maintenance` command to autoamtically add unknown projects; status no longer shows a fix for that 
+* added `maintenance` command to automatically add and relocate unknown projects; status no longer shows a fix for that 
 * added "raw projects" that represent projects without meta information
 * changed checkout paths: they are now based on the url, not gav. That feels more natural, and it works
   for all projects, even without pom

@@ -72,7 +72,7 @@ public class Status extends Base {
                     console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
                 } else {
                     parent = expected.getParent();
-                    fix = parent.exists() ? "" : "mkdir -p " + parent.toString() + "; ";
+                    fix = parent.exists() ? "" : "mkdir -p " + parent + "; ";
                     console.info.println("C " + found + " (unexpected location, fix with '" + fix + "mv " + found + " " + expected + "'}");
                 }
             }

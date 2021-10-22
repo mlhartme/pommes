@@ -24,6 +24,7 @@ import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -42,32 +43,75 @@ public class Maintenance extends Base {
         Pom foundPom;
         Scm scm;
         String input;
-        DatabaseAdd add;
         String scmUrl;
+        Pom newPom;
+        Project probed;
 
         checkouts = Scm.scanCheckouts(directory, environment.excludes());
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts in " + directory);
         }
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
-            found = entry.getKey();
-            scm = entry.getValue();
-            scmUrl = scm.getUrl(found);
-            foundPom = database.pomByScm(scmUrl);
-            if (foundPom != null) {
-                continue;
-            }
-            console.info.println(found + " " + scmUrl + " is unknown to pommes");
-            input = console.readline("add (y/n)? ");
-            if ("y".equalsIgnoreCase(input)) {
-                Project probed;
+            doRun(database, entry.getKey(), entry.getValue());
+        }
+    }
 
-                probed = NodeRepository.probe(environment, found);
-                if (probed == null) {
-                    throw new IllegalStateException();
-                }
-                database.index(Collections.singleton(Field.document(probed.load(environment, "local"))).iterator());
+    private void doRun(Database database, FileNode found, Scm scm) throws IOException {
+        Pom foundPom;
+        String input;
+        String scmUrl;
+        Pom newPom;
+        Project probed;
+        FileNode expected;
+        Relocation relocation;
+
+        scmUrl = scm.getUrl(found);
+        foundPom = database.pomByScm(scmUrl);
+        if (foundPom != null) {
+            return;
+        }
+        probed = NodeRepository.probe(environment, found);
+        if (probed == null) {
+            throw new IllegalStateException();
+        }
+        newPom = probed.load(environment, "local");
+        expected = environment.home.root().directory(newPom);
+        relocation = new Relocation(found, expected);
+        console.info.println("? " + found + " " + scmUrl + " " + relocation);
+        input = console.readline("add (y/n)? ");
+        if ("y".equalsIgnoreCase(input)) {
+            database.index(Collections.singleton(Field.document(newPom)).iterator());
+            relocation.apply();
+        }
+    }
+
+    public static class Relocation {
+        private final FileNode found;
+        private final FileNode expected;
+
+        public Relocation(FileNode found, FileNode expected) {
+            this.found = found;
+            this.expected = expected;
+        }
+
+        public void apply() throws IOException {
+            if (found.equals(expected)) {
+                return;
             }
+            expected.getParent().mkdirsOpt();
+            found.move(expected);
+        }
+
+        public String toString() {
+            FileNode parent;
+            String mkdir;
+
+            if (found.equals(expected)) {
+                return "";
+            }
+            parent = expected.getParent();
+            mkdir = parent.exists() ? "" : "mkdir -p " + parent + "; ";
+            return mkdir + "relocation: mv " + found + " " + expected;
         }
     }
 }
