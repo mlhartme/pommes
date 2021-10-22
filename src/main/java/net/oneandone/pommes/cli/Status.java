@@ -18,22 +18,14 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Pom;
-import net.oneandone.pommes.database.PommesQuery;
-import net.oneandone.pommes.project.Project;
-import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
-import net.oneandone.sushi.util.Strings;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -65,9 +57,9 @@ public class Status extends Base {
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
             scm = entry.getValue();
-            foundPom = pomByScm(database, scm.getUrl(found));
+            foundPom = database.pomByScm(scm.getUrl(found));
             if (foundPom == null) {
-                console.info.println("? " + found + " (unknown project, fix with '" + unknownProjectFix(scm, found) + "')");
+                console.info.println("? " + found);
             } else {
                 root = environment.home.root();
                 try {
@@ -88,36 +80,6 @@ public class Status extends Base {
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
             console.info.println("? " + u + " (normal directory)");
         }
-    }
-
-    private Pom pomByScm(Database database, String url) throws IOException {
-        List<Document> poms;
-
-        // TODO: to normalize subversion urls
-        url = Strings.removeRightOpt(url, "/");
-        try {
-            poms = database.query(PommesQuery.create("s:" + url));
-        } catch (QueryNodeException e) {
-            throw new IllegalStateException();
-        }
-        switch (poms.size()) {
-            case 0:
-                return null;
-            case 1:
-                return Field.pom(poms.get(0));
-            default:
-                throw new IOException("scm ambiguous: " + url);
-        }
-    }
-
-    private String unknownProjectFix(Scm scm, FileNode checkout) throws IOException, URISyntaxException {
-        Project probed;
-
-        probed = NodeRepository.probe(environment, checkout);
-        if (probed == null) {
-            throw new IllegalStateException();
-        }
-        return "pommes database-add " + checkout;
     }
 
     private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories, Filter excludes) throws ListException, DirectoryNotFoundException {
@@ -165,5 +127,4 @@ public class Status extends Base {
             }
         }
     }
-
 }

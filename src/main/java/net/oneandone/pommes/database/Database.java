@@ -16,6 +16,7 @@
 package net.oneandone.pommes.database;
 
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -182,5 +183,25 @@ public class Database implements AutoCloseable {
 
         pq = PommesQuery.create("a:" + pom.artifact.toGaString());
         return !query(pq).isEmpty();
+    }
+
+    public Pom pomByScm(String url) throws IOException {
+        List<Document> poms;
+
+        // TODO: to normalize subversion urls
+        url = Strings.removeRightOpt(url, "/");
+        try {
+            poms = query(PommesQuery.create("s:" + url));
+        } catch (QueryNodeException e) {
+            throw new IllegalStateException();
+        }
+        switch (poms.size()) {
+            case 0:
+                return null;
+            case 1:
+                return Field.pom(poms.get(0));
+            default:
+                throw new IOException("scm ambiguous: " + url);
+        }
     }
 }
