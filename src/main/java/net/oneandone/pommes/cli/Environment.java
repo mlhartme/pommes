@@ -137,19 +137,19 @@ public class Environment implements Variables {
     /** @return null if not a checkout */
     public Pom scanPomOpt(FileNode directory) throws IOException {
         Scm scm;
-        Descriptor project;
+        Descriptor descriptor;
 
         scm = Scm.probeCheckout(directory);
         if (scm == null) {
             return null;
         }
         for (Node child : directory.list()) {
-            project = Descriptor.probe(this, child);
-            if (project != null) {
-                project.setOrigin(scm.getUrl(directory) + "/" + child.getName());
-                project.setRevision(child.sha());
-                project.setScm(scm.getUrl(directory));
-                return project.load(this, "checkout");
+            descriptor = Descriptor.probe(this, child);
+            if (descriptor != null) {
+                descriptor.setOrigin(scm.getUrl(directory) + "/" + child.getName());
+                descriptor.setRevision(child.sha());
+                descriptor.setScm(scm.getUrl(directory));
+                return descriptor.load(this, "checkout");
             }
         }
         return null;

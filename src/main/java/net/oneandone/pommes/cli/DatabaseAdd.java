@@ -208,20 +208,20 @@ public class DatabaseAdd extends Base {
         }
 
         private Pom iterPom() throws IOException, InterruptedException {
-            Descriptor project;
+            Descriptor descriptor;
 
             while (true) {
-                project = src.take();
-                if (project == Descriptor.END_OF_QUEUE) {
+                descriptor = src.take();
+                if (descriptor == Descriptor.END_OF_QUEUE) {
                     return null;
                 }
                 try {
                     count++;
-                    return project.load(environment, zone);
+                    return descriptor.load(environment, zone);
                 } catch (Exception e) {
                     // CAUTION: I do catch RuntimeExceptions, because I've seen Maven 3.3.9 throw them for invalid poms
                     // (e.g. InvalidArtifactRTException)
-                    throw new IOException("error processing " + project + ": " + e.getMessage(), e);
+                    throw new IOException("error processing " + descriptor + ": " + e.getMessage(), e);
                 }
             }
         }
