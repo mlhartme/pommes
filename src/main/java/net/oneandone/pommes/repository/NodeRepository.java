@@ -19,6 +19,8 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.project.RawProject;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+/** To search files system and subversion */
 public class NodeRepository implements Repository {
     public static Project probe(Environment environment, FileNode checkout) throws IOException {
         NodeRepository repo;
@@ -125,12 +128,12 @@ public class NodeRepository implements Repository {
         }
         log.println("scan " + root.getPath());
         for (Node child : children) {
-            project = Project.probeChecked(environment, child);
-            if (project != null) {
-                project.setOrigin(child.getUri().toString());
-                project.setRevision(Long.toString(child.getLastModified()));
-                project.setScm(nodeScm(child));
-                dest.put(project);
+            if (add(dest, Project.probeChecked(environment, child), node)) {
+                return;
+            }
+        }
+        if (node instanceof FileNode fileNode) {
+            if (add(dest, RawProject.createOpt(fileNode), node)) {
                 return;
             }
         }
@@ -174,6 +177,17 @@ public class NodeRepository implements Repository {
         }
     }
 
+    private static boolean add(BlockingQueue<Project> dest, Project project, Node node) throws IOException, InterruptedException {
+        if (project == null) {
+            return false;
+        }
+        project.setOrigin(node.getUri().toString());
+        project.setRevision(Long.toString(node.getLastModified()));
+        project.setScm(nodeScm(node));
+        dest.put(project);
+        return true;
+    }
+
     private static Node child(List<? extends Node> childen, String name) {
         for (Node node : childen) {
             if (node.getName().equals(name)) {
@@ -183,7 +197,7 @@ public class NodeRepository implements Repository {
         return null;
     }
 
-    public static String nodeScm(Node descriptor) {
+    public static String nodeScm(Node descriptor) throws IOException {
         SvnNode svn;
         String path;
         SVNURL root;
@@ -201,6 +215,13 @@ public class NodeRepository implements Repository {
                 return "git:ssh://git@github.com" + path + ".git";
             } else {
                 return svn.getParent().getUri().toString();
+            }
+        } else if (descriptor instanceof FileNode fileNode) {
+            Scm scm = Scm.probeCheckout(fileNode);
+            if (scm == null) {
+                return null;
+            } else {
+                return scm.getUrl(fileNode);
             }
         } else {
             return null;

@@ -16,7 +16,6 @@
 package net.oneandone.pommes.scm;
 
 import net.oneandone.pommes.database.Gav;
-import net.oneandone.sushi.fs.ExistsException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
@@ -32,7 +31,7 @@ public class Git extends Scm {
     public Git() {
     }
 
-    public boolean isCheckout(FileNode directory) throws ExistsException {
+    public boolean isCheckout(FileNode directory) {
         return directory.join(".git").isDirectory();
     }
 
@@ -108,6 +107,7 @@ public class Git extends Scm {
             return url;
         }
     }
+
     @Override
     public Gav defaultGav(String url) {
         String artifactId;

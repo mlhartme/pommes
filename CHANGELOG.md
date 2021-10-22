@@ -2,6 +2,7 @@
 
 ### 3.3.0 (pending)
 
+* added "raw projects" that represent projects without meta information
 * changed checkout paths: they are now based on the url, not gav. That feels more natural, and it works
   for all projects, even without pom
 * support shorter scp-like git ssh urls (used by gitea)

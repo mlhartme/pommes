@@ -112,21 +112,12 @@ public class Status extends Base {
 
     private String unknownProjectFix(Scm scm, FileNode checkout) throws IOException, URISyntaxException {
         Project probed;
-        String scmurl;
-        FileNode descriptor;
-        Pom pom;
-        String result;
 
         probed = NodeRepository.probe(environment, checkout);
-        if (probed != null) {
-            return "pommes database-add " + checkout;
-        } else {
-            scmurl = scm.getUrl(checkout);
-            descriptor = checkout.join("external.json");
-            pom = new Pom("manual", descriptor.getUri().toString(), "0", null, scm.defaultGav(scmurl), scmurl, null);
-            result = pom.toJson().toString();
-            return "pommes database-add 'inline:" + result + "'";
+        if (probed == null) {
+            throw new IllegalStateException();
         }
+        return "pommes database-add " + checkout;
     }
 
     private static List<FileNode> unknown(FileNode root, Collection<FileNode> directories, Filter excludes) throws ListException, DirectoryNotFoundException {
