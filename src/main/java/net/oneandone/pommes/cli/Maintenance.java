@@ -105,7 +105,7 @@ public class Maintenance extends Base {
             String marker;
 
             scmUrl = scm.getUrl(found);
-            foundPom = database.pomByScm(scmUrl);
+            foundPom = database.projectByScm(scmUrl);
             if (foundPom == null) {
                 probed = NodeRepository.probe(environment, found);
                 if (probed == null) {

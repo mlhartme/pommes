@@ -178,14 +178,7 @@ public class Database implements AutoCloseable {
         return pq.find(searcher);
     }
 
-    public boolean contains(Project project) throws IOException, QueryNodeException {
-        PommesQuery pq;
-
-        pq = PommesQuery.create("a:" + project.artifact.toGaString());
-        return !query(pq).isEmpty();
-    }
-
-    public Project pomByScm(String url) throws IOException {
+    public Project projectByScm(String url) throws IOException {
         List<Document> poms;
 
         // TODO: to normalize subversion urls

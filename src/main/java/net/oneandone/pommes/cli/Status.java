@@ -45,7 +45,7 @@ public class Status extends Base {
         Root root;
         FileNode found;
         FileNode expected;
-        Project foundPom;
+        Project foundProject;
         Scm scm;
 
         checkouts = Scm.scanCheckouts(directory, environment.excludes());
@@ -55,19 +55,19 @@ public class Status extends Base {
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
             scm = entry.getValue();
-            foundPom = database.pomByScm(scm.getUrl(found));
-            if (foundPom == null) {
+            foundProject = database.projectByScm(scm.getUrl(found));
+            if (foundProject == null) {
                 console.info.println("? " + found);
             } else {
                 root = environment.home.root();
                 try {
-                    expected = root.directory(foundPom);
+                    expected = root.directory(foundProject);
                 } catch (IOException e) {
                     console.info.println("! " + found + " " + e.getMessage());
                     continue;
                 }
                 if (found.equals(expected)) {
-                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundPom + ")");
+                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundProject + ")");
                 } else {
                     console.info.println("C " + found);
                 }
