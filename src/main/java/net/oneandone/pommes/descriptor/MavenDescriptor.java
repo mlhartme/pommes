@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.descriptor;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
@@ -28,18 +28,18 @@ import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
 
-public class MavenProject extends Project {
+public class MavenDescriptor extends Descriptor {
     protected final Node descriptor;
 
     public static boolean matches(String name) {
         return name.equals("pom.xml") || name.endsWith(".pom");
     }
 
-    public static MavenProject create(Environment environment, Node node) {
-        return new MavenProject(node);
+    public static MavenDescriptor create(Environment environment, Node node) {
+        return new MavenDescriptor(node);
     }
 
-    public MavenProject(Node descriptor) {
+    public MavenDescriptor(Node descriptor) {
         this.descriptor = descriptor;
     }
 

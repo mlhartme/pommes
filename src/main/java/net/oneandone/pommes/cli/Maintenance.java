@@ -19,7 +19,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Pom;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -99,7 +99,7 @@ public class Maintenance extends Base {
             Pom foundPom;
             String scmUrl;
             Pom newPom;
-            Project probed;
+            Descriptor probed;
             FileNode expected;
             Relocation relocation;
             String marker;

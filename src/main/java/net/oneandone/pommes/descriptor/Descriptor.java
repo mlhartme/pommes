@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Pom;
@@ -23,41 +23,41 @@ import java.io.IOException;
 import java.util.function.BiFunction;
 
 /** Factory for Poms */
-public abstract class Project {
-    public static final Project END_OF_QUEUE = new ErrorProject(new IOException()) {
+public abstract class Descriptor {
+    public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException()) {
         @Override
         protected Pom doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
             throw new IllegalStateException();
         }
     };
 
-    public static Project probeChecked(Environment environment, Node node) {
-        BiFunction<Environment, Node, Project> m;
+    public static Descriptor probeChecked(Environment environment, Node node) {
+        BiFunction<Environment, Node, Descriptor> m;
 
         try {
             m = match(node.getName());
             return m != null ? m.apply(environment, node) : null;
         } catch (IOException | RuntimeException e) {
-            return new ErrorProject(e);
+            return new ErrorDescriptor(e);
         }
     }
 
-    public static Project probe(Environment environment, Node node) throws IOException {
-        BiFunction<Environment, Node, Project> m;
+    public static Descriptor probe(Environment environment, Node node) throws IOException {
+        BiFunction<Environment, Node, Descriptor> m;
 
         m = match(node.getName());
         return m != null ? m.apply(environment, node) : null;
     }
 
-    public static BiFunction<Environment, Node, Project> match(String name) throws IOException {
-        if (MavenProject.matches(name)) {
-            return MavenProject::create;
+    public static BiFunction<Environment, Node, Descriptor> match(String name) throws IOException {
+        if (MavenDescriptor.matches(name)) {
+            return MavenDescriptor::create;
         }
-        if (ComposerProject.matches(name)) {
-            return ComposerProject::create;
+        if (ComposerDescriptor.matches(name)) {
+            return ComposerDescriptor::create;
         }
-        if (JsonProject.matches(name)) {
-            return JsonProject::create;
+        if (JsonDescriptor.matches(name)) {
+            return JsonDescriptor::create;
         }
         return null;
     }

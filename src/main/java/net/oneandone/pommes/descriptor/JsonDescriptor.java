@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.descriptor;
 
 import com.google.gson.JsonObject;
 import net.oneandone.pommes.cli.Environment;
@@ -22,17 +22,17 @@ import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
 
-public class JsonProject extends Project {
+public class JsonDescriptor extends Descriptor {
     public static boolean matches(String name) throws IOException {
         return name.equals(".pommes.json") || name.equals("pommes.json");
     }
 
-    public static JsonProject create(Environment environment, Node node) {
+    public static JsonDescriptor create(Environment environment, Node node) {
         JsonObject json;
 
         try {
             json = environment.jsonParser().parse(node.readString()).getAsJsonObject();
-            return new JsonProject(Pom.fromJson(json));
+            return new JsonDescriptor(Pom.fromJson(json));
         } catch (IOException e) {
             throw new RuntimeException(node.getUri().toString() + ": cannot create json project", e);
         }
@@ -42,7 +42,7 @@ public class JsonProject extends Project {
 
     private final Pom orig;
 
-    public JsonProject(Pom orig) {
+    public JsonDescriptor(Pom orig) {
         this.orig = orig;
     }
 

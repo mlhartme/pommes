@@ -18,8 +18,8 @@ package net.oneandone.pommes.repository;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
-import net.oneandone.pommes.project.Project;
-import net.oneandone.pommes.project.RawProject;
+import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.descriptor.RawDescriptor;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -37,9 +37,9 @@ import java.util.concurrent.BlockingQueue;
 
 /** To search files system and subversion */
 public class NodeRepository implements Repository {
-    public static Project probe(Environment environment, FileNode checkout) throws IOException {
+    public static Descriptor probe(Environment environment, FileNode checkout) throws IOException {
         NodeRepository repo;
-        BlockingQueue<Project> dest;
+        BlockingQueue<Descriptor> dest;
 
         repo = new NodeRepository(environment, checkout, environment.console().verbose);
         dest = new ArrayBlockingQueue<>(2);
@@ -107,13 +107,13 @@ public class NodeRepository implements Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         scan(node, true, dest);
     }
 
-    public void scan(Node root, boolean recurse, BlockingQueue<Project> dest) throws IOException, InterruptedException {
+    public void scan(Node root, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
-        Project project;
+        Descriptor project;
         Node trunkNode;
         Node branchesNode;
         Node tagsNode;
@@ -128,12 +128,12 @@ public class NodeRepository implements Repository {
         }
         log.println("scan " + root.getPath());
         for (Node child : children) {
-            if (add(dest, Project.probeChecked(environment, child), node)) {
+            if (add(dest, Descriptor.probeChecked(environment, child), node)) {
                 return;
             }
         }
         if (node instanceof FileNode fileNode) {
-            if (add(dest, RawProject.createOpt(fileNode), node)) {
+            if (add(dest, RawDescriptor.createOpt(fileNode), node)) {
                 return;
             }
         }
@@ -177,7 +177,7 @@ public class NodeRepository implements Repository {
         }
     }
 
-    private static boolean add(BlockingQueue<Project> dest, Project project, Node node) throws IOException, InterruptedException {
+    private static boolean add(BlockingQueue<Descriptor> dest, Descriptor project, Node node) throws IOException, InterruptedException {
         if (project == null) {
             return false;
         }

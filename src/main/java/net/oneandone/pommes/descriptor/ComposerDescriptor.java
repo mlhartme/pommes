@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
@@ -22,13 +22,13 @@ import net.oneandone.sushi.fs.GetLastModifiedException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
 
-public class ComposerProject extends Project {
+public class ComposerDescriptor extends Descriptor {
     public static boolean matches(String name) {
         return name.equals("composer.json");
     }
 
-    public static ComposerProject create(Environment environment, Node descriptorCurrentlyNotUsed) {
-        return new ComposerProject();
+    public static ComposerDescriptor create(Environment environment, Node descriptorCurrentlyNotUsed) {
+        return new ComposerDescriptor();
     }
 
     @Override

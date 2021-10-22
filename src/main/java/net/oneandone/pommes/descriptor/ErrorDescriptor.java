@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Pom;
 
 import java.io.IOException;
 
-public class ErrorProject extends Project {
+public class ErrorDescriptor extends Descriptor {
     private final Exception exception;
 
-    public ErrorProject(Exception exception) {
+    public ErrorDescriptor(Exception exception) {
         this.exception = exception;
     }
 

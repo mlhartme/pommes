@@ -20,7 +20,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Pom;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import org.apache.lucene.document.Document;
@@ -82,7 +82,7 @@ public class DatabaseAdd extends Base {
                     repository.scan(indexer.src);
                 }
             } finally {
-                indexer.src.put(Project.END_OF_QUEUE);
+                indexer.src.put(Descriptor.END_OF_QUEUE);
                 indexer.join();
             }
             if (indexer.exception != null) {
@@ -99,7 +99,7 @@ public class DatabaseAdd extends Base {
         private final Environment environment;
         private final String zone;
 
-        public final BlockingQueue<Project> src;
+        public final BlockingQueue<Descriptor> src;
         private final Database database;
         private Exception exception;
 
@@ -208,11 +208,11 @@ public class DatabaseAdd extends Base {
         }
 
         private Pom iterPom() throws IOException, InterruptedException {
-            Project project;
+            Descriptor project;
 
             while (true) {
                 project = src.take();
-                if (project == Project.END_OF_QUEUE) {
+                if (project == Descriptor.END_OF_QUEUE) {
                     return null;
                 }
                 try {

@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.NewInputStreamException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -76,11 +76,11 @@ public class BitbucketRepository implements Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Project> dest) throws IOException, URISyntaxException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
         Bitbucket bb;
         String bbProject;
-        Project project;
-        BiFunction<Environment, Node, Project> m;
+        Descriptor project;
+        BiFunction<Environment, Node, Descriptor> m;
         byte[] bytes;
         List<String> lst;
         Node tmp;
@@ -91,7 +91,7 @@ public class BitbucketRepository implements Repository {
         for (String repo : bb.listRepos(bbProject)) {
             lst = bb.listRoot(bbProject, repo);
             for (String path : lst) {
-                m = Project.match(path);
+                m = Descriptor.match(path);
                 if (m != null) {
                     bytes = bb.readBytes(bbProject, repo, path);
                     tmp = environment.world().memoryNode(bytes);

@@ -21,9 +21,9 @@ import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.database.Pom;
-import net.oneandone.pommes.project.ErrorProject;
-import net.oneandone.pommes.project.JsonProject;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.ErrorDescriptor;
+import net.oneandone.pommes.descriptor.JsonDescriptor;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -64,10 +64,10 @@ public class JsonRepository implements Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         String prefix;
         JsonArray array;
-        Project project;
+        Descriptor project;
         Pom pom;
 
         prefix = node.getUri().toASCIIString() + ":";
@@ -76,11 +76,11 @@ public class JsonRepository implements Repository {
             for (JsonElement entry : array) {
                 try {
                     pom = Pom.fromJson(entry.getAsJsonObject());
-                    project = new JsonProject(pom);
+                    project = new JsonDescriptor(pom);
                     project.setOrigin(prefix + pom.getOrigin());
                     project.setRevision(node.getWorld().memoryNode(pom.toJson().toString()).sha());
                 } catch (Exception e) {
-                    project = new ErrorProject(new IOException("json error: " + e.getMessage(), e));
+                    project = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
                     project.setOrigin(node.getUri().toString());
                 }
                 dest.put(project);

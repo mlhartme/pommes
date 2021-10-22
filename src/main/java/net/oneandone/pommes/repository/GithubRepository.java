@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.World;
 
 import java.io.IOException;
@@ -71,7 +71,7 @@ public class GithubRepository implements Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Project> dest) throws IOException, URISyntaxException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
         String str;
         JsonParser parser;
         JsonArray repositories;

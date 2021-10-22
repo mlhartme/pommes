@@ -22,7 +22,7 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Pom;
 import net.oneandone.pommes.database.Variables;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
@@ -137,14 +137,14 @@ public class Environment implements Variables {
     /** @return null if not a checkout */
     public Pom scanPomOpt(FileNode directory) throws IOException {
         Scm scm;
-        Project project;
+        Descriptor project;
 
         scm = Scm.probeCheckout(directory);
         if (scm == null) {
             return null;
         }
         for (Node child : directory.list()) {
-            project = Project.probe(this, child);
+            project = Descriptor.probe(this, child);
             if (project != null) {
                 project.setOrigin(scm.getUrl(directory) + "/" + child.getName());
                 project.setRevision(child.sha());

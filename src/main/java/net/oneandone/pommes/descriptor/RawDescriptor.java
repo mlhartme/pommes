@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.project;
+package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 /** project without meta information like form poms, only the scm url is know */
-public class RawProject extends Project {
-    public static RawProject createOpt(FileNode node) throws IOException {
+public class RawDescriptor extends Descriptor {
+    public static RawDescriptor createOpt(FileNode node) throws IOException {
         Scm scm;
 
         if (!node.isDirectory()) {
@@ -36,13 +36,13 @@ public class RawProject extends Project {
         if (scm == null) {
             return null;
         }
-        return new RawProject(scm, node);
+        return new RawDescriptor(scm, node);
     }
 
     private final Scm scm;
     private final FileNode directory;
 
-    public RawProject(Scm scm, FileNode directory) {
+    public RawDescriptor(Scm scm, FileNode directory) {
         this.scm = scm;
         this.directory = directory;
     }

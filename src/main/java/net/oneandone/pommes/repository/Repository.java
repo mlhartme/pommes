@@ -17,7 +17,7 @@ package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.project.Project;
+import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -64,5 +64,5 @@ public interface Repository {
 
     void addOption(String option);
     void addExclude(String exclude);
-    void scan(BlockingQueue<Project> dest) throws IOException, InterruptedException, URISyntaxException;
+    void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException, URISyntaxException;
 }
