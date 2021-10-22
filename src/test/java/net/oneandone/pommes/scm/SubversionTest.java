@@ -25,7 +25,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SubversionTest {
     @Test
-    public void dflt() throws Failure, URISyntaxException {
+    public void serverPath() throws URISyntaxException {
+        Subversion svn;
+
+        svn = new Subversion();
+        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.serverPath("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk"));
+        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.serverPath("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk/"));
+        assertEquals("svn.1and1.org/controlpanel/tools/maven", svn.serverPath("svn:https://svn.1and1.org/controlpanel/tools/maven/branches/demo"));
+    }
+
+    @Test
+    public void dflt() throws URISyntaxException {
         Subversion svn;
 
         svn = new Subversion();

@@ -40,9 +40,10 @@ public class Git extends Scm {
         return url.startsWith(PROTOCOL);
     }
 
-    public String server(String url) throws URISyntaxException {
+    public String serverPath(String url) throws URISyntaxException {
         String result;
         int idx;
+        URI obj;
 
         url = Strings.removeLeft(url, PROTOCOL);
         idx = url.indexOf("://");
@@ -58,7 +59,7 @@ public class Git extends Scm {
             url = url.substring(idx);
             idx = url.indexOf(':');
             if (idx != -1) {
-                return url.substring(0, idx);
+                return url.substring(0, idx) + "/" + Strings.removeRight(url.substring(idx + 1), ".git");
             }
             idx = url.indexOf('@');
             if (idx != -1) {
@@ -68,12 +69,14 @@ public class Git extends Scm {
             if (idx == -1) {
                 throw new IllegalStateException(url);
             }
-            return url.substring(0, idx);
+            return Strings.removeRight(url, ".git");
         } else {
-            result = new URI(url).getHost();
+            obj = new URI(url);
+            result = obj.getHost();
             if (result == null) {
                 throw new IllegalStateException(url);
             }
+            result = result + obj.getPath();
             return result;
         }
     }

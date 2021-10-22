@@ -51,7 +51,7 @@ public class Root {
             throw new IOException(pom + ": unknown scm: " + pom.scm);
         }
         try {
-            server = scm.server(pom.scm);
+            server = scm.serverPath(pom.scm);
         } catch (URISyntaxException e) {
             throw new IOException(pom.scm + ": invalid uri", e);
         }

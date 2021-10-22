@@ -25,14 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitTest {
     @Test
-    public void server() throws URISyntaxException {
+    public void serverPath() throws URISyntaxException {
         Git git;
 
         git = new Git();
-        assertEquals("github.com", git.server("git:https://github.com/pustefix-projects/pustefix-framework.git"));
-        assertEquals("github.com", git.server("git:ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git"));
-        assertEquals("github.com", git.server("git:git://github.com:tcurdt/jdeb.git"));
-        assertEquals("github.com", git.server("git:git@github.com:jkschoen/jsma.git"));
+        assertEquals("github.com/pustefix-projects/pustefix-framework", git.serverPath("git:https://github.com/pustefix-projects/pustefix-framework.git"));
+        assertEquals("github.com/mlhartme/maven-active-markdown-plugin", git.serverPath("git:ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git"));
+        assertEquals("github.com/tcurdt/jdeb", git.serverPath("git:git://github.com:tcurdt/jdeb.git"));
+        assertEquals("github.com/jkschoen/jsma", git.serverPath("git:git@github.com:jkschoen/jsma.git"));
     }
 
     @Test

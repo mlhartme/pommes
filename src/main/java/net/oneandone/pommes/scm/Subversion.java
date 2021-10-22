@@ -42,12 +42,32 @@ public class Subversion extends Scm {
         return url.startsWith(PROTOCOL);
     }
 
-    public String server(String url) throws URISyntaxException {
-        return new URI(Strings.removeLeft(url, PROTOCOL)).getHost();
+    public String serverPath(String url) throws URISyntaxException {
+        final String trunk = "/trunk";
+        final String branches = "/branches/";
+        URI obj;
+        String path;
+        int idx;
+
+        obj = new URI(Strings.removeLeft(Strings.removeRightOpt(url, "/"), PROTOCOL));
+        path = obj.getPath();
+        path = Strings.removeLeftOpt(path, "/svn");
+        if (path.endsWith(trunk)) {
+            path = Strings.removeRight(path, trunk);
+        } else {
+            idx = path.lastIndexOf('/');
+            if (idx != -1) {
+                idx = path.lastIndexOf('/', idx - 1);
+                if (idx != -1 && path.substring(idx).startsWith(branches)) {
+                    path = path.substring(0, idx);
+                }
+            }
+        }
+        return obj.getHost() + path;
     }
 
     @Override
-    public Gav defaultGav(String urlstr) throws Failure, URISyntaxException {
+    public Gav defaultGav(String urlstr) throws URISyntaxException {
         String path;
         int idx;
         String groupId;

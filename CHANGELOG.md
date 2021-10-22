@@ -1,7 +1,9 @@
 ## Pommes Changelog
 
-### 3.2.1 (pending)
+### 3.3.0 (pending)
 
+* changed checkout paths: they are now based on the url, not gav. That feels more natural, and it works
+  for all projects, even without pom
 * support shorter scp-like git ssh urls (used by gitea)
 * improved error message for git.getUrl
 * update sushi 3.2.0 to 3.3.0
