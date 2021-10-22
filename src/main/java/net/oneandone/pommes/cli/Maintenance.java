@@ -23,9 +23,14 @@ import net.oneandone.pommes.project.Project;
 import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.util.Separator;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Maintenance extends Base {
@@ -39,53 +44,134 @@ public class Maintenance extends Base {
     @Override
     public void run(Database database) throws Exception {
         Map<FileNode, Scm> checkouts;
+        Map<String, Step> steps;
+        int id;
 
         checkouts = Scm.scanCheckouts(directory, environment.excludes());
         if (checkouts.isEmpty()) {
             throw new ArgumentException("no checkouts in " + directory);
         }
+        steps = new LinkedHashMap<>();
+        id = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
-            doRun(database, entry.getKey(), entry.getValue());
+            FileNode found = entry.getKey();
+
+            Step step = Step.createOpt(environment, database, found, entry.getValue());
+            if (step != null) {
+                steps.put(Integer.toString(++id), step);
+            }
+        }
+        if (steps.isEmpty()) {
+            console.info.println("nothing to do, " + checkouts.size() + " ok");
+            return;
+        }
+
+        while (!steps.isEmpty()) {
+            for (var entry : steps.entrySet()) {
+                console.info.println(entry.getValue().toString(entry.getKey()));
+            }
+            String input;
+            input = console.readline("What do you want to fix, ctrl-c to abort (<numbers>/all)? ");
+            if ("all".equals(input)) {
+                for (var entry : steps.entrySet()) {
+                    entry.getValue().apply(database);
+                    console.info.println("fixed " + entry.getKey());
+                }
+                steps.clear();
+            } else {
+                Step step;
+
+                for (String item : Separator.SPACE.split(input)) {
+                    step = steps.remove(item);
+                    if (step == null) {
+                        console.info.println("unknown input: " + item);
+                        break;
+                    }
+                    step.apply(database);
+                    console.info.println("fixed " + item);
+                }
+            }
         }
     }
 
-    private void doRun(Database database, FileNode found, Scm scm) throws IOException {
-        Pom foundPom;
-        String input;
-        String scmUrl;
-        Pom newPom;
-        Project probed;
-        FileNode expected;
-        Relocation relocation;
-        String marker;
+    public static class Step {
+        public static Step createOpt(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
+            Pom foundPom;
+            String scmUrl;
+            Pom newPom;
+            Project probed;
+            FileNode expected;
+            Relocation relocation;
+            String marker;
 
-        scmUrl = scm.getUrl(found);
-        foundPom = database.pomByScm(scmUrl);
-        if (foundPom == null) {
-            probed = NodeRepository.probe(environment, found);
-            if (probed == null) {
-                throw new IllegalStateException();
+            scmUrl = scm.getUrl(found);
+            foundPom = database.pomByScm(scmUrl);
+            if (foundPom == null) {
+                probed = NodeRepository.probe(environment, found);
+                if (probed == null) {
+                    throw new IllegalStateException();
+                }
+                newPom = probed.load(environment, "local");
+                expected = environment.home.root().directory(newPom);
+                marker = "?";
+            } else {
+                newPom = null;
+                expected = environment.home.root().directory(foundPom);
+                marker = "C";
             }
-            newPom = probed.load(environment, "local");
-            expected = environment.home.root().directory(newPom);
-            marker = "?";
-        } else {
-            newPom = null;
-            expected = environment.home.root().directory(foundPom);
-            if (expected.equals(found)) {
-                return; // nothing to do
-            }
-            marker = "C ";
+            relocation = found.equals(expected)? null : new Relocation(found, expected);
+            return newPom == null && relocation == null ? null : new Step(marker, found, scmUrl, newPom, relocation);
         }
-        relocation = new Relocation(found, expected);
-        console.info.println(marker + " " + found + " " + scmUrl + " " + relocation);
-        input = console.readline("fix (y/n)? ");
-        if ("y".equalsIgnoreCase(input)) {
+
+        private final String marker;
+        private final FileNode found;
+        private final String scmUrl;
+        private final Pom newPom;
+        private final Relocation relocation;
+
+        public Step(String marker, FileNode found, String scmUrl, Pom newPom, Relocation relocation) {
+            this.marker = marker;
+            this.found = found;
+            this.scmUrl = scmUrl;
+            this.newPom = newPom;
+            this.relocation = relocation;
+        }
+
+        public void apply(Database database) throws IOException {
             if (newPom != null) {
                 database.index(Collections.singleton(Field.document(newPom)).iterator());
             }
             relocation.apply();
-            console.info.println(found + " fixed");
+        }
+
+        public String toString(String id) {
+            String head = "[" + id + "]" + " " + marker + " ";
+            List<String> lines;
+            StringBuilder result;
+
+            lines = new ArrayList<>();
+            if (newPom != null) {
+                lines.add(found + " " + scmUrl);
+            }
+            if (relocation != null) {
+                lines.add(relocation.toString());
+            }
+            if (lines.isEmpty()) {
+                throw new IllegalStateException();
+            }
+            result = new StringBuilder();
+            boolean first = true;
+            for (String line : lines) {
+                if (first) {
+                    first = false;
+                    result.append(head);
+                } else {
+                    result.append('\n');
+                    result.append(Strings.times(' ', head.length()));
+                }
+                result.append(line);
+            }
+            return result.toString();
         }
     }
 
@@ -99,9 +185,6 @@ public class Maintenance extends Base {
         }
 
         public void apply() throws IOException {
-            if (found.equals(expected)) {
-                return;
-            }
             expected.getParent().mkdirsOpt();
             found.move(expected);
         }
@@ -110,12 +193,9 @@ public class Maintenance extends Base {
             FileNode parent;
             String mkdir;
 
-            if (found.equals(expected)) {
-                return "";
-            }
             parent = expected.getParent();
             mkdir = parent.exists() ? "" : "mkdir -p " + parent + "; ";
-            return mkdir + "relocation: mv " + found + " " + expected;
+            return "relocate: " + mkdir + "mv " + found + " " + expected;
         }
     }
 }
