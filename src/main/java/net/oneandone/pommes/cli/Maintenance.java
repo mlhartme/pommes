@@ -39,13 +39,6 @@ public class Maintenance extends Base {
     @Override
     public void run(Database database) throws Exception {
         Map<FileNode, Scm> checkouts;
-        FileNode found;
-        Pom foundPom;
-        Scm scm;
-        String input;
-        String scmUrl;
-        Pom newPom;
-        Project probed;
 
         checkouts = Scm.scanCheckouts(directory, environment.excludes());
         if (checkouts.isEmpty()) {
@@ -64,24 +57,35 @@ public class Maintenance extends Base {
         Project probed;
         FileNode expected;
         Relocation relocation;
+        String marker;
 
         scmUrl = scm.getUrl(found);
         foundPom = database.pomByScm(scmUrl);
-        if (foundPom != null) {
-            return;
+        if (foundPom == null) {
+            probed = NodeRepository.probe(environment, found);
+            if (probed == null) {
+                throw new IllegalStateException();
+            }
+            newPom = probed.load(environment, "local");
+            expected = environment.home.root().directory(newPom);
+            marker = "?";
+        } else {
+            newPom = null;
+            expected = environment.home.root().directory(foundPom);
+            if (expected.equals(found)) {
+                return; // nothing to do
+            }
+            marker = "C ";
         }
-        probed = NodeRepository.probe(environment, found);
-        if (probed == null) {
-            throw new IllegalStateException();
-        }
-        newPom = probed.load(environment, "local");
-        expected = environment.home.root().directory(newPom);
         relocation = new Relocation(found, expected);
-        console.info.println("? " + found + " " + scmUrl + " " + relocation);
-        input = console.readline("add (y/n)? ");
+        console.info.println(marker + " " + found + " " + scmUrl + " " + relocation);
+        input = console.readline("fix (y/n)? ");
         if ("y".equalsIgnoreCase(input)) {
-            database.index(Collections.singleton(Field.document(newPom)).iterator());
+            if (newPom != null) {
+                database.index(Collections.singleton(Field.document(newPom)).iterator());
+            }
             relocation.apply();
+            console.info.println(found + " fixed");
         }
     }
 
