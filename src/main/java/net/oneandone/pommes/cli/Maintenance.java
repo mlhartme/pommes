@@ -141,7 +141,9 @@ public class Maintenance extends Base {
             if (newPom != null) {
                 database.index(Collections.singleton(Field.document(newPom)).iterator());
             }
-            relocation.apply();
+            if (relocation != null) {
+                relocation.apply();
+            }
         }
 
         public String toString(String id) {
@@ -150,8 +152,9 @@ public class Maintenance extends Base {
             StringBuilder result;
 
             lines = new ArrayList<>();
+            lines.add(found.toString());
             if (newPom != null) {
-                lines.add(found + " " + scmUrl);
+                lines.add("add " + scmUrl);
             }
             if (relocation != null) {
                 lines.add(relocation.toString());
