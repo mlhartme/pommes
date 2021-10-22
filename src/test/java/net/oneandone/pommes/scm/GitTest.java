@@ -36,7 +36,7 @@ public class GitTest {
     }
 
     @Test
-    public void dflt() throws Failure {
+    public void dflt() {
         Git git;
 
         git = new Git();

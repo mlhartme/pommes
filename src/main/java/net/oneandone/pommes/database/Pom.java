@@ -23,6 +23,7 @@ import com.google.gson.JsonPrimitive;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Meta information pommes holds about projects */
 public class Pom {
     public static Pom fromJson(JsonObject object) {
         JsonElement array;

@@ -2,7 +2,8 @@
 
 # Pommes
 
-Pommes is a project checkout manager and database tool, you can use it to keep the checkouts on your disk organized. Here's an example:
+Pommes is a project checkout manager and database tool, you can use it to keep the checkouts on your disk organized.
+Here's an example:
     
     ~/Projects $ pommes goto lavender
     [1]   Projects/svn.1and1.org/sales/tools/lavender
