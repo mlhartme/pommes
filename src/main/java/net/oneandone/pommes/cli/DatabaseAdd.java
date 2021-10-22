@@ -178,30 +178,30 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iter() {
-            Project pom;
+            Project project;
             Console console;
             String existingRevision;
 
             console = environment.console();
             while (true) {
                 try {
-                    pom = iterPom();
+                    project = iterPom();
                 } catch (IOException | InterruptedException e) {
                     console.error.println(e.getMessage());
                     e.printStackTrace(console.verbose);
                     errors++;
                     continue;
                 }
-                if (pom == null) {
+                if (project == null) {
                     return null;
                 }
-                existingRevision = existing.remove(pom.id);
-                if (pom.revision.equals(existingRevision)) {
-                    console.info.println("  " + pom.id);
+                existingRevision = existing.remove(project.id);
+                if (project.revision.equals(existingRevision)) {
+                    console.info.println("  " + project.id);
                 } else {
-                    console.info.println((existingRevision == null ? "A " : "U ") + pom.id);
+                    console.info.println((existingRevision == null ? "A " : "U ") + project.id);
                     if (!dryrun) {
-                        return Field.document(pom);
+                        return Field.document(project);
                     }
                 }
             }

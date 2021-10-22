@@ -195,13 +195,13 @@ public class Find extends Base {
         try {
             jsonWriter.beginArray();
             first = true;
-            for (Project pom : matches) {
+            for (Project project : matches) {
                 if (first) {
                     first = false;
                 } else {
                     // nop
                 }
-                Streams.write(pom.toJson(), jsonWriter);
+                Streams.write(project.toJson(), jsonWriter);
             }
             jsonWriter.endArray();
             jsonWriter.flush();
@@ -233,7 +233,7 @@ public class Find extends Base {
                         values.add(Character.toString(c));
                         break;
                     case 'c':
-                        FileNode directory = environment.home.root().directory(Field.pom(document));
+                        FileNode directory = environment.home.root().directory(Field.project(document));
                         if (directory.exists()) {
                             values.add(directory.getAbsolute());
                         }

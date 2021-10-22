@@ -26,10 +26,10 @@ import java.util.List;
 
 public enum Field {
     /**
-     * Mandatory. The full uri used to load the pom for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
+     * Mandatory. The full uri used to load the project for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ID("Unique identifier for this pom. Zone + ':' + origin."),
+    ID("Unique identifier for this project. Zone + ':' + origin."),
     REVISION("Last modified timestamp or content hash of this pom."),
     PARENT(true, false, "Coordinates of the parent project."),
     ARTIFACT("Coordinates of this project."),
@@ -134,25 +134,25 @@ public enum Field {
         return result;
     }
 
-    public static Document document(Project pom) {
+    public static Document document(Project project) {
         Document doc;
 
         doc = new Document();
-        ID.add(doc, pom.id);
-        REVISION.add(doc, pom.revision);
-        if (pom.parent != null) {
-            PARENT.add(doc, pom.parent.toGavString());
+        ID.add(doc, project.id);
+        REVISION.add(doc, project.revision);
+        if (project.parent != null) {
+            PARENT.add(doc, project.parent.toGavString());
         }
-        ARTIFACT.add(doc, pom.artifact.toGavString());
-        for (Gav dep : pom.dependencies) {
+        ARTIFACT.add(doc, project.artifact.toGavString());
+        for (Gav dep : project.dependencies) {
             DEP.add(doc, dep.toGavString());
         }
-        SCM.addOpt(doc, pom.scm);
-        URL.addOpt(doc, pom.url);
+        SCM.addOpt(doc, project.scm);
+        URL.addOpt(doc, project.url);
         return doc;
     }
 
-    public static Project pom(Document document) {
+    public static Project project(Document document) {
         Project result;
         String parent;
 
@@ -171,7 +171,7 @@ public enum Field {
 
         result = new ArrayList<>();
         for (Document document : documents) {
-            result.add(Field.pom(document));
+            result.add(Field.project(document));
         }
         return result;
     }

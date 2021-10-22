@@ -47,15 +47,15 @@ public class Goto extends Base {
         Action action;
 
         actions = new ArrayList<>();
-        for (Project pom : Field.projects(database.query(PommesQuery.create(query, environment)))) {
+        for (Project project : Field.projects(database.query(PommesQuery.create(query, environment)))) {
             try {
-                directory = environment.home.root().directory(pom);
-                action = Checkout.createOpt(directory, pom);
+                directory = environment.home.root().directory(project);
+                action = Checkout.createOpt(directory, project);
                 if (action == null) {
                     action = new Nop(directory);
                 }
             } catch (IOException e) {
-                action = new Problem(world.getWorking(), pom + ": " + e.getMessage());
+                action = new Problem(world.getWorking(), project + ": " + e.getMessage());
             }
             if (!actions.contains(action)) {
                 actions.add(action);

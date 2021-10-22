@@ -35,11 +35,11 @@ public class MavenDescriptor extends Descriptor {
         return name.equals("pom.xml") || name.endsWith(".pom");
     }
 
-    public static MavenDescriptor create(Environment environment, Node node) {
+    public static MavenDescriptor create(Environment notUsed, Node<?> node) {
         return new MavenDescriptor(node);
     }
 
-    public MavenDescriptor(Node descriptor) {
+    public MavenDescriptor(Node<?> descriptor) {
         this.descriptor = descriptor;
     }
 
@@ -51,7 +51,7 @@ public class MavenDescriptor extends Descriptor {
         org.apache.maven.project.MavenProject project;
         Artifact pa;
         Gav paGav;
-        Project pom;
+        Project pommesProject;
 
         local = null;
         try {
@@ -69,11 +69,11 @@ public class MavenDescriptor extends Descriptor {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pom = new Project(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
+            pommesProject = new Project(zone, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
-                pom.dependencies.add(Gav.forDependency(dependency));
+                pommesProject.dependencies.add(Gav.forDependency(dependency));
             }
-            return pom;
+            return pommesProject;
         } finally {
             if (local != descriptor) {
                 local.deleteFile();

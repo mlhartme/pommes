@@ -68,17 +68,17 @@ public class JsonRepository implements Repository {
         String prefix;
         JsonArray array;
         Descriptor descriptor;
-        Project pom;
+        Project project;
 
         prefix = node.getUri().toASCIIString() + ":";
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
             array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
                 try {
-                    pom = Project.fromJson(entry.getAsJsonObject());
-                    descriptor = new JsonDescriptor(pom);
-                    descriptor.setOrigin(prefix + pom.getOrigin());
-                    descriptor.setRevision(node.getWorld().memoryNode(pom.toJson().toString()).sha());
+                    project = Project.fromJson(entry.getAsJsonObject());
+                    descriptor = new JsonDescriptor(project);
+                    descriptor.setOrigin(prefix + project.getOrigin());
+                    descriptor.setRevision(node.getWorld().memoryNode(project.toJson().toString()).sha());
                 } catch (Exception e) {
                     descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
                     descriptor.setOrigin(node.getUri().toString());

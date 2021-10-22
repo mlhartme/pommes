@@ -23,7 +23,7 @@ import net.oneandone.sushi.fs.Node;
 import java.io.IOException;
 
 public class JsonDescriptor extends Descriptor {
-    public static boolean matches(String name) throws IOException {
+    public static boolean matches(String name) {
         return name.equals(".pommes.json") || name.equals("pommes.json");
     }
 
@@ -48,10 +48,10 @@ public class JsonDescriptor extends Descriptor {
 
     @Override
     protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
-        Project pom;
+        Project project;
 
-        pom = new Project(zone, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
-        pom.dependencies.addAll(orig.dependencies);
-        return pom;
+        project = new Project(zone, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
+        project.dependencies.addAll(orig.dependencies);
+        return project;
     }
 }

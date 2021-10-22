@@ -32,7 +32,7 @@ public abstract class Descriptor {
     };
 
     public static Descriptor probeChecked(Environment environment, Node node) {
-        BiFunction<Environment, Node, Descriptor> m;
+        BiFunction<Environment, Node<?>, Descriptor> m;
 
         try {
             m = match(node.getName());
@@ -43,13 +43,13 @@ public abstract class Descriptor {
     }
 
     public static Descriptor probe(Environment environment, Node node) throws IOException {
-        BiFunction<Environment, Node, Descriptor> m;
+        BiFunction<Environment, Node<?>, Descriptor> m;
 
         m = match(node.getName());
         return m != null ? m.apply(environment, node) : null;
     }
 
-    public static BiFunction<Environment, Node, Descriptor> match(String name) throws IOException {
+    public static BiFunction<Environment, Node<?>, Descriptor> match(String name) throws IOException {
         if (MavenDescriptor.matches(name)) {
             return MavenDescriptor::create;
         }

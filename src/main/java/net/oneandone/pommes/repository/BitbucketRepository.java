@@ -76,11 +76,11 @@ public class BitbucketRepository implements Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         Bitbucket bb;
         String bbProject;
         Descriptor descriptor;
-        BiFunction<Environment, Node, Descriptor> m;
+        BiFunction<Environment, Node<?>, Descriptor> m;
         byte[] bytes;
         List<String> lst;
         Node tmp;

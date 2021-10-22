@@ -178,10 +178,10 @@ public class Database implements AutoCloseable {
         return pq.find(searcher);
     }
 
-    public boolean contains(Project pom) throws IOException, QueryNodeException {
+    public boolean contains(Project project) throws IOException, QueryNodeException {
         PommesQuery pq;
 
-        pq = PommesQuery.create("a:" + pom.artifact.toGaString());
+        pq = PommesQuery.create("a:" + project.artifact.toGaString());
         return !query(pq).isEmpty();
     }
 
@@ -199,7 +199,7 @@ public class Database implements AutoCloseable {
             case 0:
                 return null;
             case 1:
-                return Field.pom(poms.get(0));
+                return Field.project(poms.get(0));
             default:
                 throw new IOException("scm ambiguous: " + url);
         }

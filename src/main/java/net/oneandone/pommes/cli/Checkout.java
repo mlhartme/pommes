@@ -40,9 +40,9 @@ public class Checkout extends Base {
         FileNode directory;
 
         adds = new ArrayList<>();
-        for (Project pom : Field.projects(database.query(PommesQuery.create(query, environment)))) {
-            directory = environment.home.root().directory(pom);
-            action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, pom);
+        for (Project project : Field.projects(database.query(PommesQuery.create(query, environment)))) {
+            directory = environment.home.root().directory(project);
+            action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, project);
             if (action != null) {
                 if (!adds.contains(action)) {
                     adds.add(action);
