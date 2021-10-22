@@ -34,7 +34,7 @@ public class JsonDescriptor extends Descriptor {
             json = environment.jsonParser().parse(node.readString()).getAsJsonObject();
             return new JsonDescriptor(Pom.fromJson(json));
         } catch (IOException e) {
-            throw new RuntimeException(node.getUri().toString() + ": cannot create json project", e);
+            throw new RuntimeException(node.getUri().toString() + ": cannot create json descriptor", e);
         }
     }
 

@@ -113,7 +113,6 @@ public class NodeRepository implements Repository {
 
     public void scan(Node root, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
-        Descriptor project;
         Node trunkNode;
         Node branchesNode;
         Node tagsNode;
@@ -177,14 +176,14 @@ public class NodeRepository implements Repository {
         }
     }
 
-    private static boolean add(BlockingQueue<Descriptor> dest, Descriptor project, Node node) throws IOException, InterruptedException {
-        if (project == null) {
+    private static boolean add(BlockingQueue<Descriptor> dest, Descriptor descriptor, Node node) throws IOException, InterruptedException {
+        if (descriptor == null) {
             return false;
         }
-        project.setOrigin(node.getUri().toString());
-        project.setRevision(Long.toString(node.getLastModified()));
-        project.setScm(nodeScm(node));
-        dest.put(project);
+        descriptor.setOrigin(node.getUri().toString());
+        descriptor.setRevision(Long.toString(node.getLastModified()));
+        descriptor.setScm(nodeScm(node));
+        dest.put(descriptor);
         return true;
     }
 

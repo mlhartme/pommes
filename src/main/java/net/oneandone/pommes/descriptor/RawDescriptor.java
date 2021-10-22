@@ -24,7 +24,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-/** project without meta information like form poms, only the scm url is know */
+/** descriptor without meta information like form poms, only the scm url is know */
 public class RawDescriptor extends Descriptor {
     public static RawDescriptor createOpt(FileNode node) throws IOException {
         Scm scm;

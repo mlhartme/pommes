@@ -67,7 +67,7 @@ public class JsonRepository implements Repository {
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         String prefix;
         JsonArray array;
-        Descriptor project;
+        Descriptor descriptor;
         Pom pom;
 
         prefix = node.getUri().toASCIIString() + ":";
@@ -76,14 +76,14 @@ public class JsonRepository implements Repository {
             for (JsonElement entry : array) {
                 try {
                     pom = Pom.fromJson(entry.getAsJsonObject());
-                    project = new JsonDescriptor(pom);
-                    project.setOrigin(prefix + pom.getOrigin());
-                    project.setRevision(node.getWorld().memoryNode(pom.toJson().toString()).sha());
+                    descriptor = new JsonDescriptor(pom);
+                    descriptor.setOrigin(prefix + pom.getOrigin());
+                    descriptor.setRevision(node.getWorld().memoryNode(pom.toJson().toString()).sha());
                 } catch (Exception e) {
-                    project = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
-                    project.setOrigin(node.getUri().toString());
+                    descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
+                    descriptor.setOrigin(node.getUri().toString());
                 }
-                dest.put(project);
+                dest.put(descriptor);
             }
         }
     }

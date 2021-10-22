@@ -79,7 +79,7 @@ public class BitbucketRepository implements Repository {
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
         Bitbucket bb;
         String bbProject;
-        Descriptor project;
+        Descriptor descriptor;
         BiFunction<Environment, Node, Descriptor> m;
         byte[] bytes;
         List<String> lst;
@@ -95,13 +95,13 @@ public class BitbucketRepository implements Repository {
                 if (m != null) {
                     bytes = bb.readBytes(bbProject, repo, path);
                     tmp = environment.world().memoryNode(bytes);
-                    project = m.apply(environment, tmp);
-                    if (project != null) {
+                    descriptor = m.apply(environment, tmp);
+                    if (descriptor != null) {
                         hostname = bitbucket.getRoot().getHostname();
-                        project.setOrigin("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
-                        project.setRevision(tmp.sha());
-                        project.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");
-                        dest.put(project);
+                        descriptor.setOrigin("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
+                        descriptor.setRevision(tmp.sha());
+                        descriptor.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");
+                        dest.put(descriptor);
                     }
                 }
             }

@@ -117,7 +117,7 @@ public class ArtifactoryRepository implements Repository {
             String sha1;
             int count;
             Node node;
-            Descriptor project;
+            Descriptor descriptor;
 
             count = 0;
             try (InputStream is = listing.newInputStream(); Parser parser = new Parser(Json.createParser(is))) {
@@ -137,11 +137,11 @@ public class ArtifactoryRepository implements Repository {
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
                     node = root.join(Strings.removeLeft(uri, "/"));
-                    project = Descriptor.probeChecked(environment, node);
-                    if (project != null) {
-                        project.setOrigin("artifactory:" + node.getUri().toString());
-                        project.setRevision(sha1);
-                        dest.put(project);
+                    descriptor = Descriptor.probeChecked(environment, node);
+                    if (descriptor != null) {
+                        descriptor.setOrigin("artifactory:" + node.getUri().toString());
+                        descriptor.setRevision(sha1);
+                        dest.put(descriptor);
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();
