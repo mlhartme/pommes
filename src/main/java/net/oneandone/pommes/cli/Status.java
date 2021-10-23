@@ -91,7 +91,7 @@ public class Status extends Base {
             for (FileNode node : directory.list()) {
                 if (node.isFile()) {
                     // ignore
-                } else if (hasAnchestor(directories, node)) {
+                } else if (hasAncestor(directories, node)) {
                     // required sub-directory
                 } else if (excludes.matches(node.getRelative(root))) {
                     // excluded
@@ -103,7 +103,7 @@ public class Status extends Base {
         return result;
     }
 
-    private static boolean hasAnchestor(Collection<FileNode> directories, FileNode node) {
+    private static boolean hasAncestor(Collection<FileNode> directories, FileNode node) {
         for (FileNode directory : directories) {
             if (directory.hasAncestor(node)) {
                 return true;
