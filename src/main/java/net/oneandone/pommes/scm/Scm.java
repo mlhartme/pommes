@@ -16,6 +16,7 @@
 package net.oneandone.pommes.scm;
 
 import net.oneandone.pommes.database.Gav;
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 import net.oneandone.sushi.launcher.Failure;
@@ -23,6 +24,8 @@ import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +56,7 @@ public abstract class Scm {
         } else {
             children = directory.list();
             if (children != null) {
+                Collections.sort(children, Comparator.comparing(Node::getName));
                 for (FileNode child : children) {
                     if (!child.getName().startsWith(".")) {
                         scanCheckouts(root, child, excludes, result);
