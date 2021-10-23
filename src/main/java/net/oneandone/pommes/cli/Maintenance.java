@@ -100,7 +100,7 @@ public class Maintenance extends Base {
 
     public static class Step {
         public static Step create(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
-            Project foundPom;
+            Project foundProject;
             String scmUrl;
             Project newPom;
             Descriptor probed;
@@ -108,8 +108,8 @@ public class Maintenance extends Base {
             Relocation relocation;
 
             scmUrl = scm.getUrl(found);
-            foundPom = database.projectByScm(scmUrl);
-            if (foundPom == null) {
+            foundProject = database.projectByScm(scmUrl);
+            if (foundProject == null) {
                 probed = NodeRepository.probe(environment, found);
                 if (probed == null) {
                     throw new IllegalStateException();
@@ -119,10 +119,9 @@ public class Maintenance extends Base {
                 relocation = found.equals(expected)? null : new Relocation(found, expected);
                 return new Step("?", found.toString(), scmUrl, newPom, relocation);
             } else {
-                newPom = null;
-                expected = environment.home.root().directory(foundPom);
+                expected = environment.home.root().directory(foundProject);
                 relocation = found.equals(expected)? null : new Relocation(found, expected);
-                return new Step(relocation == null ? "" : "C", found.toString(), scmUrl, newPom, relocation);
+                return new Step(relocation == null ? "" : "C", found.toString(), scmUrl, null, relocation);
             }
         }
 
