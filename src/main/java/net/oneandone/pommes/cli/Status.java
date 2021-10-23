@@ -16,7 +16,6 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
@@ -42,7 +41,6 @@ public class Status extends Base {
     @Override
     public void run(Database database) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Root root;
         FileNode found;
         FileNode expected;
         Project foundProject;
@@ -59,9 +57,8 @@ public class Status extends Base {
             if (foundProject == null) {
                 console.info.println("? " + found);
             } else {
-                root = environment.home.root();
                 try {
-                    expected = root.directory(foundProject);
+                    expected = environment.home.root().directory(foundProject);
                 } catch (IOException e) {
                     console.info.println("! " + found + " " + e.getMessage());
                     continue;
