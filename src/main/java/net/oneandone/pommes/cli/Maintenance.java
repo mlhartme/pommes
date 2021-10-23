@@ -46,6 +46,8 @@ public class Maintenance extends Base {
         Map<FileNode, Scm> checkouts;
         Map<String, Step> steps;
         int id;
+        FileNode found;
+        Step step;
 
         checkouts = Scm.scanCheckouts(directory, environment.excludes());
         if (checkouts.isEmpty()) {
@@ -54,9 +56,8 @@ public class Maintenance extends Base {
         steps = new LinkedHashMap<>();
         id = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
-            FileNode found = entry.getKey();
-
-            Step step = Step.createOpt(environment, database, found, entry.getValue());
+            found = entry.getKey();
+            step = Step.createOpt(environment, database, found, entry.getValue());
             if (step != null) {
                 steps.put(Integer.toString(++id), step);
             }
@@ -79,8 +80,6 @@ public class Maintenance extends Base {
                 }
                 steps.clear();
             } else {
-                Step step;
-
                 for (String item : Separator.SPACE.split(input)) {
                     step = steps.remove(item);
                     if (step == null) {
