@@ -48,9 +48,8 @@ public class Status extends Base {
     @Override
     public void run(Database database) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Map<String, Step> steps;
+        Map<Integer, Step> steps;
         int id;
-        String idStr;
         FileNode found;
         Step step;
 
@@ -64,15 +63,15 @@ public class Status extends Base {
             found = entry.getKey();
             step = Step.create(environment, database, found, entry.getValue());
             if (step.isNoop()) {
-                idStr = " ";
+                console.info.println(step);
             } else {
-                idStr = Integer.toString(++id);
-                steps.put(idStr, step);
+                id++;
+                steps.put(id, step);
+                console.info.println(step.toString(id));
             }
-            console.info.println(step.toString(idStr));
         }
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
-            console.info.println(new Step("?", u + " (normal directory)", null, null, null).toString(" "));
+            console.info.println(new Step("?", u + " (normal directory)", null, null, null));
         }
 
         if (!steps.isEmpty()) {
@@ -87,7 +86,11 @@ public class Status extends Base {
                     steps.clear();
                 } else {
                     for (String item : Separator.SPACE.split(input)) {
-                        step = steps.remove(item);
+                        try {
+                            step = steps.remove(Integer.parseInt(item));
+                        } catch (NumberFormatException e) {
+                            step = null;
+                        }
                         if (step == null) {
                             console.info.println("unknown input: " + item);
                             break;
@@ -212,8 +215,12 @@ public class Status extends Base {
             }
         }
 
-        public String toString(String id) {
-            String head = "[" + id + "]" + " " + marker + " ";
+        public String toString() {
+            return toString(-1);
+        }
+
+        public String toString(int id) {
+            String head = (id == -1 ? "    " : Strings.times(' ', id > 9 ? 0 : 1) + "[" + id + "]") + " " + marker + " ";
             List<String> lines;
             StringBuilder result;
 
