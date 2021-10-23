@@ -119,18 +119,18 @@ public class Maintenance extends Base {
                 marker = "C";
             }
             relocation = found.equals(expected)? null : new Relocation(found, expected);
-            return newPom == null && relocation == null ? null : new Step(marker, found, scmUrl, newPom, relocation);
+            return newPom == null && relocation == null ? null : new Step(marker, found.toString(), scmUrl, newPom, relocation);
         }
 
         private final String marker;
-        private final FileNode found;
+        private final String message;
         private final String scmUrl;
         private final Project newPom;
         private final Relocation relocation;
 
-        public Step(String marker, FileNode found, String scmUrl, Project newPom, Relocation relocation) {
+        public Step(String marker, String message, String scmUrl, Project newPom, Relocation relocation) {
             this.marker = marker;
-            this.found = found;
+            this.message = message;
             this.scmUrl = scmUrl;
             this.newPom = newPom;
             this.relocation = relocation;
@@ -151,7 +151,7 @@ public class Maintenance extends Base {
             StringBuilder result;
 
             lines = new ArrayList<>();
-            lines.add(found.toString());
+            lines.add(message);
             if (newPom != null) {
                 lines.add("add " + scmUrl);
             }
