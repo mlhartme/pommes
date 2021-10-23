@@ -4,7 +4,7 @@
 
 * added `maintenance` command to automatically add and relocate unknown projects or relocates existing project; 
   status no longer shows a fix for that 
-* status provements
+* status improvements
   * sort entries
   * don't print the project, just the checkout
 * added "raw projects" that represent projects without meta information
