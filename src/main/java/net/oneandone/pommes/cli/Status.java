@@ -67,7 +67,7 @@ public class Status extends Base {
                     continue;
                 }
                 if (found.equals(expected)) {
-                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found + " (" + foundProject + ")");
+                    console.info.println((scm.isCommitted(found) ? ' ' : 'M') + " " + found);
                 } else {
                     console.info.println("C " + found);
                 }

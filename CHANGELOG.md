@@ -6,6 +6,7 @@
   status no longer shows a fix for that 
 * status provements
   * sort entries
+  * don't print the project, just the checkout
 * added "raw projects" that represent projects without meta information
 * changed checkout paths: they are now based on the url, not gav. That feels more natural, and it works
   for all projects, even without pom
