@@ -46,6 +46,7 @@ public class Maintenance extends Base {
         Map<FileNode, Scm> checkouts;
         Map<String, Step> steps;
         int id;
+        String idStr;
         FileNode found;
         Step step;
 
@@ -57,51 +58,54 @@ public class Maintenance extends Base {
         id = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
-            step = Step.createOpt(environment, database, found, entry.getValue());
-            if (step != null) {
-                steps.put(Integer.toString(++id), step);
-            }
-        }
-        if (steps.isEmpty()) {
-            console.info.println("nothing to do, " + checkouts.size() + " ok");
-            return;
-        }
-
-        while (!steps.isEmpty()) {
-            for (var entry : steps.entrySet()) {
-                console.info.println(entry.getValue().toString(entry.getKey()));
-            }
-            String input;
-            input = console.readline("What do you want to fix, ctrl-c to abort (<numbers>/all)? ");
-            if ("all".equals(input)) {
-                for (var entry : steps.entrySet()) {
-                    entry.getValue().apply(database);
-                    console.info.println("fixed " + entry.getKey());
-                }
-                steps.clear();
+            step = Step.create(environment, database, found, entry.getValue());
+            if (step.isNoop()) {
+                idStr = " ";
             } else {
-                for (String item : Separator.SPACE.split(input)) {
-                    step = steps.remove(item);
-                    if (step == null) {
-                        console.info.println("unknown input: " + item);
-                        break;
+                idStr = Integer.toString(++id);
+                steps.put(idStr, step);
+            }
+            console.info.println(step.toString(idStr));
+        }
+        if (!steps.isEmpty()) {
+            while (true) {
+                String input;
+                input = console.readline("What do you want to fix, ctrl-c to abort (<numbers>/all)? ");
+                if ("all".equals(input)) {
+                    for (var entry : steps.entrySet()) {
+                        entry.getValue().apply(database);
+                        console.info.println("fixed " + entry.getKey());
                     }
-                    step.apply(database);
-                    console.info.println("fixed " + item);
+                    steps.clear();
+                } else {
+                    for (String item : Separator.SPACE.split(input)) {
+                        step = steps.remove(item);
+                        if (step == null) {
+                            console.info.println("unknown input: " + item);
+                            break;
+                        }
+                        step.apply(database);
+                        console.info.println("fixed " + item);
+                    }
+                }
+                if (steps.isEmpty()) {
+                    break;
+                }
+                for (var entry : steps.entrySet()) {
+                    console.info.println(entry.getValue().toString(entry.getKey()));
                 }
             }
         }
     }
 
     public static class Step {
-        public static Step createOpt(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
+        public static Step create(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
             Project foundPom;
             String scmUrl;
             Project newPom;
             Descriptor probed;
             FileNode expected;
             Relocation relocation;
-            String marker;
 
             scmUrl = scm.getUrl(found);
             foundPom = database.projectByScm(scmUrl);
@@ -112,14 +116,14 @@ public class Maintenance extends Base {
                 }
                 newPom = probed.load(environment, "local");
                 expected = environment.home.root().directory(newPom);
-                marker = "?";
+                relocation = found.equals(expected)? null : new Relocation(found, expected);
+                return new Step("?", found.toString(), scmUrl, newPom, relocation);
             } else {
                 newPom = null;
                 expected = environment.home.root().directory(foundPom);
-                marker = "C";
+                relocation = found.equals(expected)? null : new Relocation(found, expected);
+                return new Step(relocation == null ? "" : "C", found.toString(), scmUrl, newPom, relocation);
             }
-            relocation = found.equals(expected)? null : new Relocation(found, expected);
-            return newPom == null && relocation == null ? null : new Step(marker, found.toString(), scmUrl, newPom, relocation);
         }
 
         private final String marker;
@@ -134,6 +138,10 @@ public class Maintenance extends Base {
             this.scmUrl = scmUrl;
             this.newPom = newPom;
             this.relocation = relocation;
+        }
+
+        public boolean isNoop() {
+            return newPom == null && relocation == null;
         }
 
         public void apply(Database database) throws IOException {
