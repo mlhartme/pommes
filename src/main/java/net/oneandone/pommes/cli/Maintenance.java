@@ -119,9 +119,15 @@ public class Maintenance extends Base {
                 relocation = found.equals(expected)? null : new Relocation(found, expected);
                 return new Step("?", found.toString(), scmUrl, newPom, relocation);
             } else {
-                expected = environment.home.root().directory(foundProject);
-                relocation = found.equals(expected)? null : new Relocation(found, expected);
-                return new Step(relocation == null ? "" : "C", found.toString(), scmUrl, null, relocation);
+                try {
+                    expected = environment.home.root().directory(foundProject);
+                } catch (IOException e) {
+                    return new Step("!", found.toString() + " " + e.getMessage(), scmUrl, null, null);
+                }
+                if (found.equals(expected)) {
+                    return new Step(scm.isCommitted(found) ? " " : "M", found.toString(), scmUrl, null, null);
+                }
+                return new Step("C", found.toString(), scmUrl, null, new Relocation(found, expected));
             }
         }
 
