@@ -107,7 +107,6 @@ public class Main {
             cli.add(Remove.class, "remove -stale root?=.");
 
             cli.add(Status.class, "st root?=.");
-            cli.add(Maintenance.class, "maintenance root?=.");
             cli.add(Goto.class, "goto query*");
 
             cli.add(DatabaseReset.class, "database-reset");
