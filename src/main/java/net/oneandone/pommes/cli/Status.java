@@ -72,7 +72,7 @@ public class Status extends Base {
             console.info.println(step.toString(idStr));
         }
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
-            console.info.println("? " + u + " (normal directory)");
+            console.info.println(new Step("?", u + " (normal directory)", null, null, null).toString(" "));
         }
 
         if (!steps.isEmpty()) {
