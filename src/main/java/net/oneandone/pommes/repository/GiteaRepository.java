@@ -19,6 +19,7 @@ import io.gitea.ApiClient;
 import io.gitea.ApiException;
 import io.gitea.Configuration;
 import io.gitea.api.OrganizationApi;
+import io.gitea.api.RepositoryApi;
 import io.gitea.auth.ApiKeyAuth;
 import io.gitea.model.Organization;
 import net.oneandone.inline.ArgumentException;
@@ -30,6 +31,7 @@ import net.oneandone.sushi.fs.World;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -61,9 +63,11 @@ public class GiteaRepository implements Repository {
     }
 
     private final ApiClient gitea;
+    private final OrganizationApi organizationApi;
 
     public GiteaRepository(ApiClient gitea) {
         this.gitea = gitea;
+        this.organizationApi = new OrganizationApi(gitea);
     }
 
     public void addOption(String option) {
@@ -83,18 +87,36 @@ public class GiteaRepository implements Repository {
         // TODO: duplicates orgs
         orgs = new ArrayList<>(new HashSet<>(orgs));
         Collections.sort(orgs);
-            for (String org : orgs) {
-               System.out.println(org);
-/*                var lst = organizationApi.orgListRepos(o.getUsername(), 0, 200);
-                for (var r : lst) {
-                    System.out.println("  " + r.getName() + " " + r.getDescription());
-                }
-  */
+        for (String org : orgs) {
+            for (var r : listRepos(org)) {
+                System.out.println(org + " " + r.getName());
             }
+        }
+    }
+
+    public List<io.gitea.model.Repository> listRepos(String org) throws IOException {
+        List<io.gitea.model.Repository> repos;
+        List<io.gitea.model.Repository> result;
+
+        result = new ArrayList<>();
+        try {
+            for (int page = 0; true; page++) {
+                repos = organizationApi.orgListRepos(org, page, 50);
+                if (repos.isEmpty()) {
+                    break;
+                }
+                for (var r: repos) {
+                    result.add(r);
+                }
+            }
+        } catch (ApiException e) {
+            throw new IOException(e);
+        }
+        Collections.sort(result, Comparator.comparing(io.gitea.model.Repository::getName));
+        return result;
     }
 
     public List<String> listOrganizations() throws IOException {
-        OrganizationApi organizationApi = new OrganizationApi(gitea);
         List<Organization> orgas;
         List<String> result;
 
