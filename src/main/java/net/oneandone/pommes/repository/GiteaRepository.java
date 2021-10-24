@@ -20,6 +20,7 @@ import io.gitea.ApiException;
 import io.gitea.Configuration;
 import io.gitea.api.OrganizationApi;
 import io.gitea.auth.ApiKeyAuth;
+import io.gitea.model.Organization;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
@@ -27,6 +28,9 @@ import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.World;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -72,18 +76,67 @@ public class GiteaRepository implements Repository {
 
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException {
-        OrganizationApi organizationApi = new OrganizationApi(gitea);
-        try {
-            for (var o : organizationApi.orgGetAll(0, 100)) {
-                System.out.println("organization '" + o.getUsername() + "' " + o.getFullName());
-                var lst = organizationApi.orgListRepos(o.getUsername(), 0, 200);
+        List<String> orgs;
+
+        orgs = listCurrentUserOrgs();
+        orgs.addAll(listOrganizations());
+        // TODO: duplicates orgs
+        orgs = new ArrayList<>(new HashSet<>(orgs));
+        Collections.sort(orgs);
+            for (String org : orgs) {
+               System.out.println(org);
+/*                var lst = organizationApi.orgListRepos(o.getUsername(), 0, 200);
                 for (var r : lst) {
                     System.out.println("  " + r.getName() + " " + r.getDescription());
+                }
+  */
+            }
+    }
+
+    public List<String> listOrganizations() throws IOException {
+        OrganizationApi organizationApi = new OrganizationApi(gitea);
+        List<Organization> orgas;
+        List<String> result;
+
+        result = new ArrayList<>();
+        try {
+            for (int page = 0; true; page++) {
+                orgas = organizationApi.orgGetAll(page, 50);
+                if (orgas.isEmpty()) {
+                    break;
+                }
+                for (var o : orgas) {
+                    result.add(o.getUsername());
                 }
             }
         } catch (ApiException e) {
             throw new IOException(e);
         }
+        return result;
     }
+
+    public List<String> listCurrentUserOrgs() throws IOException {
+        OrganizationApi organizationApi = new OrganizationApi(gitea);
+        List<Organization> orgas;
+        List<String> result;
+
+        result = new ArrayList<>();
+        try {
+            for (int page = 0; true; page++) {
+                orgas = organizationApi.orgListCurrentUserOrgs(page, 50);
+                if (orgas.isEmpty()) {
+                    break;
+                }
+                for (var o : orgas) {
+                    result.add(o.getUsername());
+                }
+            }
+        } catch (ApiException e) {
+            throw new IOException(e);
+        }
+        return result;
+    }
+
+
 
 }
