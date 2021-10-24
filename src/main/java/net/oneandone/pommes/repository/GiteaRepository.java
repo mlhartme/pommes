@@ -27,10 +27,14 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.memory.MemoryNode;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -43,10 +47,12 @@ public class GiteaRepository implements Repository {
     private static final String PROTOCOL = "gitea:";
 
     public static void main(String[] args) throws IOException {
+        Environment env;
         GiteaRepository gitea;
 
-        gitea = GiteaRepository.create(new Environment(Console.create(), World.create()));
-        gitea.scanOpt("CPOPS", "puc", "main");
+        env = new Environment(Console.create(), World.create());
+        gitea = GiteaRepository.create(env);
+        System.out.println("puc: " + gitea.scanOpt("CPOPS", "puc", "main").load(env, "zone"));
     }
 
     public static GiteaRepository create(Environment environment) {
@@ -59,14 +65,16 @@ public class GiteaRepository implements Repository {
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
         accessToken.setApiKey(environment.home.properties().giteaKey);
 
-        return new GiteaRepository(gitea);
+        return new GiteaRepository(environment, gitea);
     }
 
+    private final Environment environment;
     private final ApiClient gitea;
     private final OrganizationApi organizationApi;
     private final RepositoryApi repositoryApi;
 
-    public GiteaRepository(ApiClient gitea) {
+    public GiteaRepository(Environment environment, ApiClient gitea) {
+        this.environment = environment;
         this.gitea = gitea;
         this.organizationApi = new OrganizationApi(gitea);
         this.repositoryApi = new RepositoryApi(gitea);
@@ -108,10 +116,24 @@ public class GiteaRepository implements Repository {
             lst = repositoryApi.repoGetContentsList(org, repo, ref);
             for (ContentsResponse contents : lst) {
                 if ("file".equals(contents.getType())) {
-                    BiFunction m = Descriptor.match(contents.getName());
+                    BiFunction<Environment, Node<?>, Descriptor> m = Descriptor.match(contents.getName());
                     if (m != null) {
-                        var c = repositoryApi.repoGetContents(org, repo, contents.getPath(), ref);
-                        System.out.println("" + c.getContent());
+                        contents = repositoryApi.repoGetContents(org, repo, contents.getPath(), ref);
+                        String str = contents.getContent();
+                        if ("base64".equals(contents.getEncoding())) {
+                            str = new String(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+                        } else if (contents.getEncoding() != null) {
+                            throw new IllegalStateException(contents.getEncoding());
+                        }
+                        MemoryNode tmp = environment.world().memoryNode(str);
+                        Descriptor descriptor = m.apply(environment, tmp);
+                        if (descriptor != null) {
+                            String hostname = "git.ionos.org"; // TODO
+                            descriptor.setOrigin("gitea://" + hostname + "/" + org + "/" + repo + "/" + contents.getPath());
+                            descriptor.setRevision(tmp.sha());
+                            descriptor.setScm("git:ssh://git@" + hostname + "/" + org + "/" + repo + ".git");
+                            return descriptor;
+                        }
                     }
                 }
             }
