@@ -124,6 +124,17 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.zeripath</groupId>
+      <artifactId>java-gitea-api</artifactId>
+      <version>1.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.11.2</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>5.7.1</version>

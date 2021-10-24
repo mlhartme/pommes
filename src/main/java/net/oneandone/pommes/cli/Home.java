@@ -81,11 +81,11 @@ public class Home {
         return home.join("pommes.properties");
     }
 
-    public Properties properties() throws IOException {
+    public Properties properties() {
         return properties;
     }
 
-    public FileNode logs() throws IOException {
+    public FileNode logs() {
         return home.join("logs");
     }
 }

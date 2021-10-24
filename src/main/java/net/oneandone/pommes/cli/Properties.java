@@ -49,6 +49,7 @@ public class Properties {
         String queryPrefix = "query.";
         String formatPrefix = "format.";
         String importsPrefix = "import.";
+        String giteaKey;
         java.util.Properties props;
         Map<String, List<String>> queries;
         Map<String, String> formats;
@@ -56,6 +57,7 @@ public class Properties {
         FileNode checkouts;
 
         world = file.getWorld();
+        giteaKey = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
         imports = new HashMap<>();
@@ -64,6 +66,8 @@ public class Properties {
         for (String key : props.stringPropertyNames()) {
             if (key.equals("checkouts")) {
                 checkouts = world.file(props.getProperty(key));
+            } else if (key.equals("gitea.key")) {
+                giteaKey = props.getProperty(key);
             } else if (key.startsWith(queryPrefix)) {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
@@ -74,31 +78,33 @@ public class Properties {
                 throw new IOException("unknown property: " + key);
             }
         }
-        return new Properties(checkouts, queries, formats, imports);
+        return new Properties(checkouts, giteaKey, queries, formats, imports);
     }
 
     //--
 
     public final FileNode checkouts;
+    public final String giteaKey;
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
     /** maps zones to urls */
     public final Map<String, String> imports;
 
-    public Properties(FileNode checkouts, Map<String, List<String>> queries,
+    public Properties(FileNode checkouts, String giteaKey, Map<String, List<String>> queries,
                       Map<String, String> formats, Map<String, String> imports) throws IOException {
         this.checkouts = checkouts;
+        this.giteaKey = giteaKey;
         this.queries = queries;
         this.formats = formats;
         this.imports = imports;
     }
 
-    public List<String> lookupQuery(String name) throws IOException {
+    public List<String> lookupQuery(String name) {
         return queries.get(name);
     }
 
-    public String lookupFormat(String name) throws IOException {
+    public String lookupFormat(String name) {
         return formats.get(name);
     }
 }
