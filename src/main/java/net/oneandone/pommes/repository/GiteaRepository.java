@@ -21,6 +21,7 @@ import io.gitea.Configuration;
 import io.gitea.api.OrganizationApi;
 import io.gitea.api.RepositoryApi;
 import io.gitea.auth.ApiKeyAuth;
+import io.gitea.model.ContentsResponse;
 import io.gitea.model.Organization;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
@@ -35,6 +36,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.BiFunction;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class GiteaRepository implements Repository {
@@ -42,15 +44,13 @@ public class GiteaRepository implements Repository {
 
     public static void main(String[] args) throws IOException {
         GiteaRepository gitea;
-        List<io.gitea.model.Repository> lst;
 
         gitea = GiteaRepository.create(new Environment(Console.create(), World.create()));
-        gitea.scan(null);
+        gitea.scanOpt("CPOPS", "puc", "main");
     }
 
     public static GiteaRepository create(Environment environment) {
         ApiClient gitea;
-        List<io.gitea.model.Repository> lst;
 
         gitea = Configuration.getDefaultApiClient();
         gitea.setBasePath("https://git.ionos.org/api/v1");
@@ -64,10 +64,12 @@ public class GiteaRepository implements Repository {
 
     private final ApiClient gitea;
     private final OrganizationApi organizationApi;
+    private final RepositoryApi repositoryApi;
 
     public GiteaRepository(ApiClient gitea) {
         this.gitea = gitea;
         this.organizationApi = new OrganizationApi(gitea);
+        this.repositoryApi = new RepositoryApi(gitea);
     }
 
     public void addOption(String option) {
@@ -81,17 +83,42 @@ public class GiteaRepository implements Repository {
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException {
         List<String> orgs;
-
+        Descriptor descriptor;
         orgs = listCurrentUserOrgs();
         orgs.addAll(listOrganizations());
+
         // TODO: duplicates orgs
         orgs = new ArrayList<>(new HashSet<>(orgs));
         Collections.sort(orgs);
+
         for (String org : orgs) {
             for (var r : listRepos(org)) {
-                System.out.println(org + " " + r.getName());
+                descriptor = scanOpt(org, r.getName(), r.getDefaultBranch());
+                if (descriptor != null) {
+                    dest.add(descriptor);
+                }
             }
         }
+    }
+
+    public Descriptor scanOpt(String org, String repo, String ref) throws IOException {
+        List<ContentsResponse> lst;
+
+        try {
+            lst = repositoryApi.repoGetContentsList(org, repo, ref);
+            for (ContentsResponse contents : lst) {
+                if ("file".equals(contents.getType())) {
+                    BiFunction m = Descriptor.match(contents.getName());
+                    if (m != null) {
+                        var c = repositoryApi.repoGetContents(org, repo, contents.getPath(), ref);
+                        System.out.println("" + c.getContent());
+                    }
+                }
+            }
+        } catch (ApiException e) {
+            throw new IOException(e);
+        }
+        return null;
     }
 
     public List<io.gitea.model.Repository> listRepos(String org) throws IOException {
@@ -138,7 +165,6 @@ public class GiteaRepository implements Repository {
     }
 
     public List<String> listCurrentUserOrgs() throws IOException {
-        OrganizationApi organizationApi = new OrganizationApi(gitea);
         List<Organization> orgas;
         List<String> result;
 
