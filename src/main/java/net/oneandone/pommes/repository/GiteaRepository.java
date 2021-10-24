@@ -15,48 +15,37 @@
  */
 package net.oneandone.pommes.repository;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.gitea.ApiClient;
 import io.gitea.ApiException;
 import io.gitea.Configuration;
 import io.gitea.api.OrganizationApi;
-import io.gitea.api.RepositoryApi;
 import io.gitea.auth.ApiKeyAuth;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.sushi.fs.NewInputStreamException;
-import net.oneandone.sushi.fs.Node;
-import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.http.HttpNode;
-import net.oneandone.sushi.fs.http.HttpRoot;
-import net.oneandone.sushi.fs.http.MovedTemporarilyException;
-import net.oneandone.sushi.fs.http.StatusException;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiFunction;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class GiteaRepository implements Repository {
     private static final String PROTOCOL = "gitea:";
 
-    public static void main(String[] args) throws IOException, ApiException {
-        World world;
-        Environment environment;
+    public static void main(String[] args) throws IOException {
+        GiteaRepository gitea;
+        List<io.gitea.model.Repository> lst;
+
+        gitea = GiteaRepository.create(new Environment(Console.create(), World.create()));
+        gitea.scan(null);
+    }
+
+    public static GiteaRepository create(Environment environment) {
         ApiClient gitea;
         List<io.gitea.model.Repository> lst;
 
-        world = World.create();
-        environment = new Environment(Console.create(), world);
         gitea = Configuration.getDefaultApiClient();
         gitea.setBasePath("https://git.ionos.org/api/v1");
         gitea.setReadTimeout(120000);
@@ -64,170 +53,37 @@ public class GiteaRepository implements Repository {
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
         accessToken.setApiKey(environment.home.properties().giteaKey);
 
-        OrganizationApi organizationApi = new OrganizationApi(gitea);
-        for (var o : organizationApi.orgGetAll(0, 100)) {
-            System.out.println("organization '" + o.getUsername() + "' " + o.getFullName());
-            lst = organizationApi.orgListRepos(o.getUsername(), 0, 200);
-            for (var r : lst) {
-                System.out.println("  " + r.getName() + " " + r.getDescription());
-            }
-        }
+        return new GiteaRepository(gitea);
     }
 
-    private final Environment environment;
-    private final HttpNode bitbucket;
+    private final ApiClient gitea;
 
-    public GiteaRepository(Environment environment, HttpNode bitbucket) {
-        this.environment = environment;
-        this.bitbucket = bitbucket;
+    public GiteaRepository(ApiClient gitea) {
+        this.gitea = gitea;
     }
 
     public void addOption(String option) {
-        throw new ArgumentException(bitbucket.getUri() + ": unknown option: " + option);
+        throw new ArgumentException(gitea.getBasePath() + ": unknown option: " + option);
     }
 
     public void addExclude(String exclude) {
-        throw new ArgumentException(bitbucket.getUri() + ": excludes not supported: " + exclude);
+        throw new ArgumentException(gitea.getBasePath() + ": excludes not supported: " + exclude);
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
-        Bitbucket bb;
-        String bbProject;
-        Descriptor descriptor;
-        BiFunction<Environment, Node<?>, Descriptor> m;
-        byte[] bytes;
-        List<String> lst;
-        Node tmp;
-        String hostname;
-
-        bb = new Bitbucket(bitbucket.getRoot(), environment.jsonParser());
-        bbProject = bitbucket.getName();
-        for (String repo : bb.listRepos(bbProject)) {
-            lst = bb.listRoot(bbProject, repo);
-            for (String path : lst) {
-                m = Descriptor.match(path);
-                if (m != null) {
-                    bytes = bb.readBytes(bbProject, repo, path);
-                    tmp = environment.world().memoryNode(bytes);
-                    descriptor = m.apply(environment, tmp);
-                    if (descriptor != null) {
-                        hostname = bitbucket.getRoot().getHostname();
-                        descriptor.setOrigin("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
-                        descriptor.setRevision(tmp.sha());
-                        descriptor.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");
-                        dest.put(descriptor);
-                    }
+    public void scan(BlockingQueue<Descriptor> dest) throws IOException {
+        OrganizationApi organizationApi = new OrganizationApi(gitea);
+        try {
+            for (var o : organizationApi.orgGetAll(0, 100)) {
+                System.out.println("organization '" + o.getUsername() + "' " + o.getFullName());
+                var lst = organizationApi.orgListRepos(o.getUsername(), 0, 200);
+                for (var r : lst) {
+                    System.out.println("  " + r.getName() + " " + r.getDescription());
                 }
             }
+        } catch (ApiException e) {
+            throw new IOException(e);
         }
     }
 
-    private static class Bitbucket {
-        private final HttpRoot root;
-        private final JsonParser parser;
-
-
-        Bitbucket(HttpRoot root, JsonParser parser) {
-            this.root = root;
-            this.parser = parser;
-        }
-
-        // TODO: always fails with 404 error ...
-        public String getRevision(String project, String repo, String path) throws IOException {
-            JsonObject result;
-
-            result = getJsonObject("rest/api/1.0/projects/" + project + "/repos/" + repo + "/last-modified/" + path, "");
-            return result.get("id").getAsString();
-        }
-
-        public byte[] readBytes(String project, String repo, String path) throws IOException {
-            String location;
-            HttpNode node;
-
-            node = root.node("projects/" + project + "/repos/" + repo + "/browse/" + path, "raw");
-            while (true) {
-                try {
-                    // try to load. To see if we ne a redirected location
-                    return node.readBytes();
-                } catch (NewInputStreamException e) {
-                    if (e.getCause() instanceof MovedTemporarilyException) {
-                        location = ((MovedTemporarilyException) e.getCause()).location;
-                        try {
-                            node = (HttpNode) node.getWorld().node(location);
-                        } catch (URISyntaxException e1) {
-                            throw new IOException("cannot redirect to location " + location, e);
-                        }
-                        continue;
-                    } else {
-                        throw e;
-                    }
-                }
-            }
-        }
-
-        public List<String> listRepos(String project) throws IOException {
-            List<String> result;
-
-            result = new ArrayList<>();
-            for (JsonElement repo : getPaged("rest/api/1.0/projects/" + project + "/repos")) {
-                result.add(repo.getAsJsonObject().get("slug").getAsString());
-            }
-            return result;
-        }
-
-        public List<String> listRoot(String project, String repo) throws IOException {
-            String path;
-            List<JsonElement> all;
-            List<String> result;
-
-
-            result = new ArrayList<>();
-            try {
-                all = getPaged("rest/api/1.0/projects/" + project + "/repos/" + repo + "/files/");
-            } catch (NewInputStreamException e) {
-                if (e.getCause() instanceof StatusException) {
-                    if (((StatusException) e.getCause()).getStatusLine().code == 401) {
-                        // happens if the repository is still empty
-                        return result;
-                    }
-                }
-                throw e;
-            }
-
-            for (JsonElement file : all) {
-                path = file.getAsString();
-                if (!path.contains("/")) {
-                    result.add(path);
-                }
-            }
-            return result;
-        }
-
-        //--
-
-        private List<JsonElement> getPaged(String path) throws IOException {
-            int perPage = 25;
-            JsonObject paged;
-            List<JsonElement> result;
-
-            result = new ArrayList<>();
-            for (int i = 0; true; i += perPage) {
-                paged = getJsonObject(path, "limit=" + perPage + "&start=" + i);
-                for (JsonElement value : paged.get("values").getAsJsonArray()) {
-                    result.add(value);
-                }
-                if (paged.get("isLastPage").getAsBoolean()) {
-                    break;
-                }
-            }
-            return result;
-        }
-
-        private JsonObject getJsonObject(String path, String params) throws IOException {
-            try (Reader src = root.node(path, params).newReader()) {
-                return parser.parse(src).getAsJsonObject();
-            }
-        }
-    }
 }
