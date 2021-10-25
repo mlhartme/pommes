@@ -40,9 +40,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.BiFunction;
@@ -181,9 +182,9 @@ public class GiteaRepository implements Repository {
 
     public List<io.gitea.model.Repository> listRepos(String org) throws IOException {
         List<io.gitea.model.Repository> repos;
-        List<io.gitea.model.Repository> result;
+        Map<String, io.gitea.model.Repository> map;
 
-        result = new ArrayList<>();
+        map = new TreeMap<>();
         try {
             for (int page = 0; true; page++) {
                 repos = organizationApi.orgListRepos(org, page, 50);
@@ -191,14 +192,15 @@ public class GiteaRepository implements Repository {
                     break;
                 }
                 for (var r: repos) {
-                    result.add(r);
+                    if (!map.containsKey(r.getName())) { // TODO: avoid duplicates
+                        map.put(r.getName(), r);
+                    }
                 }
             }
         } catch (ApiException e) {
             throw new IOException(e);
         }
-        Collections.sort(result, Comparator.comparing(io.gitea.model.Repository::getName));
-        return result;
+        return new ArrayList<>(map.values());
     }
 
     public List<String> listOrganizations() throws IOException {
