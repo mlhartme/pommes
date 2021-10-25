@@ -28,10 +28,14 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.memory.MemoryNode;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -39,6 +43,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.BiFunction;
 
@@ -46,36 +51,64 @@ import java.util.function.BiFunction;
 public class GiteaRepository implements Repository {
     private static final String PROTOCOL = "gitea:";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         Environment env;
         GiteaRepository gitea;
 
         env = new Environment(Console.create(), World.create());
-        gitea = GiteaRepository.create(env);
-        System.out.println("puc: " + gitea.scanOpt("CPOPS", "puc", "main").load(env, "zone"));
+        gitea = GiteaRepository.create(env, "https://git.ionos.org/CPOPS");
+        BlockingQueue<Descriptor> result = new ArrayBlockingQueue<>(1000);
+        gitea.scan(result);
+        for (var d : result) {
+            System.out.println(" " + d.load(env, "zone"));
+        }
     }
 
-    public static GiteaRepository create(Environment environment) {
-        ApiClient gitea;
+    public static GiteaRepository createOpt(Environment environment, String url) throws URISyntaxException, NodeInstantiationException {
+        if (url.startsWith(PROTOCOL)) {
+            return create(environment, url.substring(PROTOCOL.length()));
+        } else {
+            return null;
+        }
+    }
 
+    public static GiteaRepository create(Environment environment, String uriStr) throws URISyntaxException {
+        ApiClient gitea;
+        URI uri;
+        String path;
+        String selectedOrganization;
+
+        uri = new URI(uriStr);
+        path = uri.getPath();
+        if (path != null) {
+            path = Strings.removeLeft(path, "/");
+            if (path.contains("/")) {
+                throw new IllegalArgumentException(uriStr);
+            }
+            selectedOrganization = path;
+        } else {
+            selectedOrganization = null;
+        }
         gitea = Configuration.getDefaultApiClient();
-        gitea.setBasePath("https://git.ionos.org/api/v1");
+        gitea.setBasePath(uri.resolve(URI.create("/api/v1")).toString());
         gitea.setReadTimeout(120000);
 
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
         accessToken.setApiKey(environment.home.properties().giteaKey);
 
-        return new GiteaRepository(environment, gitea);
+        return new GiteaRepository(environment, gitea, selectedOrganization);
     }
 
     private final Environment environment;
     private final ApiClient gitea;
+    private final String selectedOrganization;
     private final OrganizationApi organizationApi;
     private final RepositoryApi repositoryApi;
 
-    public GiteaRepository(Environment environment, ApiClient gitea) {
+    public GiteaRepository(Environment environment, ApiClient gitea, String selectedOrganization) {
         this.environment = environment;
         this.gitea = gitea;
+        this.selectedOrganization = selectedOrganization;
         this.organizationApi = new OrganizationApi(gitea);
         this.repositoryApi = new RepositoryApi(gitea);
     }
@@ -95,13 +128,16 @@ public class GiteaRepository implements Repository {
         orgs = listCurrentUserOrgs();
         orgs.addAll(listOrganizations());
 
-        // TODO: duplicates orgs
-        orgs = new ArrayList<>(new HashSet<>(orgs));
-        Collections.sort(orgs);
-
+        if (selectedOrganization == null) {
+            // TODO: duplicates orgs
+            orgs = new ArrayList<>(new HashSet<>(orgs));
+            Collections.sort(orgs);
+        } else {
+            orgs = Collections.singletonList(selectedOrganization);
+        }
         for (String org : orgs) {
             for (var r : listRepos(org)) {
-                descriptor = scanOpt(org, r.getName(), r.getDefaultBranch());
+                descriptor = scanOrganizationOpt(org, r.getName(), r.getDefaultBranch());
                 if (descriptor != null) {
                     dest.add(descriptor);
                 }
@@ -109,7 +145,7 @@ public class GiteaRepository implements Repository {
         }
     }
 
-    public Descriptor scanOpt(String org, String repo, String ref) throws IOException {
+    private Descriptor scanOrganizationOpt(String org, String repo, String ref) throws IOException {
         List<ContentsResponse> lst;
 
         try {

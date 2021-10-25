@@ -51,6 +51,10 @@ public interface Repository {
         if (repository != null) {
             return repository;
         }
+        repository = GiteaRepository.createOpt(environment, url);
+        if (repository != null) {
+            return repository;
+        }
         repository = JsonRepository.createOpt(world, url);
         if (repository != null) {
             return repository;
