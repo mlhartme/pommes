@@ -97,17 +97,19 @@ public class GiteaRepository implements Repository {
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
         accessToken.setApiKey(environment.home.properties().giteaKey);
 
-        return new GiteaRepository(environment, gitea, selectedOrganization);
+        return new GiteaRepository(environment, uri.getHost(), gitea, selectedOrganization);
     }
 
     private final Environment environment;
+    private final String hostname;
     private final ApiClient gitea;
     private final String selectedOrganization;
     private final OrganizationApi organizationApi;
     private final RepositoryApi repositoryApi;
 
-    public GiteaRepository(Environment environment, ApiClient gitea, String selectedOrganization) {
+    public GiteaRepository(Environment environment, String hostname, ApiClient gitea, String selectedOrganization) {
         this.environment = environment;
+        this.hostname = hostname;
         this.gitea = gitea;
         this.selectedOrganization = selectedOrganization;
         this.organizationApi = new OrganizationApi(gitea);
@@ -165,7 +167,6 @@ public class GiteaRepository implements Repository {
                         MemoryNode tmp = environment.world().memoryNode(str);
                         Descriptor descriptor = m.apply(environment, tmp);
                         if (descriptor != null) {
-                            String hostname = "git.ionos.org"; // TODO
                             descriptor.setOrigin("gitea://" + hostname + "/" + org + "/" + repo + "/" + contents.getPath());
                             descriptor.setRevision(tmp.sha());
                             descriptor.setScm("git:ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git");
