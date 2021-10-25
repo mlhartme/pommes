@@ -167,7 +167,7 @@ public class GiteaRepository implements Repository {
                             String hostname = "git.ionos.org"; // TODO
                             descriptor.setOrigin("gitea://" + hostname + "/" + org + "/" + repo + "/" + contents.getPath());
                             descriptor.setRevision(tmp.sha());
-                            descriptor.setScm("git:ssh://git@" + hostname + "/" + org + "/" + repo + ".git");
+                            descriptor.setScm("git:ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git");
                             return descriptor;
                         }
                     }
