@@ -1,6 +1,6 @@
 ## Pommes Changelog
 
-### 3.3.0 (pending)
+### 3.3.0 (2022-06-16)
 
 * status improvements
   * sort entries
@@ -17,7 +17,7 @@
   * rename `master` branch to `main`
   * update sushi 3.2.0 to 3.3.0
   * update gson 2.8.0 to 2.8.5
-  * update lazy-foss-parent 1.5.0 to 1.5.1
+  * update lazy-foss-parent 1.5.0 to 1.5.2
 
 
 ### 3.2.0 (2021-04-09)
