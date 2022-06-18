@@ -69,18 +69,18 @@ public class NodeRepository implements Repository {
 
     private final Environment environment;
     private final PrintWriter log;
-    private final Node node;
+    private final Node root;
     private boolean branches;
     private boolean tags;
     private final Filter exclude;
 
-    public NodeRepository(Environment environment, Node node, PrintWriter log) {
-        this(environment, node, false, false, log);
+    public NodeRepository(Environment environment, Node root, PrintWriter log) {
+        this(environment, root, false, false, log);
     }
 
-    public NodeRepository(Environment environment, Node node, boolean branches, boolean tags, PrintWriter log) {
+    public NodeRepository(Environment environment, Node root, boolean branches, boolean tags, PrintWriter log) {
         this.environment = environment;
-        this.node = node;
+        this.root = root;
         this.exclude = new Filter();
         this.branches = branches;
         this.tags = tags;
@@ -108,35 +108,35 @@ public class NodeRepository implements Repository {
 
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
-        scan(node, true, dest);
+        scan(root, true, dest);
     }
 
-    public void scan(Node<?> root, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
+    public void scan(Node<?> directory, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
         List<? extends Node> children;
         Node<?> trunkNode;
         Node<?> branchesNode;
         Node<?> tagsNode;
         List<? extends Node> grandChildren;
 
-        if (exclude.matches(root.getPath())) {
+        if (exclude.matches(directory.getPath())) {
             return;
         }
-        children = root.list();
+        children = directory.list();
         if (children == null) {
             return;
         }
-        log.println("scan " + root.getPath());
+        log.println("scan " + directory.getPath());
         for (Node child : children) {
             if (addOpt(dest, Descriptor.probeChecked(environment, child), child)) {
                 return;
             }
         }
-        if (node instanceof FileNode fileNode) {
-            if (addOpt(dest, RawDescriptor.createOpt(fileNode), node)) {
+        if (directory instanceof FileNode fileNode) {
+            if (addOpt(dest, RawDescriptor.createOpt(fileNode), directory)) {
                 return;
             }
         }
-        if (node instanceof SvnNode) {
+        if (directory instanceof SvnNode) {
             trunkNode = child(children, "trunk");
             if (trunkNode != null) {
                 scan(trunkNode, false, dest);
