@@ -157,7 +157,7 @@ public class Status extends Base {
 
     public static class Step {
         public static Step create(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
-            Project foundProject;
+            List<Project> foundProjects;
             String scmUrl;
             Project newPom;
             Descriptor probed;
@@ -165,19 +165,23 @@ public class Status extends Base {
             Relocation relocation;
 
             scmUrl = scm.getUrl(found);
-            foundProject = database.projectByScm(scmUrl);
-            if (foundProject == null) {
+            foundProjects = database.projectsByScm(scmUrl);
+            if (foundProjects.isEmpty()) {
                 probed = NodeRepository.probe(environment, found);
                 if (probed == null) {
                     throw new IllegalStateException();
                 }
                 newPom = probed.load(environment);
-                expected = environment.home.root().directory(newPom);
+                try {
+                    expected = environment.home.root().directory(newPom);
+                } catch (IOException e) {
+                    throw new IOException(found + ": " + e.getMessage(), e);
+                }
                 relocation = found.equals(expected)? null : new Relocation(found, expected);
                 return new Step("?", found.toString(), scmUrl, newPom, relocation);
             } else {
                 try {
-                    expected = environment.home.root().directory(foundProject);
+                    expected = expected(environment, foundProjects);
                 } catch (IOException e) {
                     return new Step("!", found.toString() + " " + e.getMessage(), scmUrl, null, null);
                 }
@@ -188,6 +192,21 @@ public class Status extends Base {
             }
         }
 
+        private static FileNode expected(Environment environment, List<Project> foundProjects) throws IOException {
+            FileNode result;
+            FileNode step;
+
+            result = null;
+            for (var foundProject : foundProjects) {
+                step = environment.home.root().directory(foundProject);
+                if (result == null) {
+                    result = step;
+                } else if (!step.equals(result)) {
+                    throw new IOException("path ambiguous: " + foundProjects);
+                }
+            }
+            return result;
+        }
         private final String marker;
         private final String message;
         private final String scmUrl;

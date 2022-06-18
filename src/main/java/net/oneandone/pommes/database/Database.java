@@ -178,7 +178,7 @@ public class Database implements AutoCloseable {
         return pq.find(searcher);
     }
 
-    public Project projectByScm(String url) throws IOException {
+    public List<Project> projectsByScm(String url) throws IOException {
         List<Document> poms;
 
         // TODO: to normalize subversion urls
@@ -188,13 +188,6 @@ public class Database implements AutoCloseable {
         } catch (QueryNodeException e) {
             throw new IllegalStateException();
         }
-        switch (poms.size()) {
-            case 0:
-                return null;
-            case 1:
-                return Field.project(poms.get(0));
-            default:
-                throw new IOException("scm ambiguous: " + url);
-        }
+        return poms.stream().map(pom -> Field.project(pom)).toList();
     }
 }
