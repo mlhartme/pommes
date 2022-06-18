@@ -109,7 +109,7 @@ public class Main {
             cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto query*");
 
-            cli.add(DatabaseReset.class, "database-reset");
+            cli.add(DatabaseScan.class, "database-scan");
             cli.add(DatabaseAdd.class, "database-add -delete -dryrun -zone=local url* { add*(url) }");
             cli.add(DatabaseRemove.class, "database-remove prefix*");
 

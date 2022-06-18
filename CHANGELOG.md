@@ -5,7 +5,7 @@
 * seeds
   * renamed import to seed in configuration file 
   * renamed import options to scan options
-
+  * renamed `database-reset` to `database-scan`
 
 ### 3.3.0 (2022-06-16)
 
