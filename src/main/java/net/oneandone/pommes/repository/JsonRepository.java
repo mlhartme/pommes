@@ -72,7 +72,7 @@ public class JsonRepository implements Repository {
 
         prefix = node.getUri().toASCIIString() + ":";
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
-            array = new JsonParser().parse(new InputStreamReader(src)).getAsJsonArray();
+            array = JsonParser.parseReader(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
                 try {
                     project = Project.fromJson(entry.getAsJsonObject());

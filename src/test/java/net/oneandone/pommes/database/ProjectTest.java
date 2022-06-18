@@ -29,7 +29,7 @@ public class ProjectTest {
 
         obj = new JsonParser().parse(
                 "  {\n" +
-                "    \"id\": \"zone:origin\",\n" +
+                "    \"origin\": \"o\",\n" +
                 "    \"revision\": \"32\",\n" +
                 "    \"parent\": \"net.oneandone.maven.poms:lazy-foss-parent:1.0.1\",\n" +
                 "    \"artifact\": \"net.oneandone:pommes:3.0.2-SNAPSHOT\",\n" +
@@ -40,7 +40,7 @@ public class ProjectTest {
                 "    ]\n" +
                 "  }").getAsJsonObject();
         pom = Project.fromJson(obj);
-        assertEquals("zone:origin", pom.id);
+        assertEquals("o", pom.origin);
         assertEquals("32", pom.revision);
         assertEquals(obj, pom.toJson());
     }

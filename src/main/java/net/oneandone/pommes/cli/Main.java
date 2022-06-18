@@ -62,10 +62,9 @@ public class Main {
                 + "                            svn:https://svn.yourserver.org/some/path -skip/this/subpath"
                 + "\n"
                 + "database commands\n"
-                + "  'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*\n"
+                + "  'database-add' '-delete'? '-dryrun'? '-fixscm'? url*\n"
                 + "                        add projects found under the specified urls to the database;\n"
-                + "                        zone is a prefix added to the id (defaults is local);\n"
-                + "                        overwrites projects with same id;\n"
+                + "                        overwrites projects with same origin;\n"
                 + "                        url is a svn url, http url, artifactory url, github url or json url,\n"
                 + "                        an option (prefixed with '%') or an exclude (prefixed with '-')\n"
                 + "  'database-remove' query\n"
@@ -110,7 +109,7 @@ public class Main {
             cli.add(Goto.class, "goto query*");
 
             cli.add(DatabaseScan.class, "database-scan");
-            cli.add(DatabaseAdd.class, "database-add -delete -dryrun -zone=local url* { add*(url) }");
+            cli.add(DatabaseAdd.class, "database-add -delete -dryrun url* { add*(url) }");
             cli.add(DatabaseRemove.class, "database-remove prefix*");
 
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");

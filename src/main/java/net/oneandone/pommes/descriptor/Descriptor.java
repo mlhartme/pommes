@@ -26,7 +26,7 @@ import java.util.function.BiFunction;
 public abstract class Descriptor {
     public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException()) {
         @Override
-        protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+        protected Project doLoad(Environment environment, String origin, String revision, String scm) {
             throw new IllegalStateException();
         }
     };
@@ -78,17 +78,17 @@ public abstract class Descriptor {
         this.scm = scm;
     }
 
-    public Project load(Environment environment, String zone) throws IOException {
+    public Project load(Environment environment) throws IOException {
         if (origin == null) {
             throw new IllegalStateException();
         }
         if (revision == null) {
             throw new IllegalStateException();
         }
-        return doLoad(environment, zone, origin, revision, scm);
+        return doLoad(environment, origin, revision, scm);
     }
 
-    protected abstract Project doLoad(Environment environment, String zone, String withOrigin, String withRevision, String withScm) throws IOException;
+    protected abstract Project doLoad(Environment environment, String withOrigin, String withRevision, String withScm) throws IOException;
 
     public String toString() {
         return origin;

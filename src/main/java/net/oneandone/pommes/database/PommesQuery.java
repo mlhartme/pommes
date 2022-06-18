@@ -150,7 +150,7 @@ public class PommesQuery {
         BooleanQuery.Builder result;
 
         result = new BooleanQuery.Builder();
-        result.add(Field.ID.query(Match.SUBSTRING, ""), BooleanClause.Occur.SHOULD);
+        result.add(Field.ORIGIN.query(Match.SUBSTRING, ""), BooleanClause.Occur.SHOULD);
         return result.build();
     }
 

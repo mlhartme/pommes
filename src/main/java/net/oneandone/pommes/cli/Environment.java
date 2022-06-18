@@ -149,7 +149,7 @@ public class Environment implements Variables {
                 descriptor.setOrigin(scm.getUrl(directory) + "/" + child.getName());
                 descriptor.setRevision(child.sha());
                 descriptor.setScm(scm.getUrl(directory));
-                return descriptor.load(this, "checkout");
+                return descriptor.load(this);
             }
         }
         return null;
@@ -171,7 +171,7 @@ public class Environment implements Variables {
         marker = database.scannedMarker();
         for (Map.Entry<String, String> entry : home.properties().seeds.entrySet()) {
             console.verbose.println("adding " + entry.getKey());
-            cmd = new DatabaseAdd(this, true, false, entry.getKey());
+            cmd = new DatabaseAdd(this, true, false);
             cmd.add(entry.getValue());
             cmd.run(database);
         }

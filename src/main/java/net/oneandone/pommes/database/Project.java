@@ -29,7 +29,7 @@ public class Project {
         JsonElement array;
         Project result;
 
-        result = new Project(string(object, "id"),
+        result = new Project(string(object, "origin"),
                 string(object, "revision"),
                 Gav.forGavOpt(stringOpt(object, "parent")),
                 Gav.forGav(string(object, "artifact")),
@@ -70,8 +70,7 @@ public class Project {
 
     //--
 
-    /** id = zone + ":" + origin */
-    public final String id;
+    public final String origin;
     public final String revision;
 
     /** may be null */
@@ -84,18 +83,14 @@ public class Project {
 
     public final List<Gav> dependencies;
 
-    public Project(String zone, String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
-        this(zone + ":" + origin, revision, parent, artifact, scm, url);
-    }
-
-    public Project(String id, String revision, Gav parent, Gav artifact, String scm, String url) {
-        if (id == null) {
-            throw new IllegalArgumentException("id: " + id);
+    public Project(String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
+        if (origin == null) {
+            throw new IllegalArgumentException("origin: " + origin);
         }
         if (scm == null || scm.endsWith("/")) { // forbid tailing / to normalize svn urls - some end with / and some not
             throw new IllegalArgumentException("scm: " + scm);
         }
-        this.id = id;
+        this.origin = origin;
         this.revision = revision;
         this.parent = parent;
         this.artifact = artifact;
@@ -114,11 +109,7 @@ public class Project {
     }
 
     public String getOrigin() {
-        return id.substring(id.indexOf(':') + 1);
-    }
-
-    public String getZone() {
-        return id.substring(0, id.indexOf(':'));
+        return origin;
     }
 
     public JsonObject toJson() {
@@ -126,7 +117,7 @@ public class Project {
         JsonArray array;
 
         obj = new JsonObject();
-        obj.add("id", new JsonPrimitive(id));
+        obj.add("origin", new JsonPrimitive(origin));
         obj.add("revision", new JsonPrimitive(revision));
         if (parent != null) {
             obj.add("parent", new JsonPrimitive(parent.toGavString()));

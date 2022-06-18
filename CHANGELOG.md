@@ -6,6 +6,7 @@
   * renamed import to seed in configuration file 
   * renamed import options to scan options
   * renamed `database-reset` to `database-scan`
+  * dumped zone, it doesn't make sends with seeds and projects mit multiple times via transitive seeds
 * updates
   * lucense 7.2.1 to 9.2.0
   * glassfish json 1.0.4 to 1.1.4

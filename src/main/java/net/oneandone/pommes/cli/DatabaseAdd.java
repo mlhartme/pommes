@@ -40,15 +40,13 @@ import java.util.concurrent.BlockingQueue;
 public class DatabaseAdd extends Base {
     private final boolean delete;
     private final boolean dryrun;
-    private final String zone;
     private final List<Repository> repositories;
     private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean delete, boolean dryrun, String zone) throws IOException {
+    public DatabaseAdd(Environment environment, boolean delete, boolean dryrun) throws IOException {
         super(environment);
         this.delete = delete;
         this.dryrun = dryrun;
-        this.zone = zone;
         this.repositories = new ArrayList<>();
         this.log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
     }
@@ -75,7 +73,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(delete, dryrun, environment, zone, database);
+            indexer = new Indexer(delete, dryrun, environment, database);
             indexer.start();
             try {
                 for (Repository repository : repositories) {
@@ -97,7 +95,6 @@ public class DatabaseAdd extends Base {
         private final boolean remove;
         private final boolean dryrun;
         private final Environment environment;
-        private final String zone;
 
         public final BlockingQueue<Descriptor> src;
         private final Database database;
@@ -109,13 +106,12 @@ public class DatabaseAdd extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(boolean remove, boolean dryrun, Environment environment, String zone, Database database) {
+        public Indexer(boolean remove, boolean dryrun, Environment environment, Database database) {
             super("Indexer");
 
             this.remove = remove;
             this.dryrun = dryrun;
             this.environment = environment;
-            this.zone = zone;
 
             this.src = new ArrayBlockingQueue<>(25);
             this.database = database;
@@ -134,17 +130,17 @@ public class DatabaseAdd extends Base {
 
             try {
                 started = System.currentTimeMillis();
-                database.list(existing, zone);
-                environment.console().verbose.println("scanned " + existing.size() + " existing projects in zone " + zone + ": "
+                database.list(existing);
+                environment.console().verbose.println("scanned " + existing.size() + " existing projects: "
                         + (System.currentTimeMillis() - started) + " ms");
                 current = iter();
                 database.index(this);
                 if (remove) {
-                    for (String id : existing.keySet()) {
-                        environment.console().info.println("D " + id);
+                    for (String origin : existing.keySet()) {
+                        environment.console().info.println("D " + origin);
                     }
 
-                    database.removeIds(existing.keySet());
+                    database.removeOrigins(existing.keySet());
                 }
                 summary();
             } catch (Exception e) {
@@ -195,11 +191,11 @@ public class DatabaseAdd extends Base {
                 if (project == null) {
                     return null;
                 }
-                existingRevision = existing.remove(project.id);
+                existingRevision = existing.remove(project.origin);
                 if (project.revision.equals(existingRevision)) {
-                    console.info.println("  " + project.id);
+                    console.info.println("  " + project.origin);
                 } else {
-                    console.info.println((existingRevision == null ? "A " : "U ") + project.id);
+                    console.info.println((existingRevision == null ? "A " : "U ") + project.origin);
                     if (!dryrun) {
                         return Field.document(project);
                     }
@@ -217,7 +213,7 @@ public class DatabaseAdd extends Base {
                 }
                 try {
                     count++;
-                    return descriptor.load(environment, zone);
+                    return descriptor.load(environment);
                 } catch (Exception e) {
                     // CAUTION: I do catch RuntimeExceptions, because I've seen Maven 3.3.9 throw them for invalid poms
                     // (e.g. InvalidArtifactRTException)

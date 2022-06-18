@@ -32,8 +32,8 @@ public class ComposerDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment notUsed, String zone, String origin, String revision, String scm) throws GetLastModifiedException {
-        return new Project(zone, origin, revision, null, artifact(origin), scm, null);
+    protected Project doLoad(Environment notUsed, String origin, String revision, String scm) throws GetLastModifiedException {
+        return new Project(origin, revision, null, artifact(origin), scm, null);
     }
 
     private static Gav artifact(String origin) {

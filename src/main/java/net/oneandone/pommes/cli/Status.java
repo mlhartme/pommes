@@ -171,7 +171,7 @@ public class Status extends Base {
                 if (probed == null) {
                     throw new IllegalStateException();
                 }
-                newPom = probed.load(environment, "local");
+                newPom = probed.load(environment);
                 expected = environment.home.root().directory(newPom);
                 relocation = found.equals(expected)? null : new Relocation(found, expected);
                 return new Step("?", found.toString(), scmUrl, newPom, relocation);

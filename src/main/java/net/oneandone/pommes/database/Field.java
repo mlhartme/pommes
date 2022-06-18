@@ -29,7 +29,7 @@ public enum Field {
      * Mandatory. The full uri used to load the project for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ID("Unique identifier for this project. Zone + ':' + origin."),
+    ORIGIN("Unique identifier for this project."),
     REVISION("Last modified timestamp or content hash of this pom."),
     PARENT(true, false, "Coordinates of the parent project."),
     ARTIFACT("Coordinates of this project."),
@@ -138,7 +138,7 @@ public enum Field {
         Document doc;
 
         doc = new Document();
-        ID.add(doc, project.id);
+        ORIGIN.add(doc, project.origin);
         REVISION.add(doc, project.revision);
         if (project.parent != null) {
             PARENT.add(doc, project.parent.toGavString());
@@ -157,7 +157,7 @@ public enum Field {
         String parent;
 
         parent = PARENT.get(document);
-        result = new Project(ID.get(document), REVISION.get(document),
+        result = new Project(ORIGIN.get(document), REVISION.get(document),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
                 SCM.get(document), URL.get(document));
         for (String dep : DEP.getList(document)) {

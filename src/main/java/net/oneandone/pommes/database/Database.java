@@ -116,19 +116,19 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void removeIds(Collection<String> ids) throws IOException, QueryNodeException {
+    public void removeOrigins(Collection<String> origins) throws IOException, QueryNodeException {
         IndexWriter writer;
         IndexWriterConfig config;
         Term[] terms;
         int i;
 
-        if (ids.isEmpty()) {
+        if (origins.isEmpty()) {
             return;
         }
-        terms = new Term[ids.size()];
+        terms = new Term[origins.size()];
         i = 0;
-        for (String id : ids) {
-            terms[i++] = Field.ID.term(id);
+        for (String origin : origins) {
+            terms[i++] = Field.ORIGIN.term(origin);
         }
         close();
         config =  new IndexWriterConfig(new StandardAnalyzer());
@@ -138,7 +138,7 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void list(Map<String, String> result, String zone) throws IOException {
+    public void list(Map<String, String> result) throws IOException {
         TopDocs search;
         Document document;
         Query query;
@@ -146,11 +146,11 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(Field.ID.term(zone + ":*"));
+        query = new WildcardQuery(Field.ORIGIN.term("*"));
         search = searcher.search(query, Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
-            result.put(Field.ID.get(document), Field.REVISION.get(document));
+            result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));
         }
     }
 
@@ -166,7 +166,7 @@ public class Database implements AutoCloseable {
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
         while (iterator.hasNext()) {
             doc = iterator.next();
-            writer.updateDocument(Field.ID.term(Field.ID.get(doc)), doc);
+            writer.updateDocument(Field.ORIGIN.term(Field.ORIGIN.get(doc)), doc);
         }
         writer.close();
     }

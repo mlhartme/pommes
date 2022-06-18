@@ -44,11 +44,11 @@ public class Checkout extends Action {
             }
         } else {
             if (project.scm == null) {
-                return new Problem(directory, project.id + ": missing scm: " + project.scm);
+                return new Problem(directory, project.origin + ": missing scm: " + project.scm);
             }
             scm = Scm.probeUrl(project.scm);
             if (scm == null) {
-                return new Problem(directory, project.id + ": unknown scm: " + project.scm);
+                return new Problem(directory, project.origin + ": unknown scm: " + project.scm);
             } else {
                 return new Checkout(scm, directory, project.scm);
             }

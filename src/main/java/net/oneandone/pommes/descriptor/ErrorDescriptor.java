@@ -28,7 +28,7 @@ public class ErrorDescriptor extends Descriptor {
     }
 
     @Override
-    public Project load(Environment environment, String zone) throws IOException {
+    public Project load(Environment environment) throws IOException {
         if (exception instanceof RuntimeException) {
             throw (RuntimeException) exception;
         } else {
@@ -37,7 +37,7 @@ public class ErrorDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment environment, String zone, String origin, String revision, String scm) throws IOException {
+    protected Project doLoad(Environment environment, String origin, String revision, String scm) {
         throw new IllegalStateException();
     }
 }

@@ -61,7 +61,7 @@ public class GiteaRepository implements Repository {
         BlockingQueue<Descriptor> result = new ArrayBlockingQueue<>(1000);
         gitea.scan(result);
         for (var d : result) {
-            System.out.println(" " + d.load(env, "zone"));
+            System.out.println(" " + d.load(env));
         }
     }
 
