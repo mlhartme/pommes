@@ -136,31 +136,33 @@ public class NodeRepository implements Repository {
                 return;
             }
         }
-        trunkNode = child(children, "trunk");
-        if (trunkNode != null) {
-            scan(trunkNode, false, dest);
-        }
-        branchesNode = child(children, "branches");
-        if (branchesNode != null && branches) {
-            grandChildren = branchesNode.list();
-            if (grandChildren != null) {
-                for (Node grandChild : grandChildren) {
-                    scan(grandChild, false, dest);
+        if (node instanceof SvnNode) {
+            trunkNode = child(children, "trunk");
+            if (trunkNode != null) {
+                scan(trunkNode, false, dest);
+            }
+            branchesNode = child(children, "branches");
+            if (branchesNode != null && branches) {
+                grandChildren = branchesNode.list();
+                if (grandChildren != null) {
+                    for (Node grandChild : grandChildren) {
+                        scan(grandChild, false, dest);
+                    }
                 }
             }
-        }
-        tagsNode = child(children, "tags");
-        if (tagsNode != null && tags) {
-            grandChildren = tagsNode.list();
-            if (grandChildren != null) {
-                for (Node grandChild : grandChildren) {
-                    scan(grandChild, false, dest);
+            tagsNode = child(children, "tags");
+            if (tagsNode != null && tags) {
+                grandChildren = tagsNode.list();
+                if (grandChildren != null) {
+                    for (Node grandChild : grandChildren) {
+                        scan(grandChild, false, dest);
+                    }
                 }
             }
-        }
-        if (trunkNode != null || branchesNode != null || tagsNode != null) {
-            // found project with standard svn layout; no need for further recursion
-            return;
+            if (trunkNode != null || branchesNode != null || tagsNode != null) {
+                // found project with standard svn layout; no need for further recursion
+                return;
+            }
         }
 
         if (child(children, "src") != null) {
