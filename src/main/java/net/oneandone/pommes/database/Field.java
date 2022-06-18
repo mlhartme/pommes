@@ -29,13 +29,13 @@ public enum Field {
      * Mandatory. The full uri used to load the project for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ORIGIN("Unique identifier for this project."),
-    REVISION("Last modified timestamp or content hash of this pom."),
+    ORIGIN("Where this project was loaded from. Used as unique identifier."),
+    REVISION("Last modified timestamp or content hash of this pom. Used to detect changes."),
     PARENT(true, false, "Coordinates of the parent project."),
     ARTIFACT("Coordinates of this project."),
-    SCM(true, false, "Scm location for this project."),
     DEP(true, true, "Coordinates of project dependencies."),
-    URL(true, false, "Url for this project.");
+    SCM(true, false, "Scm location for this project. Where to get the sources."),
+    URL(true, false, "Url for this project. Where to read about the project.");
 
     private final boolean optional;
     private final boolean list;
