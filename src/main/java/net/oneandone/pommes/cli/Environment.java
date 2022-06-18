@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.cli;
 
-import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
@@ -40,7 +39,6 @@ public class Environment implements Variables {
     private final boolean scanNow;
     private final boolean scanDaily;
 
-    private JsonParser lazyParser;
     private Maven lazyMaven;
     private Project lazyCurrentPom;
     private Filter lazyExcludes;
@@ -59,7 +57,6 @@ public class Environment implements Variables {
         this.home = Home.create(world, console, false);
         this.scanNow = scanNow;
         this.scanDaily = scanDaily;
-        this.lazyParser = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyExcludes = null;
@@ -176,12 +173,5 @@ public class Environment implements Variables {
             cmd.run(database);
         }
         marker.writeBytes();
-    }
-
-    public JsonParser jsonParser() {
-        if (lazyParser == null) {
-            lazyParser = new JsonParser();
-        }
-        return lazyParser;
     }
 }

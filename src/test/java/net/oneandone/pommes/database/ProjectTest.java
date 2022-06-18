@@ -27,7 +27,7 @@ public class ProjectTest {
         JsonObject obj;
         Project pom;
 
-        obj = new JsonParser().parse(
+        obj = JsonParser.parseString(
                 "  {\n" +
                 "    \"origin\": \"o\",\n" +
                 "    \"revision\": \"32\",\n" +

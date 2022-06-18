@@ -45,7 +45,7 @@ public class BitbucketRepository implements Repository {
         Bitbucket bb;
 
         world = World.create();
-        bb = new Bitbucket(((HttpNode) world.validNode("https://bitbucket.1and1.org")).getRoot(), new JsonParser());
+        bb = new Bitbucket(((HttpNode) world.validNode("https://bitbucket.1and1.org")).getRoot());
         System.out.println("rev: " + new String(bb.readBytes("CISOOPS", "puc", "pom.xml")));
     }
 
@@ -86,7 +86,7 @@ public class BitbucketRepository implements Repository {
         Node tmp;
         String hostname;
 
-        bb = new Bitbucket(bitbucket.getRoot(), environment.jsonParser());
+        bb = new Bitbucket(bitbucket.getRoot());
         bbProject = bitbucket.getName();
         for (String repo : bb.listRepos(bbProject)) {
             lst = bb.listRoot(bbProject, repo);
@@ -110,12 +110,9 @@ public class BitbucketRepository implements Repository {
 
     private static class Bitbucket {
         private final HttpRoot root;
-        private final JsonParser parser;
 
-
-        Bitbucket(HttpRoot root, JsonParser parser) {
+        Bitbucket(HttpRoot root) {
             this.root = root;
-            this.parser = parser;
         }
 
         // TODO: always fails with 404 error ...
@@ -211,7 +208,7 @@ public class BitbucketRepository implements Repository {
 
         private JsonObject getJsonObject(String path, String params) throws IOException {
             try (Reader src = root.node(path, params).newReader()) {
-                return parser.parse(src).getAsJsonObject();
+                return JsonParser.parseReader(src).getAsJsonObject();
             }
         }
     }

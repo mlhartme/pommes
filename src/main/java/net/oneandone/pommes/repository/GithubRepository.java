@@ -73,15 +73,13 @@ public class GithubRepository implements Repository {
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
         String str;
-        JsonParser parser;
         JsonArray repositories;
         JsonObject r;
         String name;
         Repository repository;
 
         str = world.validNode("https://api.github.com/users/" + user + "/repos").readString();
-        parser = new JsonParser();
-        repositories = (JsonArray) parser.parse(str);
+        repositories = (JsonArray) JsonParser.parseString(str);
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();

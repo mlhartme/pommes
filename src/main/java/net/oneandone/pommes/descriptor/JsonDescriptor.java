@@ -16,6 +16,7 @@
 package net.oneandone.pommes.descriptor;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.sushi.fs.Node;
@@ -27,11 +28,11 @@ public class JsonDescriptor extends Descriptor {
         return name.equals(".pommes.json") || name.equals("pommes.json");
     }
 
-    public static JsonDescriptor create(Environment environment, Node node) {
+    public static JsonDescriptor create(Environment notUsed, Node node) {
         JsonObject json;
 
         try {
-            json = environment.jsonParser().parse(node.readString()).getAsJsonObject();
+            json = JsonParser.parseString(node.readString()).getAsJsonObject();
             return new JsonDescriptor(Project.fromJson(json));
         } catch (IOException e) {
             throw new RuntimeException(node.getUri().toString() + ": cannot create json descriptor", e);
