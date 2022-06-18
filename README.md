@@ -34,7 +34,7 @@ The name Pommes stands for "many poms".
 
 Prerequisites
 * Linux or Mac
-* Java 8 or higher
+* Java 16 or higher
 
 Install the application
 * download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file 

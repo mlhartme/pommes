@@ -127,12 +127,12 @@ public class NodeRepository implements Repository {
         }
         log.println("scan " + root.getPath());
         for (Node child : children) {
-            if (add(dest, Descriptor.probeChecked(environment, child), node)) {
+            if (addOpt(dest, Descriptor.probeChecked(environment, child), child)) {
                 return;
             }
         }
         if (node instanceof FileNode fileNode) {
-            if (add(dest, RawDescriptor.createOpt(fileNode), node)) {
+            if (addOpt(dest, RawDescriptor.createOpt(fileNode), node)) {
                 return;
             }
         }
@@ -176,7 +176,7 @@ public class NodeRepository implements Repository {
         }
     }
 
-    private static boolean add(BlockingQueue<Descriptor> dest, Descriptor descriptor, Node node) throws IOException, InterruptedException {
+    private static boolean addOpt(BlockingQueue<Descriptor> dest, Descriptor descriptor, Node node) throws IOException, InterruptedException {
         if (descriptor == null) {
             return false;
         }
