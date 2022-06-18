@@ -32,7 +32,7 @@ public class Main {
         cli = Cli.create("Project checkout manager and database tool.\n"
                 + "\n"
                 + "Usage:\n"
-                + "  'pommes' ['-v'|'-e'] command import-options args*\n"
+                + "  'pommes' ['-v'|'-e'] command scan-options args*\n"
                 + "\n"
                 + "search commands\n"
                 + "  'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)? \n"
@@ -70,15 +70,15 @@ public class Main {
                 + "                        an option (prefixed with '%') or an exclude (prefixed with '-')\n"
                 + "  'database-remove' query\n"
                 + "                        remove all matching projects\n"
-                + "  'database-reset'      deletes the current database and runs any configured imports.\n"
+                + "  'database-reset'      deletes the current database and re-add all seeds.\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
                 + "\n"
-                + "import options          how to handle configured imports\n"
-                + "  default behaviour     no imports\n"
-                + "  '-import-now'         unconditional import\n"
-                + "  '-import-daily'       import if last import is older than one day\n"
+                + "scan options            how to handle configured seeds\n"
+                + "  default behaviour     no scanning\n"
+                + "  '-scan-now'           unconditional scan\n"
+                + "  '-scan-daily'         scan if last scan is older than one day\n"
                 + "\n"
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
@@ -102,7 +102,7 @@ public class Main {
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
           cli.add(Setup.class, "setup -batch");
-          cli.begin(Environment.class, "-import-now -import-daily");
+          cli.begin(Environment.class, "-scan-now -scan-daily");
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove -stale root?=.");
 

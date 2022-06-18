@@ -37,8 +37,8 @@ public class Environment implements Variables {
     private final Console console;
     private final World world;
     public final Home home;
-    private final boolean importNow;
-    private final boolean importDaily;
+    private final boolean scanNow;
+    private final boolean scanDaily;
 
     private JsonParser lazyParser;
     private Maven lazyMaven;
@@ -49,16 +49,16 @@ public class Environment implements Variables {
         this(console, world, false, false);
     }
 
-    public Environment(Console console, World world, boolean importNow, boolean importDaily) throws IOException {
-        if (importNow && importDaily) {
-            throw new ArgumentException("conflicting imports options");
+    public Environment(Console console, World world, boolean scanNow, boolean scanDaily) throws IOException {
+        if (scanNow && scanDaily) {
+            throw new ArgumentException("conflicting scan options");
         }
 
         this.console = console;
         this.world = world;
         this.home = Home.create(world, console, false);
-        this.importNow = importNow;
-        this.importDaily = importDaily;
+        this.scanNow = scanNow;
+        this.scanDaily = scanDaily;
         this.lazyParser = null;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
@@ -155,22 +155,22 @@ public class Environment implements Variables {
         return null;
     }
 
-    public void imports(Database database) throws Exception {
+    public void implicitScan(Database database) throws Exception {
         FileNode marker;
 
-        marker = database.importMarker();
-        if (importNow || (importDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
-            doImports(database);
+        marker = database.scannedMarker();
+        if (scanNow || (scanDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
+            scan(database);
         }
     }
 
-    public void doImports(Database database) throws Exception {
+    public void scan(Database database) throws Exception {
         DatabaseAdd cmd;
         FileNode marker;
 
-        marker = database.importMarker();
-        for (Map.Entry<String, String> entry : home.properties().imports.entrySet()) {
-            console.verbose.println("importing " + entry.getKey());
+        marker = database.scannedMarker();
+        for (Map.Entry<String, String> entry : home.properties().seeds.entrySet()) {
+            console.verbose.println("adding " + entry.getKey());
             cmd = new DatabaseAdd(this, true, false, entry.getKey());
             cmd.add(entry.getValue());
             cmd.run(database);

@@ -1,5 +1,12 @@
 ## Pommes Changelog
 
+### 3.4.0 (pending)
+
+* seeds
+  * renamed import to seed in configuration file 
+  * renamed import options to scan options
+
+
 ### 3.3.0 (2022-06-16)
 
 * status improvements

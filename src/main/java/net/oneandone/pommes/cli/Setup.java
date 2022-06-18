@@ -45,9 +45,9 @@ public class Setup {
         }
         Home.create(world, console, true);
         environment = new Environment(console, world);
-        console.info.println("initial import ...");
+        console.info.println("initial scan ...");
         try (Database database = environment.home.loadDatabase()) {
-            environment.doImports(database);
+            environment.scan(database);
         }
         console.info.println("done");
         console.info.println("Have a look at " + directory.join("pommes.properties") + " and adjust Pommes to your needs");

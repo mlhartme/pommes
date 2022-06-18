@@ -72,8 +72,8 @@ public class Database implements AutoCloseable {
         this.searcher = null;
     }
 
-    public FileNode importMarker() {
-        return directory.getParent().join(directory.getName() + ".imported");
+    public FileNode scannedMarker() {
+        return directory.getParent().join(directory.getName() + ".scanned");
     }
 
     private Directory getIndexLuceneDirectory() throws IOException {
@@ -99,7 +99,7 @@ public class Database implements AutoCloseable {
     public void reset() throws IOException {
         close();
         directory.deleteTreeOpt();
-        importMarker().deleteFileOpt();
+        scannedMarker().deleteFileOpt();
         directory.mkdir();
         index(Collections.emptyIterator());
     }

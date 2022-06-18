@@ -48,7 +48,7 @@ public class Properties {
         World world;
         String queryPrefix = "query.";
         String formatPrefix = "format.";
-        String importsPrefix = "import.";
+        String seedPrefix = "seed.";
         String giteaKey;
         java.util.Properties props;
         Map<String, List<String>> queries;
@@ -72,8 +72,8 @@ public class Properties {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
-            } else if (key.startsWith(importsPrefix)) {
-                imports.put(key.substring(importsPrefix.length()), props.getProperty(key));
+            } else if (key.startsWith(seedPrefix)) {
+                imports.put(key.substring(seedPrefix.length()), props.getProperty(key));
             } else {
                 throw new IOException("unknown property: " + key);
             }
@@ -89,15 +89,15 @@ public class Properties {
     private Map<String, String> formats;
 
     /** maps zones to urls */
-    public final Map<String, String> imports;
+    public final Map<String, String> seeds;
 
     public Properties(FileNode checkouts, String giteaKey, Map<String, List<String>> queries,
-                      Map<String, String> formats, Map<String, String> imports) throws IOException {
+                      Map<String, String> formats, Map<String, String> seeds) throws IOException {
         this.checkouts = checkouts;
         this.giteaKey = giteaKey;
         this.queries = queries;
         this.formats = formats;
-        this.imports = imports;
+        this.seeds = seeds;
     }
 
     public List<String> lookupQuery(String name) {
