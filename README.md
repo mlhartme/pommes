@@ -13,11 +13,11 @@ Here's an example:
     ~/Projects/github.com/net/oneandone/lavender $ 
 
 This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply cd into the
-already existing checkout, choosing `2` also creates the checkout. Another use case: if you keep all release of your project
+already existing checkout, choosing `2` also creates the checkout. Another use case: if you keep all release of your project in
 a database, you can search when a given dependency as used.
 
 Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
-* crawl directories, svn, github, bitbucket or artifactory and add matching projects to the database
+* crawl directories, svn, github, bitbucket, gitea or artifactory and add matching projects to the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) scm operations, e.g. checkout all projects that match a query.
   
@@ -175,17 +175,17 @@ searches the database for `puc`, offers a selection of matching projects, checks
 
 ## Advanced 
 
-You can define imports in the properties file:
+You can define seeds in the properties file:
 
-   import.foo=baruri
+   seed.foo=baruri
    
-instructs Pommes auto automatically run 
+instructs Pommes to automatically run
 
    database-add -zone foo baruri
    
-during `setup`, `database-reset` or if you invoke Pommes with `-import-now` or `-import-daily`. 
+during `setup`, `database-scan` or if you invoke Pommes with `-scan-now` or `-scan-daily`.
 
-This is most usefull with json repositories. To create a json file, run your database-add commands and run
+This is most useful with json repositories. To create a json file, run your database-add commands and run
 
     pommes find -output foo.json "" -json
     
@@ -199,12 +199,12 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
 ## Usage Message
 
     Project checkout manager and database tool.
-    
+
     Usage:
-      'pommes' ['-v'|'-e'] command import-options args*
-    
+      'pommes' ['-v'|'-e'] command scan-options args*
+
     search commands
-      'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)? 
+      'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)?
                             print projects matching this query;
                             append '-json' to print json, '-dump' to print json without formatting;
                             format is a string with placeholders: %c is replace be the current checkout
@@ -212,46 +212,48 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
                             place holders can be followed by angle brackets to filter for
                             the enclosed substring or variables;
                             output is a file or URL to write results to, default is the console.
-    
+
     checkout commands
-      'st' root?            print all checkouts under the specified directory with status markers:
-                            ? - directory is not an unknown project
-                            M - checkout has untracked files, modifications or is not pushed
+      'st' root?            print status of all checkouts under the specified directory:
+                            ? - directory is not in database
+                            M - checkout has un-tracked files, modifications or is not pushed
                             C - checkout url does not match the directory Pommes would place it in
       'goto' query          offer selection of matching projects, check it out when necessary,
                             and cds into the checkout directory
       'checkout' query      checkout matching projects; skips existing checkouts;
-                            offers selection before changing anything on disk;
+                            offers selection before changing anything on disk
       'remove' '-stale'? root?
                             remove (optional: stale) checkouts under the specified root directory;
                             a checkout is stale if the project has been removed from the database;
                             offers selection before changing anything on disk;
-                            checkouts with uncommitted changes are marked in the list
-    
+                            checkouts with uncommitted changes are marked in the list - example urls:
+                                github:mlhartme
+                                svn:https://svn.yourserver.org/some/path -skip/this/subpath
     database commands
       'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*
                             add projects found under the specified urls to the database;
                             zone is a prefix added to the id (defaults is local);
                             overwrites projects with same id;
                             url is a svn url, http url, artifactory url, github url or json url,
-                            an option (prefixed with '%') or an exclude (prefixed with '-')  'database-remove' query
+                            an option (prefixed with '%') or an exclude (prefixed with '-')
+      'database-remove' query
                             remove all matching projects
-      'database-reset'      deletes the current database and runs any configured imports.
-    
+      'database-scan'       deletes the current database and re-add all seeds.
+
     fields in the database: (field id is the first letter of the field name.)
-      id          Unique identifier for this pom. Zone + ':' + origin.
+      id          Unique identifier for this project. Zone + ':' + origin.
       revision    Last modified timestamp or content hash of this pom.
       parent      Coordinates of the parent project.
       artifact    Coordinates of this project.
       scm         Scm location for this project.
       dep         Coordinates of project dependencies.
       url         Url for this project.
-    
-    import options          how to handle configured imports
-      default behaviour     no imports
-      '-import-now'         unconditional import
-      '-import-daily'       import if last import is older than one day
-    
+
+    scan options            how to handle configured seeds
+      default behaviour     no scanning
+      '-scan-now'           unconditional scan
+      '-scan-daily'         scan if last scan is older than one day
+
     query syntax
       query     = '@' MACRO | or
       or        = (and (' ' and)*)? index?
@@ -265,9 +267,8 @@ trigger `database-add` and `database-remove` calls after each committed pom.xml 
       {gav}     = coordinates for current project
       {ga}      = group and artifact of current project
       {scm}     = scm location for current directory
-    
+
     environment:
       POMMES_HOME     home directory for Pommes
-    
+
     Home: https://github.com/mlhartme/pommes
-    

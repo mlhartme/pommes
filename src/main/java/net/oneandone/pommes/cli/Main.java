@@ -70,7 +70,7 @@ public class Main {
                 + "                        an option (prefixed with '%') or an exclude (prefixed with '-')\n"
                 + "  'database-remove' query\n"
                 + "                        remove all matching projects\n"
-                + "  'database-reset'      deletes the current database and re-add all seeds.\n"
+                + "  'database-scan'       deletes the current database and re-add all seeds.\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
