@@ -182,13 +182,14 @@ public class DatabaseAdd extends Base {
             console = environment.console();
             while (true) {
                 try {
-                    descriptor = iterDescriptor();
+                    descriptor = src.take();
                 } catch (InterruptedException e) {
                     continue; // TODO: ok so?
                 }
-                if (descriptor == null) {
-                    return null; // end of stream
+                if (descriptor == Descriptor.END_OF_QUEUE) {
+                    return null;
                 }
+                count++;
                 existingRevision = existing.remove(descriptor.getOrigin());
                 if (descriptor.getRevision().equals(existingRevision)) {
                     console.info.println("  " + descriptor.getOrigin());
@@ -207,17 +208,6 @@ public class DatabaseAdd extends Base {
                     return Field.document(project);
                 }
             }
-        }
-
-        private Descriptor iterDescriptor() throws InterruptedException {
-            Descriptor descriptor;
-
-            descriptor = src.take();
-            if (descriptor == Descriptor.END_OF_QUEUE) {
-                return null;
-            }
-            count++;
-            return descriptor;
         }
 
         @Override
