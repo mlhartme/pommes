@@ -91,6 +91,7 @@ public class DatabaseAdd extends Base {
         }
     }
 
+    /** Iterates modified or new documents, skips unmodified ones */
     public static class Indexer extends Thread implements Iterator<Document> {
         private final boolean remove;
         private final boolean dryrun;
@@ -121,7 +122,6 @@ public class DatabaseAdd extends Base {
 
             this.count = 0;
             this.errors = 0;
-
             this.existing = new HashMap<>();
         }
 
@@ -174,6 +174,7 @@ public class DatabaseAdd extends Base {
         }
 
         private Document iter() {
+            Descriptor descriptor;
             Project project;
             Console console;
             String existingRevision;
@@ -181,45 +182,42 @@ public class DatabaseAdd extends Base {
             console = environment.console();
             while (true) {
                 try {
-                    project = iterPom();
-                } catch (IOException | InterruptedException e) {
+                    descriptor = iterDescriptor();
+                } catch (InterruptedException e) {
+                    continue; // TODO: ok so?
+                }
+                if (descriptor == null) {
+                    return null; // end of stream
+                }
+                existingRevision = existing.remove(descriptor.getOrigin());
+                if (descriptor.getRevision().equals(existingRevision)) {
+                    console.info.println("  " + descriptor.getOrigin());
+                    continue;
+                }
+                try {
+                    project = descriptor.load(environment);
+                } catch (IOException e) {
                     console.error.println(e.getMessage());
                     e.printStackTrace(console.verbose);
                     errors++;
                     continue;
                 }
-                if (project == null) {
-                    return null;
-                }
-                existingRevision = existing.remove(project.origin);
-                if (project.revision.equals(existingRevision)) {
-                    console.info.println("  " + project.origin);
-                } else {
-                    console.info.println((existingRevision == null ? "A " : "U ") + project.origin);
-                    if (!dryrun) {
-                        return Field.document(project);
-                    }
+                console.info.println((existingRevision == null ? "A " : "U ") + project.origin);
+                if (!dryrun) {
+                    return Field.document(project);
                 }
             }
         }
 
-        private Project iterPom() throws IOException, InterruptedException {
+        private Descriptor iterDescriptor() throws InterruptedException {
             Descriptor descriptor;
 
-            while (true) {
-                descriptor = src.take();
-                if (descriptor == Descriptor.END_OF_QUEUE) {
-                    return null;
-                }
-                try {
-                    count++;
-                    return descriptor.load(environment);
-                } catch (Exception e) {
-                    // CAUTION: I do catch RuntimeExceptions, because I've seen Maven 3.3.9 throw them for invalid poms
-                    // (e.g. InvalidArtifactRTException)
-                    throw new IOException("error processing " + descriptor + ": " + e.getMessage(), e);
-                }
+            descriptor = src.take();
+            if (descriptor == Descriptor.END_OF_QUEUE) {
+                return null;
             }
+            count++;
+            return descriptor;
         }
 
         @Override

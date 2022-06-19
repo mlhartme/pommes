@@ -70,8 +70,16 @@ public abstract class Descriptor {
         this.origin = origin;
     }
 
+    public String getOrigin() {
+        return origin;
+    }
+
     public void setRevision(String revision) {
         this.revision = revision;
+    }
+
+    public String getRevision() {
+        return revision;
     }
 
     public void setScm(String scm) {
