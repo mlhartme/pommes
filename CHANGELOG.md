@@ -6,6 +6,7 @@
   * renamed import to seed in configuration file 
   * renamed import options to scan options
   * renamed `database-reset` to `database-scan`
+    * added `-reset` flag
   * dumped zone, it doesn't make sends with seeds and projects mit multiple times via transitive seeds
 * fixed NodeRepository to detect raw descriptors in none-root directories
 * fixed NodeRepository to check for trunk/branches/tags only for svn nodes (because ~/Projects/branches confused it)

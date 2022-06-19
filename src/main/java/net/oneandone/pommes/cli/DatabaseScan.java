@@ -18,14 +18,19 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.database.Database;
 
 public class DatabaseScan extends Base {
-    public DatabaseScan(Environment environment) {
+    private final boolean reset;
+
+    public DatabaseScan(Environment environment, boolean reset) {
         super(environment);
+        this.reset = reset;
     }
 
     @Override
     public void run() throws Exception {
         try (Database database = environment.home.loadDatabase()) {
-            database.reset();
+            if (reset) {
+                database.reset();
+            }
             environment.scan(database);
         }
     }
