@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>net.oneandone.maven.poms</groupId>
-    <artifactId>lazy-foss-parent</artifactId>
-    <version>1.5.2</version>
+    <groupId>de.schmizzolin.maven.poms</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.6.0</version>
     <relativePath />
   </parent>
 
@@ -137,7 +137,7 @@
       <plugin>
         <groupId>net.oneandone.maven.plugins</groupId>
         <artifactId>application</artifactId>
-        <version>1.6.2</version>
+        <version>1.7.0-SNAPSHOT</version>
         <configuration>
           <name>pommes</name>
           <main>net.oneandone.pommes.cli.Main</main>
