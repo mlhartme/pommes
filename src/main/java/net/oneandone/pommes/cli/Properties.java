@@ -88,11 +88,11 @@ public class Properties {
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    /** maps zones to urls */
+    /** maps seed name to urls */
     public final Map<String, String> seeds;
 
     public Properties(FileNode checkouts, String giteaKey, Map<String, List<String>> queries,
-                      Map<String, String> formats, Map<String, String> seeds) throws IOException {
+                      Map<String, String> formats, Map<String, String> seeds) {
         this.checkouts = checkouts;
         this.giteaKey = giteaKey;
         this.queries = queries;
