@@ -29,19 +29,28 @@ The name Pommes stands for "many poms".
 
 [Changes](https://github.com/mlhartme/pommes/blob/master/CHANGELOG.md)
 
+## Name
+
+stands for "many poms", "project mess", and a german word for french fries.
+
+## See also
+
+https://github.com/mthmulders/mcs
+
+https://github.com/x-motemen/ghq
 
 ## Setup
 
 Prerequisites
 * Linux or Mac
-* Java 16 or higher
+* Java 17 or higher
 
 Install the application
 * download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file 
 and store it as executable `pommes` file in your path
 
         cd some-directory-in-your-path
-        curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.1.0/pommes-3.1.0-application.sh -o pommes
+        curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.4.0/pommes-3.4.0-application.sh -o pommes
         chmod a+x pommes
     
 * run `pommes setup` and follow the instructions
@@ -194,6 +203,18 @@ It will be compressed if the url ends with .gz.
 
 You might want to setup a cron job to run this every night. Alternatively, you can setup post-commit hooks to 
 trigger `database-add` and `database-remove` calls after each committed pom.xml modification.
+
+## Glossary
+
+Descriptor: references a project, various implementation to load Maven, Json, etc
+
+Project: holds project metadata: gav, parent, dependencies, scm, url
+
+Repository: can be scanned for descriptors
+
+Seeds: list of names urls, each url defining a repository.
+
+Database: stores projects (in Lucene)
 
 
 ## Usage Message
