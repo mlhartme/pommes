@@ -20,6 +20,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -69,11 +70,11 @@ public class DatabaseAdd extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(delete, dryrun, environment, database);
+            indexer = new Indexer(delete, dryrun, environment, search.getDatabase());
             indexer.start();
             try {
                 for (Repository repository : repositories) {

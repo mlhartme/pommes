@@ -18,8 +18,8 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
-import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.Scm;
@@ -152,25 +152,25 @@ public class Environment implements Variables {
         return null;
     }
 
-    public void implicitScan(Database database) throws Exception {
+    public void implicitScan(SearchEngine search) throws Exception {
         FileNode marker;
 
-        marker = database.scannedMarker();
+        marker = search.getDatabase().scannedMarker();
         if (scanNow || (scanDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
-            scan(database);
+            scan(search);
         }
     }
 
-    public void scan(Database database) throws Exception {
+    public void scan(SearchEngine search) throws Exception {
         DatabaseAdd cmd;
         FileNode marker;
 
-        marker = database.scannedMarker();
+        marker = search.getDatabase().scannedMarker();
         for (Map.Entry<String, String> entry : home.properties().seeds.entrySet()) {
             console.verbose.println("adding " + entry.getKey());
             cmd = new DatabaseAdd(this, true, false);
             cmd.add(entry.getValue());
-            cmd.run(database);
+            cmd.run(search);
         }
         marker.writeBytes();
     }

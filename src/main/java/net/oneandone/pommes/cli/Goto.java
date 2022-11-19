@@ -15,14 +15,14 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Project;
-import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.checkout.Checkout;
 import net.oneandone.pommes.checkout.Nop;
 import net.oneandone.pommes.checkout.Problem;
+import net.oneandone.pommes.database.Field;
+import net.oneandone.pommes.database.PommesQuery;
+import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -40,14 +40,14 @@ public class Goto extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         Setenv setenv;
         List<Action> actions;
         FileNode directory;
         Action action;
 
         actions = new ArrayList<>();
-        for (Project project : Field.projects(database.query(PommesQuery.create(query, environment)))) {
+        for (Project project : Field.projects(search.query(PommesQuery.create(query, environment)))) {
             try {
                 directory = environment.home.root().directory(project);
                 action = Checkout.createOpt(directory, project);

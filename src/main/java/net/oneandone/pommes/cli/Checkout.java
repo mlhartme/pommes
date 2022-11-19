@@ -15,11 +15,11 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Project;
-import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.checkout.Action;
+import net.oneandone.pommes.database.Field;
+import net.oneandone.pommes.database.PommesQuery;
+import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ public class Checkout extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         List<Action> adds;
         Action action;
         FileNode directory;
 
         adds = new ArrayList<>();
-        for (Project project : Field.projects(database.query(PommesQuery.create(query, environment)))) {
+        for (Project project : Field.projects(search.query(PommesQuery.create(query, environment)))) {
             directory = environment.home.root().directory(project);
             action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, project);
             if (action != null) {

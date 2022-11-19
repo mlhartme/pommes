@@ -18,10 +18,10 @@ package net.oneandone.pommes.cli;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.PommesQuery;
+import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -94,7 +94,7 @@ public class Find extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         List<Document> documents;
         String format;
         String macroName;
@@ -118,7 +118,7 @@ public class Find extends Base {
             } else {
                 macroName = null;
             }
-            documents = database.query(PommesQuery.create(query, environment));
+            documents = search.query(PommesQuery.create(query, environment));
             console.verbose.println("Matching documents: " + documents.size());
             if (formatBuilder != null) {
                 format = formatBuilder.toString();

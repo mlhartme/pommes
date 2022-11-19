@@ -18,6 +18,7 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.checkout.Action;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.util.Separator;
 
@@ -38,13 +39,16 @@ public abstract class Base {
     }
 
     public void run() throws Exception {
+        SearchEngine search;
+
         try (Database database = environment.home.loadDatabase()) {
-            environment.implicitScan(database);
-            run(database);
+            search = new SearchEngine(database);
+            environment.implicitScan(search);
+            run(search);
         }
     }
 
-    public abstract void run(Database database) throws Exception;
+    public abstract void run(SearchEngine database) throws Exception;
 
     protected void runAll(Collection<Action> actionsOrig) throws Exception {
         List<Action> actions;

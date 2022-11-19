@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.SearchEngine;
 
 public class DatabaseScan extends Base {
     private final boolean reset;
@@ -31,11 +32,11 @@ public class DatabaseScan extends Base {
             if (reset) {
                 database.reset();
             }
-            environment.scan(database);
+            environment.scan(new SearchEngine(database));
         }
     }
 
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         throw new RuntimeException();
     }
 }

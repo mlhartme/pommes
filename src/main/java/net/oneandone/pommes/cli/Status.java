@@ -19,6 +19,7 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
@@ -46,7 +47,7 @@ public class Status extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         Map<FileNode, Scm> checkouts;
         Map<Integer, Step> steps;
         int id;
@@ -61,7 +62,7 @@ public class Status extends Base {
         id = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
-            step = Step.create(environment, database, found, entry.getValue());
+            step = Step.create(environment, search.getDatabase(), found, entry.getValue());
             if (step.isNoop()) {
                 console.info.println(step);
             } else {
@@ -80,7 +81,7 @@ public class Status extends Base {
                 input = console.readline("What do you want to fix, ctrl-c to abort (<numbers>/all)? ");
                 if ("all".equals(input)) {
                     for (var entry : steps.entrySet()) {
-                        entry.getValue().apply(database);
+                        entry.getValue().apply(search.getDatabase());
                         console.info.println("fixed " + entry.getKey());
                     }
                     steps.clear();
@@ -95,7 +96,7 @@ public class Status extends Base {
                             console.info.println("unknown input: " + item);
                             break;
                         }
-                        step.apply(database);
+                        step.apply(search.getDatabase());
                         console.info.println("fixed " + item);
                     }
                 }

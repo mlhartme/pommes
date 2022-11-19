@@ -16,11 +16,11 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.checkout.Problem;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
@@ -39,7 +39,7 @@ public class Remove extends Base {
     }
 
     @Override
-    public void run(Database database) throws Exception {
+    public void run(SearchEngine search) throws Exception {
         Map<FileNode, Scm> checkouts;
         Project scannedPom;
         List<Action> removes;

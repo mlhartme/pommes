@@ -18,6 +18,7 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -47,7 +48,7 @@ public class Setup {
         environment = new Environment(console, world);
         console.info.println("initial scan ...");
         try (Database database = environment.home.loadDatabase()) {
-            environment.scan(database);
+            environment.scan(new SearchEngine(database));
         }
         console.info.println("done");
         console.info.println("Have a look at " + directory.join("pommes.properties") + " and adjust Pommes to your needs");

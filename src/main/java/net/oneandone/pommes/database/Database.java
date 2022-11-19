@@ -116,7 +116,7 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void removeOrigins(Collection<String> origins) throws IOException, QueryNodeException {
+    public void removeOrigins(Collection<String> origins) throws IOException {
         IndexWriter writer;
         IndexWriterConfig config;
         Term[] terms;
