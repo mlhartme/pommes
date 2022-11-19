@@ -32,7 +32,7 @@ public class Main {
         cli = Cli.create("Project checkout manager and database tool.\n"
                 + "\n"
                 + "Usage:\n"
-                + "  'pommes' ['-v'|'-e'] command scan-options args*\n"
+                + "  'pommes' ['-v'|'-e'] command index-options args*\n"
                 + "\n"
                 + "search commands\n"
                 + "  'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)? \n"
@@ -67,10 +67,10 @@ public class Main {
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
                 + "\n"
-                + "scan options            how to handle configured seeds\n"
-                + "  default behaviour     no scanning\n"
-                + "  '-scan-now'           unconditional scan\n"
-                + "  '-scan-daily'         scan if last scan is older than one day\n"
+                + "index options           how to handle configured seeds\n"
+                + "  default behaviour     no implicit indexing\n"
+                + "  '-index-now'          unconditional index\n"
+                + "  '-index-daily'        index if last run is older than one day\n"
                 + "\n"
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
@@ -94,7 +94,7 @@ public class Main {
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
           cli.add(Setup.class, "setup -batch");
-          cli.begin(Environment.class, "-scan-now -scan-daily");
+          cli.begin(Environment.class, "-index-now -index-daily");
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove -stale root?=.");
 

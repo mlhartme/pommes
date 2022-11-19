@@ -7,6 +7,7 @@
   * renamed import options to scan options
   * renamed `database-reset` to `database-index`
     * don't parse pom when revision is the same
+    * renamed indexing options accordingly
   * dumped `database-add` and `database-remove`
   * dumped zone, it doesn't make sends with seeds and projects mit multiple times via transitive seeds
 * fixed NodeRepository to detect raw descriptors in none-root directories
