@@ -39,12 +39,8 @@ public abstract class Base {
     }
 
     public void run() throws Exception {
-        SearchEngine search;
-
         try (Database database = environment.home.loadDatabase()) {
-            search = new SearchEngine(database);
-            environment.implicitScan(search);
-            run(search);
+            run(new SearchEngine(database));
         }
     }
 

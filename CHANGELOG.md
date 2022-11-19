@@ -4,7 +4,7 @@
 
 * seeds
   * renamed import to seed in configuration file 
-  * renamed import options to scan options
+  * dumped import options, use explicit command instead
   * renamed `database-reset` to `database-index`
     * don't parse pom when revision is the same
     * renamed indexing options accordingly

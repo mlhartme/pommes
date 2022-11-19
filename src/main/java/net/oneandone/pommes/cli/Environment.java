@@ -48,27 +48,14 @@ public class Environment implements Variables {
     private final Console console;
     private final World world;
     public final Home home;
-    private final boolean indexNow;
-    private final boolean indexDaily;
-
     private Maven lazyMaven;
     private Project lazyCurrentPom;
     private Filter lazyExcludes;
 
     public Environment(Console console, World world) throws IOException {
-        this(console, world, false, false);
-    }
-
-    public Environment(Console console, World world, boolean indexNow, boolean indexDaily) throws IOException {
-        if (indexNow && indexDaily) {
-            throw new ArgumentException("conflicting scan options");
-        }
-
         this.console = console;
         this.world = world;
         this.home = Home.create(world, console, false);
-        this.indexNow = indexNow;
-        this.indexDaily = indexDaily;
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyExcludes = null;
@@ -162,15 +149,6 @@ public class Environment implements Variables {
             }
         }
         return null;
-    }
-
-    public void implicitScan(SearchEngine search) throws Exception {
-        FileNode marker;
-
-        marker = search.getDatabase().scannedMarker();
-        if (indexNow || (indexDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
-            index(search);
-        }
     }
 
     public void index(SearchEngine search) throws Exception {
