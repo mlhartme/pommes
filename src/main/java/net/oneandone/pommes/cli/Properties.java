@@ -48,19 +48,19 @@ public class Properties {
         World world;
         String queryPrefix = "query.";
         String formatPrefix = "format.";
-        String seedPrefix = "seed.";
+        String repoPrefix = "repository.";
         String giteaKey;
         java.util.Properties props;
         Map<String, List<String>> queries;
         Map<String, String> formats;
-        Map<String, String> imports;
+        Map<String, String> repositories;
         FileNode checkouts;
 
         world = file.getWorld();
         giteaKey = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
-        imports = new HashMap<>();
+        repositories = new HashMap<>();
         props = file.readProperties();
         checkouts = world.getHome().join("Projects");
         for (String key : props.stringPropertyNames()) {
@@ -72,13 +72,13 @@ public class Properties {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
-            } else if (key.startsWith(seedPrefix)) {
-                imports.put(key.substring(seedPrefix.length()), props.getProperty(key));
+            } else if (key.startsWith(repoPrefix)) {
+                repositories.put(key.substring(repoPrefix.length()), props.getProperty(key));
             } else {
                 throw new IOException("unknown property: " + key);
             }
         }
-        return new Properties(checkouts, giteaKey, queries, formats, imports);
+        return new Properties(checkouts, giteaKey, queries, formats, repositories);
     }
 
     //--
@@ -88,16 +88,16 @@ public class Properties {
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    /** maps seed name to urls */
-    public final Map<String, String> seeds;
+    /** maps names to repository urls */
+    public final Map<String, String> repositories;
 
     public Properties(FileNode checkouts, String giteaKey, Map<String, List<String>> queries,
-                      Map<String, String> formats, Map<String, String> seeds) {
+                      Map<String, String> formats, Map<String, String> repositories) {
         this.checkouts = checkouts;
         this.giteaKey = giteaKey;
         this.queries = queries;
         this.formats = formats;
-        this.seeds = seeds;
+        this.repositories = repositories;
     }
 
     public List<String> lookupQuery(String name) {

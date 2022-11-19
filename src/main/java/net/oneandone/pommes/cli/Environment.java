@@ -156,7 +156,7 @@ public class Environment implements Variables {
         FileNode marker;
 
         marker = search.getDatabase().scannedMarker();
-        for (Map.Entry<String, String> entry : home.properties().seeds.entrySet()) {
+        for (Map.Entry<String, String> entry : home.properties().repositories.entrySet()) {
             console.verbose.println("indexing " + entry.getKey());
             cmd = new DatabaseAdd(this, entry.getValue());
             cmd.run(this, search);

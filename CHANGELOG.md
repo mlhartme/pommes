@@ -3,17 +3,16 @@
 ### 3.4.0 (pending)
 
 * seeds
-  * renamed import to seed in configuration file 
+  * renamed import to repository in configuration file 
   * dumped import options, use explicit command instead
+  * dumped `database-add` and `database-remove`
   * renamed `database-reset` to `database-index`
     * don't parse pom when revision is the same
-    * renamed indexing options accordingly
-  * dumped `database-add` and `database-remove`
   * dumped zone, it doesn't make sends with seeds and projects mit multiple times via transitive seeds
 * fixed NodeRepository to detect raw descriptors in none-root directories
 * fixed NodeRepository to check for trunk/branches/tags only for svn nodes (because ~/Projects/branches confused it)
 * updates
-  * lucense 7.2.1 to 9.2.0
+  * lucene 7.2.1 to 9.2.0
   * glassfish json 1.0.4 to 1.1.4
 
 
