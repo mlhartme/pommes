@@ -18,21 +18,15 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.SearchEngine;
 
-public class DatabaseScan extends Base {
-    private final boolean reset;
-
-    public DatabaseScan(Environment environment, boolean reset) {
+public class DatabaseIndex extends Base {
+    public DatabaseIndex(Environment environment) {
         super(environment);
-        this.reset = reset;
     }
 
     @Override
     public void run() throws Exception {
         try (Database database = environment.home.loadDatabase()) {
-            if (reset) {
-                database.reset();
-            }
-            environment.scan(new SearchEngine(database));
+            environment.index(new SearchEngine(database));
         }
     }
 

@@ -157,19 +157,18 @@ public class Environment implements Variables {
 
         marker = search.getDatabase().scannedMarker();
         if (scanNow || (scanDaily && (!marker.exists() || (System.currentTimeMillis() - marker.getLastModified()) / 1000 / 3600 > 24))) {
-            scan(search);
+            index(search);
         }
     }
 
-    public void scan(SearchEngine search) throws Exception {
+    public void index(SearchEngine search) throws Exception {
         DatabaseAdd cmd;
         FileNode marker;
 
         marker = search.getDatabase().scannedMarker();
         for (Map.Entry<String, String> entry : home.properties().seeds.entrySet()) {
-            console.verbose.println("adding " + entry.getKey());
-            cmd = new DatabaseAdd(this, true, false);
-            cmd.add(entry.getValue());
+            console.verbose.println("indexing " + entry.getKey());
+            cmd = new DatabaseAdd(this, entry.getValue());
             cmd.run(search);
         }
         marker.writeBytes();

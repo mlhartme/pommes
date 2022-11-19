@@ -2,6 +2,7 @@
 
 ### 3.4.0 (pending)
 
+* dumped database-add and remove; renamed database-scan to database-index
 * seeds
   * renamed import to seed in configuration file 
   * renamed import options to scan options

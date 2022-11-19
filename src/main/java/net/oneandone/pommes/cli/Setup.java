@@ -48,7 +48,7 @@ public class Setup {
         environment = new Environment(console, world);
         console.info.println("initial scan ...");
         try (Database database = environment.home.loadDatabase()) {
-            environment.scan(new SearchEngine(database));
+            environment.index(new SearchEngine(database));
         }
         console.info.println("done");
         console.info.println("Have a look at " + directory.join("pommes.properties") + " and adjust Pommes to your needs");

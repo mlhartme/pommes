@@ -62,15 +62,7 @@ public class Main {
                 + "                            svn:https://svn.yourserver.org/some/path -skip/this/subpath"
                 + "\n"
                 + "database commands\n"
-                + "  'database-add' '-delete'? '-dryrun'? '-fixscm'? url*\n"
-                + "                        add projects found under the specified urls to the database;\n"
-                + "                        overwrites projects with same origin;\n"
-                + "                        url is a svn url, http url, artifactory url, github url or json url,\n"
-                + "                        an option (prefixed with '%') or an exclude (prefixed with '-')\n"
-                + "  'database-remove' query\n"
-                + "                        remove all matching projects\n"
-                + "  'database-scan' '-reset'? n"
-                + "                        optionally resets the current database and re-add all seeds.\n"
+                + "  'database-index'      (re-) builds the database.\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
@@ -109,10 +101,7 @@ public class Main {
             cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto query*");
 
-            cli.add(DatabaseScan.class, "database-scan -reset");
-            cli.add(DatabaseAdd.class, "database-add -delete -dryrun url* { add*(url) }");
-            cli.add(DatabaseRemove.class, "database-remove prefix*");
-
+            cli.add(DatabaseIndex.class, "database-index");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));

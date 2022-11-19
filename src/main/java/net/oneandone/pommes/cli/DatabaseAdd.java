@@ -39,20 +39,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class DatabaseAdd extends Base {
-    private final boolean delete;
-    private final boolean dryrun;
     private final List<Repository> repositories;
     private final PrintWriter log;
 
-    public DatabaseAdd(Environment environment, boolean delete, boolean dryrun) throws IOException {
+    public DatabaseAdd(Environment environment, String str) throws IOException, URISyntaxException {
         super(environment);
-        this.delete = delete;
-        this.dryrun = dryrun;
         this.repositories = new ArrayList<>();
         this.log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
+        this.add(str);
     }
 
-    public void add(String str) throws URISyntaxException, NodeInstantiationException {
+    private void add(String str) throws URISyntaxException, NodeInstantiationException {
         if (str.startsWith("-")) {
             previous(str).addExclude(str.substring(1));
         } else if (str.startsWith("%")) {
@@ -74,7 +71,7 @@ public class DatabaseAdd extends Base {
         Indexer indexer;
 
         try {
-            indexer = new Indexer(delete, dryrun, environment, search.getDatabase());
+            indexer = new Indexer(environment, search.getDatabase());
             indexer.start();
             try {
                 for (Repository repository : repositories) {
@@ -94,8 +91,6 @@ public class DatabaseAdd extends Base {
 
     /** Iterates modified or new documents, skips unmodified ones */
     public static class Indexer extends Thread implements Iterator<Document> {
-        private final boolean remove;
-        private final boolean dryrun;
         private final Environment environment;
 
         public final BlockingQueue<Descriptor> src;
@@ -108,11 +103,9 @@ public class DatabaseAdd extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(boolean remove, boolean dryrun, Environment environment, Database database) {
+        public Indexer(Environment environment, Database database) {
             super("Indexer");
 
-            this.remove = remove;
-            this.dryrun = dryrun;
             this.environment = environment;
 
             this.src = new ArrayBlockingQueue<>(25);
@@ -136,13 +129,10 @@ public class DatabaseAdd extends Base {
                         + (System.currentTimeMillis() - started) + " ms");
                 current = iter();
                 database.index(this);
-                if (remove) {
-                    for (String origin : existing.keySet()) {
-                        environment.console().info.println("D " + origin);
-                    }
-
-                    database.removeOrigins(existing.keySet());
+                for (String origin : existing.keySet()) {
+                    environment.console().info.println("D " + origin);
                 }
+                database.removeOrigins(existing.keySet());
                 summary();
             } catch (Exception e) {
                 exception = e;
@@ -205,9 +195,7 @@ public class DatabaseAdd extends Base {
                     continue;
                 }
                 console.info.println((existingRevision == null ? "A " : "U ") + project.origin);
-                if (!dryrun) {
-                    return Field.document(project);
-                }
+                return Field.document(project);
             }
         }
 

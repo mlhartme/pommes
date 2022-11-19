@@ -96,14 +96,6 @@ public class Database implements AutoCloseable {
 
     //-- change the index
 
-    public void reset() throws IOException {
-        close();
-        directory.deleteTreeOpt();
-        scannedMarker().deleteFileOpt();
-        directory.mkdir();
-        index(Collections.emptyIterator());
-    }
-
     public void remove(PommesQuery query) throws IOException, QueryNodeException {
         IndexWriter writer;
         IndexWriterConfig config;
