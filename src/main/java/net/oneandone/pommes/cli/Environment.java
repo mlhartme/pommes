@@ -18,19 +18,31 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.repository.Repository;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
+import org.apache.lucene.document.Document;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Environment implements Variables {
     private final Console console;
@@ -169,8 +181,175 @@ public class Environment implements Variables {
         for (Map.Entry<String, String> entry : home.properties().seeds.entrySet()) {
             console.verbose.println("indexing " + entry.getKey());
             cmd = new DatabaseAdd(this, entry.getValue());
-            cmd.run(search);
+            cmd.run(this, search);
         }
         marker.writeBytes();
+    }
+
+    public static class DatabaseAdd {
+        private final List<Repository> repositories;
+        private final PrintWriter log;
+
+        public DatabaseAdd(Environment environment, String str) throws IOException, URISyntaxException {
+            this.repositories = new ArrayList<>();
+            this.log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
+            if (str.startsWith("-")) {
+                previous(str).addExclude(str.substring(1));
+            } else if (str.startsWith("%")) {
+                previous(str).addOption(str.substring(1));
+            } else {
+                repositories.add(Repository.create(environment, str, log));
+            }
+        }
+
+        private Repository previous(String str) {
+            if (repositories.isEmpty()) {
+                throw new ArgumentException("missing url before '" + str + "'");
+            }
+            return repositories.get(repositories.size() - 1);
+        }
+
+        public void run(Environment environment, SearchEngine search) throws Exception {
+            Environment.Indexer indexer;
+
+            try {
+                indexer = new Environment.Indexer(environment, search.getDatabase());
+                indexer.start();
+                try {
+                    for (Repository repository : repositories) {
+                        repository.scan(indexer.src);
+                    }
+                } finally {
+                    indexer.src.put(Descriptor.END_OF_QUEUE);
+                    indexer.join();
+                }
+                if (indexer.exception != null) {
+                    throw indexer.exception;
+                }
+            } finally {
+                log.close();
+            }
+        }
+
+    }
+
+    /** Iterates modified or new documents, skips unmodified ones */
+    public static class Indexer extends Thread implements Iterator<Document> {
+        private final Environment environment;
+
+        public final BlockingQueue<Descriptor> src;
+        private final Database database;
+        private Exception exception;
+
+        private Document current;
+        private int count;
+        private int errors;
+
+        private final Map<String, String> existing;
+
+        public Indexer(Environment environment, Database database) {
+            super("Indexer");
+
+            this.environment = environment;
+
+            this.src = new ArrayBlockingQueue<>(25);
+            this.database = database;
+            this.exception = null;
+
+            // CAUTION: current is not defined until this thread is started (because it would block this constructor)!
+
+            this.count = 0;
+            this.errors = 0;
+            this.existing = new HashMap<>();
+        }
+
+        public void run() {
+            long started;
+
+            try {
+                started = System.currentTimeMillis();
+                database.list(existing);
+                environment.console().verbose.println("scanned " + existing.size() + " existing projects: "
+                        + (System.currentTimeMillis() - started) + " ms");
+                current = iter();
+                database.index(this);
+                for (String origin : existing.keySet()) {
+                    environment.console().info.println("D " + origin);
+                }
+                database.removeOrigins(existing.keySet());
+                summary();
+            } catch (Exception e) {
+                exception = e;
+                try {
+                    // consume remaining to avoid blocking scans
+                    while (iter() != null) {
+                        // nop
+                    }
+                } catch (Exception e2) {
+                    e.addSuppressed(e2);
+                }
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        @Override
+        public Document next() {
+            Document result;
+
+            if (current == null) {
+                throw new NoSuchElementException();
+            }
+            result = current;
+            current = iter();
+            return result;
+        }
+
+        private Document iter() {
+            Descriptor descriptor;
+            Project project;
+            Console console;
+            String existingRevision;
+
+            console = environment.console();
+            while (true) {
+                try {
+                    descriptor = src.take();
+                } catch (InterruptedException e) {
+                    continue; // TODO: ok so?
+                }
+                if (descriptor == Descriptor.END_OF_QUEUE) {
+                    return null;
+                }
+                count++;
+                existingRevision = existing.remove(descriptor.getOrigin());
+                if (descriptor.getRevision().equals(existingRevision)) {
+                    console.info.println("  " + descriptor.getOrigin());
+                    continue;
+                }
+                try {
+                    project = descriptor.load(environment);
+                } catch (IOException e) {
+                    console.error.println(e.getMessage());
+                    e.printStackTrace(console.verbose);
+                    errors++;
+                    continue;
+                }
+                console.info.println((existingRevision == null ? "A " : "U ") + project.origin);
+                return Field.document(project);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void summary() {
+            environment.console().info.println((count - errors) + "/" + count + " poms processed successfully.");
+        }
     }
 }
