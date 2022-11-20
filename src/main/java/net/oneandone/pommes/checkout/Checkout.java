@@ -29,18 +29,18 @@ import java.io.IOException;
 public class Checkout extends Action {
     public static Action createOpt(FileNode directory, Project project) throws IOException {
         Scm scm;
-        String scannedUrl;
+        String scannedScm;
 
         if (directory.exists()) {
             scm = Scm.probeCheckout(directory);
             if (scm == null) {
                 return new Problem(directory, directory + ": cannot detect checkout");
             }
-            scannedUrl = scm.getUrl(directory);
-            if (normalize(scannedUrl).equals(normalize(project.scm))) {
+            scannedScm = scm.getUrl(directory);
+            if (normalize(scannedScm).equals(normalize(project.scm))) {
                 return null;
             } else {
-                return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedUrl);
+                return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedScm);
             }
         } else {
             if (project.scm == null) {
