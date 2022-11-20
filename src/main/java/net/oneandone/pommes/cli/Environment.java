@@ -90,6 +90,7 @@ public class Environment implements Variables {
         arguments.clear();
     }
 
+    /* variable lookup */
     public String lookup(String name) throws IOException {
         switch (name) {
             case "scm":
