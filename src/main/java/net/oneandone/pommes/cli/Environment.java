@@ -153,15 +153,12 @@ public class Environment implements Variables {
 
     public void index(SearchEngine search) throws Exception {
         DatabaseAdd cmd;
-        FileNode marker;
 
-        marker = search.getDatabase().scannedMarker();
         for (Map.Entry<String, String> entry : home.properties().repositories.entrySet()) {
             console.verbose.println("indexing " + entry.getKey());
             cmd = new DatabaseAdd(this, entry.getKey(), entry.getValue());
             cmd.run(this, search);
         }
-        marker.writeBytes();
     }
 
     public static class DatabaseAdd {

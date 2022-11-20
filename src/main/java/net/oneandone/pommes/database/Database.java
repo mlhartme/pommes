@@ -72,10 +72,6 @@ public class Database implements AutoCloseable {
         this.searcher = null;
     }
 
-    public FileNode scannedMarker() {
-        return directory.getParent().join(directory.getName() + ".scanned");
-    }
-
     private Directory getIndexLuceneDirectory() throws IOException {
         if (indexLuceneDirectory == null) {
             indexLuceneDirectory = FSDirectory.open(directory.toPath());
