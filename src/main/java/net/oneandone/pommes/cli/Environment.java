@@ -73,7 +73,14 @@ public class Environment implements Variables {
 
     public Project currentPom() throws IOException {
         if (lazyCurrentPom == null) {
-            lazyCurrentPom = scanPom("current", world.getWorking());
+            FileNode directory = world.getWorking();
+            Project result;
+
+            result = scanPomOpt("current", directory);
+            if (result == null) {
+                throw new IllegalStateException(directory.toString());
+            }
+            lazyCurrentPom = result;
         }
         return lazyCurrentPom;
     }
@@ -105,16 +112,6 @@ public class Environment implements Variables {
     }
 
     //--
-
-    public Project scanPom(String repository, FileNode directory) throws IOException {
-        Project result;
-
-        result = scanPomOpt(repository, directory);
-        if (result == null) {
-            throw new IllegalStateException(directory.toString());
-        }
-        return result;
-    }
 
     /** @return null if not a checkout */
     public Project scanPomOpt(String repository, FileNode directory) throws IOException {
