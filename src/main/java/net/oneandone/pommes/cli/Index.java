@@ -23,69 +23,54 @@ import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.Repository;
+import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Index extends Base {
+
     public Index(Environment environment) {
         super(environment);
+
     }
+
 
     @Override
     public void run(SearchEngine search) throws Exception {
-        DatabaseAdd cmd;
+        Repository repository;
+        Indexer indexer;
+        PrintWriter log;
 
+        log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
         for (Map.Entry<String, String> entry : environment.home.properties().repositories.entrySet()) {
-            console.verbose.println("indexing " + entry.getKey());
-            cmd = new DatabaseAdd(environment, entry.getKey(), entry.getValue());
-            cmd.run(environment, search);
-        }
-    }
-
-    public static class DatabaseAdd {
-        private final List<Repository> repositories;
-        private final PrintWriter log;
-
-        public DatabaseAdd(Environment environment, String repository, String str) throws IOException, URISyntaxException {
-            this.repositories = new ArrayList<>();
-            this.log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
-            if (str.startsWith("-")) {
-                previous(str).addExclude(str.substring(1));
-            } else if (str.startsWith("%")) {
-                previous(str).addOption(str.substring(1));
-            } else {
-                repositories.add(Repository.create(environment, repository, str, log));
+            repository = null;
+            for (String str : Separator.SPACE.split(entry.getValue())) {
+                if (str.startsWith("-")) {
+                    repo(repository, str).addExclude(str.substring(1));
+                } else if (str.startsWith("%")) {
+                    repo(repository, str).addOption(str.substring(1));
+                } else {
+                    if (repository != null) {
+                        throw new ArgumentException("duplicate repository");
+                    }
+                    repository = Repository.create(environment, entry.getKey(), str, log);
+                }
             }
-        }
-
-        private Repository previous(String str) {
-            if (repositories.isEmpty()) {
-                throw new ArgumentException("missing url before '" + str + "'");
-            }
-            return repositories.get(repositories.size() - 1);
-        }
-
-        public void run(Environment environment, SearchEngine search) throws Exception {
-            Indexer indexer;
 
             try {
-                indexer = new Indexer(environment, search.getDatabase());
+                console.info.println("indexing " + entry.getKey() + ": " + entry.getValue());
+                indexer = new Indexer(environment, search.getDatabase(), entry.getKey());
                 indexer.start();
                 try {
-                    for (Repository repository : repositories) {
-                        repository.scan(indexer.src);
-                    }
+                    repository.scan(indexer.src);
                 } finally {
                     indexer.src.put(Descriptor.END_OF_QUEUE);
                     indexer.join();
@@ -97,7 +82,13 @@ public class Index extends Base {
                 log.close();
             }
         }
+    }
 
+    private Repository repo(Repository repository, String str) {
+        if (repository == null) {
+            throw new ArgumentException("missing url before '" + str + "'");
+        }
+        return repository;
     }
 
     /** Iterates modified or new documents, skips unmodified ones */
@@ -106,6 +97,8 @@ public class Index extends Base {
 
         public final BlockingQueue<Descriptor> src;
         private final Database database;
+        private final String repository;
+
         private Exception exception;
 
         private Document current;
@@ -114,13 +107,15 @@ public class Index extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(Environment environment, Database database) {
+        public Indexer(Environment environment, Database database, String repository) {
             super("Indexer");
 
             this.environment = environment;
 
             this.src = new ArrayBlockingQueue<>(25);
+
             this.database = database;
+            this.repository = repository;
             this.exception = null;
 
             // CAUTION: current is not defined until this thread is started (because it would block this constructor)!
@@ -135,7 +130,7 @@ public class Index extends Base {
 
             try {
                 started = System.currentTimeMillis();
-                database.list(existing);
+                database.list(repository, existing);
                 environment.console().verbose.println("scanned " + existing.size() + " existing projects: "
                         + (System.currentTimeMillis() - started) + " ms");
                 current = iter();
@@ -143,7 +138,7 @@ public class Index extends Base {
                 for (String origin : existing.keySet()) {
                     environment.console().info.println("D " + origin);
                 }
-                database.removeOrigins(existing.keySet());
+                database.removeOrigins(repository, existing.keySet());
                 summary();
             } catch (Exception e) {
                 exception = e;

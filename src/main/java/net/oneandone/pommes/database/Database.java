@@ -22,13 +22,12 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -104,38 +103,39 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void removeOrigins(Collection<String> origins) throws IOException {
+    public void removeOrigins(String repository, Collection<String> origins) throws IOException {
         IndexWriter writer;
         IndexWriterConfig config;
-        Term[] terms;
-        int i;
 
         if (origins.isEmpty()) {
             return;
         }
-        terms = new Term[origins.size()];
-        i = 0;
+        var orBuilder = new BooleanQuery.Builder();
         for (String origin : origins) {
-            terms[i++] = Field.ORIGIN.term(origin);
+            orBuilder.add(Field.ORIGIN.query(Match.STRING, origin), BooleanClause.Occur.SHOULD);
         }
+        var andBuilder = new BooleanQuery.Builder();
+        // make sure we have at least one entry. Because terms might be empty. Or, if it's a single "!", we need another entry to make it work.
+        andBuilder.add(Field.REPOSITORY.query(Match.STRING, repository), BooleanClause.Occur.MUST);
+        andBuilder.add(orBuilder.build(), BooleanClause.Occur.MUST);
+
+        System.out.println("query: " + andBuilder);
         close();
         config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
-        writer.deleteDocuments(terms);
+        writer.deleteDocuments(andBuilder.build());
         writer.close();
     }
 
-    public void list(Map<String, String> result) throws IOException {
+    public void list(String repository, Map<String, String> result) throws IOException {
         TopDocs search;
         Document document;
-        Query query;
 
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        query = new WildcardQuery(Field.ORIGIN.term("*"));
-        search = searcher.search(query, Integer.MAX_VALUE);
+        search = searcher.search(Field.REPOSITORY.query(Match.STRING, repository), Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
             result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));
