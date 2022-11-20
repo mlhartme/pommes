@@ -43,17 +43,7 @@ public class Index extends Base {
     }
 
     @Override
-    public void run() throws Exception {
-        try (Database database = environment.home.loadDatabase()) {
-            index(new SearchEngine(database));
-        }
-    }
-
     public void run(SearchEngine search) throws Exception {
-        throw new RuntimeException();
-    }
-
-    public void index(SearchEngine search) throws Exception {
         DatabaseAdd cmd;
 
         for (Map.Entry<String, String> entry : environment.home.properties().repositories.entrySet()) {
