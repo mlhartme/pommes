@@ -3,11 +3,11 @@
 ### 3.4.0 (pending)
 
 * commands
-  * renamed `database-reset` to `database-index`
+  * renamed `database-reset` to `index`; dumped `database-add` and `database-remove`
     * don't parse pom when revision is the same
-  * dumped `database-add` and `database-remove`
-* renamed import to repository in configuration file
-* dumped import options, use explicit command instead
+  * dumped import options, use explicit command instead
+* configuration file 
+  * renamed import to repository
 * renamed zone to repository
 * fixed NodeRepository to detect raw descriptors in none-root directories
 * fixed NodeRepository to check for trunk/branches/tags only for svn nodes (because ~/Projects/branches confused it)

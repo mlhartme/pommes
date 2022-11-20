@@ -60,9 +60,7 @@ public class Main {
                 + "                        checkouts with uncommitted changes are marked in the list - example urls:\n"
                 + "                            github:mlhartme\n"
                 + "                            svn:https://svn.yourserver.org/some/path -skip/this/subpath"
-                + "\n"
-                + "database commands\n"
-                + "  'database-index'      (re-) builds the database.\n"
+                + "  'index'               (re-) builds the database.\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
@@ -96,7 +94,7 @@ public class Main {
             cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto query*");
 
-            cli.add(DatabaseIndex.class, "database-index");
+            cli.add(Index.class, "database-index");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));

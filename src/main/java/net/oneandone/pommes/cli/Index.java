@@ -18,8 +18,8 @@ package net.oneandone.pommes.cli;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.SearchEngine;
 
-public class DatabaseIndex extends Base {
-    public DatabaseIndex(Environment environment) {
+public class Index extends Base {
+    public Index(Environment environment) {
         super(environment);
     }
 
