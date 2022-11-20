@@ -141,7 +141,7 @@ public class ArtifactoryRepository extends Repository {
                     descriptor = Descriptor.probeChecked(environment, node);
                     if (descriptor != null) {
                         descriptor.setRepository(repository);
-                        descriptor.setPath("artifactory:" + node.getUri().toString());
+                        descriptor.setPath("artifactory:" + node.getPath());
                         descriptor.setRevision(sha1);
                         dest.put(descriptor);
                     }

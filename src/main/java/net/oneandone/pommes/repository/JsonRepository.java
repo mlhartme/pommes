@@ -66,12 +66,10 @@ public class JsonRepository extends Repository {
 
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
-        String prefix;
         JsonArray array;
         Descriptor descriptor;
         Project project;
 
-        prefix = node.getUri().toASCIIString() + ":";
         try (InputStream src = node.getName().endsWith(".gz") ? new GZIPInputStream(node.newInputStream()) : node.newInputStream()) {
             array = JsonParser.parseReader(new InputStreamReader(src)).getAsJsonArray();
             for (JsonElement entry : array) {
@@ -79,12 +77,12 @@ public class JsonRepository extends Repository {
                     project = Project.fromJson(entry.getAsJsonObject());
                     descriptor = new JsonDescriptor(project);
                     descriptor.setRepository(name);
-                    descriptor.setPath(prefix + project.getPath());
+                    descriptor.setPath(project.getPath());
                     descriptor.setRevision(node.getWorld().memoryNode(project.toJson().toString()).sha());
                 } catch (Exception e) {
                     descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
                     descriptor.setRepository(name);
-                    descriptor.setPath(node.getUri().toString());
+                    descriptor.setPath(node.getPath());
                 }
                 dest.put(descriptor);
             }
