@@ -37,7 +37,7 @@ public class ErrorDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment environment, String origin, String revision, String scm) {
+    protected Project doLoad(Environment environment, String repository, String origin, String revision, String scm) {
         throw new IllegalStateException();
     }
 }

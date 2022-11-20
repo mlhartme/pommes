@@ -50,7 +50,7 @@ public class RawDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String origin, String revision, String foundScm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String origin, String revision, String foundScm) throws IOException {
         Gav artifact;
 
         if (!foundScm.equals(scm.getUrl(directory))) {
@@ -61,6 +61,6 @@ public class RawDescriptor extends Descriptor {
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-        return new Project(origin, revision, null, artifact, foundScm, null);
+        return new Project(repository, origin, revision, null, artifact, foundScm, null);
     }
 }

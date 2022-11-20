@@ -61,7 +61,7 @@ public class Remove extends Base {
                     continue;
                 }
             }
-            scannedPom = environment.scanPomOpt(checkout);
+            scannedPom = environment.scanPomOpt("unused", checkout);
             if (scannedPom == null) {
                 removes.add(new Problem(checkout, checkout + ": unknown project"));
             } else {

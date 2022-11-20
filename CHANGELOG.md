@@ -2,13 +2,13 @@
 
 ### 3.4.0 (pending)
 
-* seeds
-  * renamed import to repository in configuration file 
-  * dumped import options, use explicit command instead
-  * dumped `database-add` and `database-remove`
+* commands
   * renamed `database-reset` to `database-index`
     * don't parse pom when revision is the same
-  * dumped zone, it doesn't make sends with seeds and projects mit multiple times via transitive seeds
+  * dumped `database-add` and `database-remove`
+* renamed import to repository in configuration file
+* dumped import options, use explicit command instead
+* renamed zone to repository
 * fixed NodeRepository to detect raw descriptors in none-root directories
 * fixed NodeRepository to check for trunk/branches/tags only for svn nodes (because ~/Projects/branches confused it)
 * updates

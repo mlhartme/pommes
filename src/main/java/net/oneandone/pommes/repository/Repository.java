@@ -28,45 +28,51 @@ import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors */
-public interface Repository {
-    static Repository create(Environment environment, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+public abstract class Repository {
+    public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         World world;
         Repository repository;
         FileNode file;
 
         world = environment.world();
-        repository = ArtifactoryRepository.createOpt(environment, url);
+        repository = ArtifactoryRepository.createOpt(environment, name, url);
         if (repository != null) {
             return repository;
         }
-        repository = NodeRepository.createOpt(environment, url, log);
+        repository = NodeRepository.createOpt(environment, name, url, log);
         if (repository != null) {
             return repository;
         }
-        repository = GithubRepository.createOpt(environment, url, log);
+        repository = GithubRepository.createOpt(environment, name, url, log);
         if (repository != null) {
             return repository;
         }
-        repository = BitbucketRepository.createOpt(environment, url);
+        repository = BitbucketRepository.createOpt(environment, name, url);
         if (repository != null) {
             return repository;
         }
-        repository = GiteaRepository.createOpt(environment, url);
+        repository = GiteaRepository.createOpt(environment, name, url);
         if (repository != null) {
             return repository;
         }
-        repository = JsonRepository.createOpt(world, url);
+        repository = JsonRepository.createOpt(world, name, url);
         if (repository != null) {
             return repository;
         }
         file = world.file(url);
         if (file.exists()) {
-            return new NodeRepository(environment, file, log);
+            return new NodeRepository(environment, name, file, log);
         }
         throw new ArgumentException("unknown repository type: " + url);
     }
 
-    void addOption(String option);
-    void addExclude(String exclude);
-    void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException, URISyntaxException;
+    protected final String name;
+
+    public Repository(String name) {
+        this.name = name;
+    }
+
+    public abstract void addOption(String option);
+    public abstract void addExclude(String exclude);
+    public abstract void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException, URISyntaxException;
 }

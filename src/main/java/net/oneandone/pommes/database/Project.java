@@ -29,7 +29,9 @@ public class Project {
         JsonElement array;
         Project result;
 
-        result = new Project(string(object, "origin"),
+        result = new Project(
+                string(object, "repository"),
+                string(object, "origin"),
                 string(object, "revision"),
                 Gav.forGavOpt(stringOpt(object, "parent")),
                 Gav.forGav(string(object, "artifact")),
@@ -70,6 +72,7 @@ public class Project {
 
     //--
 
+    public final String repository;
     public final String origin;
     public final String revision;
 
@@ -83,13 +86,17 @@ public class Project {
 
     public final List<Gav> dependencies;
 
-    public Project(String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
+    public Project(String repository, String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
+        if (repository == null) {
+            throw new IllegalArgumentException("repository: " + repository);
+        }
         if (origin == null) {
             throw new IllegalArgumentException("origin: " + origin);
         }
         if (scm == null || scm.endsWith("/")) { // forbid tailing / to normalize svn urls - some end with / and some not
             throw new IllegalArgumentException("scm: " + scm);
         }
+        this.repository = repository;
         this.origin = origin;
         this.revision = revision;
         this.parent = parent;
@@ -117,6 +124,7 @@ public class Project {
         JsonArray array;
 
         obj = new JsonObject();
+        obj.add("repository", new JsonPrimitive(repository));
         obj.add("origin", new JsonPrimitive(origin));
         obj.add("revision", new JsonPrimitive(revision));
         if (parent != null) {

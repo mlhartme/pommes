@@ -39,7 +39,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.function.BiFunction;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class BitbucketRepository implements Repository {
+public class BitbucketRepository extends Repository {
     public static void main(String[] args) throws IOException {
         World world;
         Bitbucket bb;
@@ -51,9 +51,9 @@ public class BitbucketRepository implements Repository {
 
     private static final String PROTOCOL = "bitbucket:";
 
-    public static BitbucketRepository createOpt(Environment environment, String url) throws URISyntaxException, NodeInstantiationException {
+    public static BitbucketRepository createOpt(Environment environment, String name, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(PROTOCOL)) {
-            return new BitbucketRepository(environment, (HttpNode) environment.world().node(url.substring(PROTOCOL.length())));
+            return new BitbucketRepository(environment, name, (HttpNode) environment.world().node(url.substring(PROTOCOL.length())));
         } else {
             return null;
         }
@@ -62,7 +62,8 @@ public class BitbucketRepository implements Repository {
     private final Environment environment;
     private final HttpNode bitbucket;
 
-    public BitbucketRepository(Environment environment, HttpNode bitbucket) {
+    public BitbucketRepository(Environment environment, String name, HttpNode bitbucket) {
+        super(name);
         this.environment = environment;
         this.bitbucket = bitbucket;
     }
@@ -98,6 +99,7 @@ public class BitbucketRepository implements Repository {
                     descriptor = m.apply(environment, tmp);
                     if (descriptor != null) {
                         hostname = bitbucket.getRoot().getHostname();
+                        descriptor.setRepository(name);
                         descriptor.setOrigin("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
                         descriptor.setRevision(tmp.sha());
                         descriptor.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");

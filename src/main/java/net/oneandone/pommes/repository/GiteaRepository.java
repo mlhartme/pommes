@@ -49,7 +49,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.function.BiFunction;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class GiteaRepository implements Repository {
+public class GiteaRepository extends Repository {
     private static final String PROTOCOL = "gitea:";
 
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -57,7 +57,7 @@ public class GiteaRepository implements Repository {
         GiteaRepository gitea;
 
         env = new Environment(Console.create(), World.create());
-        gitea = GiteaRepository.create(env, "https://git.ionos.org/CPOPS");
+        gitea = GiteaRepository.create(env, "reponame", "https://git.ionos.org/CPOPS");
         BlockingQueue<Descriptor> result = new ArrayBlockingQueue<>(1000);
         gitea.scan(result);
         for (var d : result) {
@@ -65,15 +65,15 @@ public class GiteaRepository implements Repository {
         }
     }
 
-    public static GiteaRepository createOpt(Environment environment, String url) throws URISyntaxException, NodeInstantiationException {
+    public static GiteaRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(PROTOCOL)) {
-            return create(environment, url.substring(PROTOCOL.length()));
+            return create(environment, repository, url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
     }
 
-    public static GiteaRepository create(Environment environment, String uriStr) throws URISyntaxException {
+    public static GiteaRepository create(Environment environment, String repository, String uriStr) throws URISyntaxException {
         ApiClient gitea;
         URI uri;
         String path;
@@ -97,7 +97,7 @@ public class GiteaRepository implements Repository {
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
         accessToken.setApiKey(environment.home.properties().giteaKey);
 
-        return new GiteaRepository(environment, uri.getHost(), gitea, selectedOrganization);
+        return new GiteaRepository(environment, repository, uri.getHost(), gitea, selectedOrganization);
     }
 
     private final Environment environment;
@@ -107,7 +107,8 @@ public class GiteaRepository implements Repository {
     private final OrganizationApi organizationApi;
     private final RepositoryApi repositoryApi;
 
-    public GiteaRepository(Environment environment, String hostname, ApiClient gitea, String selectedOrganization) {
+    public GiteaRepository(Environment environment, String repository, String hostname, ApiClient gitea, String selectedOrganization) {
+        super(repository);
         this.environment = environment;
         this.hostname = hostname;
         this.gitea = gitea;
@@ -167,6 +168,7 @@ public class GiteaRepository implements Repository {
                         MemoryNode tmp = environment.world().memoryNode(str);
                         Descriptor descriptor = m.apply(environment, tmp);
                         if (descriptor != null) {
+                            descriptor.setRepository(name);
                             descriptor.setOrigin("gitea://" + hostname + "/" + org + "/" + repo + "/" + contents.getPath());
                             descriptor.setRevision(tmp.sha());
                             descriptor.setScm("git:ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git");

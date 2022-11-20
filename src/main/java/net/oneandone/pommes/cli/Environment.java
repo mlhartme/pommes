@@ -87,7 +87,7 @@ public class Environment implements Variables {
 
     public Project currentPom() throws IOException {
         if (lazyCurrentPom == null) {
-            lazyCurrentPom = scanPom(world.getWorking());
+            lazyCurrentPom = scanPom("current", world.getWorking());
         }
         return lazyCurrentPom;
     }
@@ -119,11 +119,10 @@ public class Environment implements Variables {
 
     //--
 
-    public Project scanPom(FileNode directory) throws IOException {
+    public Project scanPom(String repository, FileNode directory) throws IOException {
         Project result;
 
-        result = scanPomOpt(directory);
-
+        result = scanPomOpt(repository, directory);
         if (result == null) {
             throw new IllegalStateException(directory.toString());
         }
@@ -131,7 +130,7 @@ public class Environment implements Variables {
     }
 
     /** @return null if not a checkout */
-    public Project scanPomOpt(FileNode directory) throws IOException {
+    public Project scanPomOpt(String repository, FileNode directory) throws IOException {
         Scm scm;
         Descriptor descriptor;
 
@@ -142,6 +141,7 @@ public class Environment implements Variables {
         for (Node child : directory.list()) {
             descriptor = Descriptor.probe(this, child);
             if (descriptor != null) {
+                descriptor.setRepository(repository);
                 descriptor.setOrigin(scm.getUrl(directory) + "/" + child.getName());
                 descriptor.setRevision(child.sha());
                 descriptor.setScm(scm.getUrl(directory));
@@ -158,7 +158,7 @@ public class Environment implements Variables {
         marker = search.getDatabase().scannedMarker();
         for (Map.Entry<String, String> entry : home.properties().repositories.entrySet()) {
             console.verbose.println("indexing " + entry.getKey());
-            cmd = new DatabaseAdd(this, entry.getValue());
+            cmd = new DatabaseAdd(this, entry.getKey(), entry.getValue());
             cmd.run(this, search);
         }
         marker.writeBytes();
@@ -168,7 +168,7 @@ public class Environment implements Variables {
         private final List<Repository> repositories;
         private final PrintWriter log;
 
-        public DatabaseAdd(Environment environment, String str) throws IOException, URISyntaxException {
+        public DatabaseAdd(Environment environment, String repository, String str) throws IOException, URISyntaxException {
             this.repositories = new ArrayList<>();
             this.log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
             if (str.startsWith("-")) {
@@ -176,7 +176,7 @@ public class Environment implements Variables {
             } else if (str.startsWith("%")) {
                 previous(str).addOption(str.substring(1));
             } else {
-                repositories.add(Repository.create(environment, str, log));
+                repositories.add(Repository.create(environment, repository, str, log));
             }
         }
 

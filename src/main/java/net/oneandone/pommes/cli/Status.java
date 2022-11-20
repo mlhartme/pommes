@@ -168,7 +168,7 @@ public class Status extends Base {
             scmUrl = scm.getUrl(found);
             foundProjects = database.projectsByScm(scmUrl);
             if (foundProjects.isEmpty()) {
-                probed = NodeRepository.probe(environment, found);
+                probed = NodeRepository.probe(environment, "unused", found);
                 if (probed == null) {
                     throw new IllegalStateException();
                 }

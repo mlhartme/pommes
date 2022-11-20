@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Field {
+    REPOSITORY("Repository"),
     /**
      * Mandatory. The full uri used to load the project for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
@@ -138,6 +139,7 @@ public enum Field {
         Document doc;
 
         doc = new Document();
+        REPOSITORY.add(doc, project.repository);
         ORIGIN.add(doc, project.origin);
         REVISION.add(doc, project.revision);
         if (project.parent != null) {
@@ -157,7 +159,7 @@ public enum Field {
         String parent;
 
         parent = PARENT.get(document);
-        result = new Project(ORIGIN.get(document), REVISION.get(document),
+        result = new Project(REPOSITORY.get(document), ORIGIN.get(document), REVISION.get(document),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
                 SCM.get(document), URL.get(document));
         for (String dep : DEP.getList(document)) {

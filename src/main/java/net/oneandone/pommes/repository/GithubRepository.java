@@ -29,12 +29,12 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
-public class GithubRepository implements Repository {
+public class GithubRepository extends Repository {
     private static final String PROTOCOL = "github:";
 
-    public static GithubRepository createOpt(Environment environment, String url, PrintWriter log) {
+    public static GithubRepository createOpt(Environment environment, String name, String url, PrintWriter log) {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(environment, url.substring(PROTOCOL.length()), log);
+            return new GithubRepository(environment, name, url.substring(PROTOCOL.length()), log);
         } else {
             return null;
         }
@@ -47,7 +47,8 @@ public class GithubRepository implements Repository {
     private boolean tags;
     private final PrintWriter log;
 
-    public GithubRepository(Environment environment, String user, PrintWriter log) {
+    public GithubRepository(Environment environment, String name, String user, PrintWriter log) {
+        super(name);
         this.environment = environment;
         this.world = environment.world();
         this.user = user;
@@ -83,7 +84,7 @@ public class GithubRepository implements Repository {
         for (JsonElement e : repositories) {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
-            repository = new NodeRepository(environment, world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
+            repository = new NodeRepository(environment, this.name, world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
             repository.scan(dest);
         }
     }

@@ -35,23 +35,24 @@ import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.GZIPInputStream;
 
-public class JsonRepository implements Repository {
+public class JsonRepository extends Repository {
     private static final String JSON = "json:";
     private static final String INLINE = "inline:";
 
-    public static JsonRepository createOpt(World world, String url) throws URISyntaxException, NodeInstantiationException {
+    public static JsonRepository createOpt(World world, String name, String url) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(JSON)) {
-            return new JsonRepository(Find.fileOrNode(world, url.substring(JSON.length())));
+            return new JsonRepository(name, Find.fileOrNode(world, url.substring(JSON.length())));
         }
         if (url.startsWith(INLINE)) {
-            return new JsonRepository(world.memoryNode("[ " + url.substring(INLINE.length()) + " ]"));
+            return new JsonRepository(name, world.memoryNode("[ " + url.substring(INLINE.length()) + " ]"));
         }
         return null;
     }
 
     private final Node node;
 
-    public JsonRepository(Node node) {
+    public JsonRepository(String name, Node node) {
+        super(name);
         this.node = node;
     }
 
@@ -77,10 +78,12 @@ public class JsonRepository implements Repository {
                 try {
                     project = Project.fromJson(entry.getAsJsonObject());
                     descriptor = new JsonDescriptor(project);
+                    descriptor.setRepository(name);
                     descriptor.setOrigin(prefix + project.getOrigin());
                     descriptor.setRevision(node.getWorld().memoryNode(project.toJson().toString()).sha());
                 } catch (Exception e) {
                     descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
+                    descriptor.setRepository(name);
                     descriptor.setOrigin(node.getUri().toString());
                 }
                 dest.put(descriptor);

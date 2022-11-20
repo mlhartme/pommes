@@ -29,6 +29,7 @@ public class ProjectTest {
 
         obj = JsonParser.parseString(
                 "  {\n" +
+                "    \"repository\": \"r\",\n" +
                 "    \"origin\": \"o\",\n" +
                 "    \"revision\": \"32\",\n" +
                 "    \"parent\": \"net.oneandone.maven.poms:lazy-foss-parent:1.0.1\",\n" +

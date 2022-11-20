@@ -36,12 +36,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /** To search files system and subversion */
-public class NodeRepository implements Repository {
-    public static Descriptor probe(Environment environment, FileNode checkout) throws IOException {
+public class NodeRepository extends Repository {
+    public static Descriptor probe(Environment environment, String repository, FileNode checkout) throws IOException {
         NodeRepository repo;
         BlockingQueue<Descriptor> dest;
 
-        repo = new NodeRepository(environment, checkout, environment.console().verbose);
+        repo = new NodeRepository(environment, repository, checkout, environment.console().verbose);
         dest = new ArrayBlockingQueue<>(2);
         try {
             repo.scan(checkout, false, dest);
@@ -57,9 +57,9 @@ public class NodeRepository implements Repository {
     private static final String FILE = "file:";
     private static final String SVN = "svn:";
 
-    public static NodeRepository createOpt(Environment environment, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+    public static NodeRepository createOpt(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeRepository(environment, Find.fileOrNode(environment.world(), url), log);
+            return new NodeRepository(environment, name, Find.fileOrNode(environment.world(), url), log);
         } else {
             return null;
         }
@@ -74,11 +74,12 @@ public class NodeRepository implements Repository {
     private boolean tags;
     private final Filter exclude;
 
-    public NodeRepository(Environment environment, Node root, PrintWriter log) {
-        this(environment, root, false, false, log);
+    public NodeRepository(Environment environment, String name, Node root, PrintWriter log) {
+        this(environment, name, root, false, false, log);
     }
 
-    public NodeRepository(Environment environment, Node root, boolean branches, boolean tags, PrintWriter log) {
+    public NodeRepository(Environment environment, String name, Node root, boolean branches, boolean tags, PrintWriter log) {
+        super(name);
         this.environment = environment;
         this.root = root;
         this.exclude = new Filter();
@@ -127,12 +128,12 @@ public class NodeRepository implements Repository {
         }
         log.println("scan " + directory.getPath());
         for (Node child : children) {
-            if (addOpt(dest, Descriptor.probeChecked(environment, child), child)) {
+            if (addOpt(dest, name, Descriptor.probeChecked(environment, child), child)) {
                 return;
             }
         }
         if (directory instanceof FileNode fileNode) {
-            if (addOpt(dest, RawDescriptor.createOpt(fileNode), directory)) {
+            if (addOpt(dest, name, RawDescriptor.createOpt(fileNode), directory)) {
                 return;
             }
         }
@@ -178,10 +179,11 @@ public class NodeRepository implements Repository {
         }
     }
 
-    private static boolean addOpt(BlockingQueue<Descriptor> dest, Descriptor descriptor, Node node) throws IOException, InterruptedException {
+    private static boolean addOpt(BlockingQueue<Descriptor> dest, String name, Descriptor descriptor, Node node) throws IOException, InterruptedException {
         if (descriptor == null) {
             return false;
         }
+        descriptor.setRepository(name);
         descriptor.setOrigin(node.getUri().toString());
         descriptor.setRevision(Long.toString(node.getLastModified()));
         descriptor.setScm(nodeScm(node));

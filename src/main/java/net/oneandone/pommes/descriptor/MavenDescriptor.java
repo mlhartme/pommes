@@ -46,7 +46,7 @@ public class MavenDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String origin, String revision, String scm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String origin, String revision, String scm) throws IOException {
         FileNode local;
         org.apache.maven.project.MavenProject project;
         Artifact pa;
@@ -69,7 +69,7 @@ public class MavenDescriptor extends Descriptor {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pommesProject = new Project(origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
+            pommesProject = new Project(repository, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pommesProject.dependencies.add(Gav.forDependency(dependency));
             }
