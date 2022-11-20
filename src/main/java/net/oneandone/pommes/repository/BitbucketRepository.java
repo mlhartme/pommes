@@ -100,7 +100,7 @@ public class BitbucketRepository extends Repository {
                     if (descriptor != null) {
                         hostname = bitbucket.getRoot().getHostname();
                         descriptor.setRepository(name);
-                        descriptor.setOrigin("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
+                        descriptor.setPath("bitbucket://" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + "/" + path);
                         descriptor.setRevision(tmp.sha());
                         descriptor.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");
                         dest.put(descriptor);

@@ -128,7 +128,7 @@ public class Environment implements Variables {
             descriptor = Descriptor.probe(this, child);
             if (descriptor != null) {
                 descriptor.setRepository(repository);
-                descriptor.setOrigin(scm.getUrl(directory) + "/" + child.getName());
+                descriptor.setPath(scm.getUrl(directory) + "/" + child.getName());
                 descriptor.setRevision(child.sha());
                 descriptor.setScm(scm.getUrl(directory));
                 return descriptor.load(this);

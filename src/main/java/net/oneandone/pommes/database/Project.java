@@ -31,7 +31,7 @@ public class Project {
 
         result = new Project(
                 string(object, "repository"),
-                string(object, "origin"),
+                string(object, "path"),
                 string(object, "revision"),
                 Gav.forGavOpt(stringOpt(object, "parent")),
                 Gav.forGav(string(object, "artifact")),
@@ -73,7 +73,7 @@ public class Project {
     //--
 
     public final String repository;
-    public final String origin;
+    public final String path;
     public final String revision;
 
     /** may be null */
@@ -86,24 +86,28 @@ public class Project {
 
     public final List<Gav> dependencies;
 
-    public Project(String repository, String origin, String revision, Gav parent, Gav artifact, String scm, String url) {
-        if (repository == null) {
+    public Project(String repository, String path, String revision, Gav parent, Gav artifact, String scm, String url) {
+        if (repository == null || repository.contains(":")) {
             throw new IllegalArgumentException("repository: " + repository);
         }
-        if (origin == null) {
-            throw new IllegalArgumentException("origin: " + origin);
+        if (path == null) {
+            throw new IllegalArgumentException("path: " + path);
         }
         if (scm == null || scm.endsWith("/")) { // forbid tailing / to normalize svn urls - some end with / and some not
             throw new IllegalArgumentException("scm: " + scm);
         }
         this.repository = repository;
-        this.origin = origin;
+        this.path = path;
         this.revision = revision;
         this.parent = parent;
         this.artifact = artifact;
         this.scm = scm;
         this.url = url;
         this.dependencies = new ArrayList<>();
+    }
+
+    public String origin() {
+        return repository + Field.ORIGIN_DELIMITER + path;
     }
 
     public String toLine() {
@@ -115,8 +119,8 @@ public class Project {
         return toLine();
     }
 
-    public String getOrigin() {
-        return origin;
+    public String getPath() {
+        return path;
     }
 
     public JsonObject toJson() {
@@ -125,7 +129,7 @@ public class Project {
 
         obj = new JsonObject();
         obj.add("repository", new JsonPrimitive(repository));
-        obj.add("origin", new JsonPrimitive(origin));
+        obj.add("path", new JsonPrimitive(path));
         obj.add("revision", new JsonPrimitive(revision));
         if (parent != null) {
             obj.add("parent", new JsonPrimitive(parent.toGavString()));

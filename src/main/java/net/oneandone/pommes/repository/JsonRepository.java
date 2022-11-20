@@ -79,12 +79,12 @@ public class JsonRepository extends Repository {
                     project = Project.fromJson(entry.getAsJsonObject());
                     descriptor = new JsonDescriptor(project);
                     descriptor.setRepository(name);
-                    descriptor.setOrigin(prefix + project.getOrigin());
+                    descriptor.setPath(prefix + project.getPath());
                     descriptor.setRevision(node.getWorld().memoryNode(project.toJson().toString()).sha());
                 } catch (Exception e) {
                     descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
                     descriptor.setRepository(name);
-                    descriptor.setOrigin(node.getUri().toString());
+                    descriptor.setPath(node.getUri().toString());
                 }
                 dest.put(descriptor);
             }

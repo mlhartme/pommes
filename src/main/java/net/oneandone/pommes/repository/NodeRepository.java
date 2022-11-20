@@ -184,7 +184,7 @@ public class NodeRepository extends Repository {
             return false;
         }
         descriptor.setRepository(name);
-        descriptor.setOrigin(node.getUri().toString());
+        descriptor.setPath(node.getUri().toString());
         descriptor.setRevision(Long.toString(node.getLastModified()));
         descriptor.setScm(nodeScm(node));
         dest.put(descriptor);

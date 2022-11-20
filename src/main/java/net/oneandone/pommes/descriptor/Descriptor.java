@@ -63,7 +63,7 @@ public abstract class Descriptor {
     }
 
     private String repository;
-    private String origin;
+    private String path;
     private String revision;
     private String scm;
 
@@ -75,12 +75,12 @@ public abstract class Descriptor {
         return repository;
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public String getOrigin() {
-        return origin;
+    public String getPath() {
+        return path;
     }
 
     public void setRevision(String revision) {
@@ -99,18 +99,18 @@ public abstract class Descriptor {
         if (repository == null) {
             throw new IllegalStateException();
         }
-        if (origin == null) {
+        if (path == null) {
             throw new IllegalStateException();
         }
         if (revision == null) {
             throw new IllegalStateException();
         }
-        return doLoad(environment, repository, origin, revision, scm);
+        return doLoad(environment, repository, path, revision, scm);
     }
 
     protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision, String withScm) throws IOException;
 
     public String toString() {
-        return origin;
+        return path;
     }
 }

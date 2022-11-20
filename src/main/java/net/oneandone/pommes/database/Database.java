@@ -22,9 +22,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -103,27 +102,25 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void removeOrigins(String repository, Collection<String> origins) throws IOException {
+    public void removeOrigins(Collection<String> origins) throws IOException {
         IndexWriter writer;
         IndexWriterConfig config;
+        Term[] terms;
 
         if (origins.isEmpty()) {
             return;
         }
-        var orBuilder = new BooleanQuery.Builder();
+        terms = new Term[origins.size()];
+        int i = 0;
         for (String origin : origins) {
-            orBuilder.add(Field.ORIGIN.query(Match.STRING, origin), BooleanClause.Occur.SHOULD);
+            terms[i++] = Field.ORIGIN.term(origin);
         }
-        var andBuilder = new BooleanQuery.Builder();
-        // make sure we have at least one entry. Because terms might be empty. Or, if it's a single "!", we need another entry to make it work.
-        andBuilder.add(Field.REPOSITORY.query(Match.STRING, repository), BooleanClause.Occur.MUST);
-        andBuilder.add(orBuilder.build(), BooleanClause.Occur.MUST);
 
         close();
         config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         writer = new IndexWriter(getIndexLuceneDirectory(), config);
-        writer.deleteDocuments(andBuilder.build());
+        writer.deleteDocuments(terms);
         writer.close();
     }
 
@@ -134,7 +131,7 @@ public class Database implements AutoCloseable {
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        search = searcher.search(Field.REPOSITORY.query(Match.STRING, repository), Integer.MAX_VALUE);
+        search = searcher.search(Field.ORIGIN.query(Match.PREFIX, repository + Field.ORIGIN_DELIMITER), Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().document(scoreDoc.doc);
             result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));

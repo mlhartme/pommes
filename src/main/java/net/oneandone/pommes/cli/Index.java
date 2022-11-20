@@ -138,7 +138,7 @@ public class Index extends Base {
                 for (String origin : existing.keySet()) {
                     environment.console().info.println("D " + origin);
                 }
-                database.removeOrigins(repository, existing.keySet());
+                database.removeOrigins(existing.keySet());
                 summary();
             } catch (Exception e) {
                 exception = e;
@@ -187,9 +187,9 @@ public class Index extends Base {
                     return null;
                 }
                 count++;
-                existingRevision = existing.remove(descriptor.getOrigin());
+                existingRevision = existing.remove(descriptor.getPath());
                 if (descriptor.getRevision().equals(existingRevision)) {
-                    console.info.println("  " + descriptor.getOrigin());
+                    console.info.println("  " + descriptor.getPath());
                     continue;
                 }
                 try {
@@ -200,7 +200,7 @@ public class Index extends Base {
                     errors++;
                     continue;
                 }
-                console.info.println((existingRevision == null ? "A " : "U ") + project.origin);
+                console.info.println((existingRevision == null ? "A " : "U ") + project.origin());
                 return Field.document(project);
             }
         }

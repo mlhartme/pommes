@@ -25,18 +25,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Field {
-    REPOSITORY("Repository"),
     /**
      * Mandatory. The full uri used to load the project for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ORIGIN("Where this project was loaded from. Used as unique identifier."),
+    ORIGIN("Where this project was loaded from. Used as unique identifier. <repositoryName>:<path>"),
+
     REVISION("Last modified timestamp or content hash of this pom. Used to detect changes."),
     PARENT(true, false, "Coordinates of the parent project."),
     ARTIFACT("Coordinates of this project."),
     DEP(true, true, "Coordinates of project dependencies."),
     SCM(true, false, "Scm location for this project. Where to get the sources."),
     URL(true, false, "Url for this project. Where to read about the project.");
+
+    public static final char ORIGIN_DELIMITER = ':';
 
     private final boolean optional;
     private final boolean list;
@@ -139,8 +141,7 @@ public enum Field {
         Document doc;
 
         doc = new Document();
-        REPOSITORY.add(doc, project.repository);
-        ORIGIN.add(doc, project.origin);
+        ORIGIN.add(doc, project.origin());
         REVISION.add(doc, project.revision);
         if (project.parent != null) {
             PARENT.add(doc, project.parent.toGavString());
@@ -157,9 +158,16 @@ public enum Field {
     public static Project project(Document document) {
         Project result;
         String parent;
+        String origin;
+        int idx;
 
         parent = PARENT.get(document);
-        result = new Project(REPOSITORY.get(document), ORIGIN.get(document), REVISION.get(document),
+        origin = ORIGIN.get(document);
+        idx = origin.indexOf(ORIGIN_DELIMITER);
+        if (idx <= 0) {
+            throw new IllegalStateException("invalid origin: " + origin);
+        }
+        result = new Project(origin.substring(0, idx), origin.substring(idx + 1), REVISION.get(document),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
                 SCM.get(document), URL.get(document));
         for (String dep : DEP.getList(document)) {
