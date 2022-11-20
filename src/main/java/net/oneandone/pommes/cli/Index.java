@@ -187,7 +187,7 @@ public class Index extends Base {
                     return null;
                 }
                 count++;
-                existingRevision = existing.remove(descriptor.getPath());
+                existingRevision = existing.remove(descriptor.getRepository() + Field.ORIGIN_DELIMITER + descriptor.getPath());
                 if (descriptor.getRevision().equals(existingRevision)) {
                     console.info.println("  " + descriptor.getPath());
                     continue;
