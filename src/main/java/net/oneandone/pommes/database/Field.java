@@ -80,7 +80,7 @@ public enum Field {
                 return new WildcardQuery(new Term(dbname, str + "*"));
             case SUFFIX:
                 return new WildcardQuery(new Term(dbname, "*" + str));
-            case STRING:
+            case STRING: // TODO: without wildcard
                 return new WildcardQuery(new Term(dbname, str));
             default:
                 throw new IllegalStateException();

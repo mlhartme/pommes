@@ -119,7 +119,6 @@ public class Database implements AutoCloseable {
         andBuilder.add(Field.REPOSITORY.query(Match.STRING, repository), BooleanClause.Occur.MUST);
         andBuilder.add(orBuilder.build(), BooleanClause.Occur.MUST);
 
-        System.out.println("query: " + andBuilder);
         close();
         config =  new IndexWriterConfig(new StandardAnalyzer());
         config.setOpenMode(IndexWriterConfig.OpenMode.APPEND);

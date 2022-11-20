@@ -146,7 +146,7 @@ public class PommesQuery {
         }
     }
 
-    private static Query any() {
+    public static Query any() {
         BooleanQuery.Builder result;
 
         result = new BooleanQuery.Builder();
