@@ -17,7 +17,6 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -33,7 +32,6 @@ import net.oneandone.sushi.util.Strings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +70,7 @@ public class Status extends Base {
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
-            console.info.println(new Step("?", u + " (normal directory)", null, null, null));
+            console.info.println(new Step("?", u + " (normal directory)", null));
         }
 
         if (!steps.isEmpty()) {
@@ -81,7 +79,7 @@ public class Status extends Base {
                 input = console.readline("What do you want to fix, ctrl-c to abort (<numbers>/all)? ");
                 if ("all".equals(input)) {
                     for (var entry : steps.entrySet()) {
-                        entry.getValue().apply(search.getDatabase());
+                        entry.getValue().apply();
                         console.info.println("fixed " + entry.getKey());
                     }
                     steps.clear();
@@ -96,7 +94,7 @@ public class Status extends Base {
                             console.info.println("unknown input: " + item);
                             break;
                         }
-                        step.apply(search.getDatabase());
+                        step.apply();
                         console.info.println("fixed " + item);
                     }
                 }
@@ -179,17 +177,17 @@ public class Status extends Base {
                     throw new IOException(found + ": " + e.getMessage(), e);
                 }
                 relocation = found.equals(expected)? null : new Relocation(found, expected);
-                return new Step("?", found.toString(), scmUrl, newPom, relocation);
+                return new Step("?", found.toString(), relocation);
             } else {
                 try {
                     expected = expected(environment, foundProjects);
                 } catch (IOException e) {
-                    return new Step("!", found.toString() + " " + e.getMessage(), scmUrl, null, null);
+                    return new Step("!", found.toString() + " " + e.getMessage(), null);
                 }
                 if (found.equals(expected)) {
-                    return new Step(scm.isModified(found) ? "M" : " ", found.toString(), scmUrl, null, null);
+                    return new Step(scm.isModified(found) ? "M" : " ", found.toString(), null);
                 }
-                return new Step("C", found.toString(), scmUrl, null, new Relocation(found, expected));
+                return new Step("C", found.toString(), new Relocation(found, expected));
             }
         }
 
@@ -210,26 +208,19 @@ public class Status extends Base {
         }
         private final String marker;
         private final String message;
-        private final String scmUrl;
-        private final Project newPom;
         private final Relocation relocation;
 
-        public Step(String marker, String message, String scmUrl, Project newPom, Relocation relocation) {
+        public Step(String marker, String message, Relocation relocation) {
             this.marker = marker;
             this.message = message;
-            this.scmUrl = scmUrl;
-            this.newPom = newPom;
             this.relocation = relocation;
         }
 
         public boolean isNoop() {
-            return newPom == null && relocation == null;
+            return relocation == null;
         }
 
-        public void apply(Database database) throws IOException {
-            if (newPom != null) {
-                database.index(Collections.singleton(Field.document(newPom)).iterator());
-            }
+        public void apply() throws IOException {
             if (relocation != null) {
                 relocation.apply();
             }
@@ -246,9 +237,6 @@ public class Status extends Base {
 
             lines = new ArrayList<>();
             lines.add(message);
-            if (newPom != null) {
-                lines.add("add " + scmUrl);
-            }
             if (relocation != null) {
                 lines.add(relocation.toString());
             }
