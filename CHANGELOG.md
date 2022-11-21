@@ -6,6 +6,7 @@
   * renamed `database-reset` to `index`; dumped `database-add` and `database-remove`
     * don't parse pom when revision is the same
   * dumped import options, use explicit command instead
+  * simplified delete command
 * configuration file 
   * renamed import to repository
 * renamed zone to repository

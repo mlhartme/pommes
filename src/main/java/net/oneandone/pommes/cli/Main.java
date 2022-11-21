@@ -53,11 +53,9 @@ public class Main {
                 + "                        and cds into the checkout directory\n"
                 + "  'checkout' query      checkout matching projects; skips existing checkouts;\n"
                 + "                        offers selection before changing anything on disk\n"
-                + "  'remove' '-stale'? root?\n"
-                + "                        remove (optional: stale) checkouts under the specified root directory;\n"
-                + "                        a checkout is stale if the project has been removed from the database;\n"
+                + "  'remove' root?        remove checkouts under the specified root directory;\n"
                 + "                        offers selection before changing anything on disk;\n"
-                + "                        checkouts with uncommitted changes are marked in the list\n"
+                + "                        checkouts with modifications are marked in the list\n"
                 + "  'index'               (re-) builds the database.\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
@@ -87,7 +85,7 @@ public class Main {
           cli.add(Setup.class, "setup -batch");
           cli.begin(Environment.class);
             cli.add(Checkout.class, "checkout query*");
-            cli.add(Remove.class, "remove -stale root?=.");
+            cli.add(Remove.class, "remove root?=.");
 
             cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto query*");

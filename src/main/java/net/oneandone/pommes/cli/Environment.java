@@ -71,20 +71,6 @@ public class Environment implements Variables {
         return lazyMaven;
     }
 
-    public Project currentPom() throws IOException {
-        if (lazyCurrentPom == null) {
-            FileNode directory = world.getWorking();
-            Project result;
-
-            result = scanPomOpt("current", directory);
-            if (result == null) {
-                throw new IllegalStateException(directory.toString());
-            }
-            lazyCurrentPom = result;
-        }
-        return lazyCurrentPom;
-    }
-
     //-- Variables interface
 
     private Map<String, String> arguments = new HashMap<>();
@@ -113,25 +99,29 @@ public class Environment implements Variables {
 
     //--
 
-    /** @return null if not a checkout */
-    public Project scanPomOpt(String repository, FileNode directory) throws IOException {
+    private Project currentPom() throws IOException {
+        if (lazyCurrentPom == null) {
+            lazyCurrentPom = scanPom(world.getWorking());
+        }
+        return lazyCurrentPom;
+    }
+    private Project scanPom(FileNode directory) throws IOException {
         Scm scm;
         Descriptor descriptor;
 
         scm = Scm.probeCheckout(directory);
-        if (scm == null) {
-            return null;
-        }
-        for (Node child : directory.list()) {
-            descriptor = Descriptor.probe(this, child);
-            if (descriptor != null) {
-                descriptor.setRepository(repository);
-                descriptor.setPath(child.getPath());
-                descriptor.setRevision(child.sha());
-                descriptor.setScm(scm.getUrl(directory));
-                return descriptor.load(this);
+        if (scm != null) {
+            for (Node child : directory.list()) {
+                descriptor = Descriptor.probe(this, child);
+                if (descriptor != null) {
+                    descriptor.setRepository("unused");
+                    descriptor.setPath(child.getPath());
+                    descriptor.setRevision(child.sha());
+                    descriptor.setScm(scm.getUrl(directory));
+                    return descriptor.load(this);
+                }
             }
         }
-        return null;
+        throw new IllegalStateException(directory.toString());
     }
 }

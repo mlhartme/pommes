@@ -16,9 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.checkout.Action;
-import net.oneandone.pommes.checkout.Root;
 import net.oneandone.pommes.checkout.Problem;
 import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.scm.Scm;
@@ -29,22 +27,17 @@ import java.util.List;
 import java.util.Map;
 
 public class Remove extends Base {
-    private final boolean stale;
     private final FileNode directory;
 
-    public Remove(Environment environment, boolean stale, FileNode directory) {
+    public Remove(Environment environment, FileNode directory) {
         super(environment);
-        this.stale = stale;
         this.directory = directory;
     }
 
     @Override
     public void run(SearchEngine search) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Project scannedPom;
         List<Action> removes;
-        Root root;
-        FileNode configuredDirectory;
         FileNode checkout;
         Scm scm;
 
@@ -56,22 +49,10 @@ public class Remove extends Base {
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             checkout = entry.getKey();
             scm = entry.getValue();
-            if (stale) {
-                if (scm.isAlive(checkout)) {
-                    continue;
-                }
-            }
-            scannedPom = environment.scanPomOpt("unused", checkout);
-            if (scannedPom == null) {
-                removes.add(new Problem(checkout, checkout + ": unknown project"));
+            if (scm.isAlive(checkout)) {
+                removes.add(net.oneandone.pommes.checkout.Remove.create(checkout));
             } else {
-                root = environment.home.root();
-                configuredDirectory = root.directory(scannedPom);
-                if (checkout.equals(configuredDirectory)) {
-                    removes.add(net.oneandone.pommes.checkout.Remove.create(checkout));
-                } else {
-                    removes.add(new Problem(checkout, checkout + ": checkout expected at " + configuredDirectory));
-                }
+                removes.add(new Problem(checkout, checkout + ": checkout is not alive"));
             }
         }
         runAll(removes);

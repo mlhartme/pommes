@@ -29,7 +29,7 @@ public class Remove extends Action {
 
         scm = Scm.probeCheckout(directory);
         if (scm.isModified(directory)) {
-            return new Problem(directory, directory + ": checkout is not committed.");
+            return new Problem(directory, directory + ": checkout has modifications");
         } else {
             return new Remove(directory);
         }
