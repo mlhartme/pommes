@@ -151,25 +151,26 @@ public class Git extends Scm {
     }
 
     @Override
-    public boolean isCommitted(FileNode checkout) {
+    public boolean isModified(FileNode checkout) {
         try {
             git(checkout, "diff", "--quiet").execNoOutput();
         } catch (Failure e) {
-            return false;
+            return true;
         }
         try {
             git(checkout, "diff", "--cached", "--quiet").execNoOutput();
         } catch (Failure e) {
-            return false;
+            return true;
         }
 
-        //  TODO: other branches
         try {
             git(checkout, "diff", "@{u}..HEAD", "--quiet").execNoOutput();
         } catch (Failure e) {
-            return false;
+            return true;
         }
-        return true;
+        // TODO: other branches
+        // TODO: stashes
+        return false;
     }
 
     private static Launcher git(FileNode dir, String... args) {

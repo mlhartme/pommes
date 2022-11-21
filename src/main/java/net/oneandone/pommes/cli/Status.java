@@ -187,7 +187,7 @@ public class Status extends Base {
                     return new Step("!", found.toString() + " " + e.getMessage(), scmUrl, null, null);
                 }
                 if (found.equals(expected)) {
-                    return new Step(scm.isCommitted(found) ? " " : "M", found.toString(), scmUrl, null, null);
+                    return new Step(scm.isModified(found) ? "M" : " ", found.toString(), scmUrl, null, null);
                 }
                 return new Step("C", found.toString(), scmUrl, null, new Relocation(found, expected));
             }

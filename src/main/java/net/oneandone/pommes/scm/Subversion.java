@@ -125,21 +125,21 @@ public class Subversion extends Scm {
     }
 
     @Override
-    public boolean isCommitted(FileNode directory) throws IOException {
-        return isCommitted(directory.exec("svn", "status"));
+    public boolean isModified(FileNode directory) throws IOException {
+        return isModified(directory.exec("svn", "status"));
     }
 
-    private static boolean isCommitted(String lines) {
+    private static boolean isModified(String lines) {
         for (String line : Separator.on("\n").split(lines)) {
             if (line.trim().length() > 0) {
                 if (line.startsWith("X") || line.startsWith("Performing status on external item")) {
                     // needed for pws workspace svn:externals  -> ok
                 } else {
-                    return false;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     private static Launcher svn(FileNode dir, String... args) {
