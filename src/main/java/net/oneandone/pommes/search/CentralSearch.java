@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.MavenDescriptor;
 import net.oneandone.sushi.fs.World;
@@ -28,13 +29,13 @@ public class CentralSearch {
         this.maven = maven;
     }
 
-    public List<Project> query(List<String> query) throws IOException {
+    public List<Project> query(PommesQuery query) throws IOException {
         HttpNode search;
         JsonObject json;
         List<Project> result;
 
         search = (HttpNode) world.validNode("https://search.maven.org/solrsearch/select");
-        search = search.withParameter("q", centralQueryStr(query));
+        search = search.withParameter("q", query.toCentral());
         search = search.withParameter("rows", "20");
         search = search.withParameter("wt", "json");
         try (Reader src = search.newReader()) {
@@ -75,18 +76,5 @@ public class CentralSearch {
             throw new IOException("member not found: " + member);
         }
         return result;
-    }
-
-    private static String centralQueryStr(List<String> query) {
-        StringBuilder result;
-
-        result = new StringBuilder();
-        for (String q : query) {
-            if (!result.isEmpty()) {
-                result.append(" AND ");
-            }
-            result.append(q);
-        }
-        return result.toString();
     }
 }

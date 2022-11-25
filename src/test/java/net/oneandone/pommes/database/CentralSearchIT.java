@@ -24,18 +24,29 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class CentralSearchIT {
     @Test
-    public void json() throws IOException {
+    public void test() throws IOException {
+        check("de.schmizzolin:yogi:1.4.0", "yogi", "yogi");
+        check("net.sf.beezle.sushi:sushi:2.7.0", "sushi AND beezle", "sushi+beezle");
+    }
+
+    public void check(String expectedGav, String expectedParsed, String queryString) throws IOException {
         World world;
+        PommesQuery query;
         CentralSearch search;
         List<Project> projects;
+        Project p;
 
         world = World.create();
         search = new CentralSearch(world, Maven.withSettings(world));
-        projects = search.query(Arrays.asList("sushi AND -beezle"));
-        for (var project : projects) {
-            System.out.println(" " + project);
-        }
+        query = PommesQuery.parse(queryString);
+        assertEquals(expectedParsed, query.toCentral());
+        projects = search.query(query);
+        assertEquals(1, projects.size());
+        p = projects.get(0);
+        assertEquals(Gav.forGav(expectedGav), p.artifact);
     }
 }

@@ -26,10 +26,12 @@ public class Scope {
         return database;
     }
 
-    public List<Project> query(List<String> query) throws IOException, QueryNodeException {
+    public List<Project> query(List<String> queryStrings) throws IOException, QueryNodeException {
+        PommesQuery query;
         List<Project> result;
 
-        result = databaseQuery(PommesQuery.parse(query, variables));
+        query = PommesQuery.parse(queryStrings, variables);
+        result = databaseQuery(query);
         result.addAll(centralSearch.query(query));
         return result;
     }

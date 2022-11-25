@@ -60,9 +60,8 @@ public class PommesQuery {
         }
         orBuilder = new Or();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
-            and = variables.substitute(and);
             andBuilder = new And();
-            terms = PLUS.split(and);
+            terms = PLUS.split(variables.substitute(and));
             for (String termWithNot : terms) {
                 andBuilder.add(Atom.parse(termWithNot, variables));
             }
@@ -76,6 +75,8 @@ public class PommesQuery {
 
     public abstract static class Expr {
         public abstract Query toLucene();
+
+        public abstract String toCentral();
 
         // TODO: proper precendence handling
         public abstract String toString();
@@ -94,6 +95,19 @@ public class PommesQuery {
                 builder.add(expression.toLucene(), BooleanClause.Occur.SHOULD);
             }
             return builder.build();
+        }
+
+        public String toCentral() {
+            StringBuilder result;
+
+            result = new StringBuilder();
+            for (Expr expression : expressions) {
+                if (!result.isEmpty()) {
+                    result.append(" OR ");
+                }
+                result.append(expression.toCentral());
+            }
+            return result.toString();
         }
 
         public String toString() {
@@ -137,6 +151,20 @@ public class PommesQuery {
             result = new BooleanQuery.Builder();
             result.add(Field.ORIGIN.query(Match.SUBSTRING, ""), BooleanClause.Occur.SHOULD);
             return result.build();
+        }
+
+
+        public String toCentral() {
+            StringBuilder result;
+
+            result = new StringBuilder();
+            for (Expr expression : expressions) {
+                if (!result.isEmpty()) {
+                    result.append(" AND ");
+                }
+                result.append(expression.toCentral());
+            }
+            return result.toString();
         }
 
         public String toString() {
@@ -211,6 +239,15 @@ public class PommesQuery {
             return result.build();
         }
 
+        public String toCentral() {
+            StringBuilder result = new StringBuilder();
+            if (not) {
+                result.append("-");
+            }
+            result.append(string);
+            return result.toString();
+        }
+
         public String toString() {
             StringBuilder result = new StringBuilder();
             if (not) {
@@ -268,5 +305,9 @@ public class PommesQuery {
             result = result + "[" + idx + "]";
         }
         return result;
+    }
+
+    public String toCentral() {
+        return query.toCentral();
     }
 }
