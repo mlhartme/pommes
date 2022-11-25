@@ -20,4 +20,44 @@ import java.io.IOException;
 public interface Variables {
     /** @return null when not found */
     String lookup(String var) throws IOException;
+
+    String PREFIX = "{";
+    String SUFFIX = "}";
+
+    default String substitute(String string) throws IOException {
+        StringBuilder builder;
+        int start;
+        int end;
+        int last;
+        String var;
+        String replaced;
+
+        builder = new StringBuilder();
+        last = 0;
+        while (true) {
+            start = string.indexOf(PREFIX, last);
+            if (start == -1) {
+                if (last == 0) {
+                    return string;
+                } else {
+                    builder.append(string.substring(last));
+                    return builder.toString();
+                }
+            }
+            end = string.indexOf(SUFFIX, start + PREFIX.length());
+            if (end == -1) {
+                throw new IllegalArgumentException("missing end marker");
+            }
+            var = string.substring(start + PREFIX.length(), end);
+            replaced = this.lookup(var);
+            if (replaced == null) {
+                throw new IOException("undefined variable: " + var);
+            }
+            builder.append(string, last, start);
+            builder.append(replaced);
+            last = end + SUFFIX.length();
+        }
+    }
+
+
 }

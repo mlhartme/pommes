@@ -33,7 +33,7 @@ public class CentralSearchIT {
 
         world = World.create();
         search = new CentralSearch(world, Maven.withSettings(world));
-        projects = search.query(Arrays.asList("sushi"));
+        projects = search.query(Arrays.asList("sushi AND -beezle"));
         for (var project : projects) {
             System.out.println(" " + project);
         }

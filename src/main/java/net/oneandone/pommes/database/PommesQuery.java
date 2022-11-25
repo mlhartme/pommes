@@ -75,7 +75,7 @@ public class PommesQuery {
         }
         orBuilder = new BooleanQuery.Builder();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
-            and = variables(and, variables);
+            and = variables.substitute(and);
             andBuilder = new BooleanQuery.Builder();
             // make sure we have at least one entry. Because terms might be empty. Or, if it's a single "!", we need another entry to make it work.
             andBuilder.add(any(), BooleanClause.Occur.MUST);
@@ -98,7 +98,7 @@ public class PommesQuery {
                     // search origin, not trunk. Because scm url is regularly not adjusted
                     fields = Field.forIds(idx < 1 ? "as" : term.substring(0, idx));
                     string = term.substring(idx + 1); // ok for -1
-                    string = variables(string, variables);
+                    string = variables.substitute(string);
                     termQuery = or(fields, match, string);
                 }
                 andBuilder.add(termQuery, not ? BooleanClause.Occur.MUST_NOT : BooleanClause.Occur.MUST);
@@ -106,44 +106,6 @@ public class PommesQuery {
             orBuilder.add(andBuilder.build(), BooleanClause.Occur.SHOULD);
         }
         return new PommesQuery(queryIndex, orBuilder.build());
-    }
-
-    private static final String PREFIX = "{";
-    private static final String SUFFIX = "}";
-
-    private static String variables(String string, Variables variables) throws IOException {
-        StringBuilder builder;
-        int start;
-        int end;
-        int last;
-        String var;
-        String replaced;
-
-        builder = new StringBuilder();
-        last = 0;
-        while (true) {
-            start = string.indexOf(PREFIX, last);
-            if (start == -1) {
-                if (last == 0) {
-                    return string;
-                } else {
-                    builder.append(string.substring(last));
-                    return builder.toString();
-                }
-            }
-            end = string.indexOf(SUFFIX, start + PREFIX.length());
-            if (end == -1) {
-                throw new IllegalArgumentException("missing end marker");
-            }
-            var = string.substring(start + PREFIX.length(), end);
-            replaced = variables.lookup(var);
-            if (replaced == null) {
-                throw new IOException("undefined variable: " + var);
-            }
-            builder.append(string.substring(last, start));
-            builder.append(replaced);
-            last = end + SUFFIX.length();
-        }
     }
 
     public static Query any() {
