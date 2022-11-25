@@ -34,7 +34,7 @@ public class Remove extends Base {
     }
 
     @Override
-    public void run(SearchEngine search) throws Exception {
+    public void run(Scope scopeNotUsed) throws Exception {
         Map<FileNode, Scm> checkouts;
         List<Action> removes;
         FileNode checkout;

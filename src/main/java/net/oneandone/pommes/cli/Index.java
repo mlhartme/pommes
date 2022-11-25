@@ -43,7 +43,7 @@ public class Index extends Base {
 
 
     @Override
-    public void run(SearchEngine search) throws Exception {
+    public void run(Scope scope) throws Exception {
         Repository repository;
         Indexer indexer;
         PrintWriter log;
@@ -66,7 +66,7 @@ public class Index extends Base {
 
             try {
                 console.info.println("indexing " + entry.getKey() + ": " + entry.getValue());
-                indexer = new Indexer(environment, search.getDatabase(), entry.getKey());
+                indexer = new Indexer(environment, scope.getDatabase(), entry.getKey());
                 indexer.start();
                 try {
                     repository.scan(indexer.src);

@@ -11,12 +11,12 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import java.io.IOException;
 import java.util.List;
 
-public class SearchEngine {
+public class Scope {
     private final Database database;
     private final CentralSearch centralSearch;
     private final Variables variables;
 
-    public SearchEngine(Database database, Variables variables, CentralSearch centralSearch) {
+    public Scope(Database database, Variables variables, CentralSearch centralSearch) {
         this.database = database;
         this.variables = variables;
         this.centralSearch = centralSearch;

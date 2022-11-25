@@ -44,7 +44,7 @@ public class Status extends Base {
     }
 
     @Override
-    public void run(SearchEngine search) throws Exception {
+    public void run(Scope scope) throws Exception {
         Map<FileNode, Scm> checkouts;
         Map<Integer, Step> steps;
         int id;
@@ -59,7 +59,7 @@ public class Status extends Base {
         id = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
-            step = Step.create(environment, search.getDatabase(), found, entry.getValue());
+            step = Step.create(environment, scope.getDatabase(), found, entry.getValue());
             if (step.isNoop()) {
                 console.info.println(step);
             } else {

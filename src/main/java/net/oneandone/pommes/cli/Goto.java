@@ -37,14 +37,14 @@ public class Goto extends Base {
     }
 
     @Override
-    public void run(SearchEngine search) throws Exception {
+    public void run(Scope scope) throws Exception {
         Setenv setenv;
         List<Action> actions;
         FileNode directory;
         Action action;
 
         actions = new ArrayList<>();
-        for (Project project : search.query(query)) {
+        for (Project project : scope.query(query)) {
             try {
                 directory = environment.home.root().directory(project);
                 action = Checkout.createOpt(directory, project);

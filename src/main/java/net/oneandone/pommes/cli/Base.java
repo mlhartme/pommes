@@ -40,11 +40,11 @@ public abstract class Base {
 
     public void run() throws Exception {
         try (Database database = environment.home.loadDatabase()) {
-            run(new SearchEngine(database, environment, new CentralSearch(environment.world(), environment.maven())));
+            run(new Scope(database, environment, new CentralSearch(environment.world(), environment.maven())));
         }
     }
 
-    public abstract void run(SearchEngine database) throws Exception;
+    public abstract void run(Scope scope) throws Exception;
 
     protected void runAll(Collection<Action> actionsOrig) throws Exception {
         List<Action> actions;

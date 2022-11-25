@@ -31,13 +31,13 @@ public class Checkout extends Base {
     }
 
     @Override
-    public void run(SearchEngine search) throws Exception {
+    public void run(Scope scope) throws Exception {
         List<Action> adds;
         Action action;
         FileNode directory;
 
         adds = new ArrayList<>();
-        for (Project project : search.query(query)) {
+        for (Project project : scope.query(query)) {
             directory = environment.home.root().directory(project);
             action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, project);
             if (action != null) {

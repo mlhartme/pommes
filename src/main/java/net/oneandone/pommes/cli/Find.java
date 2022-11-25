@@ -92,7 +92,7 @@ public class Find extends Base {
     }
 
     @Override
-    public void run(SearchEngine search) throws Exception {
+    public void run(Scope scope) throws Exception {
         List<Project> projects;
         String format;
         String macroName;
@@ -116,8 +116,8 @@ public class Find extends Base {
             } else {
                 macroName = null;
             }
-            projects = search.query(query);
-            console.verbose.println("Matching documents: " + projects.size());
+            projects = scope.query(query);
+            console.verbose.println("Matching projects: " + projects.size());
             if (formatBuilder != null) {
                 format = formatBuilder.toString();
                 if (format.startsWith("-")) {
