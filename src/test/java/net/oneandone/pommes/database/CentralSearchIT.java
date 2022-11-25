@@ -16,6 +16,7 @@
 package net.oneandone.pommes.database;
 
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.search.CentralSearch;
 import net.oneandone.sushi.fs.World;
 import org.junit.jupiter.api.Test;
 

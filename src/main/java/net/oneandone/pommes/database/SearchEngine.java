@@ -1,5 +1,6 @@
 package net.oneandone.pommes.database;
 
+import net.oneandone.pommes.search.CentralSearch;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;

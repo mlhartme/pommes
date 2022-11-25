@@ -1,9 +1,10 @@
-package net.oneandone.pommes.database;
+package net.oneandone.pommes.search;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.maven.embedded.Maven;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.MavenDescriptor;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.http.HttpNode;

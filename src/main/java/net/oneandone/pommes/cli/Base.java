@@ -16,7 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
-import net.oneandone.pommes.database.CentralSearch;
+import net.oneandone.pommes.search.CentralSearch;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.database.SearchEngine;
