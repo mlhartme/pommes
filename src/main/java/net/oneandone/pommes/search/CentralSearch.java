@@ -58,7 +58,7 @@ public class CentralSearch {
         } catch (ProjectBuildingException | RepositoryException e) {
             throw new IOException("failed to resolve " + artifact + ": " + e.getMessage(), e);
         }
-        return MavenDescriptor.mavenToPommesProject(p, "repoTODO", "originTODO", "revisionTODO", MavenDescriptor.scmOpt(p));
+        return MavenDescriptor.mavenToPommesProject(p, "central", p.getFile().getPath(), p.getVersion(), MavenDescriptor.scmOpt(p));
     }
 
     private static String getString(JsonObject obj, String member) throws IOException {

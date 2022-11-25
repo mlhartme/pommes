@@ -47,7 +47,7 @@ public class MavenDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String origin, String revision, String scm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String path, String revision, String scm) throws IOException {
         FileNode local;
         MavenProject project;
 
@@ -65,7 +65,7 @@ public class MavenDescriptor extends Descriptor {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
-            return mavenToPommesProject(project, repository, origin, revision, scm(environment.console(), scm, project));
+            return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), scm, project));
         } finally {
             if (local != descriptor) {
                 local.deleteFile();
@@ -73,14 +73,14 @@ public class MavenDescriptor extends Descriptor {
         }
     }
 
-    public static Project mavenToPommesProject(MavenProject project, String repository, String origin, String revision, String scm) {
+    public static Project mavenToPommesProject(MavenProject project, String repository, String path, String revision, String scm) {
         Artifact pa;
         Gav paGav;
         Project pommesProject;
 
         pa = project.getParentArtifact();
         paGav = pa != null ? Gav.forArtifact(pa) : null;
-        pommesProject = new Project(repository, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm, project.getUrl());
+        pommesProject = new Project(repository, path, revision, paGav, Gav.forArtifact(project.getArtifact()), scm, project.getUrl());
         for (Dependency dependency : project.getDependencies()) {
             pommesProject.dependencies.add(Gav.forDependency(dependency));
         }
