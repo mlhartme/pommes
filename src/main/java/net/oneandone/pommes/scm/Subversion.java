@@ -34,7 +34,7 @@ public class Subversion extends Scm {
     public Subversion() {
     }
 
-    public boolean isCheckout(FileNode directory) throws ExistsException {
+    public boolean isCheckout(FileNode directory) {
         return directory.join(".svn").isDirectory();
     }
 

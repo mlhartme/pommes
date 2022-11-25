@@ -201,12 +201,10 @@ public class NodeRepository extends Repository {
     }
 
     public static String nodeScm(Node descriptor) throws IOException {
-        SvnNode svn;
         String path;
         SVNURL root;
 
-        if (descriptor instanceof SvnNode) {
-            svn = (SvnNode) descriptor;
+        if (descriptor instanceof SvnNode svn) {
             // TODO: I currently use svn to crawl github ...
             // sushi path is only trunk/pom.xml - i need svnkit path instead
             root = svn.getRoot().getRepository().getLocation();

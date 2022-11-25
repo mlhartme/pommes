@@ -69,7 +69,8 @@ public class MavenDescriptor extends Descriptor {
 
             pa = project.getParentArtifact();
             paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pommesProject = new Project(repository, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm(environment.console(), scm, project), project.getUrl());
+            pommesProject = new Project(repository, origin, revision, paGav, Gav.forArtifact(project.getArtifact()),
+                    scm(environment.console(), scm, project), project.getUrl());
             for (Dependency dependency : project.getDependencies()) {
                 pommesProject.dependencies.add(Gav.forDependency(dependency));
             }

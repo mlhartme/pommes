@@ -97,7 +97,7 @@ public class Git extends Scm {
 
         idx = url.indexOf("://");
         if (idx < 0) {
-            // turn into explicit ssh protocol -- see https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols
+            // turn scp-like syntax into explicit ssh syntax -- see https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols
             idx = url.indexOf(':');
             if (idx < 0) {
                 throw new IllegalStateException(url);
