@@ -87,18 +87,10 @@ public class MavenDescriptor extends Descriptor {
         return pommesProject;
 
     }
-    private String scm(Console console, String repositoryScm, org.apache.maven.project.MavenProject project) throws IOException {
+    private String scm(Console console, String repositoryScm, MavenProject project) throws IOException {
         String pomScm;
 
-        if (project.getScm() != null) {
-            pomScm = project.getScm().getConnection();
-            if (pomScm != null) {
-                // removeOpt because I've seen projects that omit the prefix ...
-                pomScm = Strings.removeLeftOpt(pomScm, "scm:");
-            }
-        } else {
-            pomScm = null;
-        }
+        pomScm = scmOpt(project);
         if (repositoryScm != null) {
             if (pomScm != null && !pomScm.equals(repositoryScm)) {
                 console.error.println("overriding pom scm " + pomScm + " with " + repositoryScm);
@@ -109,5 +101,18 @@ public class MavenDescriptor extends Descriptor {
             throw new IOException("missing scm in pom.xml");
         }
         return pomScm;
+    }
+
+    public static String scmOpt(MavenProject project) {
+        String pomScm;
+
+        if (project.getScm() != null) {
+            pomScm = project.getScm().getConnection();
+            if (pomScm != null) {
+                // removeOpt because I've seen projects that omit the prefix ...
+                return Strings.removeLeftOpt(pomScm, "scm:");
+            }
+        }
+        return null;
     }
 }

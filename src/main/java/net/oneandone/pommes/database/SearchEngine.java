@@ -1,6 +1,5 @@
 package net.oneandone.pommes.database;
 
-import net.oneandone.sushi.fs.World;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 

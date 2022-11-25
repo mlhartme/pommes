@@ -60,8 +60,7 @@ public class CentralSearch {
         } catch (ProjectBuildingException | RepositoryException e) {
             throw new IOException("failed to resolve " + artifact + ": " + e.getMessage(), e);
         }
-        pommes = MavenDescriptor.mavenToPommesProject(p, "repoTODO", "originTODO", "revisionTODO",
-                p.getScm().getConnection() /* TODO: shared code */ );
+        pommes = MavenDescriptor.mavenToPommesProject(p, "repoTODO", "originTODO", "revisionTODO", MavenDescriptor.scmOpt(p));
         return Field.document(pommes);
     }
 
