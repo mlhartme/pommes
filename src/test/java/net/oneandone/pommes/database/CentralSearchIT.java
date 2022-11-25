@@ -17,7 +17,6 @@ package net.oneandone.pommes.database;
 
 import net.oneandone.maven.embedded.Maven;
 import net.oneandone.sushi.fs.World;
-import org.apache.lucene.document.Document;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -29,13 +28,13 @@ public class CentralSearchIT {
     public void json() throws IOException {
         World world;
         CentralSearch search;
-        List<Document> documents;
+        List<Project> projects;
 
         world = World.create();
         search = new CentralSearch(world, Maven.withSettings(world));
-        documents = search.query(Arrays.asList("sushi"));
-        for (var document : documents) {
-            System.out.println(" " + document);
+        projects = search.query(Arrays.asList("sushi"));
+        for (var project : projects) {
+            System.out.println(" " + project);
         }
     }
 }

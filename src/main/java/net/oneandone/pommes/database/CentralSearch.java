@@ -7,7 +7,6 @@ import net.oneandone.maven.embedded.Maven;
 import net.oneandone.pommes.descriptor.MavenDescriptor;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.http.HttpNode;
-import org.apache.lucene.document.Document;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.eclipse.aether.RepositoryException;
@@ -28,10 +27,10 @@ public class CentralSearch {
         this.maven = maven;
     }
 
-    public List<Document> query(List<String> query) throws IOException {
+    public List<Project> query(List<String> query) throws IOException {
         HttpNode search;
         JsonObject json;
-        List<Document> result;
+        List<Project> result;
 
         search = (HttpNode) world.validNode("https://search.maven.org/solrsearch/select");
         search = search.withParameter("q", centralQueryStr(query));
@@ -43,16 +42,14 @@ public class CentralSearch {
         json = getObject(json, "response");
         result = new ArrayList();
         for (JsonElement element : get(json, "docs").getAsJsonArray()) {
-            result.add(document(element.getAsJsonObject()));
+            result.add(project(element.getAsJsonObject()));
         }
         return result;
     }
 
-    // TODO: return project instead -- and merge with MavenDescriotor code
-    private Document document(JsonObject obj) throws IOException {
+    private Project project(JsonObject obj) throws IOException {
         Artifact artifact;
         MavenProject p;
-        Project pommes;
 
         artifact = new DefaultArtifact(getString(obj, "g"), getString(obj, "a"), "pom", getString(obj, "latestVersion"));
         try {
@@ -60,8 +57,7 @@ public class CentralSearch {
         } catch (ProjectBuildingException | RepositoryException e) {
             throw new IOException("failed to resolve " + artifact + ": " + e.getMessage(), e);
         }
-        pommes = MavenDescriptor.mavenToPommesProject(p, "repoTODO", "originTODO", "revisionTODO", MavenDescriptor.scmOpt(p));
-        return Field.document(pommes);
+        return MavenDescriptor.mavenToPommesProject(p, "repoTODO", "originTODO", "revisionTODO", MavenDescriptor.scmOpt(p));
     }
 
     private static String getString(JsonObject obj, String member) throws IOException {

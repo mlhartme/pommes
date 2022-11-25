@@ -1,6 +1,5 @@
 package net.oneandone.pommes.database;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
@@ -21,15 +20,15 @@ public class SearchEngine {
         return database;
     }
 
-    public List<Document> query(List<String> query) throws IOException, QueryNodeException {
-        List<Document> result;
+    public List<Project> query(List<String> query) throws IOException, QueryNodeException {
+        List<Project> result;
 
         result = databaseQuery(PommesQuery.create(query, variables));
         result.addAll(centralSearch.query(query));
         return result;
     }
 
-    private List<Document> databaseQuery(PommesQuery pq) throws IOException {
-        return database.query(pq);
+    private List<Project> databaseQuery(PommesQuery pq) throws IOException {
+        return Field.projects(database.query(pq));
     }
 }

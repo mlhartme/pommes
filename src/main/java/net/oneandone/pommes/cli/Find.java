@@ -94,7 +94,7 @@ public class Find extends Base {
 
     @Override
     public void run(SearchEngine search) throws Exception {
-        List<Document> documents;
+        List<Project> projects;
         String format;
         String macroName;
         List<String> macro;
@@ -117,8 +117,8 @@ public class Find extends Base {
             } else {
                 macroName = null;
             }
-            documents = search.query(query);
-            console.verbose.println("Matching documents: " + documents.size());
+            projects = search.query(query);
+            console.verbose.println("Matching documents: " + projects.size());
             if (formatBuilder != null) {
                 format = formatBuilder.toString();
                 if (format.startsWith("-")) {
@@ -148,13 +148,13 @@ public class Find extends Base {
             }
             switch (format) {
                 case JSON:
-                    json(Field.projects(documents), true, dest);
+                    json(projects, true, dest);
                     break;
                 case DUMP:
-                    json(Field.projects(documents), false, dest);
+                    json(projects, false, dest);
                     break;
                 default:
-                    text(documents, format, dest);
+                    text(projects, format, dest);
             }
         } finally {
             if (dest != null) {
@@ -164,13 +164,13 @@ public class Find extends Base {
         }
     }
 
-    private void text(List<Document> documents, String format, Writer dest) throws IOException {
+    private void text(List<Project> projects, String format, Writer dest) throws IOException {
         List<String> done;
         String line;
 
         done = new ArrayList<>();
-        for (Document document : documents) {
-            line = format(document, format);
+        for (Project project : projects) {
+            line = format(Field.document(project), format);
             if (fold) {
                 if (done.contains(line)) {
                     continue;
