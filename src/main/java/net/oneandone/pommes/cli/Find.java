@@ -19,7 +19,6 @@ import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.sushi.fs.Node;
@@ -118,7 +117,7 @@ public class Find extends Base {
             } else {
                 macroName = null;
             }
-            documents = search.query(PommesQuery.create(query, environment));
+            documents = search.query(query);
             console.verbose.println("Matching documents: " + documents.size());
             if (formatBuilder != null) {
                 format = formatBuilder.toString();

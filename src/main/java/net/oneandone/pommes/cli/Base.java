@@ -40,7 +40,7 @@ public abstract class Base {
 
     public void run() throws Exception {
         try (Database database = environment.home.loadDatabase()) {
-            run(new SearchEngine(database));
+            run(new SearchEngine(database, environment));
         }
     }
 

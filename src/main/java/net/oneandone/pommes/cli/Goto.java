@@ -20,7 +20,6 @@ import net.oneandone.pommes.checkout.Checkout;
 import net.oneandone.pommes.checkout.Nop;
 import net.oneandone.pommes.checkout.Problem;
 import net.oneandone.pommes.database.Field;
-import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.setenv.Setenv;
@@ -47,7 +46,7 @@ public class Goto extends Base {
         Action action;
 
         actions = new ArrayList<>();
-        for (Project project : Field.projects(search.query(PommesQuery.create(query, environment)))) {
+        for (Project project : Field.projects(search.query(query))) {
             try {
                 directory = environment.home.root().directory(project);
                 action = Checkout.createOpt(directory, project);
