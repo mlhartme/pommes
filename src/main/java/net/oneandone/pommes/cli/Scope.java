@@ -29,7 +29,7 @@ public class Scope {
     public List<Project> query(List<String> query) throws IOException, QueryNodeException {
         List<Project> result;
 
-        result = databaseQuery(PommesQuery.create(query, variables));
+        result = databaseQuery(PommesQuery.parse(query, variables));
         result.addAll(centralSearch.query(query));
         return result;
     }

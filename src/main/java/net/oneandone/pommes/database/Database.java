@@ -167,11 +167,7 @@ public class Database implements AutoCloseable {
 
         // TODO: to normalize subversion urls
         url = Strings.removeRightOpt(url, "/");
-        try {
-            poms = query(PommesQuery.create("s:" + url));
-        } catch (QueryNodeException e) {
-            throw new IllegalStateException();
-        }
+        poms = query(PommesQuery.parse("s:" + url));
         return poms.stream().map(pom -> Field.project(pom)).toList();
     }
 }

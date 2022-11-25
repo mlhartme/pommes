@@ -41,7 +41,7 @@ public class CentralSearch {
             json = JsonParser.parseReader(src).getAsJsonObject();
         }
         json = getObject(json, "response");
-        result = new ArrayList();
+        result = new ArrayList<>();
         for (JsonElement element : get(json, "docs").getAsJsonArray()) {
             result.add(project(element.getAsJsonObject()));
         }

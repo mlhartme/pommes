@@ -16,7 +16,13 @@
 package net.oneandone.pommes.database;
 
 public enum Match {
-    SUBSTRING, PREFIX, SUFFIX, STRING;
+    SUBSTRING(':'), PREFIX('='), SUFFIX('^'), STRING('%');
+
+    public final char delimiter;
+
+    Match(char delimiter) {
+        this.delimiter = delimiter;
+    }
 
     public static Object[] locate(String str) {
         for (int i = 0; i < str.length(); i++) {

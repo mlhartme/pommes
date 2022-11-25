@@ -18,8 +18,6 @@ package net.oneandone.pommes.database;
 import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -33,33 +31,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class PommesQuery {
-    private static final Variables EMPTY = new Variables() {
-        @Override
-        public String lookup(String var) throws IOException {
-            return null;
-        }
-    };
+    private static final Variables EMPTY = var -> null;
 
     private static final Separator PLUS = Separator.on('+');
 
-    public static PommesQuery create(String str) throws IOException, QueryNodeException {
-        return create(Collections.singletonList(str), EMPTY);
+    public static PommesQuery parse(String str) throws IOException {
+        return parse(Collections.singletonList(str), EMPTY);
     }
 
-    public static PommesQuery create(List<String> initialOr, Variables variables) throws IOException, QueryNodeException {
+    public static PommesQuery parse(List<String> initialOr, Variables variables) throws IOException {
         int queryIndex;
         List<String> or;
-        BooleanQuery.Builder orBuilder;
-        BooleanQuery.Builder andBuilder;
-        Query termQuery;
+        Or orBuilder;
+        And andBuilder;
         List<String> terms;
-        Match match;
-        int idx;
-        String string;
-        List<Field> fields;
-        Object[] tmp;
-        boolean not;
-        String term;
 
         queryIndex = -1;
         or = initialOr;
@@ -73,65 +58,179 @@ public class PommesQuery {
                 // fall-through - not and index
             }
         }
-        orBuilder = new BooleanQuery.Builder();
+        orBuilder = new Or();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
             and = variables.substitute(and);
-            andBuilder = new BooleanQuery.Builder();
-            // make sure we have at least one entry. Because terms might be empty. Or, if it's a single "!", we need another entry to make it work.
-            andBuilder.add(any(), BooleanClause.Occur.MUST);
+            andBuilder = new And();
             terms = PLUS.split(and);
             for (String termWithNot : terms) {
-                not = termWithNot.startsWith("!");
-                term = not ? termWithNot.substring(1) : termWithNot;
-                if (term.startsWith("§")) {
-                    // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
-                    termQuery = new StandardQueryParser().parse(and.substring(1), Field.ARTIFACT.dbname());
-                } else {
-                    tmp = Match.locate(term);
-                    if (tmp == null) {
-                        match = Match.SUBSTRING;
-                        idx = -1;
-                    } else {
-                        match = (Match) tmp[0];
-                        idx = (Integer) tmp[1];
-                    }
-                    // search origin, not trunk. Because scm url is regularly not adjusted
-                    fields = Field.forIds(idx < 1 ? "as" : term.substring(0, idx));
-                    string = term.substring(idx + 1); // ok for -1
-                    string = variables.substitute(string);
-                    termQuery = or(fields, match, string);
-                }
-                andBuilder.add(termQuery, not ? BooleanClause.Occur.MUST_NOT : BooleanClause.Occur.MUST);
+                andBuilder.add(Atom.parse(termWithNot, variables));
             }
-            orBuilder.add(andBuilder.build(), BooleanClause.Occur.SHOULD);
+            orBuilder.add(andBuilder);
         }
-        return new PommesQuery(queryIndex, orBuilder.build());
+        return new PommesQuery(queryIndex, orBuilder);
     }
 
-    public static Query any() {
-        BooleanQuery.Builder result;
 
-        result = new BooleanQuery.Builder();
-        result.add(Field.ORIGIN.query(Match.SUBSTRING, ""), BooleanClause.Occur.SHOULD);
-        return result.build();
+    //--
+
+    public abstract static class Expr {
+        public abstract Query toLucene();
+
+        // TODO: proper precendence handling
+        public abstract String toString();
     }
 
-    private static Query or(List<Field> fields, Match match, String string) {
-        BooleanQuery.Builder result;
+    public static class Or extends Expr {
+        private final List<Expr> expressions = new ArrayList<>();
 
-        result = new BooleanQuery.Builder();
-        for (Field field : fields) {
-            result.add(field.query(match, string), BooleanClause.Occur.SHOULD);
+        public void add(Expr expression) {
+            expressions.add(expression);
         }
-        return result.build();
+
+        public Query toLucene() {
+            BooleanQuery.Builder builder = new BooleanQuery.Builder();
+            for (Expr expression : expressions) {
+                builder.add(expression.toLucene(), BooleanClause.Occur.SHOULD);
+            }
+            return builder.build();
+        }
+
+        public String toString() {
+            StringBuilder result;
+
+            result = new StringBuilder();
+            for (Expr expression : expressions) {
+                if (!result.isEmpty()) {
+                    result.append(" ");
+                }
+                result.append(expression.toString());
+            }
+            return result.toString();
+        }
+    }
+
+
+    public static class And extends Expr {
+        private final List<Expr> expressions = new ArrayList<>();
+
+        public void add(Expr expression) {
+            // TODO: not ? BooleanClause.Occur.MUST_NOT : BooleanClause.Occur.MUST);
+            expressions.add(expression);
+        }
+
+        public Query toLucene() {
+            BooleanQuery.Builder builder = new BooleanQuery.Builder();
+
+            // make sure we have at least one entry. Because terms might be empty. Or, if it's a single "!", we need another entry to make it work.
+            builder.add(any(), BooleanClause.Occur.MUST);
+
+            for (Expr expression : expressions) {
+                builder.add(expression.toLucene(), BooleanClause.Occur.SHOULD);
+            }
+            return builder.build();
+        }
+
+        private static Query any() {
+            BooleanQuery.Builder result;
+
+            result = new BooleanQuery.Builder();
+            result.add(Field.ORIGIN.query(Match.SUBSTRING, ""), BooleanClause.Occur.SHOULD);
+            return result.build();
+        }
+
+        public String toString() {
+            StringBuilder result;
+
+            result = new StringBuilder();
+            for (Expr expression : expressions) {
+                if (!result.isEmpty()) {
+                    result.append("+");
+                }
+                result.append(expression.toString());
+            }
+            return result.toString();
+        }
+    }
+
+    public static class Atom extends Expr {
+        public static Atom parse(String termWithNot, Variables variables) throws IOException {
+            boolean not;
+            String term;
+            Object[] tmp;
+            Match match;
+            int idx;
+            List<Field> fields;
+            String string;
+
+            not = termWithNot.startsWith("!");
+            term = not ? termWithNot.substring(1) : termWithNot;
+            if (term.startsWith("§")) {
+                // CAUTION: don't merge this into + separates terms below, because lucene query may contain '+' themselves
+                //termQuery = new StandardQueryParser().parse(and.substring(1), Field.ARTIFACT.dbname());
+                throw new RuntimeException("TODO: support §");
+            } else {
+                tmp = Match.locate(term);
+                if (tmp == null) {
+                    match = Match.SUBSTRING;
+                    idx = -1;
+                } else {
+                    match = (Match) tmp[0];
+                    idx = (Integer) tmp[1];
+                }
+                // search origin, not trunk. Because scm url is regularly not adjusted
+                fields = Field.forIds(idx < 1 ? "as" : term.substring(0, idx));
+                string = term.substring(idx + 1); // ok for -1
+                string = variables.substitute(string);
+                return new Atom(not, fields, match, string);
+            }
+        }
+
+        public final boolean not;
+        private final List<Field> fields;
+        private final Match match;
+        private final String string;
+
+        public Atom(boolean not, List<Field> fields, Match match, String string) {
+            if (fields.isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+            this.not = not;
+            this.fields = fields;
+            this.match = match;
+            this.string = string;
+        }
+
+        public Query toLucene() {
+            BooleanQuery.Builder result;
+
+            result = new BooleanQuery.Builder();
+            for (Field field : fields) {
+                result.add(field.query(match, string), BooleanClause.Occur.SHOULD);
+            }
+            return result.build();
+        }
+
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            if (not) {
+                result.append("-");
+            }
+            for (Field field : fields) {
+                result.append(field.dbname().charAt(0));
+            }
+            result.append(match.delimiter);
+            result.append(string);
+            return result.toString();
+        }
     }
 
     //--
 
     private final int idx;
-    private final Query query;
+    private final Expr query;
 
-    public PommesQuery(int idx, Query query) {
+    public PommesQuery(int idx, Or query) {
         this.idx = idx;
         this.query = query;
     }
@@ -140,7 +239,7 @@ public class PommesQuery {
         TopDocs search;
         List<Document> list;
 
-        search = searcher.search(query, Integer.MAX_VALUE);
+        search = searcher.search(query.toLucene(), Integer.MAX_VALUE);
         list = new ArrayList<>();
         if (idx < 0) {
             for (ScoreDoc scoreDoc : search.scoreDocs) {
@@ -158,6 +257,16 @@ public class PommesQuery {
         if (idx >= 0) {
             throw new UnsupportedOperationException();
         }
-        writer.deleteDocuments(query);
+        writer.deleteDocuments(query.toLucene());
+    }
+
+    public String toString() {
+        String result;
+
+        result = query.toString();
+        if (idx > 0) {
+            result = result + "[" + idx + "]";
+        }
+        return result;
     }
 }
