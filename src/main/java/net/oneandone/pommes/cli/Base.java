@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.database.CentralSearch;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.database.SearchEngine;
@@ -40,7 +41,7 @@ public abstract class Base {
 
     public void run() throws Exception {
         try (Database database = environment.home.loadDatabase()) {
-            run(new SearchEngine(database, environment));
+            run(new SearchEngine(database, environment, new CentralSearch(environment.world(), environment.maven())));
         }
     }
 

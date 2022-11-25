@@ -24,6 +24,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.IOException;
@@ -48,10 +49,7 @@ public class MavenDescriptor extends Descriptor {
     @Override
     protected Project doLoad(Environment environment, String repository, String origin, String revision, String scm) throws IOException {
         FileNode local;
-        org.apache.maven.project.MavenProject project;
-        Artifact pa;
-        Gav paGav;
-        Project pommesProject;
+        MavenProject project;
 
         local = null;
         try {
@@ -67,14 +65,7 @@ public class MavenDescriptor extends Descriptor {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
-            pa = project.getParentArtifact();
-            paGav = pa != null ? Gav.forArtifact(pa) : null;
-            pommesProject = new Project(repository, origin, revision, paGav, Gav.forArtifact(project.getArtifact()),
-                    scm(environment.console(), scm, project), project.getUrl());
-            for (Dependency dependency : project.getDependencies()) {
-                pommesProject.dependencies.add(Gav.forDependency(dependency));
-            }
-            return pommesProject;
+            return mavenToPommesProject(project, repository, origin, revision, scm(environment.console(), scm, project));
         } finally {
             if (local != descriptor) {
                 local.deleteFile();
@@ -82,6 +73,20 @@ public class MavenDescriptor extends Descriptor {
         }
     }
 
+    public static Project mavenToPommesProject(MavenProject project, String repository, String origin, String revision, String scm) {
+        Artifact pa;
+        Gav paGav;
+        Project pommesProject;
+
+        pa = project.getParentArtifact();
+        paGav = pa != null ? Gav.forArtifact(pa) : null;
+        pommesProject = new Project(repository, origin, revision, paGav, Gav.forArtifact(project.getArtifact()), scm, project.getUrl());
+        for (Dependency dependency : project.getDependencies()) {
+            pommesProject.dependencies.add(Gav.forDependency(dependency));
+        }
+        return pommesProject;
+
+    }
     private String scm(Console console, String repositoryScm, org.apache.maven.project.MavenProject project) throws IOException {
         String pomScm;
 
