@@ -50,4 +50,24 @@ public class CentralSearchIT {
         p = projects.get(0);
         assertEquals(Gav.forGav(expectedGav), p.artifact);
     }
+
+    @Test
+    public void testRaw() throws IOException {
+        checkRaw("+sushi -metridoc -beezle", "net.oneandone:sushi:3.3.0");
+        checkRaw("+metri"); // does not match substring
+        checkRaw("metri"); // does not match substring
+        checkRaw("beezle");
+    }
+
+    private void checkRaw(String queryRaw, String... expectedGavs) throws IOException {
+        World world;
+        CentralSearch search;
+        List<Project> projects;
+
+        world = World.create();
+        search = new CentralSearch(world, Maven.withSettings(world));
+        projects = search.query(queryRaw);
+        assertEquals(Arrays.asList(expectedGavs).stream().map(Gav::forGav).toList(),
+                projects.stream().map((p) -> p.artifact).toList());
+    }
 }

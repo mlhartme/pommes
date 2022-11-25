@@ -30,12 +30,16 @@ public class CentralSearch {
     }
 
     public List<Project> query(PommesQuery query) throws IOException {
+        return query(query.toCentral());
+    }
+
+    public List<Project> query(String query) throws IOException {
         HttpNode search;
         JsonObject json;
         List<Project> result;
 
         search = (HttpNode) world.validNode("https://search.maven.org/solrsearch/select");
-        search = search.withParameter("q", query.toCentral());
+        search = search.withParameter("q", query);
         search = search.withParameter("rows", "20");
         search = search.withParameter("wt", "json");
         try (Reader src = search.newReader()) {
