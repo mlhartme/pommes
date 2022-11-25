@@ -17,7 +17,6 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.database.Project;
-import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;

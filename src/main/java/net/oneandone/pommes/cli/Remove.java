@@ -18,7 +18,6 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.checkout.Action;
 import net.oneandone.pommes.checkout.Problem;
-import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 

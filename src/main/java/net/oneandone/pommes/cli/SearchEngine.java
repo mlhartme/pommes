@@ -1,5 +1,10 @@
-package net.oneandone.pommes.database;
+package net.oneandone.pommes.cli;
 
+import net.oneandone.pommes.database.Database;
+import net.oneandone.pommes.database.Field;
+import net.oneandone.pommes.database.PommesQuery;
+import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.search.CentralSearch;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 

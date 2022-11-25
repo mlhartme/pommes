@@ -20,7 +20,6 @@ import com.google.gson.stream.JsonWriter;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
-import net.oneandone.pommes.database.SearchEngine;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
