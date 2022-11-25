@@ -36,7 +36,11 @@ public class PommesQuery {
     private static final Separator PLUS = Separator.on('+');
 
     public static PommesQuery parse(String str) throws IOException {
-        return parse(Collections.singletonList(str), EMPTY);
+        return parse(Collections.singletonList(str));
+    }
+
+    public static PommesQuery parse(List<String> initialOr) throws IOException {
+        return parse(initialOr, EMPTY);
     }
 
     public static PommesQuery parse(List<String> initialOr, Variables variables) throws IOException {

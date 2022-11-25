@@ -31,9 +31,10 @@ public class CentralSearchIT {
     public void test() throws IOException {
         check("de.schmizzolin:yogi:1.4.0", "yogi", "yogi");
         check("net.sf.beezle.sushi:sushi:2.7.0", "sushi AND beezle", "sushi+beezle");
+        check("de.schmizzolin:yogi:1.4.0", "yogi AND -beezle", "yogi+!beezle");
     }
 
-    public void check(String expectedGav, String expectedParsed, String queryString) throws IOException {
+    public void check(String expectedGav, String expectedParsed, String... queryStrings) throws IOException {
         World world;
         PommesQuery query;
         CentralSearch search;
@@ -42,7 +43,7 @@ public class CentralSearchIT {
 
         world = World.create();
         search = new CentralSearch(world, Maven.withSettings(world));
-        query = PommesQuery.parse(queryString);
+        query = PommesQuery.parse(Arrays.asList(queryStrings));
         assertEquals(expectedParsed, query.toCentral());
         projects = search.query(query);
         assertEquals(1, projects.size());
