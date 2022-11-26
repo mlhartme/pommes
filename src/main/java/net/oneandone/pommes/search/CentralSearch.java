@@ -18,6 +18,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CentralSearch {
@@ -30,7 +31,23 @@ public class CentralSearch {
     }
 
     public List<Project> query(PommesQuery query) throws IOException {
-        return query(query.toCentral());
+        List<Project> result;
+        int idx;
+
+        result = new ArrayList<>();
+        for (String str : query.toCentral()) {
+            result.addAll(query(str));
+        }
+        idx = query.getIndex();
+        if (idx > 0) {
+            if (idx <= result.size()) {
+                return Collections.singletonList(result.get(idx - 1));
+            } else {
+                return Collections.emptyList();
+            }
+        } else {
+            return result;
+        }
     }
 
     public List<Project> query(String query) throws IOException {

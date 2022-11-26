@@ -27,6 +27,7 @@ import org.apache.lucene.search.TopDocs;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class PommesQuery {
     public abstract static class Expr {
         public abstract Query toLucene();
 
-        public abstract String toCentral();
+        public abstract List<String> toCentral();
 
         // TODO: proper precendence handling
         public abstract String toString();
@@ -101,17 +102,14 @@ public class PommesQuery {
             return builder.build();
         }
 
-        public String toCentral() {
-            StringBuilder result;
+        public List<String> toCentral() {
+            List<String> result;
 
-            result = new StringBuilder();
+            result = new ArrayList<>();
             for (Expr expression : expressions) {
-                if (!result.isEmpty()) {
-                    result.append(" OR ");
-                }
-                result.append(expression.toCentral());
+                result.add(one(expression.toCentral()));
             }
-            return result.toString();
+            return result;
         }
 
         public String toString() {
@@ -128,6 +126,13 @@ public class PommesQuery {
         }
     }
 
+
+    private static String one(List<String> lst) {
+        if (lst.size() != 1) {
+            return lst.toString();
+        }
+        return lst.get(0);
+    }
 
     public static class And extends Expr {
         private final List<Expr> expressions = new ArrayList<>();
@@ -158,17 +163,17 @@ public class PommesQuery {
         }
 
 
-        public String toCentral() {
+        public List<String> toCentral() {
             StringBuilder result;
 
             result = new StringBuilder();
             for (Expr expression : expressions) {
                 if (!result.isEmpty()) {
-                    result.append(" AND ");
+                    result.append(" ");
                 }
-                result.append(expression.toCentral());
+                result.append(one(expression.toCentral()));
             }
-            return result.toString();
+            return Arrays.asList(result.toString());
         }
 
         public String toString() {
@@ -243,13 +248,13 @@ public class PommesQuery {
             return result.build();
         }
 
-        public String toCentral() {
+        public List<String> toCentral() {
             StringBuilder result = new StringBuilder();
             if (not) {
                 result.append("-");
             }
             result.append(string);
-            return result.toString();
+            return Arrays.asList(result.toString());
         }
 
         public String toString() {
@@ -274,6 +279,10 @@ public class PommesQuery {
     public PommesQuery(int idx, Or query) {
         this.idx = idx;
         this.query = query;
+    }
+
+    public int getIndex() {
+        return idx;
     }
 
     public List<Document> find(IndexSearcher searcher) throws IOException {
@@ -311,7 +320,7 @@ public class PommesQuery {
         return result;
     }
 
-    public String toCentral() {
+    public List<String> toCentral() {
         return query.toCentral();
     }
 }

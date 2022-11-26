@@ -73,6 +73,12 @@ public class CentralSearchIT {
                 "org.apache.maven.plugins:maven-eclipse-plugin:2.10",
                 "org.apache.tuscany.maven.plugins:maven-eclipse-compiler:1.0.2");
     }
+    @Test
+    public void testRawTodo() throws IOException {
+        checkRaw("'maven-eclipse-compiler'",
+                "org.apache.maven.plugins:maven-eclipse-plugin:2.10",
+                "org.apache.tuscany.maven.plugins:maven-eclipse-compiler:1.0.2");
+    }
 
     private void checkRaw(String queryRaw, String... expectedGavs) throws IOException {
         List<Project> projects;
