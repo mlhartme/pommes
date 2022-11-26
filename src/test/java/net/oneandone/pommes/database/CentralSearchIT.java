@@ -27,6 +27,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CentralSearchIT {
+    private static final CentralSearch SEARCH;
+    static {
+        try {
+            World world = World.create();
+            SEARCH = new CentralSearch(world, Maven.withSettings(world));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Test
     public void test() throws IOException {
         check("de.schmizzolin:yogi:1.4.0", "yogi", "yogi");
@@ -35,17 +45,13 @@ public class CentralSearchIT {
     }
 
     public void check(String expectedGav, String expectedParsed, String... queryStrings) throws IOException {
-        World world;
         PommesQuery query;
-        CentralSearch search;
         List<Project> projects;
         Project p;
 
-        world = World.create();
-        search = new CentralSearch(world, Maven.withSettings(world));
         query = PommesQuery.parse(Arrays.asList(queryStrings));
         assertEquals(expectedParsed, query.toCentral());
-        projects = search.query(query);
+        projects = SEARCH.query(query);
         assertEquals(1, projects.size());
         p = projects.get(0);
         assertEquals(Gav.forGav(expectedGav), p.artifact);
@@ -56,17 +62,22 @@ public class CentralSearchIT {
         checkRaw("+sushi -metridoc -beezle", "net.oneandone:sushi:3.3.0");
         checkRaw("+metri"); // does not match substring
         checkRaw("metri"); // does not match substring
-        checkRaw("beezle");
+        checkRaw("beezle parent", "net.sf.beezle.maven.poms:parent:1.0.10"); // without +
+        // checkRaw("text:beezle" -> 5+ results); // word-match only for text field, not for id
+        checkRaw("g:beezle"); // word-match only for text field, not for group
+        checkRaw("id:beezle"); // word-match only for text field, not for id
+        checkRaw("+org +apache +maven +plugins +eclipse",
+                "org.apache.maven.plugins:maven-eclipse-plugin:2.10",
+                "org.apache.tuscany.maven.plugins:maven-eclipse-compiler:1.0.2");
+        checkRaw("org apache maven plugins eclipse",
+                "org.apache.maven.plugins:maven-eclipse-plugin:2.10",
+                "org.apache.tuscany.maven.plugins:maven-eclipse-compiler:1.0.2");
     }
 
     private void checkRaw(String queryRaw, String... expectedGavs) throws IOException {
-        World world;
-        CentralSearch search;
         List<Project> projects;
 
-        world = World.create();
-        search = new CentralSearch(world, Maven.withSettings(world));
-        projects = search.query(queryRaw);
+        projects = SEARCH.query(queryRaw);
         assertEquals(Arrays.asList(expectedGavs).stream().map(Gav::forGav).toList(),
                 projects.stream().map((p) -> p.artifact).toList());
     }
