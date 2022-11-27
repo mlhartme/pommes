@@ -149,7 +149,7 @@ public class PommesQuery {
             builder.add(any(), BooleanClause.Occur.MUST);
 
             for (Expr expression : expressions) {
-                builder.add(expression.toLucene(), BooleanClause.Occur.SHOULD);
+                builder.add(expression.toLucene(), BooleanClause.Occur.MUST);
             }
             return builder.build();
         }

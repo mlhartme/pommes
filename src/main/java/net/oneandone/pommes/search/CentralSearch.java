@@ -54,6 +54,7 @@ public class CentralSearch {
         HttpNode search;
         JsonObject json;
         List<Project> result;
+        Project project;
 
         search = (HttpNode) world.validNode("https://search.maven.org/solrsearch/select");
         search = search.withParameter("q", query);
@@ -65,14 +66,18 @@ public class CentralSearch {
         json = getObject(json, "response");
         result = new ArrayList<>();
         for (JsonElement element : get(json, "docs").getAsJsonArray()) {
-            result.add(project(element.getAsJsonObject()));
+            project = projectOpt(element.getAsJsonObject());
+            if (project != null) {
+                result.add(project);
+            }
         }
         return result;
     }
 
-    private Project project(JsonObject obj) throws IOException {
+    private Project projectOpt(JsonObject obj) throws IOException {
         Artifact artifact;
         MavenProject p;
+        String scm;
 
         artifact = new DefaultArtifact(getString(obj, "g"), getString(obj, "a"), "pom", getString(obj, "latestVersion"));
         try {
@@ -80,7 +85,12 @@ public class CentralSearch {
         } catch (ProjectBuildingException | RepositoryException e) {
             throw new IOException("failed to resolve " + artifact + ": " + e.getMessage(), e);
         }
-        return MavenDescriptor.mavenToPommesProject(p, "central", p.getFile().getPath(), p.getVersion(), MavenDescriptor.scmOpt(p));
+        scm = MavenDescriptor.scmOpt(p);
+        if (scm == null) {
+            System.out.println("TODO: no scm: " + artifact);
+            return null;
+        }
+        return MavenDescriptor.mavenToPommesProject(p, "central", p.getFile().getPath(), p.getVersion(), scm);
     }
 
     private static String getString(JsonObject obj, String member) throws IOException {
