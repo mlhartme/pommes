@@ -6,7 +6,6 @@ import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.search.CentralSearch;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,17 +25,17 @@ public class Scope {
         return database;
     }
 
-    public List<Project> query(List<String> queryStrings) throws IOException, QueryNodeException {
+    public List<Project> queryDatabase(List<String> queryStrings) throws IOException {
         PommesQuery query;
-        List<Project> result;
 
         query = PommesQuery.parse(queryStrings, variables);
-        result = databaseQuery(query);
-        result.addAll(centralSearch.query(query));
-        return result;
+        return Field.projects(database.query(query));
     }
 
-    private List<Project> databaseQuery(PommesQuery pq) throws IOException {
-        return Field.projects(database.query(pq));
+    public List<Project> queryCentral(List<String> queryStrings) throws IOException {
+        PommesQuery query;
+
+        query = PommesQuery.parse(queryStrings, variables);
+        return centralSearch.query(query);
     }
 }

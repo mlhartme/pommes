@@ -37,7 +37,7 @@ public class Checkout extends Base {
         FileNode directory;
 
         adds = new ArrayList<>();
-        for (Project project : scope.query(query)) {
+        for (Project project : scope.queryDatabase(query)) {
             directory = environment.home.root().directory(project);
             action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, project);
             if (action != null) {

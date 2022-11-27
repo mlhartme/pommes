@@ -116,7 +116,7 @@ public class Find extends Base {
             } else {
                 macroName = null;
             }
-            projects = scope.query(query);
+            projects = scope.queryDatabase(query);
             console.verbose.println("Matching projects: " + projects.size());
             if (formatBuilder != null) {
                 format = formatBuilder.toString();

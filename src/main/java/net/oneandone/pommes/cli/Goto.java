@@ -40,23 +40,12 @@ public class Goto extends Base {
     public void run(Scope scope) throws Exception {
         Setenv setenv;
         List<Action> actions;
-        FileNode directory;
         Action action;
 
-        actions = new ArrayList<>();
-        for (Project project : scope.query(query)) {
-            try {
-                directory = environment.home.root().directory(project);
-                action = Checkout.createOpt(directory, project);
-                if (action == null) {
-                    action = new Nop(directory);
-                }
-            } catch (IOException e) {
-                action = new Problem(world.getWorking(), project + ": " + e.getMessage());
-            }
-            if (!actions.contains(action)) {
-                actions.add(action);
-            }
+        actions = getActions(scope.queryDatabase(query));
+        if (actions.isEmpty()) {
+            console.info.println("no found locally -- running external search ...");
+            actions = getActions(scope.queryCentral(query));
         }
         action = runSingle(actions);
         if (action == null) {
@@ -68,6 +57,29 @@ public class Goto extends Base {
         } else {
             console.info.println("cd " + action.directory.getAbsolute());
         }
+    }
+
+    private List<Action> getActions(List<Project> projects) {
+        FileNode directory;
+        Action action;
+        List<Action> actions;
+
+        actions = new ArrayList<>();
+        for (Project project : projects) {
+            try {
+                directory = environment.home.root().directory(project);
+                action = Checkout.createOpt(directory, project);
+                if (action == null) {
+                    action = new Nop(directory);
+                }
+            } catch (IllegalArgumentException /* TODO */| IOException e) {
+                action = new Problem(world.getWorking(), project + ": " + e.getMessage());
+            }
+            if (!actions.contains(action)) {
+                actions.add(action);
+            }
+        }
+        return actions;
     }
 
     /** @return never null */

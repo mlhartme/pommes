@@ -66,20 +66,25 @@ public class CentralSearch {
         json = getObject(json, "response");
         result = new ArrayList<>();
         for (JsonElement element : get(json, "docs").getAsJsonArray()) {
-            project = projectOpt(element.getAsJsonObject());
-            if (project != null) {
-                result.add(project);
+            JsonObject obj = element.getAsJsonObject();
+            Artifact artifact = new DefaultArtifact(getString(obj, "g"), getString(obj, "a"), "pom", getString(obj, "latestVersion"));
+            try {
+                project = projectOpt(artifact);
+                if (project != null) {
+                    result.add(project);
+                }
+            } catch (Exception e) {
+                // TODO
+                System.out.println("cannot load pom " + artifact + ": " + e.getMessage());
             }
         }
         return result;
     }
 
-    private Project projectOpt(JsonObject obj) throws IOException {
-        Artifact artifact;
+    private Project projectOpt(Artifact artifact) throws IOException {
         MavenProject p;
         String scm;
 
-        artifact = new DefaultArtifact(getString(obj, "g"), getString(obj, "a"), "pom", getString(obj, "latestVersion"));
         try {
             p = maven.loadPom(artifact);
         } catch (ProjectBuildingException | RepositoryException e) {
