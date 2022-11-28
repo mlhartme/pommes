@@ -7,6 +7,7 @@
     * don't parse pom when revision is the same
   * dumped import options, use explicit command instead
   * simplified delete command
+* tailing `.git` in git scm url is now optional
 * configuration file 
   * renamed import to repository
 * renamed zone to repository

@@ -58,7 +58,7 @@ public class Git extends Scm {
             url = url.substring(idx);
             idx = url.indexOf(':');
             if (idx != -1) {
-                return url.substring(0, idx) + "/" + Strings.removeRight(url.substring(idx + 1), ".git");
+                return url.substring(0, idx) + "/" + Strings.removeRightOpt(url.substring(idx + 1), ".git");
             }
             idx = url.indexOf('@');
             if (idx != -1) {
@@ -68,7 +68,7 @@ public class Git extends Scm {
             if (idx == -1) {
                 throw new IllegalStateException(url);
             }
-            return Strings.removeRight(url, ".git");
+            return Strings.removeRightOpt(url, ".git");
         } else {
             obj = new URI(url);
             result = obj.getHost();
