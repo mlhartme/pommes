@@ -29,10 +29,12 @@ import java.util.Collection;
 import java.util.List;
 
 public class Goto extends Base {
+    private final boolean external;
     private final List<String> query;
 
-    public Goto(Environment environment, List<String> query) {
+    public Goto(boolean external, Environment environment, List<String> query) {
         super(environment);
+        this.external = external;
         this.query = query;
     }
 
@@ -42,11 +44,7 @@ public class Goto extends Base {
         List<Action> actions;
         Action action;
 
-        actions = getActions(scope.queryDatabase(query));
-        if (actions.isEmpty()) {
-            console.info.println("no found locally -- running external search ...");
-            actions = getActions(scope.queryCentral(query));
-        }
+        actions = getActions(external ? scope.queryCentral(query) : scope.queryDatabase(query));
         action = runSingle(actions);
         if (action == null) {
             throw new IOException("nothing selected");

@@ -88,7 +88,8 @@ public class Main {
             cli.add(Remove.class, "remove root?=.");
 
             cli.add(Status.class, "st root?=.");
-            cli.add(Goto.class, "goto query*");
+            cli.add(Goto.class, "goto -x=false query*");
+            cli.add(Goto.class, "gotox -x=true query*");
 
             cli.add(Index.class, "index");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
