@@ -127,7 +127,7 @@ public class NodeRepository extends Repository {
             return;
         }
         log.println("scan " + directory.getPath());
-        for (Node child : children) {
+        for (Node<?> child : children) {
             if (addOpt(dest, name, Descriptor.probeChecked(environment, child), child)) {
                 return;
             }

@@ -67,7 +67,7 @@ public class MavenDescriptor extends Descriptor {
 
             return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), scm, project));
         } finally {
-            if (local != descriptor) {
+            if (local != null && local != descriptor) {
                 local.deleteFile();
             }
         }
