@@ -60,4 +60,14 @@ public class GitlabRepositoryIT {
         assertEquals("ru.t1.sochilenkov.tm", project.artifact.groupId);
         assertEquals("task-manager", project.artifact.artifactId);
     }
+
+    @Test
+    public void raw() throws IOException {
+        Environment environment;
+        GitlabRepository gitlab;
+
+        environment = new Environment(Console.create(), World.create());
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
+        System.out.println(gitlab.listProjects());
+    }
 }
