@@ -29,14 +29,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.pommes.scm.Git;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
-import org.gitlab4j.api.GitLabApi;
-import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.models.Project;
-import org.gitlab4j.api.models.TreeItem;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -54,10 +49,7 @@ public class GitlabRepository extends Repository {
     private static final String PROTOCOL = "gitlab:";
 
     private final Environment environment;
-    private final GitLabApi api;
-
     private final ObjectMapper mapper;
-
     private final HttpNode root;
 
     public GitlabRepository(Environment environment, String name, String url) throws NodeInstantiationException {
@@ -66,8 +58,6 @@ public class GitlabRepository extends Repository {
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.registerModule(new RecordNamingStrategyPatchModule());
-
-        api = new GitLabApi(url, null);
         root = (HttpNode) environment.world().validNode(url).join("api/v4");
     }
 
@@ -143,20 +133,9 @@ public class GitlabRepository extends Repository {
         return mapper.readValue(url.readString(), GitlabProject.class);
     }
 
-    public Project findProject(String namespace, String name) throws GitLabApiException {
-        return api.getProjectApi().getProject(namespace, name);
-    }
-
-    public List<String> list(Project project) throws GitLabApiException {
-        List<TreeItem> lst;
-
-        lst = api.getRepositoryApi().getTree(project.getId(), "", project.getDefaultBranch(), false);
-        return lst.stream().map((item) -> item.getType() == TreeItem.Type.BLOB ? item.getName() : null).filter(Objects::nonNull).toList();
-    }
-
     public List<String> list(GitlabProject project) throws IOException {
         HttpNode url;
-        List<TI> items;
+        List<TreeItem> items;
 
         url = root.join("projects", Long.toString(project.id()), "repository/tree");
         url.withParameter("per_page", 100);
@@ -165,8 +144,7 @@ public class GitlabRepository extends Repository {
         return items.stream().map((item) -> "blob".equals(item.type()) ? item.name() : null).filter(Objects::nonNull).toList();
     }
 
-    public static record TI(String id, String name, String type, String path, String mode) {
-    }
+    public record TreeItem(String id, String name, String type, String path, String mode) { }
 
     public void addExclude(String exclude) {
         throw new ArgumentException("excludes not supported: " + exclude);
@@ -176,7 +154,7 @@ public class GitlabRepository extends Repository {
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
     }
 
-    public Descriptor scanOpt(Project project) throws GitLabApiException, IOException {
+    public Descriptor scanOpt(GitlabProject project) throws IOException {
         BiFunction<Environment, Node<?>, Descriptor> m;
         Node<?> node;
         Descriptor result;
@@ -187,12 +165,14 @@ public class GitlabRepository extends Repository {
                 System.out.println("name " + name);
                 // TODO: when to delete?
                 node = environment.world().getTemp().createTempFile();
-                node.writeBytes(api.getRepositoryFileApi().getFile(project.getId(), name, project.getDefaultBranch(), true).getDecodedContentAsBytes());
+                HttpNode url = root.join("projects", Long.toString(project.id()), "repository/files", name, "raw");
+                url = url.withParameter("ref", project.defaultBranch());
+                url.copyFile(node);
                 result = m.apply(environment, node);
                 result.setRepository(this.name);
-                result.setPath(project.getPathWithNamespace() + "/" + name);
+                result.setPath(project.pathWithNamespace() + "/" + name);
                 result.setRevision("TODO");
-                result.setScm(project.getSshUrlToRepo());
+                result.setScm(project.sshUrlToRepo());
                 return result;
             }
         }
