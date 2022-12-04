@@ -24,19 +24,17 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GitlabRepositoryIT {
     @Test
-    public void getProject() throws IOException {
+    public void scanOpt() throws IOException {
         Environment environment;
         GitlabRepository gitlab;
-        GitlabProject project;
         Descriptor descriptor;
 
         environment = new Environment(Console.create(), World.create());
         gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
-        project = gitlab.getProject(41573530);
+        var project = gitlab.getProject(41573530);
         System.out.println("" + gitlab.list(project));
         descriptor = gitlab.scanOpt(project);
         var pommes = descriptor.load(environment);

@@ -16,16 +16,8 @@
 package net.oneandone.pommes.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
-import com.fasterxml.jackson.databind.deser.ValueInstantiator;
-import com.fasterxml.jackson.databind.deser.ValueInstantiators;
-import com.fasterxml.jackson.databind.deser.std.StdValueInstantiator;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -36,14 +28,10 @@ import net.oneandone.sushi.fs.http.HttpNode;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class GitlabRepository extends Repository {
     private static final String PROTOCOL = "gitlab:";
@@ -57,7 +45,6 @@ public class GitlabRepository extends Repository {
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.registerModule(new RecordNamingStrategyPatchModule());
         root = (HttpNode) environment.world().validNode(url).join("api/v4");
     }
 
@@ -65,47 +52,6 @@ public class GitlabRepository extends Repository {
         throw new ArgumentException("unknown option: " + option);
     }
 
-    // TODO
-    public class RecordNamingStrategyPatchModule extends SimpleModule {
-
-        @Override
-        public void setupModule(SetupContext context) {
-            context.addValueInstantiators(new ValueInstantiatorsModifier());
-            super.setupModule(context);
-        }
-
-        /**
-         * Remove when the following issue is resolved:
-         * <a href="https://github.com/FasterXML/jackson-databind/issues/2992">Properties naming strategy do not work with Record #2992</a>
-         */
-        private static class ValueInstantiatorsModifier extends ValueInstantiators.Base {
-            @Override
-            public ValueInstantiator findValueInstantiator(
-                    DeserializationConfig config, BeanDescription beanDesc, ValueInstantiator defaultInstantiator
-            ) {
-                if (!beanDesc.getBeanClass().isRecord() || !(defaultInstantiator instanceof StdValueInstantiator) || !defaultInstantiator.canCreateFromObjectWith()) {
-                    return defaultInstantiator;
-                }
-                Map<String, BeanPropertyDefinition> map = beanDesc.findProperties().stream().collect(Collectors.toMap(p -> p.getInternalName(), Function.identity()));
-                SettableBeanProperty[] renamedConstructorArgs = Arrays.stream(defaultInstantiator.getFromObjectArguments(config))
-                        .map(p -> {
-                            BeanPropertyDefinition prop = map.get(p.getName());
-                            return prop != null ? p.withName(prop.getFullName()) : p;
-                        })
-                        .toArray(SettableBeanProperty[]::new);
-
-                return new PatchedValueInstantiator((StdValueInstantiator) defaultInstantiator, renamedConstructorArgs);
-            }
-        }
-
-        private static class PatchedValueInstantiator extends StdValueInstantiator {
-
-            protected PatchedValueInstantiator(StdValueInstantiator src, SettableBeanProperty[] constructorArguments) {
-                super(src);
-                _constructorArguments = constructorArguments;
-            }
-        }
-    }
     public List<GitlabProject> listProjects() throws IOException {
         List<GitlabProject> result;
         List<GitlabProject> step;
@@ -139,12 +85,10 @@ public class GitlabRepository extends Repository {
 
         url = root.join("projects", Long.toString(project.id()), "repository/tree");
         url.withParameter("per_page", 100);
-        url.withParameter("ref", project.defaultBranch());
+        url.withParameter("ref", project.default_branch());
         items = mapper.readValue(url.readString(), new TypeReference<>() {});
         return items.stream().map((item) -> "blob".equals(item.type()) ? item.name() : null).filter(Objects::nonNull).toList();
     }
-
-    public record TreeItem(String id, String name, String type, String path, String mode) { }
 
     public void addExclude(String exclude) {
         throw new ArgumentException("excludes not supported: " + exclude);
@@ -166,16 +110,25 @@ public class GitlabRepository extends Repository {
                 // TODO: when to delete?
                 node = environment.world().getTemp().createTempFile();
                 HttpNode url = root.join("projects", Long.toString(project.id()), "repository/files", name, "raw");
-                url = url.withParameter("ref", project.defaultBranch());
+                url = url.withParameter("ref", project.default_branch());
                 url.copyFile(node);
                 result = m.apply(environment, node);
                 result.setRepository(this.name);
-                result.setPath(project.pathWithNamespace() + "/" + name);
+                result.setPath(project.path_with_namespace() + "/" + name);
                 result.setRevision("TODO");
-                result.setScm(project.sshUrlToRepo());
+                result.setScm(project.ssh_url_to_repo());
                 return result;
             }
         }
         return null;
+    }
+
+    //--
+
+
+    public record TreeItem(String id, String name, String type, String path, String mode) { }
+
+    public record GitlabProject(String default_branch, int id, String path, String path_with_namespace,
+                                String ssh_url_to_repo, String http_url_to_repo, String web_url) {
     }
 }
