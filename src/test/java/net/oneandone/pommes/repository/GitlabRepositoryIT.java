@@ -70,4 +70,16 @@ public class GitlabRepositoryIT {
         gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
         System.out.println(gitlab.listProjects());
     }
+
+    @Test
+    public void getProject() throws IOException {
+        Environment environment;
+        GitlabRepository gitlab;
+        GitlabProject project;
+
+        environment = new Environment(Console.create(), World.create());
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
+        project = gitlab.getProject(41573530);
+        System.out.println("" + gitlab.list(project));
+    }
 }

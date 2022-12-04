@@ -56,11 +56,17 @@ public class GitlabRepository extends Repository {
     private final Environment environment;
     private final GitLabApi api;
 
+    private final ObjectMapper mapper;
+
     private final HttpNode root;
 
     public GitlabRepository(Environment environment, String name, String url) throws NodeInstantiationException {
         super(name);
         this.environment = environment;
+        this.mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.registerModule(new RecordNamingStrategyPatchModule());
+
         api = new GitLabApi(url, null);
         root = (HttpNode) environment.world().validNode(url).join("api/v4");
     }
@@ -113,9 +119,6 @@ public class GitlabRepository extends Repository {
     public List<GitlabProject> listProjects() throws IOException {
         List<GitlabProject> result;
         List<GitlabProject> step;
-        ObjectMapper m = new ObjectMapper();
-        m.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        m.registerModule(new RecordNamingStrategyPatchModule());
         String str;
         HttpNode url;
 
@@ -124,13 +127,20 @@ public class GitlabRepository extends Repository {
         url = root.join("projects");
         for (int page = 1; true; page++) {
             str = url.withParameter("page", page).withParameter("per_page", pageSize).readString();
-            step = m.readValue(str, new TypeReference<>() {});
+            step = mapper.readValue(str, new TypeReference<>() {});
             result.addAll(step);
             if (step.size() < pageSize) {
                 break;
             }
         }
         return result;
+    }
+
+    public GitlabProject getProject(long id) throws IOException {
+        HttpNode url;
+
+        url = root.join("projects", Long.toString(id));
+        return mapper.readValue(url.readString(), GitlabProject.class);
     }
 
     public Project findProject(String namespace, String name) throws GitLabApiException {
@@ -142,6 +152,20 @@ public class GitlabRepository extends Repository {
 
         lst = api.getRepositoryApi().getTree(project.getId(), "", project.getDefaultBranch(), false);
         return lst.stream().map((item) -> item.getType() == TreeItem.Type.BLOB ? item.getName() : null).filter(Objects::nonNull).toList();
+    }
+
+    public List<String> list(GitlabProject project) throws IOException {
+        HttpNode url;
+        List<TI> items;
+
+        url = root.join("projects", Long.toString(project.id()), "repository/tree");
+        url.withParameter("per_page", 100);
+        url.withParameter("ref", project.defaultBranch());
+        items = mapper.readValue(url.readString(), new TypeReference<>() {});
+        return items.stream().map((item) -> "blob".equals(item.type()) ? item.name() : null).filter(Objects::nonNull).toList();
+    }
+
+    public static record TI(String id, String name, String type, String path, String mode) {
     }
 
     public void addExclude(String exclude) {
