@@ -20,7 +20,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
+import net.oneandone.pommes.database.Gav;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.scm.Git;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
@@ -184,7 +188,25 @@ public class GitlabRepository extends Repository {
                 return result;
             }
         }
-        return null;
+
+        Gav gav;
+        try {
+            gav = Scm.GIT.defaultGav(project.ssh_url_to_repo());
+        } catch (URISyntaxException e) {
+            throw new IOException("invalid url", e);
+        }
+        result = new Descriptor() {
+            @Override
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {
+                return new Project(name, project.path_with_namespace(), "TODO", null, gav, Git.PROTOCOL + project.ssh_url_to_repo(), project.web_url);
+            }
+        };
+        // TODO: kind of duplication ...
+        result.setRepository(name);
+        result.setPath(project.path_with_namespace());
+        result.setRevision("TODO");
+        result.setScm(Git.PROTOCOL + project.ssh_url_to_repo());
+        return result;
     }
 
     //--

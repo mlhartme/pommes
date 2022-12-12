@@ -26,7 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Git extends Scm {
-    private static final String PROTOCOL = "git:";
+    public static final String PROTOCOL = "git:";
 
     public Git() {
     }

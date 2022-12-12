@@ -31,9 +31,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Scm {
-    private static final Scm[] SCMS = {
-        new Subversion(), new Git()
-    };
+    public static final Scm GIT = new Git();
+    public static final Scm SUBVERSION = new Subversion();
+
+    private static final Scm[] SCMS = { GIT, SUBVERSION };
 
     public static Map<FileNode, Scm> scanCheckouts(FileNode directory, Filter excludes) throws IOException {
         Map<FileNode, Scm> result;
