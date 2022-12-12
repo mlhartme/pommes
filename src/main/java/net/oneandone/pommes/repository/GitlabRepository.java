@@ -24,7 +24,6 @@ import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
-import net.oneandone.sushi.fs.http.model.HeaderList;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -36,6 +35,15 @@ import java.util.function.BiFunction;
 
 public class GitlabRepository extends Repository {
     private static final String PROTOCOL = "gitlab:";
+
+    public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
+        if (url.startsWith(PROTOCOL)) {
+            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.home.tokenOpt(PROTOCOL));
+        } else {
+            return null;
+        }
+    }
+
 
     private final Environment environment;
     private final ObjectMapper mapper;

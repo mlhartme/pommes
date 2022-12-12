@@ -20,6 +20,7 @@ import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.checkout.Root;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 
@@ -67,6 +68,11 @@ public class Home {
     public Home(FileNode home) throws IOException {
         this.home = home;
         this.properties = Properties.load(propertiesFile());
+    }
+
+    public String tokenOpt(String protocol) throws IOException {
+        var file = home.join("." + Strings.removeRight(protocol.toLowerCase(), ":"));
+        return file.exists() ? file.readString().trim() : null;
     }
 
     public Root root() throws IOException {

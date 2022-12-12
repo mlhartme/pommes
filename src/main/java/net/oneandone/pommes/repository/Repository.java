@@ -29,7 +29,7 @@ import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors */
 public abstract class Repository {
-    public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+    public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException {
         World world;
         Repository repository;
         FileNode file;
@@ -52,6 +52,10 @@ public abstract class Repository {
             return repository;
         }
         repository = GiteaRepository.createOpt(environment, name, url);
+        if (repository != null) {
+            return repository;
+        }
+        repository = GitlabRepository.createOpt(environment, name, url);
         if (repository != null) {
             return repository;
         }
