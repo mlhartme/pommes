@@ -86,7 +86,8 @@ public class Git extends Scm {
 
         launcher = git(checkout, "config", "--get", "remote.origin.url");
         try {
-            return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
+            return PROTOCOL + launcher.exec().trim();
+            // TODO return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
         }
