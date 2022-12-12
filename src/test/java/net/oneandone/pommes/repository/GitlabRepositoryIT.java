@@ -18,6 +18,7 @@ package net.oneandone.pommes.repository;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +27,26 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitlabRepositoryIT {
+    private GitlabRepository repository() throws IOException {
+        Environment environment;
+        GitlabRepository gitlab;
+        String token;
+
+        environment = new Environment(Console.create(), World.create());
+        token = null; // TODO environment.world().getHome().join(".pommes", "gitlab").readString().trim();
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", token);
+        return gitlab;
+    }
+    @Test
+    public void listGroups() throws IOException {
+        var gitlab = repository();
+        var lst = gitlab.listGroupProjects("jeffster");
+        System.out.println("common-tools: " + lst.size());
+        for (var g : lst) {
+            System.out.println(g.toString());
+        }
+    }
+
     @Test
     public void scanOpt() throws IOException {
         Environment environment;
@@ -33,7 +54,7 @@ public class GitlabRepositoryIT {
         Descriptor descriptor;
 
         environment = new Environment(Console.create(), World.create());
-        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", null);
         var project = gitlab.getProject(41573530);
         System.out.println("" + gitlab.list(project));
         descriptor = gitlab.scanOpt(project);

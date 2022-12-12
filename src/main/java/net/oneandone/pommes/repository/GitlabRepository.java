@@ -24,6 +24,7 @@ import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
+import net.oneandone.sushi.fs.http.model.HeaderList;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -40,16 +41,44 @@ public class GitlabRepository extends Repository {
     private final ObjectMapper mapper;
     private final HttpNode root;
 
-    public GitlabRepository(Environment environment, String name, String url) throws NodeInstantiationException {
+    public GitlabRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
         super(name);
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         root = (HttpNode) environment.world().validNode(url).join("api/v4");
+        if (token != null) {
+            // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
+            root.getRoot().addExtraHeader("PRIVATE-TOKEN", token);
+        }
     }
 
     public void addOption(String option) {
         throw new ArgumentException("unknown option: " + option);
+    }
+
+    // https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
+    public List<GitlabProject> listGroupProjects(String group) throws IOException {
+        List<GitlabProject> result;
+        List<GitlabProject> step;
+        String str;
+        HttpNode url;
+
+        result = new ArrayList<>();
+        int pageSize = 80;
+        url = root.join("groups", group, "projects")
+                .withParameter("include_subgroups", "true")
+                .withParameter("archived", "false")
+                .withParameter("with_shared", "false");
+        for (int page = 1; true; page++) {
+            str = url.withParameter("page", page).withParameter("per_page", pageSize).readString();
+            step = mapper.readValue(str, new TypeReference<>() {});
+            result.addAll(step);
+            if (step.size() < pageSize) {
+                break;
+            }
+        }
+        return result;
     }
 
     public List<GitlabProject> listProjects() throws IOException {
