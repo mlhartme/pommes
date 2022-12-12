@@ -38,7 +38,21 @@ public class GitlabRepository extends Repository {
 
     public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
         if (url.startsWith(PROTOCOL)) {
-            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.home.tokenOpt(PROTOCOL));
+            GitlabRepository result;
+            String add;
+
+            var idx = url.lastIndexOf('%');
+            if (idx != -1) {
+                add = url.substring(idx + 1);
+                url = url.substring(0, idx);
+            } else {
+                add = null;
+            }
+            result = new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.home.tokenOpt(PROTOCOL));
+            if (add != null) {
+                result.addOption(add);
+            }
+            return result;
         } else {
             return null;
         }
@@ -48,6 +62,8 @@ public class GitlabRepository extends Repository {
     private final Environment environment;
     private final ObjectMapper mapper;
     private final HttpNode root;
+
+    private final List<String> groups;
 
     public GitlabRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
         super(name);
@@ -59,10 +75,11 @@ public class GitlabRepository extends Repository {
             // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
             root.getRoot().addExtraHeader("PRIVATE-TOKEN", token);
         }
+        this.groups = new ArrayList<>();
     }
 
     public void addOption(String option) {
-        throw new ArgumentException("unknown option: " + option);
+        groups.add(option);
     }
 
     // https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
@@ -133,6 +150,17 @@ public class GitlabRepository extends Repository {
 
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
+        if (groups.isEmpty()) {
+            throw new IOException("no groups specified");
+        }
+        for (String group : groups) {
+            for (GitlabProject project : listGroupProjects(group)) {
+                var descriptor = scanOpt(project);
+                if (descriptor != null) {
+                    dest.add(descriptor);
+                }
+            }
+        }
     }
 
     public Descriptor scanOpt(GitlabProject project) throws IOException {
@@ -143,7 +171,6 @@ public class GitlabRepository extends Repository {
         for (String name : list(project)) {
             m = Descriptor.match(name);
             if (m != null) {
-                System.out.println("name " + name);
                 // TODO: when to delete?
                 node = environment.world().getTemp().createTempFile();
                 HttpNode url = root.join("projects", Long.toString(project.id()), "repository/files", name, "raw");
