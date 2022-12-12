@@ -35,10 +35,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Status extends Base {
+public class Ls extends Base {
     private final FileNode directory;
 
-    public Status(Environment environment, FileNode directory) {
+    public Ls(Environment environment, FileNode directory) {
         super(environment);
         this.directory = directory;
     }
@@ -181,12 +181,13 @@ public class Status extends Base {
                 try {
                     expected = expected(environment, foundProjects);
                 } catch (IOException e) {
-                    return new Step("!", found.toString() + " " + e.getMessage(), null);
+                    return new Step("#", found.toString() + " " + e.getMessage(), null);
                 }
                 if (found.equals(expected)) {
-                    return new Step(scm.isModified(found) ? "M" : " ", found.toString(), null);
+                    return new Step(" ", found.toString(), null);
+                } else {
+                    return new Step("!", found.toString(), new Relocation(found, expected));
                 }
-                return new Step("C", found.toString(), new Relocation(found, expected));
             }
         }
 

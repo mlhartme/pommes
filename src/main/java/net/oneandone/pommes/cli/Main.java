@@ -47,11 +47,12 @@ public class Main {
                 + "                        offers selection before changing anything on disk\n"
                 + "  'goto' query          offer selection of matching projects, check it out when necessary,\n"
                 + "                        and cds into the checkout directory\n"
+                + "  'ls' root?            lists all checkouts under the specified directory along with a status:\n"
+                + "                        ' ' - checkout is fine\n"
+                + "                        '?' - checkout is not in database\n"
+                + "                        '!' - checkout in wrong directory\n"
+                + "                        '#' - error checking this checkout\n"
           /* TODO -- clarify
-                + "  'st' root?            print status of all checkouts under the specified directory:\n"
-                + "                        ? - directory is not in database\n"
-                + "                        M - checkout has un-tracked files, modifications or is not pushed\n"
-                + "                        C - checkout url does not match the directory Pommes would place it in\n"
                 + "  'remove' root?        remove checkouts under the specified root directory;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with modifications are marked in the list\n" */
@@ -85,11 +86,8 @@ public class Main {
           cli.begin(Environment.class);
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove root?=.");
-
-            cli.add(Status.class, "st root?=.");
+            cli.add(Ls.class, "ls root?=.");
             cli.add(Goto.class, "goto -x=false query*");
-            cli.add(Goto.class, "gotox -x=true query*");
-
             cli.add(Index.class, "index");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 

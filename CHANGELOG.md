@@ -5,6 +5,8 @@
 * commands
   * renamed `database-reset` to `index`; dumped `database-add` and `database-remove`
     * don't parse pom when revision is the same
+  * renamed 'st' to 'ls', and it no longer prints the scm status now; adjusted status indicators to differ from 
+    typical scm status indicators 
   * dumped import options, use explicit command instead
   * simplified delete command
 * tailing `.git` in git scm url is now optional
