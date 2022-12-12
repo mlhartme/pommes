@@ -23,7 +23,6 @@ import io.gitea.api.RepositoryApi;
 import io.gitea.auth.ApiKeyAuth;
 import io.gitea.model.ContentsResponse;
 import io.gitea.model.Organization;
-import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -115,14 +114,6 @@ public class GiteaRepository extends Repository {
         this.selectedOrganization = selectedOrganization;
         this.organizationApi = new OrganizationApi(gitea);
         this.repositoryApi = new RepositoryApi(gitea);
-    }
-
-    public void addOption(String option) {
-        throw new ArgumentException(gitea.getBasePath() + ": unknown option: " + option);
-    }
-
-    public void addExclude(String exclude) {
-        throw new ArgumentException(gitea.getBasePath() + ": excludes not supported: " + exclude);
     }
 
     @Override

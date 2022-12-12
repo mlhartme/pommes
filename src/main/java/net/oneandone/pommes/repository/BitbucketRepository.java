@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.NewInputStreamException;
@@ -66,14 +65,6 @@ public class BitbucketRepository extends Repository {
         super(name);
         this.environment = environment;
         this.bitbucket = bitbucket;
-    }
-
-    public void addOption(String option) {
-        throw new ArgumentException(bitbucket.getUri() + ": unknown option: " + option);
-    }
-
-    public void addExclude(String exclude) {
-        throw new ArgumentException(bitbucket.getUri() + ": excludes not supported: " + exclude);
     }
 
     @Override

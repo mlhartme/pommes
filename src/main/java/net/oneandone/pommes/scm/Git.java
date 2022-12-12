@@ -86,13 +86,13 @@ public class Git extends Scm {
 
         launcher = git(checkout, "config", "--get", "remote.origin.url");
         try {
-            return PROTOCOL + withProtocol(launcher.exec().trim());
+            return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
         }
     }
 
-    private static String withProtocol(String url) {
+    private static String explicitSshProtocol(String url) {
         int idx;
 
         idx = url.indexOf("://");

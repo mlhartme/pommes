@@ -71,10 +71,6 @@ public class ArtifactoryRepository extends Repository {
         throw new ArgumentException(url + ": unknown option: " + option);
     }
 
-    public void addExclude(String exclude) {
-        throw new ArgumentException(url + ": excludes not supported: " + exclude);
-    }
-
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException {
         Node listing;

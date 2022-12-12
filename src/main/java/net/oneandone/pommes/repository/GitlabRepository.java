@@ -184,7 +184,7 @@ public class GitlabRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
                 result.setRevision("TODO");
-                result.setScm(project.ssh_url_to_repo());
+                result.setScm(Git.PROTOCOL + project.ssh_url_to_repo());
                 return result;
             }
         }

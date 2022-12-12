@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.oneandone.inline.ArgumentException;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.ErrorDescriptor;
@@ -54,14 +53,6 @@ public class JsonRepository extends Repository {
     public JsonRepository(String name, Node node) {
         super(name);
         this.node = node;
-    }
-
-    public void addOption(String option) {
-        throw new ArgumentException("unknown option: " + option);
-    }
-
-    public void addExclude(String exclude) {
-        throw new ArgumentException("excludes not supported: " + exclude);
     }
 
     @Override

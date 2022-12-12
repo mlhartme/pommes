@@ -67,10 +67,6 @@ public class GithubRepository extends Repository {
         }
     }
 
-    public void addExclude(String exclude) {
-        throw new ArgumentException(user + ": excludes not supported: " + exclude);
-    }
-
     @Override
     public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
         String str;

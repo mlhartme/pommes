@@ -75,7 +75,13 @@ public abstract class Repository {
         this.name = name;
     }
 
-    public abstract void addOption(String option);
-    public abstract void addExclude(String exclude);
+
+    public void addOption(String option) {
+        throw new ArgumentException(name + ": unknown option: " + option);
+    }
+
+    public void addExclude(String exclude) {
+        throw new ArgumentException(name + ": excludes not supported: " + exclude);
+    }
     public abstract void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException, URISyntaxException;
 }
