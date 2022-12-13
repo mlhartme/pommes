@@ -35,9 +35,12 @@ stands for "many poms", "project mess", and a german word for french fries.
 
 ## See also
 
-https://github.com/mthmulders/mcs
+https://github.com/gabrie30/ghorg
 
 https://github.com/x-motemen/ghq
+
+https://github.com/mthmulders/mcs
+
 
 ## Setup
 
