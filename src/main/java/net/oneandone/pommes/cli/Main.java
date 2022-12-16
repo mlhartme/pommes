@@ -56,7 +56,9 @@ public class Main {
                 + "  'remove' root?        remove checkouts under the specified root directory;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with modifications are marked in the list\n" */
-                + "  'index'               (re-) builds the database.\n"
+                + "  'index' {repo}        (re-) index the specified (or all) repositories.\n"
+                + "  'setup' ['-batch] {name'='value'}\n"
+                + "                        setup pommes with specified name values as repositories\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
@@ -89,7 +91,7 @@ public class Main {
             cli.add(Remove.class, "remove root?=.");
             cli.add(Ls.class, "ls root?=.");
             cli.add(Goto.class, "goto -x=false query*");
-            cli.add(Index.class, "index");
+            cli.add(Index.class, "index repo*");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));

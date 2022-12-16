@@ -21,6 +21,8 @@ import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
+import java.util.ArrayList;
+
 public class Setup {
     private final World world;
     private final Console console;
@@ -47,7 +49,7 @@ public class Setup {
         Lib lib = Lib.create(world, console, true);
         environment = new Environment(console, world);
         console.info.println("initial scan ...");
-        new Index(environment).run();
+        new Index(environment, new ArrayList<>()).run();
         console.info.println("done");
         console.info.println("Have a look at " + directory.join("config") + " and adjust Pommes to your needs");
         if (!Setenv.create().isConfigured()) {

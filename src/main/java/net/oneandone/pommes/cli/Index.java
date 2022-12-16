@@ -29,18 +29,27 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Index extends Base {
+    private final List<String> repositories;
 
-    public Index(Environment environment) {
+    public Index(Environment environment, List<String> repositories) {
         super(environment);
 
+        Set<String> available = environment.lib.properties().repositories.keySet();
+        this.repositories = repositories;
+        for (String repository : repositories) {
+            if (!available.contains(repository)) {
+                throw new ArgumentException("repository not found: " + repository);
+            }
+        }
     }
-
 
     @Override
     public void run(Scope scope) throws Exception {
@@ -50,6 +59,10 @@ public class Index extends Base {
 
         log = new PrintWriter(environment.lib.logs().join("pommes.log").newWriter(), true);
         for (Map.Entry<String, String> entry : environment.lib.properties().repositories.entrySet()) {
+            if (!repositories.isEmpty() && !repositories.contains(entry.getKey())) {
+                // not selected
+                continue;
+            }
             repository = null;
             for (String str : Separator.SPACE.split(entry.getValue())) {
                 if (str.startsWith("-")) {
