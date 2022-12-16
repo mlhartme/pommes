@@ -72,7 +72,7 @@ public class GithubRepository extends Repository {
     }
 
     // curl "https://api.github.com/orgs/1and1/repos"
-    public List<GithubRepo> listOrganizationRepos(String org) throws IOException {
+    public List<GithubRepo> listOrganizationOrUserRepos(String orgOrUser) throws IOException {
         final int pageSize = 30;
         String str;
         HttpNode url;
@@ -80,7 +80,11 @@ public class GithubRepository extends Repository {
         List<GithubRepo> step;
 
         result = new ArrayList<>();
-        url = root.join("orgs", org, "repos");
+        if (orgOrUser.startsWith("~")) {
+            url = root.join("users", orgOrUser.substring(1), "repos");
+        } else {
+            url = root.join("orgs", orgOrUser, "repos");
+        }
         for (int page = 1; true; page++) {
             str = url.withParameter("page", page).withParameter("per_page", pageSize).readString();
             step = mapper.readValue(str, new TypeReference<>() {});

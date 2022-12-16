@@ -45,9 +45,15 @@ public class GithubRepositoryIT {
     }
 
     @Test
-    public void orgRepos() throws IOException {
+    public void orgOrgRepos() throws IOException {
         var hub = repository();
-        var repo = hub.listOrganizationRepos("1and1");
-        assertEquals(1, repo.size());
+        var repo = hub.listOrganizationOrUserRepos("1and1");
+        assertTrue(repo.size() == 100);
+    }
+    @Test
+    public void orgUserRepos() throws IOException {
+        var hub = repository();
+        var repo = hub.listOrganizationOrUserRepos("~mlhartme");
+        assertEquals(25, repo.size());
     }
 }
