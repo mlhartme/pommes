@@ -38,7 +38,7 @@ public class GitlabRepositoryIT {
     @Test
     public void listGroups() throws IOException {
         var gitlab = repository();
-        var lst = gitlab.listGroupProjects("jeffster");
+        var lst = gitlab.listGroupOrUserProjects("jeffster");
         System.out.println("common-tools: " + lst.size());
         for (var g : lst) {
             System.out.println(g.toString());

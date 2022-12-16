@@ -68,7 +68,7 @@ public class GitlabRepository extends Repository {
     private final ObjectMapper mapper;
     private final HttpNode root;
 
-    private final List<String> groups;
+    private final List<String> groupsOrUsers;
 
     public GitlabRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
         super(name);
@@ -80,15 +80,15 @@ public class GitlabRepository extends Repository {
             // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
             root.getRoot().addExtraHeader("PRIVATE-TOKEN", token);
         }
-        this.groups = new ArrayList<>();
+        this.groupsOrUsers = new ArrayList<>();
     }
 
     public void addOption(String option) {
-        groups.add(option);
+        groupsOrUsers.add(option);
     }
 
     // https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
-    public List<GitlabProject> listGroupProjects(String group) throws IOException {
+    public List<GitlabProject> listGroupOrUserProjects(String groupOrUsers) throws IOException {
         List<GitlabProject> result;
         List<GitlabProject> step;
         String str;
@@ -96,8 +96,12 @@ public class GitlabRepository extends Repository {
 
         result = new ArrayList<>();
         int pageSize = 80;
-        url = root.join("groups", group, "projects")
-                .withParameter("include_subgroups", "true")
+        if (groupOrUsers.startsWith("~")) {
+            url = root.join("users", groupOrUsers.substring(1), "projects");
+        } else {
+            url = root.join("groups", groupOrUsers, "projects");
+        }
+        url = url.withParameter("include_subgroups", "true")
                 .withParameter("archived", "false")
                 .withParameter("with_shared", "false");
         for (int page = 1; true; page++) {
@@ -170,7 +174,7 @@ public class GitlabRepository extends Repository {
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
         List<GitlabProject> all;
 
-        if (groups.isEmpty()) {
+        if (groupsOrUsers.isEmpty()) {
             console.info.println("collecting projects ...");
             all = listProjects();
             console.info.println("scan " + all.size() + " projects");
@@ -178,8 +182,8 @@ public class GitlabRepository extends Repository {
                 scan(project, dest, console);
             }
         } else {
-            for (String group : groups) {
-                for (GitlabProject project : listGroupProjects(group)) {
+            for (String groupOrUser : groupsOrUsers) {
+                for (GitlabProject project : listGroupOrUserProjects(groupOrUser)) {
                     scan(project, dest, console);
                 }
             }
