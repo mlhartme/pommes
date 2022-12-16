@@ -42,6 +42,7 @@ public class GithubRepositoryIT {
         var repo = hub.getRepo("mlhartme", "pommes");
         assertEquals("pommes", repo.name());
         assertTrue(repo.clone_url().startsWith("https://"));
+        assertEquals("", hub.files(repo));
     }
 
     @Test

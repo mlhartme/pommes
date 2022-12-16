@@ -29,10 +29,13 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
 public class GithubRepository extends Repository {
+    private static final int PAGE_SIZE = 3; // TODO
+
     private static final String PROTOCOL = "github:";
 
     public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
@@ -73,7 +76,6 @@ public class GithubRepository extends Repository {
 
     // curl "https://api.github.com/orgs/1and1/repos"
     public List<GithubRepo> listOrganizationOrUserRepos(String orgOrUser) throws IOException {
-        final int pageSize = 30;
         String str;
         HttpNode url;
         List<GithubRepo> result;
@@ -86,15 +88,36 @@ public class GithubRepository extends Repository {
             url = root.join("orgs", orgOrUser, "repos");
         }
         for (int page = 1; true; page++) {
-            str = url.withParameter("page", page).withParameter("per_page", pageSize).readString();
+            str = page(url, page).readString();
             step = mapper.readValue(str, new TypeReference<>() {});
             result.addAll(step);
-            if (step.size() < pageSize) {
-                break;
+            if (step.size() < PAGE_SIZE) {
+                return result;
             }
-
         }
-        return result;
+    }
+
+    private HttpNode page(HttpNode url, int page) {
+        return url.withParameter("page", page).withParameter("per_page", PAGE_SIZE);
+    }
+    public List<String> files(GithubRepo repo) throws IOException {
+        HttpNode url;
+        String str;
+        List<GithubFile> files;
+        List<String> result;
+
+        result = new ArrayList<>();
+        url = root.join("repos", repo.full_name, "contents");
+        for (int page = 1; true; page++) {
+            str = page(url, page).readString();
+            files = mapper.readValue(str, new TypeReference<>() {});
+            for (GithubFile file : files) {
+                result.add(file.path);
+            }
+            if (files.size() < PAGE_SIZE) {
+                return result;
+            }
+        }
     }
 
     @Override
@@ -105,5 +128,9 @@ public class GithubRepository extends Repository {
         return repo.clone_url;
     }
     public record GithubRepo(int id, String name, String full_name, String url, String clone_url, String git_url, String default_branch) {
+    }
+
+    public record GithubFile(String path) {
+
     }
 }
