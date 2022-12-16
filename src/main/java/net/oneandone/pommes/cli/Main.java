@@ -56,9 +56,10 @@ public class Main {
                 + "  'remove' root?        remove checkouts under the specified root directory;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with modifications are marked in the list\n" */
-                + "  'index' {repo}        (re-) index the specified (or all) repositories.\n"
+                + "  'index' {repo}        re-index the specified (default: all) repositories.\n"
                 + "  'setup' ['-batch] {name'='value'}\n"
-                + "                        setup pommes with specified name values as repositories\n"
+                + "                        creates pommes configuration files with the specified repositories\n"
+                + "                        and indexes them\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()

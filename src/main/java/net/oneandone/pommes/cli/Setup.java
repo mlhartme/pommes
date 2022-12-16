@@ -72,7 +72,7 @@ public class Setup {
         console.info.println("initial scan ...");
         new Index(environment, new ArrayList<>()).run();
         console.info.println("done");
-        console.info.println("Have a look at " + directory.join("config") + " and adjust Pommes to your needs");
+        console.info.println("Edit " + directory.join("config") + " to adjust Pommes configuration.");
         if (!Setenv.create().isConfigured()) {
             console.info.println("To complete the setup, please add the following to your bash initialization:");
             console.info.println(Setenv.get().setenvBash());
