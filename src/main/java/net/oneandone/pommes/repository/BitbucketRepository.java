@@ -18,6 +18,7 @@ package net.oneandone.pommes.repository;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.NewInputStreamException;
@@ -68,7 +69,7 @@ public class BitbucketRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
         Bitbucket bb;
         String bbProject;
         Descriptor descriptor;

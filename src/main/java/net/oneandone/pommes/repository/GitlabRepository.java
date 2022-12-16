@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
@@ -140,12 +141,17 @@ public class GitlabRepository extends Repository {
     public List<String> list(GitlabProject project) throws IOException {
         HttpNode url;
         List<TreeItem> items;
+        String defaultBranch;
 
         url = root.join("projects", Long.toString(project.id()), "repository/tree");
         url.withParameter("per_page", 100);
-        url.withParameter("ref", project.default_branch());
+        url.withParameter("ref", or(project.default_branch(), "main"));
         items = mapper.readValue(url.readString(), new TypeReference<>() {});
         return items.stream().map((item) -> "blob".equals(item.type()) ? item.name() : null).filter(Objects::nonNull).toList();
+    }
+
+    private static String or(String left, String right) {
+        return left != null ? left : right;
     }
 
     public void addExclude(String exclude) {
@@ -153,18 +159,39 @@ public class GitlabRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
+        List<GitlabProject> all;
+
         if (groups.isEmpty()) {
-            throw new IOException("no groups specified");
-        }
-        for (String group : groups) {
-            for (GitlabProject project : listGroupProjects(group)) {
-                var descriptor = scanOpt(project);
-                if (descriptor != null) {
-                    dest.add(descriptor);
+            all = listProjects();
+            console.info.println("scan " + all.size() + " projects");
+            for (GitlabProject project : all) {
+                scan(project, dest, console);
+                Thread.sleep(5000);
+            }
+        } else {
+            for (String group : groups) {
+                for (GitlabProject project : listGroupProjects(group)) {
+                    scan(project, dest, console);
                 }
             }
         }
+    }
+
+    private void scan(GitlabProject project, BlockingQueue<Descriptor> dest, Console console) {
+        try {
+            var descriptor = scanOpt(project);
+            if (descriptor != null) {
+                dest.add(descriptor);
+            }
+        } catch (IOException e) {
+            console.error.println("cannot load " + project.path_with_namespace + " (id=" + project.id + "): " + e.getMessage());
+            e.printStackTrace(console.verbose);
+        }
+    }
+
+    private String repoUrl(GitlabProject project) {
+        return project.http_url_to_repo(); // TODO: configurable
     }
 
     public Descriptor scanOpt(GitlabProject project) throws IOException {
@@ -184,28 +211,28 @@ public class GitlabRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
                 result.setRevision("TODO");
-                result.setScm(Git.PROTOCOL + project.ssh_url_to_repo());
+                result.setScm(Git.PROTOCOL + repoUrl(project));
                 return result;
             }
         }
 
         Gav gav;
         try {
-            gav = Scm.GIT.defaultGav(project.ssh_url_to_repo());
+            gav = Scm.GIT.defaultGav(repoUrl(project));
         } catch (URISyntaxException e) {
             throw new IOException("invalid url", e);
         }
         result = new Descriptor() {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {
-                return new Project(name, project.path_with_namespace(), "TODO", null, gav, Git.PROTOCOL + project.ssh_url_to_repo(), project.web_url);
+                return new Project(name, project.path_with_namespace(), "TODO", null, gav, Git.PROTOCOL + repoUrl(project), project.web_url);
             }
         };
         // TODO: kind of duplication ...
         result.setRepository(name);
         result.setPath(project.path_with_namespace());
         result.setRevision("TODO");
-        result.setScm(Git.PROTOCOL + project.ssh_url_to_repo());
+        result.setScm(Git.PROTOCOL + repoUrl(project));
         return result;
     }
 

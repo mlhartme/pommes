@@ -69,7 +69,7 @@ public class Index extends Base {
                 indexer = new Indexer(environment, scope.getDatabase(), entry.getKey());
                 indexer.start();
                 try {
-                    repository.scan(indexer.src);
+                    repository.scan(indexer.src, environment.console());
                 } finally {
                     indexer.src.put(Descriptor.END_OF_QUEUE);
                     indexer.join();

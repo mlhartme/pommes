@@ -58,7 +58,7 @@ public class GiteaRepository extends Repository {
         env = new Environment(Console.create(), World.create());
         gitea = GiteaRepository.create(env, "reponame", "https://git.ionos.org/CPOPS");
         BlockingQueue<Descriptor> result = new ArrayBlockingQueue<>(1000);
-        gitea.scan(result);
+        gitea.scan(result, env.console());
         for (var d : result) {
             System.out.println(" " + d.load(env));
         }
@@ -117,7 +117,7 @@ public class GiteaRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException {
         List<String> orgs;
         Descriptor descriptor;
         orgs = listCurrentUserOrgs();

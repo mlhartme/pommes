@@ -18,6 +18,7 @@ package net.oneandone.pommes.repository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.ErrorDescriptor;
@@ -56,7 +57,7 @@ public class JsonRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
         JsonArray array;
         Descriptor descriptor;
         Project project;

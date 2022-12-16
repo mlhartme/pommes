@@ -20,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.World;
@@ -68,7 +69,7 @@ public class GithubRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, URISyntaxException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
         String str;
         JsonArray repositories;
         JsonObject r;
@@ -81,7 +82,7 @@ public class GithubRepository extends Repository {
             r = e.getAsJsonObject();
             name = r.get("name").getAsString();
             repository = new NodeRepository(environment, this.name, world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
-            repository.scan(dest);
+            repository.scan(dest, console);
         }
     }
 }

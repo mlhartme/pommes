@@ -16,6 +16,7 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -108,7 +109,7 @@ public class NodeRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
         scan(root, true, dest);
     }
 
