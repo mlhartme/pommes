@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,7 +44,9 @@ public class GithubRepositoryIT {
         var repo = hub.getRepo("mlhartme", "pommes");
         assertEquals("pommes", repo.name());
         assertTrue(repo.clone_url().startsWith("https://"));
-        assertEquals("", hub.files(repo));
+        var pom = new String(hub.file(repo, "pom.xml"), Charset.defaultCharset());
+        assertTrue(hub.files(repo).contains("pom.xml"));
+        assertTrue(pom.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"), pom);
     }
 
     @Test

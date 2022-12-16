@@ -20,9 +20,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
+import net.oneandone.pommes.database.Gav;
+import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.scm.Git;
+import net.oneandone.pommes.scm.Scm;
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
+import net.oneandone.sushi.fs.http.model.HeaderList;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,6 +36,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.BiFunction;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
 public class GithubRepository extends Repository {
@@ -123,6 +130,57 @@ public class GithubRepository extends Repository {
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
     }
 
+    public byte[] file(GithubRepo repo, String path) throws IOException {
+        HttpNode url = root.join("repos", repo.full_name, "contents", path);
+        url = url.withParameter("ref", repo.default_branch());
+        url = url.withHeaders(HeaderList.of("Accept", "application/vnd.github.v3.raw"));
+        return url.readBytes();
+    }
+
+    public Descriptor scanOpt(GithubRepo repo) throws IOException {
+        BiFunction<Environment, Node<?>, Descriptor> m;
+        Node<?> node;
+        Descriptor result;
+
+        for (String name : files(repo)) {
+            m = Descriptor.match(name);
+            if (m != null) {
+                // TODO: when to delete node?
+                node = environment.world().getTemp().createTempFile();
+                HttpNode url = root.join("projects", Long.toString(repo.id()), "repository/files", name, "raw");
+                url = url.withParameter("ref", repo.default_branch());
+                url.copyFile(node);
+                result = m.apply(environment, node);
+                result.setRepository(this.name);
+                result.setPath(repo.full_name());
+                result.setRevision("TODO");
+                result.setScm(Git.PROTOCOL + repoUrl(repo));
+                return result;
+            }
+        }
+
+        Gav gav;
+        try {
+            gav = Scm.GIT.defaultGav(repoUrl(repo));
+        } catch (URISyntaxException e) {
+            throw new IOException("invalid url", e);
+        }
+        result = new Descriptor() {
+            @Override
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {
+                return new Project(name, repo.full_name(), "TODO", null, gav,
+                        Git.PROTOCOL + repoUrl(repo), repo.url);
+            }
+        };
+        // TODO: kind of duplication ...
+        result.setRepository(name);
+        result.setPath(repo.full_name());
+        result.setRevision("TODO");
+        result.setScm(Git.PROTOCOL + repoUrl(repo));
+        return result;
+    }
+
+
     private String repoUrl(GithubRepo repo) {
         return repo.clone_url;
     }
@@ -130,6 +188,5 @@ public class GithubRepository extends Repository {
     }
 
     public record GithubFile(String path) {
-
     }
 }
