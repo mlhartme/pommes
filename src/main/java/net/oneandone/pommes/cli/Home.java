@@ -27,8 +27,6 @@ import java.io.IOException;
 public class Home {
     public static Home create(World world, Console console, boolean setup) throws IOException {
         FileNode home;
-        FileNode dflt;
-        FileNode dest;
 
         home = directory(world);
         if (!home.isDirectory()) {
@@ -38,36 +36,37 @@ public class Home {
             console.info.println("creating pommes home: " + home);
             home.mkdir();
             home.join("logs").mkdir();
-            dflt = world.locateClasspathEntry(Home.class).getParent().join("pommes.properties.default");
-            dest = home.join("pommes.properties");
-            if (dflt.exists()) {
-                dflt.copy(dest);
-            } else {
-                Properties.writeDefaults(dest);
-            }
+            Properties.writeDefaults(configFile(home));
         }
         return new Home(home);
     }
 
+    /** @return .pommes directory to use */
     public static FileNode directory(World world) {
+        final String hidden = ".pommes";
         String path;
+        FileNode dir;
 
         path = System.getenv("POMMES_HOME");
-        if (path == null) {
-            return world.getHome().join(".pommes");
-        } else {
+        if (path != null) {
             return world.file(path);
         }
+        dir = world.getHome().join("Projects", hidden);
+        if (dir.exists()) {
+            return dir;
+        }
+        return world.getHome().join("Pommes", hidden);
     }
 
     //--
 
+    /** points to .pommes directory */
     private final FileNode home;
     private final Properties properties;
 
     public Home(FileNode home) throws IOException {
         this.home = home;
-        this.properties = Properties.load(propertiesFile());
+        this.properties = Properties.load(configFile(home));
     }
 
     public String tokenOpt(String protocol) throws IOException {
@@ -83,8 +82,8 @@ public class Home {
         return Database.load(home.join("database"));
     }
 
-    private FileNode propertiesFile() {
-        return home.join("pommes.properties");
+    private static FileNode configFile(FileNode home) {
+        return home.join("config");
     }
 
     public Properties properties() {

@@ -11,6 +11,7 @@
   * simplified delete command
 * tailing `.git` in git scm url is now optional
 * configuration file 
+  * checkouts is now parent of Pommes' home directory, you can no longer configure it  
   * renamed import to repository
 * renamed zone to repository
 * fixed NodeRepository to detect raw descriptors in none-root directories

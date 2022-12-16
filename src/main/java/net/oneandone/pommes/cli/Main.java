@@ -77,7 +77,8 @@ public class Main {
                 + "  {scm}     = scm location for current directory\n"
                 + "\n"
                 + "environment:\n"
-                + "  POMMES_HOME     home directory for Pommes\n"
+                + "  POMMES_HOME     home directory for Pommes,\""
+                + "                  default is ~/Projects/.pommes if it exists, otherwise ~/Pommes/.pommes\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);

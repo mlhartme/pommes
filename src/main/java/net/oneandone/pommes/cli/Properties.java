@@ -29,19 +29,15 @@ public class Properties {
         file.writeLines(
                 "# Pommes configuration file, see https://github.com/mlhartme/pommes",
                 "",
-                "# where to manage checkouts; defaults is ~/Projects",
-                "# checkouts=/some/path",
-                "",
-                "# urls where to import from",
-                "#import.first=url1",
-                "#import.second=url2",
+                "# repositories for indexing",
+                "#repository.first=url1",
+                "#repository.second=url2",
                 "",
                 "# query macros",
                 "query.users=d:=ga=",
                 "",
                 "# format macros",
-                "format.default=%a",
-                "format.users=%a -> %d[=ga=]");
+                "format.default=%a");
     }
 
     public static Properties load(FileNode file) throws IOException {
@@ -56,17 +52,14 @@ public class Properties {
         Map<String, String> repositories;
         FileNode checkouts;
 
-        world = file.getWorld();
         giteaKey = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
         repositories = new HashMap<>();
         props = file.readProperties();
-        checkouts = world.getHome().join("Projects");
+        checkouts = file.getParent().getParent();
         for (String key : props.stringPropertyNames()) {
-            if (key.equals("checkouts")) {
-                checkouts = world.file(props.getProperty(key));
-            } else if (key.equals("gitea.key")) {
+            if (key.equals("gitea.key")) {
                 giteaKey = props.getProperty(key);
             } else if (key.startsWith(queryPrefix)) {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
