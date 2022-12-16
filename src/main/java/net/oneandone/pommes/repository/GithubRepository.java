@@ -130,11 +130,11 @@ public class GithubRepository extends Repository {
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
     }
 
-    public byte[] file(GithubRepo repo, String path) throws IOException {
+    public HttpNode fileNode(GithubRepo repo, String path) {
         HttpNode url = root.join("repos", repo.full_name, "contents", path);
         url = url.withParameter("ref", repo.default_branch());
         url = url.withHeaders(HeaderList.of("Accept", "application/vnd.github.v3.raw"));
-        return url.readBytes();
+        return url;
     }
 
     public Descriptor scanOpt(GithubRepo repo) throws IOException {
@@ -147,9 +147,7 @@ public class GithubRepository extends Repository {
             if (m != null) {
                 // TODO: when to delete node?
                 node = environment.world().getTemp().createTempFile();
-                HttpNode url = root.join("projects", Long.toString(repo.id()), "repository/files", name, "raw");
-                url = url.withParameter("ref", repo.default_branch());
-                url.copyFile(node);
+                fileNode(repo, name).copyFile(node);
                 result = m.apply(environment, node);
                 result.setRepository(this.name);
                 result.setPath(repo.full_name());

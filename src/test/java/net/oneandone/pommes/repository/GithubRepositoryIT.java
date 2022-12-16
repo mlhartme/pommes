@@ -44,9 +44,14 @@ public class GithubRepositoryIT {
         var repo = hub.getRepo("mlhartme", "pommes");
         assertEquals("pommes", repo.name());
         assertTrue(repo.clone_url().startsWith("https://"));
-        var pom = new String(hub.file(repo, "pom.xml"), Charset.defaultCharset());
+        var pom = hub.fileNode(repo, "pom.xml").readString();
         assertTrue(hub.files(repo).contains("pom.xml"));
         assertTrue(pom.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"), pom);
+        var descriptor = hub.scanOpt(repo);
+        var project = descriptor.load(new Environment(Console.create(), World.create()));
+        System.out.println("" + project.toJson());
+        assertEquals("net.oneandone:pommes", project.artifact.toGaString());
+
     }
 
     @Test
