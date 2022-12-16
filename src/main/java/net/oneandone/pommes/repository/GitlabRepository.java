@@ -167,7 +167,6 @@ public class GitlabRepository extends Repository {
             console.info.println("scan " + all.size() + " projects");
             for (GitlabProject project : all) {
                 scan(project, dest, console);
-                Thread.sleep(5000);
             }
         } else {
             for (String group : groups) {
@@ -178,11 +177,11 @@ public class GitlabRepository extends Repository {
         }
     }
 
-    private void scan(GitlabProject project, BlockingQueue<Descriptor> dest, Console console) {
+    private void scan(GitlabProject project, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
         try {
             var descriptor = scanOpt(project);
             if (descriptor != null) {
-                dest.add(descriptor);
+                dest.put(descriptor);
             }
         } catch (IOException e) {
             console.error.println("cannot load " + project.path_with_namespace + " (id=" + project.id + "): " + e.getMessage());

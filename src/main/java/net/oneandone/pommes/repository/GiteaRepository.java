@@ -51,7 +51,7 @@ import java.util.function.BiFunction;
 public class GiteaRepository extends Repository {
     private static final String PROTOCOL = "gitea:";
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
         Environment env;
         GiteaRepository gitea;
 
@@ -117,7 +117,7 @@ public class GiteaRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException {
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
         List<String> orgs;
         Descriptor descriptor;
         orgs = listCurrentUserOrgs();
@@ -134,7 +134,7 @@ public class GiteaRepository extends Repository {
             for (var r : listRepos(org)) {
                 descriptor = scanOrganizationOpt(org, r.getName(), r.getDefaultBranch());
                 if (descriptor != null) {
-                    dest.add(descriptor);
+                    dest.put(descriptor);
                 }
             }
         }
