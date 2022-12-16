@@ -36,18 +36,20 @@ public class Setup {
         FileNode directory;
         Environment environment;
 
+        // TODO: duplicate file names ...
         directory = Lib.directory(world);
         if (!batch) {
-            console.info.println("Ready to setup Pommes in " + directory.getAbsolute());
-            console.info.println("Nothing outside this directory is touched; to uninstall, simply delete this directory");
+            console.info.println("Ready to setup Pommes for this directory: " + directory.getAbsolute());
+            console.info.println("Nothing outside this directory is touched; to revert setup, simply remove "
+                    + directory.join(".pommes"));
             console.readline("Press return to continue, ctl-c to abort: ");
         }
-        Lib.create(world, console, true);
+        Lib lib = Lib.create(world, console, true);
         environment = new Environment(console, world);
         console.info.println("initial scan ...");
         new Index(environment).run();
         console.info.println("done");
-        console.info.println("Have a look at " + directory.join("pommes.properties") + " and adjust Pommes to your needs");
+        console.info.println("Have a look at " + directory.join("config") + " and adjust Pommes to your needs");
         if (!Setenv.create().isConfigured()) {
             console.info.println("To complete the setup, please add the following to your bash initialization:");
             console.info.println(Setenv.get().setenvBash());
