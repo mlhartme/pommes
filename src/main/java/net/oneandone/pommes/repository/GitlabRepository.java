@@ -147,7 +147,7 @@ public class GitlabRepository extends Repository {
         return mapper.readValue(url.readString(), GitlabProject.class);
     }
 
-    public List<String> list(GitlabProject project) throws IOException {
+    public List<String> files(GitlabProject project) throws IOException {
         HttpNode url;
         List<TreeItem> items;
 
@@ -187,6 +187,10 @@ public class GitlabRepository extends Repository {
     }
 
     private void scan(GitlabProject project, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
+        if (Boolean.TRUE.equals(project.archived)) {
+            console.verbose.println("skip archived: " + project.path_with_namespace);
+            return;
+        }
         try {
             var descriptor = scanOpt(project);
             if (descriptor != null) {
@@ -207,10 +211,10 @@ public class GitlabRepository extends Repository {
         Node<?> node;
         Descriptor result;
 
-        for (String name : list(project)) {
+        for (String name : files(project)) {
             m = Descriptor.match(name);
             if (m != null) {
-                // TODO: when to delete?
+                // TODO: when to delete node?
                 node = environment.world().getTemp().createTempFile();
                 HttpNode url = root.join("projects", Long.toString(project.id()), "repository/files", name, "raw");
                 url = url.withParameter("ref", project.default_branch());
@@ -218,7 +222,7 @@ public class GitlabRepository extends Repository {
                 result = m.apply(environment, node);
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
-                result.setRevision(branchRevision(project, project.default_branch())); // TODO: should be more accurate with the revision of this very file ...
+                result.setRevision(branchRevision(project, project.default_branch())); // TODO: could be more accurate with the revision of this very file ...
                 result.setScm(Git.PROTOCOL + repoUrl(project));
                 return result;
             }
@@ -249,7 +253,7 @@ public class GitlabRepository extends Repository {
     public record TreeItem(String id, String name, String type, String path, String mode) { }
 
     public record GitlabProject(String default_branch, int id, String path, String path_with_namespace,
-                                String ssh_url_to_repo, String http_url_to_repo, String web_url) {
+                                String ssh_url_to_repo, String http_url_to_repo, String web_url, String visibility, Boolean archived) {
     }
     public record Branch(String name, Commit commit) {
     }

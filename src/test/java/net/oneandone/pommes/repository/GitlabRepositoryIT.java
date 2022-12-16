@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class GitlabRepositoryIT {
         environment = new Environment(Console.create(), World.create());
         gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", null);
         var project = gitlab.getProject(41573530);
-        System.out.println("" + gitlab.list(project));
+        System.out.println("" + gitlab.files(project));
         System.out.println("default branch: " + project.default_branch());
         System.out.println("branch revision: " + gitlab.branchRevision(project, project.default_branch()));
         descriptor = gitlab.scanOpt(project);
