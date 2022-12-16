@@ -57,11 +57,6 @@ and store it as executable `pommes` file in your path
         chmod a+x pommes
     
 * run `pommes setup` and follow the instructions
- 
-Current Limitations:
-* doesn't care about git branches
-* crawling multi-module projects will only add the top-level pom to the database
-
 
 ## Database commands
 

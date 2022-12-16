@@ -15,74 +15,91 @@
  */
 package net.oneandone.pommes.repository;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.oneandone.inline.ArgumentException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.http.HttpNode;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+/** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
 public class GithubRepository extends Repository {
     private static final String PROTOCOL = "github:";
 
-    public static GithubRepository createOpt(Environment environment, String name, String url, PrintWriter log) {
+    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(environment, name, url.substring(PROTOCOL.length()), log);
+            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(PROTOCOL));
         } else {
             return null;
         }
     }
 
-    private final Environment environment;
-    private final World world;
-    private final String user;
-    private boolean branches;
-    private boolean tags;
-    private final PrintWriter log;
 
-    public GithubRepository(Environment environment, String name, String user, PrintWriter log) {
+    private final Environment environment;
+    private final ObjectMapper mapper;
+    private final HttpNode root;
+
+    private final List<String> groupsOrUsers;
+
+    public GithubRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
         super(name);
         this.environment = environment;
-        this.world = environment.world();
-        this.user = user;
-        this.branches = false;
-        this.tags = false;
-        this.log = log;
+        this.mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        root = (HttpNode) environment.world().validNode(url);
+        this.groupsOrUsers = new ArrayList<>();
     }
 
     public void addOption(String option) {
-        if (option.equals("branches")) {
-            branches = true;
-        } else if (option.equals("tags")) {
-            tags = true;
-        } else {
-            throw new ArgumentException(user + ": unknown option: " + option);
+        groupsOrUsers.add(option);
+    }
+
+    // curl "https://api.github.com/repos/mlhartme/pommes"
+    public GithubRepo getRepo(String org, String name) throws IOException {
+        HttpNode url;
+
+        url = root.join("repos", org, name);
+        return mapper.readValue(url.readString(), GithubRepo.class);
+    }
+
+    // curl "https://api.github.com/orgs/1and1/repos"
+    public List<GithubRepo> listOrganizationRepos(String org) throws IOException {
+        final int pageSize = 30;
+        String str;
+        HttpNode url;
+        List<GithubRepo> result;
+        List<GithubRepo> step;
+
+        result = new ArrayList<>();
+        url = root.join("orgs", org, "repos");
+        for (int page = 1; true; page++) {
+            str = url.withParameter("page", page).withParameter("per_page", pageSize).readString();
+            step = mapper.readValue(str, new TypeReference<>() {});
+            result.addAll(step);
+            if (step.size() < pageSize) {
+                break;
+            }
+
         }
+        return result;
     }
 
     @Override
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
-        String str;
-        JsonArray repositories;
-        JsonObject r;
-        String name;
-        Repository repository;
+    }
 
-        str = world.validNode("https://api.github.com/users/" + user + "/repos").readString();
-        repositories = (JsonArray) JsonParser.parseString(str);
-        for (JsonElement e : repositories) {
-            r = e.getAsJsonObject();
-            name = r.get("name").getAsString();
-            repository = new NodeRepository(environment, this.name, world.validNode("svn:https://github.com/" + user + "/" + name), branches, tags, log);
-            repository.scan(dest, console);
-        }
+    private String repoUrl(GithubRepo repo) {
+        return repo.clone_url;
+    }
+    public record GithubRepo(int id, String name, String full_name, String url, String clone_url, String git_url, String default_branch) {
     }
 }

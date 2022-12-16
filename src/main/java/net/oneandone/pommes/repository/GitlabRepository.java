@@ -115,7 +115,7 @@ public class GitlabRepository extends Repository {
         return result;
     }
 
-    public List<GitlabProject> listProjects() throws IOException {
+    public List<GitlabProject> listAllProjects() throws IOException {
         List<GitlabProject> result;
         List<GitlabProject> step;
         String str;
@@ -176,7 +176,7 @@ public class GitlabRepository extends Repository {
 
         if (groupsOrUsers.isEmpty()) {
             console.info.println("collecting projects ...");
-            all = listProjects();
+            all = listAllProjects();
             console.info.println("scan " + all.size() + " projects");
             for (GitlabProject project : all) {
                 scan(project, dest, console);
