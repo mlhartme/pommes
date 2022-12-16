@@ -131,6 +131,15 @@ public class GitlabRepository extends Repository {
         return result;
     }
 
+    public String branchRevision(GitlabProject project, String branch) throws IOException {
+        HttpNode url;
+        Branch obj;
+
+        url = root.join("projects", Long.toString(project.id()), "repository/branches", branch);
+        obj = mapper.readValue(url.readString(), Branch.class);
+        return obj.commit.id;
+    }
+
     public GitlabProject getProject(long id) throws IOException {
         HttpNode url;
 
@@ -141,7 +150,6 @@ public class GitlabRepository extends Repository {
     public List<String> list(GitlabProject project) throws IOException {
         HttpNode url;
         List<TreeItem> items;
-        String defaultBranch;
 
         url = root.join("projects", Long.toString(project.id()), "repository/tree");
         url.withParameter("per_page", 100);
@@ -163,6 +171,7 @@ public class GitlabRepository extends Repository {
         List<GitlabProject> all;
 
         if (groups.isEmpty()) {
+            console.info.println("collecting projects ...");
             all = listProjects();
             console.info.println("scan " + all.size() + " projects");
             for (GitlabProject project : all) {
@@ -209,7 +218,7 @@ public class GitlabRepository extends Repository {
                 result = m.apply(environment, node);
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
-                result.setRevision("TODO");
+                result.setRevision(branchRevision(project, project.default_branch())); // TODO: should be more accurate with the revision of this very file ...
                 result.setScm(Git.PROTOCOL + repoUrl(project));
                 return result;
             }
@@ -237,10 +246,14 @@ public class GitlabRepository extends Repository {
 
     //--
 
-
     public record TreeItem(String id, String name, String type, String path, String mode) { }
 
     public record GitlabProject(String default_branch, int id, String path, String path_with_namespace,
                                 String ssh_url_to_repo, String http_url_to_repo, String web_url) {
+    }
+    public record Branch(String name, Commit commit) {
+    }
+
+    public record Commit(String id, String short_id) {
     }
 }

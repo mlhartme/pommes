@@ -30,13 +30,12 @@ public class GitlabRepositoryIT {
     private GitlabRepository repository() throws IOException {
         Environment environment;
         GitlabRepository gitlab;
-        String token;
 
         environment = new Environment(Console.create(), World.create());
-        token = null; // TODO environment.world().getHome().join(".pommes", "gitlab").readString().trim();
-        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", token);
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", null);
         return gitlab;
     }
+
     @Test
     public void listGroups() throws IOException {
         var gitlab = repository();
@@ -57,6 +56,8 @@ public class GitlabRepositoryIT {
         gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", null);
         var project = gitlab.getProject(41573530);
         System.out.println("" + gitlab.list(project));
+        System.out.println("default branch: " + project.default_branch());
+        System.out.println("branch revision: " + gitlab.branchRevision(project, project.default_branch()));
         descriptor = gitlab.scanOpt(project);
         var pommes = descriptor.load(environment);
         System.out.println("project: " + project);
