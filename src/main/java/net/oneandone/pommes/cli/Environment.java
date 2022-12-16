@@ -41,7 +41,7 @@ public class Environment implements Variables {
     public Environment(Console console, World world) throws IOException {
         this.console = console;
         this.world = world;
-        this.lib = Lib.create(world, console, false);
+        this.lib = Lib.load(world);
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyExcludes = null;

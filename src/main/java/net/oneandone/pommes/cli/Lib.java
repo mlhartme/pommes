@@ -25,22 +25,31 @@ import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 /** Represents the .pommes directory */
 public class Lib {
-    public static Lib create(World world, Console console, boolean setup) throws IOException {
+    public static Lib load(World world) throws IOException {
         FileNode lib;
 
         lib = directory(world);
         if (!lib.isDirectory()) {
-            if (!setup) {
-                throw new IOException("pommes is not set up. Please run 'pommes setup'");
-            }
-            console.info.println("creating " + lib);
-            lib.mkdir();
-            lib.join("logs").mkdir();
-            Properties.writeDefaults(configFile(lib));
+            throw new IOException("pommes is not set up. Please run 'pommes setup'");
         }
+        return new Lib(lib);
+    }
+
+    public static Lib create(World world, Console console, Map<String, String> repositories) throws IOException {
+        FileNode lib;
+
+        lib = directory(world);
+        if (lib.isDirectory()) {
+            throw new IOException("already set up at " + lib);
+        }
+        console.info.println("creating " + lib);
+        lib.mkdir();
+        lib.join("logs").mkdir();
+        configFile(lib).writeLines(Properties.defaultConfig(repositories));
         return new Lib(lib);
     }
 

@@ -15,33 +15,41 @@
  */
 package net.oneandone.pommes.cli;
 
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Properties {
-    public static void writeDefaults(FileNode file) throws IOException {
-        file.writeLines(
-                "# Pommes configuration file, see https://github.com/mlhartme/pommes",
-                "",
-                "# repositories for indexing",
-                "#repository.first=url1",
-                "#repository.second=url2",
-                "",
-                "# query macros",
-                "query.users=d:=ga=",
-                "",
-                "# format macros",
-                "format.default=%a");
+    public static List<String> defaultConfig(Map<String, String> repositories) {
+        List<String> lines;
+
+        lines = new ArrayList<>();
+        lines.add("# Pommes configuration file, see https://github.com/mlhartme/pommes");
+        lines.add("");
+        lines.add("# repositories for indexing");
+        if (repositories.isEmpty()) {
+            lines.add("#repository.first=url1");
+            lines.add("#repository.second=url2");
+        } else {
+            for (var entry : repositories.entrySet()) {
+                lines.add("repository." + entry.getKey() + "=" + entry.getValue());
+            }
+        }
+        lines.add("");
+        lines.add("# query macros");
+        lines.add("query.users=d:=ga=");
+        lines.add("");
+        lines.add("# format macros");
+        lines.add("format.default=%a");
+        return lines;
     }
 
     public static Properties load(FileNode file) throws IOException {
-        World world;
         String queryPrefix = "query.";
         String formatPrefix = "format.";
         String repoPrefix = "repository.";

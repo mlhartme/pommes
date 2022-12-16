@@ -16,22 +16,43 @@
 package net.oneandone.pommes.cli;
 
 
+import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Setup {
     private final World world;
     private final Console console;
     private final boolean batch;
 
-    public Setup(World world, Console console, boolean batch) {
+    private final Map<String, String> repositories;
+
+    public Setup(World world, Console console, boolean batch, List<String> keyValues) {
         this.world = world;
         this.console = console;
         this.batch = batch;
+        this.repositories = new LinkedHashMap<>();
+        for (String kv : keyValues) {
+            add(kv);
+        }
+    }
+
+    private void add(String kv) {
+        int idx = kv.indexOf('=');
+        if (idx == -1) {
+            throw new ArgumentException("delimiter '=' not found: " + kv);
+        }
+        String key = kv.substring(0, idx).trim();
+        if (repositories.put(key, kv.substring(idx +1).trim()) != null) {
+            throw new ArgumentException("duplicate key: " + key);
+        }
     }
 
     public void run() throws Exception {
@@ -46,7 +67,7 @@ public class Setup {
                     + directory.join(".pommes"));
             console.readline("Press return to continue, ctl-c to abort: ");
         }
-        Lib lib = Lib.create(world, console, true);
+        Lib lib = Lib.create(world, console, repositories);
         environment = new Environment(console, world);
         console.info.println("initial scan ...");
         new Index(environment, new ArrayList<>()).run();
