@@ -26,36 +26,27 @@ import java.io.IOException;
 
 public class Home {
     public static Home create(World world, Console console, boolean setup) throws IOException {
-        FileNode home;
+        FileNode lib;
 
-        home = directory(world);
-        if (!home.isDirectory()) {
+        lib = directory(world);
+        if (!lib.isDirectory()) {
             if (!setup) {
                 throw new IOException("pommes is not set up. Please run 'pommes setup'");
             }
-            console.info.println("creating pommes home: " + home);
-            home.mkdir();
-            home.join("logs").mkdir();
-            Properties.writeDefaults(configFile(home));
+            console.info.println("creating " + lib);
+            lib.mkdir();
+            lib.join("logs").mkdir();
+            Properties.writeDefaults(configFile(lib));
         }
-        return new Home(home);
+        return new Home(lib);
     }
 
     /** @return .pommes directory to use */
     public static FileNode directory(World world) {
-        final String hidden = ".pommes";
         String path;
-        FileNode dir;
 
-        path = System.getenv("POMMES_HOME");
-        if (path != null) {
-            return world.file(path);
-        }
-        dir = world.getHome().join("Projects", hidden);
-        if (dir.exists()) {
-            return dir;
-        }
-        return world.getHome().join("Pommes", hidden);
+        path = System.getenv("POMMES_ROOT");
+        return (path != null ? world.file(path) : world.getHome().join("Projects")).join(".pommes");
     }
 
     //--

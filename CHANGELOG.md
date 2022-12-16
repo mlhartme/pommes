@@ -10,8 +10,11 @@
   * dumped import options, use explicit command instead
   * simplified delete command
 * tailing `.git` in git scm url is now optional
-* configuration file 
-  * checkouts is now parent of Pommes' home directory, you can no longer configure it  
+* configuration
+  * renamed environment variable `POMMES_HOME` to `POMMES_ROOT`, and it now points to the directory containing 
+    the former POMMES_HOME (i.e `.pommes`)
+  * renamed pommes.properties to config
+  * property `checkouts` is gone, it's now configured via `POMMES_ROOT`
   * renamed import to repository
 * renamed zone to repository
 * fixed NodeRepository to detect raw descriptors in none-root directories
