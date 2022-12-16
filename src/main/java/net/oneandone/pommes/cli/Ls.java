@@ -171,7 +171,7 @@ public class Ls extends Base {
                 }
                 newPom = probed.load(environment);
                 try {
-                    expected = environment.home.root().directory(newPom);
+                    expected = environment.lib.projectDirectory(newPom);
                 } catch (IOException e) {
                     throw new IOException(found + ": " + e.getMessage(), e);
                 }
@@ -197,7 +197,7 @@ public class Ls extends Base {
 
             result = null;
             for (var foundProject : foundProjects) {
-                step = environment.home.root().directory(foundProject);
+                step = environment.lib.projectDirectory(foundProject);
                 if (result == null) {
                     result = step;
                 } else if (!step.equals(result)) {

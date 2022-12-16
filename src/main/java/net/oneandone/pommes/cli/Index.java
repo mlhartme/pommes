@@ -48,8 +48,8 @@ public class Index extends Base {
         Indexer indexer;
         PrintWriter log;
 
-        log = new PrintWriter(environment.home.logs().join("pommes.log").newWriter(), true);
-        for (Map.Entry<String, String> entry : environment.home.properties().repositories.entrySet()) {
+        log = new PrintWriter(environment.lib.logs().join("pommes.log").newWriter(), true);
+        for (Map.Entry<String, String> entry : environment.lib.properties().repositories.entrySet()) {
             repository = null;
             for (String str : Separator.SPACE.split(entry.getValue())) {
                 if (str.startsWith("-")) {

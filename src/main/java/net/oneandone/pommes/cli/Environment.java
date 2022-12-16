@@ -33,7 +33,7 @@ import java.util.Map;
 public class Environment implements Variables {
     private final Console console;
     private final World world;
-    public final Home home;
+    public final Lib lib;
     private Maven lazyMaven;
     private Project lazyCurrentPom;
     private Filter lazyExcludes;
@@ -41,7 +41,7 @@ public class Environment implements Variables {
     public Environment(Console console, World world) throws IOException {
         this.console = console;
         this.world = world;
-        this.home = Home.create(world, console, false);
+        this.lib = Lib.create(world, console, false);
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyExcludes = null;

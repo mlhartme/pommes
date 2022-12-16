@@ -39,7 +39,7 @@ public abstract class Base {
     }
 
     public void run() throws Exception {
-        try (Database database = environment.home.loadDatabase()) {
+        try (Database database = environment.lib.loadDatabase()) {
             run(new Scope(database, environment, new CentralSearch(environment.world(), environment.maven())));
         }
     }

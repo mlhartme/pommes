@@ -65,7 +65,7 @@ public class Goto extends Base {
         actions = new ArrayList<>();
         for (Project project : projects) {
             try {
-                directory = environment.home.root().directory(project);
+                directory = environment.lib.projectDirectory(project);
                 action = Checkout.createOpt(directory, project);
                 if (action == null) {
                     action = new Nop(directory);

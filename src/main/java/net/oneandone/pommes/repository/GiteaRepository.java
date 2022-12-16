@@ -94,7 +94,7 @@ public class GiteaRepository extends Repository {
         gitea.setReadTimeout(120000);
 
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
-        accessToken.setApiKey(environment.home.properties().giteaKey);
+        accessToken.setApiKey(environment.lib.properties().giteaKey);
 
         return new GiteaRepository(environment, repository, uri.getHost(), gitea, selectedOrganization);
     }

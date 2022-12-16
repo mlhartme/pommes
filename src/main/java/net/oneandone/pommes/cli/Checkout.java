@@ -38,7 +38,7 @@ public class Checkout extends Base {
 
         adds = new ArrayList<>();
         for (Project project : scope.queryDatabase(query)) {
-            directory = environment.home.root().directory(project);
+            directory = environment.lib.projectDirectory(project);
             action = net.oneandone.pommes.checkout.Checkout.createOpt(directory, project);
             if (action != null) {
                 if (!adds.contains(action)) {

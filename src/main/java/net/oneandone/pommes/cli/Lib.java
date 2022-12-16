@@ -17,15 +17,18 @@ package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
-import net.oneandone.pommes.checkout.Root;
+import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
-public class Home {
-    public static Home create(World world, Console console, boolean setup) throws IOException {
+/** Represents the .pommes directory */
+public class Lib {
+    public static Lib create(World world, Console console, boolean setup) throws IOException {
         FileNode lib;
 
         lib = directory(world);
@@ -38,7 +41,7 @@ public class Home {
             lib.join("logs").mkdir();
             Properties.writeDefaults(configFile(lib));
         }
-        return new Home(lib);
+        return new Lib(lib);
     }
 
     /** @return .pommes directory to use */
@@ -55,7 +58,7 @@ public class Home {
     private final FileNode home;
     private final Properties properties;
 
-    public Home(FileNode home) throws IOException {
+    public Lib(FileNode home) throws IOException {
         this.home = home;
         this.properties = Properties.load(configFile(home));
     }
@@ -65,8 +68,23 @@ public class Home {
         return file.exists() ? file.readString().trim() : null;
     }
 
-    public Root root() throws IOException {
-        return new Root(properties.checkouts);
+    public FileNode projectDirectory(Project project) throws IOException {
+        Scm scm;
+        String path;
+
+        if (project.scm == null) {
+            throw new IOException(project + ": missing scm");
+        }
+        scm = Scm.probeUrl(project.scm);
+        if (scm == null) {
+            throw new IOException(project + ": unknown scm: " + project.scm);
+        }
+        try {
+            path = scm.path(project.scm);
+        } catch (URISyntaxException e) {
+            throw new IOException(project.scm + ": invalid scm uri", e);
+        }
+        return properties.checkouts.join(path);
     }
 
     public Database loadDatabase() throws IOException {

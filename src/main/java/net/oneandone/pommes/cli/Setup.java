@@ -36,13 +36,13 @@ public class Setup {
         FileNode directory;
         Environment environment;
 
-        directory = Home.directory(world);
+        directory = Lib.directory(world);
         if (!batch) {
             console.info.println("Ready to setup Pommes in " + directory.getAbsolute());
             console.info.println("Nothing outside this directory is touched; to uninstall, simply delete this directory");
             console.readline("Press return to continue, ctl-c to abort: ");
         }
-        Home.create(world, console, true);
+        Lib.create(world, console, true);
         environment = new Environment(console, world);
         console.info.println("initial scan ...");
         new Index(environment).run();

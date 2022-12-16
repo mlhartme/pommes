@@ -53,7 +53,7 @@ public class GitlabRepository extends Repository {
             } else {
                 add = null;
             }
-            result = new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.home.tokenOpt(PROTOCOL));
+            result = new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(PROTOCOL));
             if (add != null) {
                 result.addOption(add);
             }
