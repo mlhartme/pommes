@@ -29,16 +29,15 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
 public class GithubRepository extends Repository {
-    private static final int PAGE_SIZE = 3; // TODO
+    private static final int PAGE_SIZE = 30;
 
     private static final String PROTOCOL = "github:";
 
-    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
+    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws IOException {
         if (url.startsWith(PROTOCOL)) {
             return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(PROTOCOL));
         } else {
@@ -59,6 +58,10 @@ public class GithubRepository extends Repository {
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         root = (HttpNode) environment.world().validNode(url);
+        if (token != null) {
+            // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
+            root.getRoot().addExtraHeader("Authorization", "Bearer " + token);
+        }
         this.groupsOrUsers = new ArrayList<>();
     }
 
@@ -107,17 +110,13 @@ public class GithubRepository extends Repository {
         List<String> result;
 
         result = new ArrayList<>();
-        url = root.join("repos", repo.full_name, "contents");
-        for (int page = 1; true; page++) {
-            str = page(url, page).readString();
-            files = mapper.readValue(str, new TypeReference<>() {});
-            for (GithubFile file : files) {
-                result.add(file.path);
-            }
-            if (files.size() < PAGE_SIZE) {
-                return result;
-            }
+        url = root.join("repos", repo.full_name, "contents"); // caution: not paginated!
+        str = url.readString();
+        files = mapper.readValue(str, new TypeReference<>() {});
+        for (GithubFile file : files) {
+            result.add(file.path);
         }
+        return result;
     }
 
     @Override

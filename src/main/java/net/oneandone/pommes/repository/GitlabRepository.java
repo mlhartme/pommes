@@ -43,21 +43,7 @@ public class GitlabRepository extends Repository {
 
     public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
         if (url.startsWith(PROTOCOL)) {
-            GitlabRepository result;
-            String add;
-
-            var idx = url.lastIndexOf('%');
-            if (idx != -1) {
-                add = url.substring(idx + 1);
-                url = url.substring(0, idx);
-            } else {
-                add = null;
-            }
-            result = new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(PROTOCOL));
-            if (add != null) {
-                result.addOption(add);
-            }
-            return result;
+            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(PROTOCOL));
         } else {
             return null;
         }

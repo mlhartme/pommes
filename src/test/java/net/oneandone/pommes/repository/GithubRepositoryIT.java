@@ -22,6 +22,7 @@ import net.oneandone.sushi.fs.World;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +33,7 @@ public class GithubRepositoryIT {
         GithubRepository hub;
 
         environment = new Environment(Console.create(), World.create());
-        hub = new GithubRepository(environment, "name", "https://api.github.com", null);
+        hub = GithubRepository.createOpt(environment, "name", "github:https://api.github.com", null);
         return hub;
     }
 
