@@ -48,10 +48,7 @@ public class Goto extends Base {
         if (action == null) {
             throw new IOException("nothing selected");
         }
-        autoCd = AutoCd.get();
-        if (autoCd.isConfigured()) {
-            autoCd.cd(action.directory.getAbsolute());
-        } else {
+        if (!AutoCd.set(action.directory)) {
             console.info.println("cd " + action.directory.getAbsolute());
         }
     }

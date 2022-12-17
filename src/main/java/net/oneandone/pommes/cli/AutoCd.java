@@ -15,33 +15,27 @@
  */
 package net.oneandone.pommes.cli;
 
+import net.oneandone.sushi.fs.file.FileNode;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
-public class AutoCd implements Runnable {
-    private static AutoCd lazyAutoCd;
-
-    public static AutoCd get() {
-        if (lazyAutoCd == null) {
-            lazyAutoCd = create();
-        }
-        return lazyAutoCd;
-    }
-
-    public static AutoCd create() {
+public final class AutoCd {
+    public static boolean set(FileNode dir) throws IOException {
         String str;
-        AutoCd result;
+        Path dest;
 
         str = System.getenv("POMMES_AUTO_CD");
-        result = new AutoCd(new PrintWriter(System.out, true), str == null ? null : Paths.get(str + "-" + pid()));
-        Runtime.getRuntime().addShutdownHook(new Thread(result));
-        return result;
+        if (str == null) {
+            return false;
+        }
+        dest = Paths.get(str + "-" + pid());
+        Files.write(dest, escape(dir.getAbsolute()).getBytes(Charset.defaultCharset()));
+        return true;
     }
 
     public static int pid() {
@@ -54,26 +48,6 @@ public class AutoCd implements Runnable {
             str = str.substring(0, idx);
         }
         return Integer.parseInt(str);
-    }
-
-    //--
-
-    private PrintWriter messages;
-    private final Path dest;
-    private List<String> lines;
-
-    public AutoCd(PrintWriter messages, Path dest) {
-        this.messages = messages;
-        this.dest = dest;
-        this.lines = new ArrayList<>();
-    }
-
-    public boolean isConfigured() {
-        return dest != null;
-    }
-
-    public void cd(String path) {
-        line(escape(path));
     }
 
     public static String escape(String str) {
@@ -117,34 +91,6 @@ public class AutoCd implements Runnable {
         return result.toString();
     }
 
-    public void line(String line) {
-        lines.add(line);
-    }
-
-    @Override
-    public void run() {
-        if (dest == null) {
-            messages.print(toString());
-        } else {
-            try {
-                save();
-            } catch (IOException e) {
-                e.printStackTrace(messages);
-            }
-        }
-    }
-
-    public void save() throws IOException {
-        Files.write(dest, toString().getBytes("UTF8"));
-    }
-
-    public String toString() {
-        StringBuilder result;
-
-        result = new StringBuilder();
-        for (String line : lines) {
-            result.append(line).append('\n');
-        }
-        return result.toString();
+    private AutoCd() {
     }
 }
