@@ -27,6 +27,11 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,5 +128,73 @@ public class Environment implements Variables {
             }
         }
         throw new IllegalStateException(directory.toString());
+    }
+
+    //--
+
+    public static boolean cd(FileNode dir) throws IOException {
+        String str;
+        Path dest;
+
+        str = System.getenv("POMMES_AUTO_CD");
+        if (str == null) {
+            return false;
+        }
+        dest = Paths.get(str + "-" + pid());
+        Files.write(dest, escape(dir.getAbsolute()).getBytes(Charset.defaultCharset()));
+        return true;
+    }
+
+    public static int pid() {
+        String str;
+        int idx;
+
+        str = ManagementFactory.getRuntimeMXBean().getName();
+        idx = str.indexOf('@');
+        if (idx != -1) {
+            str = str.substring(0, idx);
+        }
+        return Integer.parseInt(str);
+    }
+
+    public static String escape(String str) {
+        StringBuilder result;
+        char c;
+
+        result = new StringBuilder();
+        for (int i = 0, max = str.length(); i < max; i++) {
+            c = str.charAt(i);
+            // see http://pubs.opengroup.org/onlinepubs/009604499/utilities/xcu_chap02.html, 2.2 Quoting
+            switch (c) {
+                case '|':
+                case '&':
+                case ';':
+                case '<':
+                case '>':
+                case '(':
+                case ')':
+                case '$':
+                case '`':
+                case '\\':
+                case '"':
+                case '\'':
+                case ' ':
+                case '\t':
+                case '\n':
+
+                case '*':
+                case '?':
+                case '[':
+                case '#':
+                case '~':
+                case '=':
+                case '%':
+                    result.append('\\').append(c);
+                    break;
+                default:
+                    result.append(c);
+            }
+        }
+        return result.toString();
     }
 }

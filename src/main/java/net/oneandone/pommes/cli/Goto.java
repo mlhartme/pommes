@@ -39,7 +39,6 @@ public class Goto extends Base {
 
     @Override
     public void run(Scope scope) throws Exception {
-        AutoCd autoCd;
         List<Action> actions;
         Action action;
 
@@ -48,7 +47,7 @@ public class Goto extends Base {
         if (action == null) {
             throw new IOException("nothing selected");
         }
-        if (!AutoCd.set(action.directory)) {
+        if (!Environment.cd(action.directory)) {
             console.info.println("cd " + action.directory.getAbsolute());
         }
     }
