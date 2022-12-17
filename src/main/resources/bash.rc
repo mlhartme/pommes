@@ -1,0 +1,16 @@
+if [ -z "${POMMES_CD}" ] ; then
+  export POMMES_OLD_PROMPT_COMMAND=$PROMPT_COMMAND
+
+  doPommes() {
+    eval "$POMMES_OLD_PROMPT_COMMAND"
+    for file in ${POMMES_CD}-*; do
+        if [ -f "${file}" ] ; then
+            cd $(cat $file)
+            rm ${file}
+        fi
+    done
+  }
+  PROMPT_COMMAND=doPommes
+# else
+#   already initialized, nothing to do
+fi
