@@ -247,7 +247,6 @@ public class GitlabRepository extends Repository {
     }
     public record Branch(String name, Commit commit) {
     }
-
     public record Commit(String id, String short_id) {
     }
 }

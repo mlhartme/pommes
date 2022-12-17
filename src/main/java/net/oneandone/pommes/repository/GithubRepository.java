@@ -84,6 +84,16 @@ public class GithubRepository extends Repository {
         return mapper.readValue(url.readString(), GithubRepo.class);
     }
 
+    public String branchRevision(GithubRepo repo, String branch) throws IOException {
+        HttpNode url;
+        Branch obj;
+
+        url = root.join("repos", repo.full_name, "branches", branch);
+        obj = mapper.readValue(url.readString(), Branch.class);
+        return obj.commit.sha;
+    }
+
+
     // curl "https://api.github.com/orgs/1and1/repos"
     public List<GithubRepo> listOrganizationOrUserRepos(String orgOrUser) throws IOException {
         String str;
@@ -151,7 +161,7 @@ public class GithubRepository extends Repository {
                 result = m.apply(environment, node);
                 result.setRepository(this.name);
                 result.setPath(repo.full_name());
-                result.setRevision("TODO");
+                result.setRevision(branchRevision(repo, repo.default_branch()));
                 result.setScm(Git.PROTOCOL + repoUrl(repo));
                 return result;
             }
@@ -187,4 +197,9 @@ public class GithubRepository extends Repository {
 
     public record GithubFile(String path) {
     }
+    public record Branch(String name, Commit commit) {
+    }
+    public record Commit(String sha) {
+    }
+
 }

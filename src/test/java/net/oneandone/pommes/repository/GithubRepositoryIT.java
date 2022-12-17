@@ -49,9 +49,8 @@ public class GithubRepositoryIT {
         assertTrue(pom.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"), pom);
         var descriptor = hub.scanOpt(repo);
         var project = descriptor.load(new Environment(Console.create(), World.create()));
-        System.out.println("" + project.toJson());
+        System.out.println("" + project.revision);
         assertEquals("net.oneandone:pommes", project.artifact.toGaString());
-
     }
 
     @Test
