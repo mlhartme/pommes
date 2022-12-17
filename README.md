@@ -17,21 +17,16 @@ already existing checkout, choosing `2` also creates the checkout. Another use c
 a database, you can search when a given dependency as used.
 
 Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
-* crawl directories, svn, github, bitbucket, gitea or artifactory and add matching projects to the database
+* index repositories (e.g. github or github) to fill it's database
 * search the database by coordinates, dependencies, scm location, etc. 
-* perform (bulk-) scm operations, e.g. checkout all projects that match a query.
+* perform (bulk-) checkouts for all projects that match a query.
   
-Pommes supports Maven projects with a pom.xml file, php projects with a composer.json file, and projects defined with by Pommes-Json. 
-Php support is very basic. 
+Pommes detects addition metadata for Maven projects with a pom.xml file and php projects with a composer.json file. 
 
-The name Pommes stands for "many poms".
+The name Pommes stands for "many poms", "project mess", or a german word for french fries.
 
 
 [Changes](https://github.com/mlhartme/pommes/blob/master/CHANGELOG.md)
-
-## Name
-
-stands for "many poms", "project mess", and a german word for french fries.
 
 ## See also
 
@@ -56,50 +51,26 @@ and store it as executable `pommes` file in your path
         curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.4.0/pommes-3.4.0-application.sh -o pommes
         chmod a+x pommes
     
-* run `pommes setup` and follow the instructions
+* run `pommes setup` and follow the instructions. Basically, the command creates a directory `~/Projects/.pommes` containing
+  a `config` configuration file and a database. If create `.pommes` in a different directory, define an environment variable
+  `POMMES_ROOT` pointing to it before you run setup.
 
-## Database commands
 
-Pommes maintains a [Lucene](http://lucene.apache.org) database to store projects. You'll typically feed it with your corporate projects and 
-the open source stuff you regularly use. 
+## Managing the Database
 
-You have three commands to modify the database: `database-add` and `database-remove` to add/remove projects, and `database-reset` resets 
-the database to the initial empty state.
-                                                                         
-Use `pommes database-add` to add projects to your database. You can specify various kinds of repositories to crawl for projects.
+Pommes maintains a [Lucene](http://lucene.apache.org) database to store project metadata. The database is filled
+by indexing so-called repositories.
 
-Local files:
+`.pommes/config` defines the list of repositories, each is specified by name, url and possibly options.
 
-    pommes database-add ~/.m2/repository
-    
-adds all Maven Poms in your local repository.
+Available url protocols:
+* github
+* gitlab
 
-Subversion:
+Example configuration
 
-    pommes database-add svn:https://user:password@svn.yourcompany.com/your/repo/path
-
-adds all project in the specified Subversion subtree.
-
-Artifactory:
-
-    pommes database-add artifactory:https://user:password@artifactory.yourcompany.com/your/repo/path
-    
-adds all projects found in the respective Artifactory repository subtree.
-
-Github:
-
-    pommes database-add github:someuser
-
-adds all projects of the specified user (or organization) to your database.
-
-Bitbucket:
-
-    pommes database-add bitbucket:https://bitbucket.yourcompany.com/yourproject
-    
-adds all projects found in the respective bitbucket project.
-
-Note that `database-add` overwrites existing projects in the database, so you don't get duplicate projects from repeated invokations. 
-The id field is used to detect duplicates, the revision field to detect modifications.  
+       repository.mlhartme=github:https://api.github.com %~mlhartme
+       repository.work=gitlab:https://gitlab.company.com 
 
 ## Find Command
 
@@ -139,14 +110,14 @@ TODO: Prefix, suffix, macros; formats
 
 ## Checkout commands
 
-Checkout commands (`checkout`, `remove`, `st` and `goto`) manage checkouts on your disk, e.g. run scm operations on projects that 
+Checkout commands (`checkout`, `goto` and `ls`) manage checkouts on your disk, e.g. run scm operations on projects that 
 match a query. Pommes supports Subversion and Git scms. The root directory for all checkouts is specified by the `checkouts` property
 in $POMMES_HOME/pommes.properties.
 
 
 ### Checkout
 
-`pommes checkout s:/trunk` checks out all trunks.
+`pommes checkout s:/mlhartme` checks out all mlhartme projects.
 
 Before changing anything on your disk, `checkout` presents a selection of the checkouts to perform, and you can pick one, multiple 
 (separated with blanks) or all of them. Or you can quit without doing anything.
@@ -163,13 +134,9 @@ the `checkout` command, it asks before changing anything on your disk.
 all trunks checked out, you can run `pommes remove -stale` to remove checkouts that are no longer used.
 
 
-### Status
+### List
 
-`pommes st` lists all checkouts in the current directory, together with a status marker similar to `svn st`. 
-
-This command is useful to cleanup your checkouts. E.g. you can see where you have uncommitted files: run it on a subtree with 
-many checkouts before you run `rm -rf`
-
+`pommes ls` lists all checkouts in the current directory, together with a status marker similar to `git status`. 
 If a checkout is not in your database, `st` flags it with `?` and prints the command you can run to get it into your database.
 
 
@@ -178,29 +145,6 @@ If a checkout is not in your database, `st` flags it with `?` and prints the com
 `pommes goto puc`
 
 searches the database for `puc`, offers a selection of matching projects, checks it out if necessary and cds into the resulting directory.
-
-
-## Advanced 
-
-You can define seeds in the properties file:
-
-   seed.foo=baruri
-   
-instructs Pommes to automatically run
-
-   database-add -zone foo baruri
-   
-during `setup`, `database-scan` or if you invoke Pommes with `-scan-now` or `-scan-daily`.
-
-This is most useful with json repositories. To create a json file, run your database-add commands and run
-
-    pommes find -output foo.json "" -json
-    
-to create a json repository `foo.json`. You can also specify a webdav url to automatically upload the file. 
-It will be compressed if the url ends with .gz.
-
-You might want to setup a cron job to run this every night. Alternatively, you can setup post-commit hooks to 
-trigger `database-add` and `database-remove` calls after each committed pom.xml modification.
 
 ## Glossary
 
