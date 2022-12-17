@@ -60,6 +60,8 @@ public class Main {
                 + "  'setup' ['-batch] {name'='value'}\n"
                 + "                        creates pommes configuration files with the specified repositories\n"
                 + "                        and indexes them\n"
+                + "  'profile' ('bash'|'zsh')\n"
+                + "                        prints shell to enable auto-cd\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
@@ -87,6 +89,7 @@ public class Main {
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
           cli.add(Setup.class, "setup -batch nameEqUrl*");
+          cli.add(Profile.class, "profile shell");
           cli.begin(Environment.class);
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove root?=.");

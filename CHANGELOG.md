@@ -9,6 +9,7 @@
     typical scm status indicators 
   * dumped import options, use explicit command instead
   * simplified delete command
+  * added profile command (replaces dependency to setenv setup)
 * tailing `.git` in git scm url is now optional
 * configuration
   * renamed environment variable `POMMES_HOME` to `POMMES_ROOT`, and it now points to the directory containing 

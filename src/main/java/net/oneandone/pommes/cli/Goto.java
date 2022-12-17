@@ -20,7 +20,6 @@ import net.oneandone.pommes.checkout.Checkout;
 import net.oneandone.pommes.checkout.Nop;
 import net.oneandone.pommes.checkout.Problem;
 import net.oneandone.pommes.database.Project;
-import net.oneandone.setenv.Setenv;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;

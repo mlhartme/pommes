@@ -20,7 +20,8 @@ Technically, Pommes is a command line tool that maintains a database with projec
 * index repositories (e.g. github or github) to fill it's database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) checkouts for all projects that match a query.
-  
+It uses `git` command-line tool for git all operations.
+
 Pommes detects addition metadata for Maven projects with a pom.xml file and php projects with a composer.json file. 
 
 The name Pommes stands for "many poms", "project mess", or a german word for french fries.
