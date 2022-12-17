@@ -72,9 +72,6 @@ public class Setup {
         new Index(environment, new ArrayList<>()).run();
         console.info.println("done");
         console.info.println("Edit " + directory.join("config") + " to adjust Pommes configuration.");
-        if (!AutoCd.create().isConfigured()) {
-            console.info.println("To complete the setup, please add the following to your bash initialization:");
-            console.info.println(AutoCd.get().setenvBash());
-        }
+        console.info.println("Consider running 'pommes profile' to setup auto-cd");
     }
 }

@@ -15,11 +15,8 @@
  */
 package net.oneandone.pommes.cli;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,31 +70,6 @@ public class AutoCd implements Runnable {
 
     public boolean isConfigured() {
         return dest != null;
-    }
-
-    public String setenvBash() {
-        byte[] buffer = new byte[2];
-        InputStream src;
-        ByteArrayOutputStream bytes;
-        int count;
-
-        src = getClass().getResourceAsStream("/setenv.bash");
-        bytes = new ByteArrayOutputStream();
-        while (true) {
-            try {
-                count = src.read(buffer);
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-            if (count == -1) {
-                try {
-                    return new String(bytes.toByteArray(), "UTF8");
-                } catch (UnsupportedEncodingException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-            bytes.write(buffer, 0, count);
-        }
     }
 
     public void cd(String path) {
