@@ -11,6 +11,7 @@ if [ -z "${POMMES_AUTO_CD}" ] ; then
     done
   }
   PROMPT_COMMAND=doPommes
+  alias pg='pommes goto'
 # else
 #   already initialized, nothing to do
 fi

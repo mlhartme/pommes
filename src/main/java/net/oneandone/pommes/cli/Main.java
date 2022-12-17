@@ -89,7 +89,6 @@ public class Main {
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);
           cli.add(Setup.class, "setup -batch nameEqUrl*");
-          cli.add(Profile.class, "profile shell?");
           cli.begin(Environment.class);
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove root?=.");

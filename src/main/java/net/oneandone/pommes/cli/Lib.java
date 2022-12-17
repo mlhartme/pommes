@@ -49,6 +49,7 @@ public class Lib {
         console.info.println("creating " + lib);
         lib.mkdir();
         lib.join("logs").mkdir();
+        world.resource("profiles").copyDirectory(lib.join("profiles").mkdir());
         configFile(lib).writeLines(Properties.defaultConfig(repositories));
         return new Lib(lib);
     }

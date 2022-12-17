@@ -61,17 +61,20 @@ public class Setup {
         // TODO: duplicate file names ...
         directory = Lib.directory(world);
         if (!batch) {
-            console.info.println("Ready to setup Pommes for this directory: " + directory.getAbsolute());
-            console.info.println("Nothing outside this directory is touched; to revert setup, simply remove "
-                    + directory.join(".pommes"));
+            console.info.println("Ready to create " + directory.getAbsolute());
+            console.info.println("(To revert setup, you can simply remove this directory)");
             console.readline("Press return to continue, ctl-c to abort: ");
         }
         Lib lib = Lib.create(world, console, repositories);
         environment = new Environment(console, world);
-        console.info.println("initial scan ...");
+        console.info.println("initial indexing ...");
         new Index(environment, new ArrayList<>()).run();
-        console.info.println("done");
-        console.info.println("Edit " + directory.join("config") + " to adjust Pommes configuration.");
-        console.info.println("Consider running 'pommes profile' to setup auto-cd");
+        console.info.println("indexing done");
+        console.info.println();
+        console.info.println("To complete setup, source the appropriate profile in your shell initialization");
+        console.info.println("For zsh, that looks something like this:");
+        console.info.println("   echo \"source '" + directory.join("profiles/zsh.rc").getAbsolute() + "'\" >> ~/.zprofile");
+        console.info.println("   source ~/.zprofile # or restart terminal");
+        console.info.println("You might also want to adjust " + directory.join("config"));
     }
 }

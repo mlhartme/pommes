@@ -10,6 +10,7 @@ if [ -z "${POMMES_AUTO_CD}" ] ; then
   }
   autoload -Uz add-zsh-hook
   add-zsh-hook precmd pommes_precmd
+  alias pg='pommes goto'
 
 # else
 #   already initialized, nothing to do
