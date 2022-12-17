@@ -1,8 +1,8 @@
-if [ -z "${POMMES_CD}" ] ; then
-  export POMMES_CD=/tmp/pommes-$$
+if [ -z "${POMMES_AUTO_CD}" ] ; then
+  export POMMES_AUTO_CD=/tmp/pommes-$$
   pommes_precmd() {
     # wrap in eval to avoid bash syntax error
-    eval "files=(${POMMES_CD}-*(N))"
+    eval "files=(${POMMES_AUTO_CD}-*(N))"
     for file in ${files}; do
       cd $(cat $file)
       rm ${file}

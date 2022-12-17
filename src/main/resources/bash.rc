@@ -1,9 +1,9 @@
-if [ -z "${POMMES_CD}" ] ; then
+if [ -z "${POMMES_AUTO_CD}" ] ; then
   export POMMES_OLD_PROMPT_COMMAND=$PROMPT_COMMAND
 
   doPommes() {
     eval "$POMMES_OLD_PROMPT_COMMAND"
-    for file in ${POMMES_CD}-*; do
+    for file in ${POMMES_AUTO_CD}-*; do
         if [ -f "${file}" ] ; then
             cd $(cat $file)
             rm ${file}
