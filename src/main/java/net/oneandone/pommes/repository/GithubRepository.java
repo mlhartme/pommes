@@ -138,6 +138,27 @@ public class GithubRepository extends Repository {
 
     @Override
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
+        if (groupsOrUsers.isEmpty()) {
+            throw new IOException("cannot collect all repos ...");
+        } else {
+            for (String groupOrUser : groupsOrUsers) {
+                for (GithubRepo repo : listOrganizationOrUserRepos(groupOrUser)) {
+                    scan(repo, dest, console);
+                }
+            }
+        }
+    }
+
+    private void scan(GithubRepo repo, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
+        try {
+            var descriptor = scanOpt(repo);
+            if (descriptor != null) {
+                dest.put(descriptor);
+            }
+        } catch (IOException e) {
+            console.error.println("cannot load " + repo.full_name + " (id=" + repo.id + "): " + e.getMessage());
+            e.printStackTrace(console.verbose);
+        }
     }
 
     public HttpNode fileNode(GithubRepo repo, String path) {
