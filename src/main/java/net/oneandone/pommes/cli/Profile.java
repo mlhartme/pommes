@@ -35,9 +35,19 @@ public class Profile {
     public void run() throws Exception {
         String str;
 
+        if (shell == null || shell.isEmpty()) {
+            console.info.println("Generates shell code to configure auto-cd for pommes.");
+            console.info.println("Typical zsh setup looks like this:");
+            console.info.println("   pommes profile zsh >> ~/.zprofile");
+            console.info.println("   source ~/.zsh # or restart terminal");
+        }
         try {
+            console.info.println("## start pommes profile");
             str = world.resource(shell + ".rc").readString();
             console.info.println(str);
+            console.info.println("# option: un-comment this for more convenience");
+            console.info.println("# alias pg='pommes goto'");
+            console.info.println("## end pommes profile");
         } catch (IOException e) {
             console.info.println("shell not found: " + shell);
             e.printStackTrace(console.verbose);
