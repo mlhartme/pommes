@@ -9,7 +9,7 @@
     typical scm status indicators 
   * dumped import options, use explicit command instead
   * simplified delete command
-  * added profile command (replaces dependency to setenv setup)
+  * added profile command (replaces dependency to autoCd setup)
 * tailing `.git` in git scm url is now optional
 * configuration
   * renamed environment variable `POMMES_HOME` to `POMMES_ROOT`, and it now points to the directory containing 
@@ -69,7 +69,7 @@
   * lucene 6.3.0 to 7.2.1
   * svnkit 1.8.12 to 1.9.0
   * sushi 3.1.3 to 3.1.6
-  * setenv 1.0.0 to 1.0.2
+  * autoCd 1.0.0 to 1.0.2
   * inline 1.1.0 to 1.1.1
  
  
@@ -106,7 +106,7 @@
 * Improved mount and goto: common actions are merged.
 * Improved mount and goto output: print the scm url, not the artifact id.
 * Fixed checkout conflict message, it no longer depends on pom.scm.
-* Replaced .pommes.goto by setenv module. 
+* Replaced .pommes.goto by autoCd module. 
 * Fix npe for checkout actions on a directory without project.
 
 

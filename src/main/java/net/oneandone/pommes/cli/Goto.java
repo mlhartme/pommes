@@ -39,7 +39,7 @@ public class Goto extends Base {
 
     @Override
     public void run(Scope scope) throws Exception {
-        Setenv setenv;
+        AutoCd autoCd;
         List<Action> actions;
         Action action;
 
@@ -48,9 +48,9 @@ public class Goto extends Base {
         if (action == null) {
             throw new IOException("nothing selected");
         }
-        setenv = Setenv.get();
-        if (setenv.isConfigured()) {
-            setenv.cd(action.directory.getAbsolute());
+        autoCd = AutoCd.get();
+        if (autoCd.isConfigured()) {
+            autoCd.cd(action.directory.getAbsolute());
         } else {
             console.info.println("cd " + action.directory.getAbsolute());
         }

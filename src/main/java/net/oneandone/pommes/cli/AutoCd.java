@@ -27,22 +27,22 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Setenv implements Runnable {
-    private static Setenv lazySetenv;
+public class AutoCd implements Runnable {
+    private static AutoCd lazyAutoCd;
 
-    public static Setenv get() {
-        if (lazySetenv == null) {
-            lazySetenv = create();
+    public static AutoCd get() {
+        if (lazyAutoCd == null) {
+            lazyAutoCd = create();
         }
-        return lazySetenv;
+        return lazyAutoCd;
     }
 
-    public static Setenv create() {
+    public static AutoCd create() {
         String str;
-        Setenv result;
+        AutoCd result;
 
-        str = System.getenv("SETENV_BASE");
-        result = new Setenv(new PrintWriter(System.out, true), str == null ? null : Paths.get(str + "-" + pid()));
+        str = System.getenv("POMMES_AUTO_CD");
+        result = new AutoCd(new PrintWriter(System.out, true), str == null ? null : Paths.get(str + "-" + pid()));
         Runtime.getRuntime().addShutdownHook(new Thread(result));
         return result;
     }
@@ -65,7 +65,7 @@ public class Setenv implements Runnable {
     private final Path dest;
     private List<String> lines;
 
-    public Setenv(PrintWriter messages, Path dest) {
+    public AutoCd(PrintWriter messages, Path dest) {
         this.messages = messages;
         this.dest = dest;
         this.lines = new ArrayList<>();
@@ -101,11 +101,7 @@ public class Setenv implements Runnable {
     }
 
     public void cd(String path) {
-        line("cd " + escape(path));
-    }
-
-    public void set(String key, String value) {
-        line("export " + key + "=" + escape(value) + "\n");
+        line(escape(path));
     }
 
     public static String escape(String str) {
