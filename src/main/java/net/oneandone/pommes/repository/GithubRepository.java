@@ -46,7 +46,7 @@ public class GithubRepository extends Repository {
 
     public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws IOException {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(PROTOCOL));
+            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(repository, PROTOCOL));
         } else {
             return null;
         }

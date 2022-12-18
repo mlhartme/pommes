@@ -73,8 +73,9 @@ public class Lib {
         this.properties = Properties.load(configFile(home));
     }
 
-    public String tokenOpt(String protocol) throws IOException {
-        var file = home.join("." + Strings.removeRight(protocol.toLowerCase(), ":"));
+    public String tokenOpt(String repositoryName, String protocol) throws IOException {
+        var file = home.join(Strings.removeRight(protocol.toLowerCase(), ":")
+                + "-" + repositoryName + ".token");
         return file.exists() ? file.readString().trim() : null;
     }
 
