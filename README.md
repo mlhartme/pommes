@@ -57,18 +57,22 @@ Install the application
 ## Managing the Database
 
 Pommes maintains a [Lucene](http://lucene.apache.org) database to store project metadata. The database is filled
-by indexing so-called repositories.
+by indexing so-called repositories. The database is stored in `$POMMES_ROOT/.pommes/database`, it's save to delete this
+directory to wipe the database.
 
-`.pommes/config` defines the list of repositories, each is specified by name, url and possibly options.
+`.pommes/config` defines databases in the form *repository.<name> = <url> {<option>}*
+* name is an arbitrary name
+* url is the primary definition of the repository, the protocol distinishes the repository type
+  * github:<url-of-github-api>
+  * gitlab:<url-of-gitlab-server>
+  * json:<url-pointing-to-json-file>
+  * file:///path-to-local-directory-with checkouts
+* options depend on the repository type
 
-Available url protocols:
-* github
-* gitlab
-
-Example configuration
+Example urls
 
        repository.mlhartme=github:https://api.github.com %~mlhartme
-       repository.work=gitlab:https://gitlab.company.com 
+       repository.company=gitlab:https://gitlab.company.com 
 
 ## Find Command
 
@@ -109,8 +113,8 @@ TODO: Prefix, suffix, macros; formats
 ## Checkout commands
 
 Checkout commands (`checkout`, `goto` and `ls`) manage checkouts on your disk, e.g. run scm operations on projects that 
-match a query. Pommes supports Subversion and Git scms. The root directory for all checkouts is specified by the `checkouts` property
-in $POMMES_HOME/pommes.properties.
+match a query. Pommes supports Subversion and Git scms. The root directory for all checkouts is the directory containing
+`.pommes`.
 
 
 ### Checkout
@@ -123,36 +127,27 @@ Before changing anything on your disk, `checkout` presents a selection of the ch
 If a checkout already exists on your disk, it is not touched. This is useful to checkout newly created projects by just re-running your 
 checkout command.
 
-### Remove
 
-The `remove` command is equivalent to removing checkouts with `rm -rf`, but it also checks for uncommitted changes. Similar to 
-the `checkout` command, it asks before changing anything on your disk.
+### Goto
 
-`remove` has a `-stale` option to remove only checkouts that have been removed from the database. For example, if you have 
-all trunks checked out, you can run `pommes remove -stale` to remove checkouts that are no longer used.
+`pommes goto sushi`
+
+searches the database for `sushi`, offers a selection of matching projects, checks it out if necessary,
+and cds into the resulting directory.
 
 
 ### List
 
 `pommes ls` lists all checkouts in the current directory, together with a status marker similar to `git status`. 
-If a checkout is not in your database, `st` flags it with `?` and prints the command you can run to get it into your database.
 
 
-### Goto
-
-`pommes goto puc`
-
-searches the database for `puc`, offers a selection of matching projects, checks it out if necessary and cds into the resulting directory.
-
-## Glossary
+## Glossary for reading the source code
 
 Descriptor: references a project, various implementation to load Maven, Json, etc
 
 Project: holds project metadata: gav, parent, dependencies, scm, url
 
 Repository: can be scanned for descriptors
-
-Seeds: list of names urls, each url defining a repository.
 
 Database: stores projects (in Lucene)
 
