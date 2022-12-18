@@ -3,7 +3,7 @@
 # Pommes
 
 Pommes is a project checkout manager and database tool, you can use it search for projects and keep their checkouts 
-on your disk organized. Here's an example:
+organized on your disk. Here's an example:
     
     ~/Projects $ pommes goto lavender
     [1]   Projects/svn.1and1.org/sales/tools/lavender
