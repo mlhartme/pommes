@@ -21,6 +21,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,6 +61,9 @@ public class Setup {
 
         // TODO: duplicate file names ...
         directory = Lib.directory(world);
+        if (directory.exists())  {
+            throw new IOException("pommes is already set up: " + directory);
+        }
         if (!batch) {
             console.info.println("Ready to create " + directory.getAbsolute());
             console.info.println("(To revert setup, you can simply remove this directory)");
