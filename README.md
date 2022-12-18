@@ -2,8 +2,8 @@
 
 # Pommes
 
-Pommes is a project checkout manager and database tool, you can use it to keep the checkouts on your disk organized.
-Here's an example:
+Pommes is a project checkout manager and database tool, you can use it search for projects and keep their checkouts 
+on your disk organized. Here's an example:
     
     ~/Projects $ pommes goto lavender
     [1]   Projects/svn.1and1.org/sales/tools/lavender
@@ -12,31 +12,27 @@ Here's an example:
     [/Projects/github.com/net/oneandone] git clone ssh://git@github.com/mlhartme/lavender.git lavender
     ~/Projects/github.com/net/oneandone/lavender $ 
 
-This searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would simply cd into the
-already existing checkout, choosing `2` also creates the checkout. Another use case: if you keep all release of your project in
-a database, you can search when a given dependency as used.
+This command searches the database for `lavender` projects and lets you choose between the hits. Selecting `1` would 
+simply cd into the already existing checkout, choosing `2` also creates the checkout. 
 
 Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
-* index repositories (e.g. github or github) to fill it's database
+* index repositories (e.g. github or github) to populate the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) checkouts for all projects that match a query.
-It uses `git` command-line tool for git all operations.
 
-Pommes detects addition metadata for Maven projects with a pom.xml file and php projects with a composer.json file. 
+Pommes detects addition metadata for Maven projects with a `pom.xml` file and php projects with a `composer.json` file. 
 
 The name Pommes stands for "many poms", "project mess", or a german word for french fries.
 
 
-[Changes](https://github.com/mlhartme/pommes/blob/master/CHANGELOG.md)
-
-
 ## See also
 
-https://github.com/gabrie30/ghorg
+[Changes](https://github.com/mlhartme/pommes/blob/master/CHANGELOG.md)
 
-https://github.com/x-motemen/ghq
-
-https://github.com/mthmulders/mcs
+Alternative tools
+* https://github.com/gabrie30/ghorg
+* https://github.com/x-motemen/ghq
+* https://github.com/mthmulders/mcs
 
 
 ## Setup
@@ -44,19 +40,19 @@ https://github.com/mthmulders/mcs
 Prerequisites
 * Linux or Mac
 * Java 17 or higher
+* `git`
 
 Install the application
-* download the [latest](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22net.oneandone%22%20AND%20a%3A%22pommes%22)  `application.sh` file 
-and store it as executable `pommes` file in your path
+* open https://repo1.maven.org/maven2/net/oneandone/pommes/, choose the latest version and download the  `pommes-x.y.z-application.sh` file,
+  store it as executable `pommes` file in your path
 
         cd some-directory-in-your-path
         curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.4.0/pommes-3.4.0-application.sh -o pommes
         chmod a+x pommes
     
 * run `pommes setup` and follow the instructions. Basically, the command creates a directory `~/Projects/.pommes` containing
-  a `config` configuration file and a database. If create `.pommes` in a different directory, define an environment variable
-  `POMMES_ROOT` pointing to it before you run setup.
-
+  a `config` file and a database. (To create `.pommes` in a different directory, define an environment variable
+  `POMMES_ROOT` pointing to that directory before runing setup.)
 
 ## Managing the Database
 
