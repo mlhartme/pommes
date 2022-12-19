@@ -39,8 +39,9 @@ Alternative tools
 
 Prerequisites
 * Linux or Mac
+* Git
 * Java 17 or higher
-* `git`
+* Maven 3.6 or higher
 
 Install the application
 * open https://repo1.maven.org/maven2/net/oneandone/pommes/, choose the latest version and download the  `pommes-x.y.z-application.sh` file,
