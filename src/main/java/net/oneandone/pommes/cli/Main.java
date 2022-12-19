@@ -59,7 +59,7 @@ public class Main {
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with modifications are marked in the list\n" */
                 + "  'index' {repo}        re-index the specified (default: all) repositories.\n"
-                + "  'setup' ['-batch] {name'='value'}\n"
+                + "  'setup' ['-batch'] {name'='value}\n"
                 + "                        creates '.pommes' directory with initial configuration containing name/values as repositories; \n"
                 + "                        indexes all repositories to create intial database;\n"
                 + "                        '.pommes' is created in the directory specified by $POMMES_ROOT, default is ~/" + Lib.DEFAULT_ROOT + ".\n"

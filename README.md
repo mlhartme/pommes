@@ -155,77 +155,60 @@ Database: stores projects (in Lucene)
 
 ## Usage Message
 
-    Project checkout manager and database tool.
+Project checkout manager and database tool.
 
-    Usage:
-      'pommes' ['-v'|'-e'] command scan-options args*
+Usage:
+  'pommes' ['-v'|'-e'] command args*
 
-    search commands
-      'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)?
-                            print projects matching this query;
-                            append '-json' to print json, '-dump' to print json without formatting;
-                            format is a string with placeholders: %c is replace be the current checkout
-                            and %FIELD_ID is replaced by the respective field;
-                            place holders can be followed by angle brackets to filter for
-                            the enclosed substring or variables;
-                            output is a file or URL to write results to, default is the console.
+commands
+  'find' ('-output' str)? '-fold'? query ('-' format* | '-json' | '-dump' | '-'MACRO)? 
+                        print projects matching this query;
+                        append '-json' to print json, '-dump' to print json without formatting;
+                        format is a string with placeholders: %c is replace be the current checkout
+                        and %FIELD_ID is replaced by the respective field;
+                        placeholders can be followed by angle brackets to filter for
+                        the enclosed substring or variables;
+                        output is a file or URL to write results to, default is the console.
+  'checkout' query      checkout matching projects; skips existing checkouts;
+                        asks before doing any checkout
+  'goto' query          offer selection of matching projects, checks it out when necessary,
+                        and cds into the checkout directory
+  'ls' root?            lists all checkouts under the specified directory (default '.') along with a status:
+                        ' ' - checkout is fine
+                        '?' - checkout is not in database
+                        '!' - checkout in wrong directory
+                        '#' - error checking this checkout
+  'index' {repo}        re-index the specified (default: all) repositories.
+  'setup' ['-batch'] {name'='value}
+                        creates '.pommes' directory with initial configuration containing name/values as repositories; 
+                        indexes all repositories to create intial database;
+                        '.pommes' is created in the directory specified by $POMMES_ROOT, default is ~/Pommes.
 
-    checkout commands
-      'st' root?            print status of all checkouts under the specified directory:
-                            ? - directory is not in database
-                            M - checkout has un-tracked files, modifications or is not pushed
-                            C - checkout url does not match the directory Pommes would place it in
-      'goto' query          offer selection of matching projects, check it out when necessary,
-                            and cds into the checkout directory
-      'checkout' query      checkout matching projects; skips existing checkouts;
-                            offers selection before changing anything on disk
-      'remove' '-stale'? root?
-                            remove (optional: stale) checkouts under the specified root directory;
-                            a checkout is stale if the project has been removed from the database;
-                            offers selection before changing anything on disk;
-                            checkouts with uncommitted changes are marked in the list - example urls:
-                                github:mlhartme
-                                svn:https://svn.yourserver.org/some/path -skip/this/subpath
-    database commands
-      'database-add' '-delete'? '-dryrun'? '-fixscm'? ('-zone' zone)?  url*
-                            add projects found under the specified urls to the database;
-                            zone is a prefix added to the id (defaults is local);
-                            overwrites projects with same id;
-                            url is a svn url, http url, artifactory url, github url or json url,
-                            an option (prefixed with '%') or an exclude (prefixed with '-')
-      'database-remove' query
-                            remove all matching projects
-      'database-scan'       deletes the current database and re-add all seeds.
+fields in the database: (field id is the first letter of the field name.)
+  origin      Where this project was loaded from. Used as unique identifier. <repositoryName>:<path>
+  revision    Last modified timestamp or content hash of this pom. Used to detect changes.
+  parent      Coordinates of the parent project.
+  artifact    Coordinates of this project.
+  dep         Coordinates of project dependencies.
+  scm         Scm location for this project. Where to get the sources.
+  url         Url for this project. Where to read about the project.
 
-    fields in the database: (field id is the first letter of the field name.)
-      id          Unique identifier for this project. Zone + ':' + origin.
-      revision    Last modified timestamp or content hash of this pom.
-      parent      Coordinates of the parent project.
-      artifact    Coordinates of this project.
-      scm         Scm location for this project.
-      dep         Coordinates of project dependencies.
-      url         Url for this project.
+query syntax
+  query     = '@' MACRO | or
+  or        = (and (' ' and)*)? index?
+  index     = NUMBER
+  and       = term ('+' term)*
+  term      = field | lucene
+  field     = '!'? (FIELD_ID* match)? STR ; match on one of the specified fields (or 'ao' if not specified)
+  match     = ':' | '^' | '%' | '='     ; substring, prefix, suffix or string match
+  lucene    = '§' STR                   ; STR in Lucene query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html
+and STR may contain the following variables:
+  {gav}     = coordinates for current project
+  {ga}      = group and artifact of current project
+  {scm}     = scm location for current directory
 
-    scan options            how to handle configured seeds
-      default behaviour     no scanning
-      '-scan-now'           unconditional scan
-      '-scan-daily'         scan if last scan is older than one day
+environment:
+  POMMES_ROOT     directory for manged checkouts and '.pommes'
 
-    query syntax
-      query     = '@' MACRO | or
-      or        = (and (' ' and)*)? index?
-      index     = NUMBER
-      and       = term ('+' term)*
-      term      = field | lucene
-      field     = '!'? (FIELD_ID* match)? STR ; match on one of the specified fields (or 'ao' if not specified)
-      match     = ':' | '^' | '%' | '='     ; substring, prefix, suffix or string match
-      lucene    = '§' STR                   ; STR in Lucene query Syntax: https://lucene.apache.org/core/6_0_1/queryparser/org/apache/lucene/queryparser/classic/QueryParser.html
-    and STR may contain the following variables:
-      {gav}     = coordinates for current project
-      {ga}      = group and artifact of current project
-      {scm}     = scm location for current directory
+Home: https://github.com/mlhartme/pommes
 
-    environment:
-      POMMES_HOME     home directory for Pommes
-
-    Home: https://github.com/mlhartme/pommes
