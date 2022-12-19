@@ -23,6 +23,7 @@
 * updates
   * lucene 7.2.1 to 9.2.0
   * glassfish json 1.0.4 to 1.1.4
+* avoid net.rc loading, because sushi's parser has a problem
 
 
 ### 3.3.0 (2022-06-16)
