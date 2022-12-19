@@ -74,8 +74,8 @@ public class Setup {
         new Index(environment, new ArrayList<>()).run();
         console.info.println("indexing done");
         console.info.println();
-        console.info.println("To complete setup, source the appropriate profile from " + directory.join("profiles"));
-        console.info.println("in your shell initialization. For zsh, that looks something like this:");
+        console.info.println("TODO for YOU: To complete setup, source the appropriate profile from " + directory.join("profiles"));
+        console.info.println("in your shell initialization and restart the shell. For zsh, that looks something like this:");
         console.info.println("   echo \"source '" + directory.join("profiles/zsh.rc").getAbsolute() + "'\" >> ~/.zprofile");
         console.info.println("   source ~/.zprofile # or restart terminal");
         console.info.println("You might also want to adjust " + directory.join("config"));
