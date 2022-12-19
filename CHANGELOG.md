@@ -13,7 +13,7 @@
 * tailing `.git` in git scm url is now optional
 * configuration
   * renamed environment variable `POMMES_HOME` to `POMMES_ROOT`, and it now points to the directory containing 
-    the former POMMES_HOME (i.e `.pommes`)
+    the former POMMES_HOME (i.e `.pommes`); default is 'Pommes'
   * renamed pommes.properties to config
   * property `checkouts` is gone, it's now configured via `POMMES_ROOT`
   * renamed import to repository

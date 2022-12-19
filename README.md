@@ -50,7 +50,7 @@ Install the application
         curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.4.0/pommes-3.4.0-application.sh -o pommes
         chmod a+x pommes
     
-* run `pommes setup` and follow the instructions. Basically, the command creates a directory `~/Projects/.pommes` containing
+* run `pommes setup` and follow the instructions. Basically, the command creates a directory `~/Pommes/.pommes` containing
   a `config` file and a database. (To create `.pommes` in a different directory, define an environment variable
   `POMMES_ROOT` pointing to that directory before runing setup.)
 

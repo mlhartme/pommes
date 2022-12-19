@@ -48,18 +48,20 @@ public class Lib {
         }
         console.info.println("creating " + lib);
         lib.mkdir();
-        lib.join("logs").mkdir();
+        lib.join("logs").mkdirs();
         world.resource("profiles").copyDirectory(lib.join("profiles").mkdir());
         configFile(lib).writeLines(Properties.defaultConfig(repositories));
         return new Lib(lib);
     }
+
+    public static final String DEFAULT_ROOT = "Pommes";
 
     /** @return .pommes directory to use */
     public static FileNode directory(World world) {
         String path;
 
         path = System.getenv("POMMES_ROOT");
-        return (path != null ? world.file(path) : world.getHome().join("Projects")).join(".pommes");
+        return (path != null ? world.file(path) : world.getHome().join(DEFAULT_ROOT)).join(".pommes");
     }
 
     //--

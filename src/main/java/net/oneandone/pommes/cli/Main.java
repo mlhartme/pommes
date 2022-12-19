@@ -60,7 +60,7 @@ public class Main {
                 + "  'setup' ['-batch] {name'='value'}\n"
                 + "                        creates '.pommes' directory with initial configuration containing name/values as repositories; \n"
                 + "                        indexes all repositories to create intial database;\n"
-                + "                        '.pommes' is created in the directory specified by $POMMES_ROOT, default is ~/Projects.\n"
+                + "                        '.pommes' is created in the directory specified by $POMMES_ROOT, default is ~/" + Lib.DEFAULT_ROOT + ".\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
