@@ -21,14 +21,16 @@ import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 
-import java.io.IOException;
-
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         World world;
         Cli cli;
 
-        world = World.create();
+        // CAUTION:
+        // don't use world = World.create() because netRc parsing in sushi has a problem
+        world = World.createMinimal();
+        world.withStandardFilesystems(false);
+
         cli = Cli.create("Project checkout manager and database tool.\n"
                 + "\n"
                 + "Usage:\n"
