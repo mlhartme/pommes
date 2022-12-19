@@ -47,8 +47,8 @@ public class Lib {
             throw new IOException("already set up at " + lib);
         }
         console.info.println("creating " + lib);
-        lib.mkdir();
-        lib.join("logs").mkdirs();
+        lib.mkdirs();
+        lib.join("logs").mkdir();
         world.resource("profiles").copyDirectory(lib.join("profiles").mkdir());
         configFile(lib).writeLines(Properties.defaultConfig(repositories));
         return new Lib(lib);
