@@ -1,6 +1,6 @@
 ## Pommes Changelog
 
-### 3.4.0 (pending)
+### 3.4.0 (2022-12-19)
 
 * commands
   * renamed `database-reset` to `index`; dumped `database-add` and `database-remove`
@@ -23,6 +23,7 @@
 * updates
   * lucene 7.2.1 to 9.2.0
   * glassfish json 1.0.4 to 1.1.4
+  * maven-embedded 3.12.2 to 3.13.0
 * avoid net.rc loading, because sushi's parser has a problem
 
 
