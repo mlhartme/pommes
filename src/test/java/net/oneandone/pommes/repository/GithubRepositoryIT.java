@@ -57,7 +57,7 @@ public class GithubRepositoryIT {
     public void orgOrgRepos() throws IOException {
         var hub = repository();
         var repo = hub.listOrganizationOrUserRepos("1and1");
-        assertTrue(repo.size() == 100);
+        assertTrue(repo.size() > 100);
     }
     @Test
     public void orgUserRepos() throws IOException {
