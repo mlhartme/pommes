@@ -75,6 +75,9 @@ Example urls
        repository.mlhartme=github:https://api.github.com %~mlhartme
        repository.company=gitlab:https://gitlab.company.com 
 
+You can configure access token for github and gitlab by storing them in a file $POMMES_ROOT/.pommes/<reponame>-<protocol>.token.
+For example, a token in file $POMMES_ROOT/.pommes/github-mlhartme.token will be used to index the above mlhartme repository.
+
 ## Find Command
 
 Pommes stores the following fields for every project added to the database:
