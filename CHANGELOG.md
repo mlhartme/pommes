@@ -1,5 +1,9 @@
 ## Pommes Changelog
 
+### 3.4.1 (pending)
+
+* update jackson-databind
+
 ### 3.4.0 (2022-12-19)
 
 * commands
