@@ -59,7 +59,15 @@ public class Ls extends Base {
         id = 0;
         for (Map.Entry<FileNode, Scm> entry : checkouts.entrySet()) {
             found = entry.getKey();
-            step = Step.create(environment, scope.getDatabase(), found, entry.getValue());
+            try {
+                step = Step.create(environment, scope.getDatabase(), found, entry.getValue());
+            } catch (IOException e) {
+                console.error.println("E " + e.getMessage());
+                if (console.getVerbose()) {
+                    e.printStackTrace(console.error);
+                }
+                continue;
+            }
             if (step.isNoop()) {
                 console.info.println(step);
             } else {

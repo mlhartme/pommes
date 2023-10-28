@@ -2,7 +2,9 @@
 
 ### 3.4.1 (pending)
 
+* ls: do not abort on pom loading errors, just report them
 * update jackson-databind
+
 
 ### 3.4.0 (2022-12-19)
 
