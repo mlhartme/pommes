@@ -2,6 +2,8 @@
 
 ### 3.5.0 (pending)
 
+* build
+  * update application plugin 1.7.0 to 1.8.0
 * update maven-embedded 3.13 to maven-summon 4
 * ls:
   * renamed it to `st`
