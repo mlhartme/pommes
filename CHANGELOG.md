@@ -3,6 +3,7 @@
 ### 3.5.0 (pending)
 
 * build
+  * update parent 1.6.1 to 1.6.3
   * update application plugin 1.7.0 to 1.8.0
 * update maven-embedded 3.13 to maven-summon 4
 * ls:
