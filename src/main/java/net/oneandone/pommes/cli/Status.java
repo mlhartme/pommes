@@ -35,10 +35,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Ls extends Base {
+public class Status extends Base {
     private final FileNode directory;
 
-    public Ls(Environment environment, FileNode directory) {
+    public Status(Environment environment, FileNode directory) {
         super(environment);
         this.directory = directory;
     }
@@ -62,11 +62,10 @@ public class Ls extends Base {
             try {
                 step = Step.create(environment, scope.getDatabase(), found, entry.getValue());
             } catch (IOException e) {
-                console.error.println("E " + e.getMessage());
+                step = new Step("#", e.getMessage(), null);
                 if (console.getVerbose()) {
                     e.printStackTrace(console.error);
                 }
-                continue;
             }
             if (step.isNoop()) {
                 console.info.println(step);

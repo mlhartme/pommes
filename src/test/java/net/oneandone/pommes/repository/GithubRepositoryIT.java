@@ -63,6 +63,6 @@ public class GithubRepositoryIT {
     public void orgUserRepos() throws IOException {
         var hub = repository();
         var repo = hub.listOrganizationOrUserRepos("~mlhartme");
-        assertEquals(25, repo.size());
+        assertEquals(26, repo.size());
     }
 }

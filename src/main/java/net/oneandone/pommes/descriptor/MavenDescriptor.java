@@ -60,7 +60,7 @@ public class MavenDescriptor extends Descriptor {
                 descriptor.copyFile(local);
             }
             try {
-                project = environment.maven().loadPom(local);
+                project = environment.maven().loadPom(local.toPath().toFile());
             } catch (ProjectBuildingException e) {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }

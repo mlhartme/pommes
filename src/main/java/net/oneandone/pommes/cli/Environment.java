@@ -16,7 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.Console;
-import net.oneandone.maven.embedded.Maven;
+import net.oneandone.maven.summon.api.Maven;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -71,7 +71,7 @@ public class Environment implements Variables {
 
     public Maven maven() throws IOException {
         if (lazyMaven == null) {
-            lazyMaven = Maven.withSettings(world);
+            lazyMaven = Maven.create();
         }
         return lazyMaven;
     }

@@ -116,7 +116,7 @@ TODO: Prefix, suffix, macros; formats
 
 ## Checkout commands
 
-Checkout commands (`checkout`, `goto` and `ls`) manage checkouts on your disk, e.g. run scm operations on projects that 
+Checkout commands (`checkout`, `goto` and `st`) manage checkouts on your disk, e.g. run scm operations on projects that 
 match a query. Pommes supports Subversion and Git scms. The root directory for all checkouts is the directory containing
 `.pommes`.
 
@@ -140,9 +140,9 @@ searches the database for `sushi`, offers a selection of matching projects, chec
 and cds into the resulting directory.
 
 
-### List
+### Status
 
-`pommes ls` lists all checkouts in the current directory, together with a status marker similar to `git status`. 
+`pommes st` lists all checkouts in the current directory, together with a status marker similar to `git status`. 
 
 
 ## Glossary for reading the source code
@@ -176,7 +176,7 @@ commands
                         asks before doing any checkout
   'goto' query          offer selection of matching projects, checks it out when necessary,
                         and cds into the checkout directory
-  'ls' root?            lists all checkouts under the specified directory (default '.') along with a status:
+  'st' root?            lists all checkouts under the specified directory (default '.') along with a status:
                         ' ' - checkout is fine
                         '?' - checkout is not in database
                         '!' - checkout in wrong directory

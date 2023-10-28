@@ -18,7 +18,7 @@ package net.oneandone.pommes.search;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.oneandone.maven.embedded.Maven;
+import net.oneandone.maven.summon.api.Maven;
 import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.MavenDescriptor;

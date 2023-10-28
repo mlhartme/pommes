@@ -1,8 +1,11 @@
 ## Pommes Changelog
 
-### 3.4.1 (pending)
+### 3.5.0 (pending)
 
-* ls: do not abort on pom loading errors, just report them
+* update maven-embedded 3.13 to maven-summon 4
+* ls:
+  * renamed it to `st`
+  * do not abort on pom loading errors, just report them
 * update jackson-databind
 
 

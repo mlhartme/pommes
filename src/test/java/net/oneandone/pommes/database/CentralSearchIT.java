@@ -15,7 +15,7 @@
  */
 package net.oneandone.pommes.database;
 
-import net.oneandone.maven.embedded.Maven;
+import net.oneandone.maven.summon.api.Maven;
 import net.oneandone.pommes.search.CentralSearch;
 import net.oneandone.sushi.fs.World;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class CentralSearchIT {
     static {
         try {
             World world = World.create();
-            SEARCH = new CentralSearch(world, Maven.withSettings(world));
+            SEARCH = new CentralSearch(world, Maven.create());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

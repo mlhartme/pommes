@@ -49,7 +49,7 @@ public class Main {
                 + "                        asks before doing any checkout\n"
                 + "  'goto' query          offer selection of matching projects, checks it out when necessary,\n"
                 + "                        and cds into the checkout directory\n"
-                + "  'ls' root?            lists all checkouts under the specified directory (default '.') along with a status:\n"
+                + "  'st' root?            lists all checkouts under the specified directory (default '.') along with a status:\n"
                 + "                        ' ' - checkout is fine\n"
                 + "                        '?' - checkout is not in database\n"
                 + "                        '!' - checkout in wrong directory\n"
@@ -92,7 +92,7 @@ public class Main {
           cli.begin(Environment.class);
             cli.add(Checkout.class, "checkout query*");
             cli.add(Remove.class, "remove root?=.");
-            cli.add(Ls.class, "ls root?=.");
+            cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto -x=false query*");
             cli.add(Index.class, "index repo*");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
