@@ -22,7 +22,6 @@ import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Git extends Scm {
@@ -40,44 +39,9 @@ public class Git extends Scm {
     }
 
     public String path(String url) throws URISyntaxException {
-        String result;
-        int idx;
-        URI obj;
-
         url = Strings.removeLeft(url, PROTOCOL);
-        idx = url.indexOf("://");
-        if (idx != -1) {
-            idx += 3;
-        } else {
-            idx = url.indexOf('@');
-            if (idx != -1) {
-                idx++;
-            }
-        }
-        if (idx != -1) {
-            url = url.substring(idx);
-            idx = url.indexOf(':');
-            if (idx != -1) {
-                return url.substring(0, idx) + "/" + Strings.removeRightOpt(url.substring(idx + 1), ".git");
-            }
-            idx = url.indexOf('@');
-            if (idx != -1) {
-                url = url.substring(idx + 1);
-            }
-            idx = url.indexOf('/');
-            if (idx == -1) {
-                throw new IllegalStateException(url);
-            }
-            return Strings.removeRightOpt(url, ".git");
-        } else {
-            obj = new URI(url);
-            result = obj.getHost();
-            if (result == null) {
-                throw new IllegalStateException(url);
-            }
-            result = result + obj.getPath();
-            return result;
-        }
+        GitUrl gu = GitUrl.create(url);
+        return gu.getHost() + "/" + gu.getPath();
     }
 
     @Override
@@ -90,22 +54,6 @@ public class Git extends Scm {
             // TODO return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
-        }
-    }
-
-    private static String explicitSshProtocol(String url) {
-        int idx;
-
-        idx = url.indexOf("://");
-        if (idx < 0) {
-            // turn scp-like syntax into explicit ssh syntax -- see https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols
-            idx = url.indexOf(':');
-            if (idx < 0) {
-                throw new IllegalStateException(url);
-            }
-            return "ssh://" + url.substring(0, idx) + "/" + url.substring(idx + 1);
-        } else {
-            return url;
         }
     }
 

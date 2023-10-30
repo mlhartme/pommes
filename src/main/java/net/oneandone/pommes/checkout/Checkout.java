@@ -17,12 +17,13 @@ package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.Git;
+import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
-import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 
@@ -56,7 +57,11 @@ public class Checkout extends Action {
     }
 
     private static String normalize(String url) {
-        return Strings.removeRightOpt(url, "/");
+        if (url.startsWith(Git.PROTOCOL)) {
+            return GitUrl.create(url.substring(Git.PROTOCOL.length())).withSsh(false).url();
+        } else {
+            return url;
+        }
     }
 
     private final Scm scm;
@@ -83,10 +88,7 @@ public class Checkout extends Action {
     }
 
     public boolean equals(Object obj) {
-        Checkout c;
-
-        if (obj instanceof Checkout) {
-            c = (Checkout) obj;
+        if (obj instanceof Checkout c) {
             return scm.equals(c.scm) && url.equals(c.url);
         }
         return false;
