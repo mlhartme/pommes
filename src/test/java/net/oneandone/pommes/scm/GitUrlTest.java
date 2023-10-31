@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class GitUrlTest {
     @Test
@@ -15,7 +16,15 @@ public class GitUrlTest {
 
         // ssh protocol
         assertEquals("ssh://git@github.com/mlhartme/maven-active-markdown-plugin", GitUrl.create("ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git").url());
-        // TODO: assertEquals("github.com/jkschoen/jsma", GitUrl.create("git@github.com:jkschoen/jsma.git"));
+
+        // scp like
+        assertEquals("ssh://git@github.com/jkschoen/jsma", GitUrl.create("git@github.com:jkschoen/jsma.git").url());
+        try {
+            GitUrl.create("github.com:jkschoen/jsma.git").url();
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("git user expected"));
+        };
 
         // TODO
         // assertEquals("github.com/tcurdt/jdeb", GitUrl.create("git://github.com:tcurdt/jdeb.git"));

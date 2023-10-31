@@ -6,16 +6,46 @@ import java.net.URI;
 
 /**
  * Normalized git url.
- * Supports https and ssh schemes from https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols.
+ * Supports https and ssh schemes from https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols,
+ * including scp-like syntax.
  * See https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories
  */
 public class GitUrl {
     public static GitUrl create(String str) {
-        URI uri = URI.create(str);
+        if (str.contains("://")) {
+            return regular(str);
+        } else {
+            return scplike(str);
+        }
+    }
+
+    private static GitUrl scplike(String str) {
+        int idx;
+        URI uri;
+        String path;
+
+        idx = str.indexOf(':');
+        if (idx < 1) {
+            throw new IllegalArgumentException("invalid scp-like url: " + str);
+        }
+        uri = URI.create("ssh://" + str.substring(0, idx));
+        if (!"git".equals(uri.getUserInfo())) {
+            throw new IllegalArgumentException("git user expected in scp-like url: " + str);
+        }
+        path = str.substring(idx + 1);
+        if (path.startsWith("/")) {
+            throw new IllegalArgumentException("absolute path in scp-like url: " + str);
+        }
+        return new GitUrl(true, uri.getHost(), normalzeTail(path));
+    }
+
+    private static GitUrl regular(String str) {
+        URI uri;
         String sshUser;
         String scheme;
         String path;
 
+        uri = URI.create(str);
         scheme = uri.getScheme().toLowerCase();
         sshUser = uri.getUserInfo();
         if (sshUser == null) {
@@ -31,7 +61,7 @@ public class GitUrl {
             }
         }
         if (uri.getFragment() != null) {
-            throw new IllegalStateException("unexpected fragment: "  + str);
+            throw new IllegalStateException("unexpected fragment: " + str);
         }
         if (uri.getPort() != -1) {
             throw new IllegalStateException("unexecpted port: " + str);
@@ -41,12 +71,17 @@ public class GitUrl {
             throw new IllegalArgumentException("absolute path expected: " + str);
         }
         path = path.substring(1);
+        path = normalzeTail(path);
+        return new GitUrl(sshUser != null, uri.getHost(), path);
+    }
+
+    private static String normalzeTail(String path) {
         path = Strings.removeRightOpt(path, "/");
         path = Strings.removeRightOpt(path, ".git");
         if (path.isEmpty()) {
             throw new IllegalArgumentException("empty path: " + path);
         }
-        return new GitUrl(sshUser != null, uri.getHost(), path);
+        return path;
     }
 
     private final String host;
