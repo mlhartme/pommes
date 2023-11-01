@@ -98,7 +98,7 @@ public class MavenDescriptor extends Descriptor {
             return repositoryScm;
         }
         if (pomScm == null) {
-            throw new IOException("missing scm in pom.xml");
+            throw new IOException("missing scm in pom.xml: " + project.getFile());
         }
         return pomScm;
     }

@@ -64,7 +64,7 @@
     <dependency>
       <groupId>net.oneandone.maven.summon</groupId>
       <artifactId>api</artifactId>
-      <version>4.0.0</version>
+      <version>4.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
