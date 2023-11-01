@@ -28,10 +28,8 @@ import java.net.URISyntaxException;
 
 /** urls are normalized by removing the tailing slash. */
 public class Subversion extends Scm<String> {
-    private static final String PROTOCOL = "svn:";
-
     public Subversion() {
-        super(PROTOCOL);
+        super("svn:");
     }
 
     public boolean isCheckout(FileNode directory) {
@@ -55,7 +53,7 @@ public class Subversion extends Scm<String> {
         String path;
         int idx;
 
-        obj = new URI(Strings.removeLeft(Strings.removeRightOpt(url, "/"), PROTOCOL));
+        obj = new URI(Strings.removeLeft(Strings.removeRightOpt(url, "/"), protocol()));
         path = obj.getPath();
         path = Strings.removeLeftOpt(path, "/svn");
         if (path.endsWith(trunk)) {
@@ -79,7 +77,7 @@ public class Subversion extends Scm<String> {
         String groupId;
         String artifactId;
 
-        path = new URI(Strings.removeLeft(urlstr, PROTOCOL)).getPath();
+        path = new URI(Strings.removeLeft(urlstr, protocol())).getPath();
         path = Strings.removeRightOpt(path, "/");
         path = Strings.removeLeftOpt(path, "/svn");
         path = Strings.removeLeftOpt(path, "/");
@@ -108,14 +106,14 @@ public class Subversion extends Scm<String> {
 
         url = checkout.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
-        return PROTOCOL + Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
+        return protocol() + Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
     }
 
     @Override
     public Launcher checkout(FileNode directory, String fullurl) throws Failure {
         String url;
 
-        url = Strings.removeLeft(fullurl, PROTOCOL);
+        url = Strings.removeLeft(fullurl, protocol());
         return Subversion.svn(directory.getParent(), "co", url, directory.getName());
     }
 
