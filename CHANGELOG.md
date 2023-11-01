@@ -8,7 +8,7 @@
   * update gson 2.9.0 to 2.10.1
   * update application plugin 1.7.0 to 1.8.0
   * update maven-embedded 3.13 to maven-summon 4
-  * update jackson-databind
+  * update jackson-databind 2.13.4 to 2.15.3
 * normalize git urls to avoid conflicting checkout problems
 * ls:
   * renamed it to `st`
