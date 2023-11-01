@@ -103,7 +103,7 @@
     <dependency>
       <groupId>com.github.zeripath</groupId>
       <artifactId>java-gitea-api</artifactId>
-      <version>1.14.0</version>
+      <version>1.18.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

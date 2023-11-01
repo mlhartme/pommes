@@ -10,6 +10,7 @@
   * update maven-embedded 3.13 to maven-summon 4
   * update jackson-databind 2.13.4 to 2.15.3
   * update junit 5.7.1 to 5.10.0
+  * update java-gitea-api 1.14.0 to 1.18.0
 * normalize git urls to avoid conflicting checkout problems
 * ls:
   * renamed it to `st`
