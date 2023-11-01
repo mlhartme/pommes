@@ -11,6 +11,8 @@
   * update jackson-databind 2.13.4 to 2.15.3
   * update junit 5.7.1 to 5.10.0
   * update java-gitea-api 1.14.0 to 1.18.0
+  * update svnkit 1.9.0 to 1.10.11
+  * added logback 1.4.11
 * normalize git urls to avoid conflicting checkout problems
 * ls:
   * renamed it to `st`
