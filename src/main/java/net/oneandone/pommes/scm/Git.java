@@ -24,24 +24,25 @@ import net.oneandone.sushi.util.Strings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class Git extends Scm {
-    public static final String PROTOCOL = "git:";
-
+public class Git extends Scm<GitUrl> {
     public Git() {
+        super("git:");
+    }
+
+    public GitUrl parseUrl(String url) {
+        return GitUrl.create(url);
+    }
+
+    public GitUrl normalize(GitUrl url) {
+        return url.withSsh(false);
+    }
+
+    public String path(GitUrl url) throws URISyntaxException {
+        return url.getHost() + "/" + url.getPath();
     }
 
     public boolean isCheckout(FileNode directory) {
         return directory.join(".git").isDirectory();
-    }
-
-    public boolean isUrl(String url) {
-        return url.startsWith(PROTOCOL);
-    }
-
-    public String path(String url) throws URISyntaxException {
-        url = Strings.removeLeft(url, PROTOCOL);
-        GitUrl gu = GitUrl.create(url);
-        return gu.getHost() + "/" + gu.getPath();
     }
 
     @Override
@@ -50,7 +51,7 @@ public class Git extends Scm {
 
         launcher = git(checkout, "config", "--get", "remote.origin.url");
         try {
-            return PROTOCOL + launcher.exec().trim();
+            return protocol() + launcher.exec().trim();
             // TODO return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
@@ -84,7 +85,7 @@ public class Git extends Scm {
     public Launcher checkout(FileNode directory, String fullurl) {
         String url;
 
-        url = Strings.removeLeft(fullurl, PROTOCOL);
+        url = Strings.removeLeft(fullurl, protocol());
         return git(directory.getParent(), "clone", url, directory.getName());
     }
 

@@ -27,18 +27,25 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /** urls are normalized by removing the tailing slash. */
-public class Subversion extends Scm {
+public class Subversion extends Scm<String> {
     private static final String PROTOCOL = "svn:";
 
     public Subversion() {
+        super(PROTOCOL);
     }
 
     public boolean isCheckout(FileNode directory) {
         return directory.join(".svn").isDirectory();
     }
 
-    public boolean isUrl(String url) {
-        return url.startsWith(PROTOCOL);
+    @Override
+    public String normalize(String url) {
+        return url;
+    }
+
+    @Override
+    public String parseUrl(String url) {
+        return url;
     }
 
     public String path(String url) throws URISyntaxException {

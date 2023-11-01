@@ -1,6 +1,5 @@
 package net.oneandone.pommes.scm;
 
-import net.oneandone.pommes.scm.GitUrl;
 import org.junit.jupiter.api.Test;
 
 

@@ -23,7 +23,6 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.pommes.scm.Git;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -183,7 +182,7 @@ public class GithubRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(repo.full_name());
                 result.setRevision(branchRevision(repo, repo.default_branch()));
-                result.setScm(Git.PROTOCOL + repoUrl(repo));
+                result.setScm(Scm.GIT.protocol() + repoUrl(repo));
                 return result;
             }
         }
@@ -198,14 +197,14 @@ public class GithubRepository extends Repository {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {
                 return new Project(name, repo.full_name(), "TODO", null, gav,
-                        Git.PROTOCOL + repoUrl(repo), repo.url);
+                        Scm.GIT.protocol() + repoUrl(repo), repo.url);
             }
         };
         // TODO: kind of duplication ...
         result.setRepository(name);
         result.setPath(repo.full_name());
         result.setRevision("TODO");
-        result.setScm(Git.PROTOCOL + repoUrl(repo));
+        result.setScm(Scm.GIT.protocol() + repoUrl(repo));
         return result;
     }
 

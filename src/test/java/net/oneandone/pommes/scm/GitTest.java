@@ -28,8 +28,8 @@ public class GitTest {
         Git git;
 
         git = new Git();
-        assertEquals("github.com/pustefix-projects/pustefix-framework", git.path("git:https://github.com/pustefix-projects/pustefix-framework.git"));
-        assertEquals("github.com/mlhartme/maven-active-markdown-plugin", git.path("git:ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git"));
+        assertEquals("github.com/pustefix-projects/pustefix-framework", git.path(GitUrl.create("https://github.com/pustefix-projects/pustefix-framework.git")));
+        assertEquals("github.com/mlhartme/maven-active-markdown-plugin", git.path(GitUrl.create("ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git")));
         // TODO
         //    assertEquals("github.com/tcurdt/jdeb", git.path("git:git://github.com:tcurdt/jdeb.git"));
         //    assertEquals("github.com/jkschoen/jsma", git.path("git:git@github.com:jkschoen/jsma.git"));

@@ -19,6 +19,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
@@ -26,6 +27,7 @@ import net.oneandone.sushi.util.Strings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Optional;
 
 /** Represents the .pommes directory */
 public class Lib {
@@ -82,18 +84,18 @@ public class Lib {
     }
 
     public FileNode projectDirectory(Project project) throws IOException {
-        Scm scm;
+        Optional<ScmUrl> scmUrl;
         String path;
 
         if (project.scm == null) {
             throw new IOException(project + ": missing scm");
         }
-        scm = Scm.probeUrl(project.scm);
-        if (scm == null) {
+        scmUrl = Scm.createUrl(project.scm);
+        if (scmUrl.isEmpty()) {
             throw new IOException(project + ": unknown scm: " + project.scm);
         }
         try {
-            path = scm.path(project.scm);
+            path = scmUrl.get().scm().path(scmUrl.get().url());
         } catch (URISyntaxException e) {
             throw new IOException(project.scm + ": invalid scm uri", e);
         }

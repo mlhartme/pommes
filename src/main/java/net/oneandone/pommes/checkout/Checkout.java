@@ -17,19 +17,20 @@ package net.oneandone.pommes.checkout;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Project;
-import net.oneandone.pommes.scm.Git;
-import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.MkdirException;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class Checkout extends Action {
     public static Action createOpt(FileNode directory, Project project) throws IOException {
         Scm scm;
+        Optional<ScmUrl> url;
         String scannedScm;
 
         if (directory.exists()) {
@@ -38,7 +39,8 @@ public class Checkout extends Action {
                 return new Problem(directory, directory + ": cannot detect checkout");
             }
             scannedScm = scm.getUrl(directory);
-            if (normalize(scannedScm).equals(normalize(project.scm))) {
+
+            if (Scm.createUrl(scannedScm).get().same(Scm.createUrl(project.scm).get())) {
                 return null;
             } else {
                 return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedScm);
@@ -47,20 +49,12 @@ public class Checkout extends Action {
             if (project.scm == null) {
                 return new Problem(directory, project.origin() + ": missing scm: " + project.scm);
             }
-            scm = Scm.probeUrl(project.scm);
-            if (scm == null) {
+            url = Scm.createUrl(project.scm);
+            if (url.isEmpty()) {
                 return new Problem(directory, project.origin() + ": unknown scm: " + project.scm);
             } else {
-                return new Checkout(scm, directory, project.scm);
+                return new Checkout(url.get().scm(), directory, project.scm);
             }
-        }
-    }
-
-    private static String normalize(String url) {
-        if (url.startsWith(Git.PROTOCOL)) {
-            return GitUrl.create(url.substring(Git.PROTOCOL.length())).withSsh(false).url();
-        } else {
-            return url;
         }
     }
 

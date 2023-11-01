@@ -29,8 +29,22 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public abstract class Scm {
+public abstract class Scm<U> {
+    private final String protocol;
+
+    protected Scm(String protocol) {
+        if (!protocol.endsWith(":")) {
+            throw new IllegalArgumentException(protocol);
+        }
+        this.protocol = protocol;
+    }
+
+    public String protocol() {
+        return protocol;
+    }
+
     public static final Scm GIT = new Git();
     public static final Scm SUBVERSION = new Subversion();
 
@@ -76,20 +90,23 @@ public abstract class Scm {
         return null;
     }
 
-    public static Scm probeUrl(String url) {
+    public static Optional<ScmUrl> createUrl(String url) {
         for (Scm scm : SCMS) {
-            if (scm.isUrl(url)) {
-                return scm;
+            // TODO: drop?
+            if (url.startsWith(scm.protocol)) {
+                return Optional.of(new ScmUrl(scm, scm.parseUrl(url.substring(scm.protocol.length()))));
             }
         }
-        return null;
+        return Optional.empty();
     }
-
 
     //--
 
-    public abstract boolean isUrl(String url);
-    public abstract String path(String url) throws URISyntaxException;
+    public abstract U parseUrl(String url);
+    public abstract U normalize(U url);
+
+
+    public abstract String path(U url) throws URISyntaxException;
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
