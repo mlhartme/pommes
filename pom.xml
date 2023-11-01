@@ -59,14 +59,7 @@
     <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
       <artifactId>svnkit</artifactId>
-      <version>1.9.0</version>
-      <exclusions>
-        <exclusion>
-          <!-- looks like a bug in svnkit dependencies - they depend on net.java.dev.jna:jna-platform:4.1.0, but don't exclude this: -->
-          <groupId>net.java.dev.jna</groupId>
-          <artifactId>platform</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.10.11</version>
     </dependency>
 
     <dependency>
@@ -130,8 +123,8 @@
           <main>net.oneandone.pommes.cli.Main</main>
           <remove>META-INF/versions/9/module-info.class, module-info.class, META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
           <concat>META-INF/services/org.apache.lucene.codecs.Codec, META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat, META-INF/services/org.apache.lucene.codecs.DocValuesFormat, META-INF/services/org.apache.lucene.analysis.TokenizerFactory</concat>
-          <equal>com/jcraft/jsch/agentproxy/**/*</equal>
-          <overwrite>javax/annotation/**/*</overwrite>
+          <equal>META-INF/AL2.0, META-INF/LGPL2.1, com/jcraft/jsch/agentproxy/**/*</equal>
+          <overwrite>.cache/formatter-maven-cache.properties, javax/annotation/**/*</overwrite>
         </configuration>
         <executions>
           <execution>
