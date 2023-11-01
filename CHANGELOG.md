@@ -4,12 +4,14 @@
 
 * build
   * update parent 1.6.1 to 1.6.3
+  * update lucene 9.2.0 to 9.8.0
   * update application plugin 1.7.0 to 1.8.0
-* update maven-embedded 3.13 to maven-summon 4
+  * update maven-embedded 3.13 to maven-summon 4
+  * update jackson-databind
+* normalize git urls to avoid conflicting checkout problems
 * ls:
   * renamed it to `st`
   * do not abort on pom loading errors, just report them
-* update jackson-databind
 
 
 ### 3.4.0 (2022-12-19)
