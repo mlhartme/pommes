@@ -133,7 +133,7 @@ public class Database implements AutoCloseable {
         }
         search = searcher.search(Field.ORIGIN.query(Match.PREFIX, repository + Field.ORIGIN_DELIMITER), Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
-            document = searcher.getIndexReader().document(scoreDoc.doc);
+            document = searcher.getIndexReader().storedFields().document(scoreDoc.doc);
             result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));
         }
     }
@@ -162,12 +162,12 @@ public class Database implements AutoCloseable {
         return pq.find(searcher);
     }
 
-    public List<Project> projectsByScm(String url) throws IOException {
+    public List<Project> projectsByScm(String scmUrl) throws IOException {
         List<Document> poms;
 
-        // TODO: to normalize subversion urls
-        url = Strings.removeRightOpt(url, "/");
-        poms = query(PommesQuery.parse("s:" + url));
+        // TODO: to normalize urls
+        scmUrl = Strings.removeRightOpt(scmUrl, "/");
+        poms = query(PommesQuery.parse("s:" + scmUrl));
         return poms.stream().map(pom -> Field.project(pom)).toList();
     }
 }

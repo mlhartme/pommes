@@ -293,11 +293,11 @@ public class PommesQuery {
         list = new ArrayList<>();
         if (idx < 0) {
             for (ScoreDoc scoreDoc : search.scoreDocs) {
-                list.add(searcher.getIndexReader().document(scoreDoc.doc));
+                list.add(searcher.getIndexReader().storedFields().document(scoreDoc.doc));
             }
         } else {
             if (idx < search.scoreDocs.length) {
-                list.add(searcher.getIndexReader().document(search.scoreDocs[idx].doc));
+                list.add(searcher.getIndexReader().storedFields().document(search.scoreDocs[idx].doc));
             }
         }
         return list;
