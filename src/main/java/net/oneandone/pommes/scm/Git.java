@@ -46,12 +46,12 @@ public class Git extends Scm<GitUrl> {
     }
 
     @Override
-    public String getUrl(FileNode checkout) throws IOException {
+    public ScmUrl getUrl(FileNode checkout) throws IOException {
         Launcher launcher;
 
         launcher = git(checkout, "config", "--get", "remote.origin.url");
         try {
-            return protocol() + launcher.exec().trim();
+            return new ScmUrl(this, GitUrl.create(launcher.exec().trim()));
             // TODO return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);

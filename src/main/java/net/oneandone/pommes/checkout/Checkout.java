@@ -31,7 +31,7 @@ public class Checkout extends Action {
     public static Action createOpt(FileNode directory, Project project) throws IOException {
         Scm scm;
         Optional<ScmUrl> url;
-        String scannedScm;
+        ScmUrl scannedScm;
 
         if (directory.exists()) {
             scm = Scm.probeCheckout(directory);
@@ -40,7 +40,7 @@ public class Checkout extends Action {
             }
             scannedScm = scm.getUrl(directory);
 
-            if (Scm.createUrl(scannedScm).get().same(Scm.createUrl(project.scm).get())) {
+            if (scannedScm.same(Scm.createUrl(project.scm).get())) {
                 return null;
             } else {
                 return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedScm);

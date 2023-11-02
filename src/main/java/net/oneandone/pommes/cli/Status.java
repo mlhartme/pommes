@@ -21,6 +21,7 @@ import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.repository.NodeRepository;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
 import net.oneandone.sushi.fs.ListException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -163,14 +164,14 @@ public class Status extends Base {
     public static class Step {
         public static Step create(Environment environment, Database database, FileNode found, Scm scm) throws IOException {
             List<Project> foundProjects;
-            String scmUrl;
+            ScmUrl scmUrl;
             Project newPom;
             Descriptor probed;
             FileNode expected;
             Relocation relocation;
 
             scmUrl = scm.getUrl(found);
-            foundProjects = database.projectsByScm(scmUrl);
+            foundProjects = database.projectsByScm(scmUrl.scmUrl());
             if (foundProjects.isEmpty()) {
                 probed = NodeRepository.probe(environment, "unused", found);
                 if (probed == null) {

@@ -111,10 +111,10 @@ public abstract class Scm<U> {
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
-    public abstract String getUrl(FileNode checkout) throws IOException;
+    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
+    public abstract ScmUrl getUrl(FileNode checkout) throws IOException;
 
     public abstract Gav defaultGav(String url) throws Failure, URISyntaxException;
 
-    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
 
 }

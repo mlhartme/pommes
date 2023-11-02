@@ -126,7 +126,7 @@ public class Environment implements Variables {
                     descriptor.setRepository("unused");
                     descriptor.setPath(child.getPath());
                     descriptor.setRevision(child.sha());
-                    descriptor.setScm(scm.getUrl(directory));
+                    descriptor.setScm(scm.getUrl(directory).scmUrl());
                     return descriptor.load(this);
                 }
             }

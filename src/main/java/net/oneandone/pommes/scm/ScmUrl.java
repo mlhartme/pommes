@@ -7,4 +7,7 @@ public record ScmUrl(Scm scm, Object url) {
         }
         return false;
     }
+    public String scmUrl() {
+        return scm.protocol() + url.toString();
+    }
 }

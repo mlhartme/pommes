@@ -126,4 +126,8 @@ public class GitUrl {
     public String url() {
         return (ssh ? "ssh://git@" : "https://") + host + "/" + path;
     }
+
+    public String toString() {
+        return url();
+    }
 }

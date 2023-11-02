@@ -223,7 +223,7 @@ public class NodeRepository extends Repository {
             if (scm == null) {
                 return null;
             } else {
-                return scm.getUrl(fileNode);
+                return scm.getUrl(fileNode).scmUrl();
             }
         } else {
             return null;

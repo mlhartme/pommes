@@ -100,13 +100,13 @@ public class Subversion extends Scm<String> {
     }
 
     @Override
-    public String getUrl(FileNode checkout) throws Failure {
+    public ScmUrl getUrl(FileNode checkout) throws Failure {
         String url;
         int idx;
 
         url = checkout.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
-        return protocol() + Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/");
+        return new ScmUrl(this, Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/"));
     }
 
     @Override
