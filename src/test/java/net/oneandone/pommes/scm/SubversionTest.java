@@ -25,12 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SubversionTest {
     @Test
     public void path() throws URISyntaxException {
-        Subversion svn;
-
-        svn = new Subversion();
-        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.directory("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk"));
-        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", svn.directory("svn:https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk/"));
-        assertEquals("svn.1and1.org/controlpanel/tools/maven", svn.directory("svn:https://svn.1and1.org/controlpanel/tools/maven/branches/demo"));
+        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", new SubversionUrl("https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk").directory());
+        assertEquals("svn.1and1.org/controlpanel/tools/maven/plugins/check-characters", new SubversionUrl("https://svn.1and1.org/svn/controlpanel/tools/maven/plugins/check-characters/trunk/").directory());
+        assertEquals("svn.1and1.org/controlpanel/tools/maven", new SubversionUrl("https://svn.1and1.org/controlpanel/tools/maven/branches/demo").directory());
     }
 
     @Test

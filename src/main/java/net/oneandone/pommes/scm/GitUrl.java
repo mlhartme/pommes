@@ -10,7 +10,7 @@ import java.net.URI;
  * including scp-like syntax.
  * See https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories
  */
-public class GitUrl {
+public class GitUrl extends ScmUrl {
     public static GitUrl create(String str) {
         if (str.contains("://")) {
             return regular(str);
@@ -89,9 +89,18 @@ public class GitUrl {
     private final String path;  // path to project
 
     public GitUrl(boolean ssh, String host, String path) {
+        super(Scm.GIT);
         this.ssh = ssh;
         this.host = host;
         this.path = path;
+    }
+
+    public GitUrl normalize() {
+        return withSsh(false);
+    }
+
+    public String directory() {
+        return host + "/" + path;
     }
 
     public boolean equiv(GitUrl other) {

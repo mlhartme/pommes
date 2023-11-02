@@ -27,7 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /** urls are normalized by removing the tailing slash. */
-public class Subversion extends Scm<String> {
+public class Subversion extends Scm<SubversionUrl> {
     public Subversion() {
         super("svn:");
     }
@@ -37,37 +37,12 @@ public class Subversion extends Scm<String> {
     }
 
     @Override
-    public String normalize(String url) {
-        return url;
-    }
-
-    @Override
-    public String parseUrl(String url) {
-        return url;
-    }
-
-    public String directory(String url) throws URISyntaxException {
-        final String trunk = "/trunk";
-        final String branches = "/branches/";
-        URI obj;
-        String path;
-        int idx;
-
-        obj = new URI(Strings.removeLeft(Strings.removeRightOpt(url, "/"), protocol()));
-        path = obj.getPath();
-        path = Strings.removeLeftOpt(path, "/svn");
-        if (path.endsWith(trunk)) {
-            path = Strings.removeRight(path, trunk);
-        } else {
-            idx = path.lastIndexOf('/');
-            if (idx != -1) {
-                idx = path.lastIndexOf('/', idx - 1);
-                if (idx != -1 && path.substring(idx).startsWith(branches)) {
-                    path = path.substring(0, idx);
-                }
-            }
+    public SubversionUrl parseUrl(String url) {
+        try {
+            return new SubversionUrl(url);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(url, e);
         }
-        return obj.getHost() + path;
     }
 
     @Override
@@ -100,13 +75,19 @@ public class Subversion extends Scm<String> {
     }
 
     @Override
-    public ScmUrl getUrl(FileNode checkout) throws Failure {
+    public SubversionUrl getUrl(FileNode checkout) throws Failure {
         String url;
         int idx;
+        String str;
 
         url = checkout.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
-        return new ScmUrl(this, Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/"));
+        str = (Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/"));
+        try {
+            return new SubversionUrl(str);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(str, e);
+        }
     }
 
     @Override

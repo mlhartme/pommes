@@ -31,7 +31,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class Scm<U> {
+public abstract class Scm<U extends ScmUrl> {
+    public static final Scm GIT = new Git();
+    public static final Scm SUBVERSION = new Subversion();
+
+    private static final Scm[] SCMS = { GIT, SUBVERSION };
+
+    //--
+
     private final String protocol;
 
     protected Scm(String protocol) {
@@ -44,11 +51,6 @@ public abstract class Scm<U> {
     public String protocol() {
         return protocol;
     }
-
-    public static final Scm GIT = new Git();
-    public static final Scm SUBVERSION = new Subversion();
-
-    private static final Scm[] SCMS = { GIT, SUBVERSION };
 
     public static Map<FileNode, Scm> scanCheckouts(FileNode directory, Filter excludes) throws IOException {
         Map<FileNode, Scm> result;
@@ -94,7 +96,7 @@ public abstract class Scm<U> {
         for (Scm scm : SCMS) {
             // TODO: drop?
             if (url.startsWith(scm.protocol)) {
-                return Optional.of(new ScmUrl(scm, scm.parseUrl(url.substring(scm.protocol.length()))));
+                return Optional.of(scm.parseUrl(url.substring(scm.protocol.length())));
             }
         }
         return Optional.empty();
@@ -103,16 +105,13 @@ public abstract class Scm<U> {
     //--
 
     public abstract U parseUrl(String url);
-    public abstract U normalize(U url);
-
+    public abstract U getUrl(FileNode checkout) throws IOException;
 
     /** directory for checkouts */
-    public abstract String directory(U url) throws URISyntaxException;
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
     public abstract Launcher checkout(FileNode dest, String url) throws Failure;
-    public abstract ScmUrl getUrl(FileNode checkout) throws IOException;
 
     public abstract Gav defaultGav(String url) throws Failure, URISyntaxException;
 

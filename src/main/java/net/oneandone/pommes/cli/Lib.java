@@ -25,7 +25,6 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -85,7 +84,6 @@ public class Lib {
 
     public FileNode projectDirectory(Project project) throws IOException {
         Optional<ScmUrl> scmUrl;
-        String path;
 
         if (project.scm == null) {
             throw new IOException(project + ": missing scm");
@@ -94,12 +92,7 @@ public class Lib {
         if (scmUrl.isEmpty()) {
             throw new IOException(project + ": unknown scm: " + project.scm);
         }
-        try {
-            path = scmUrl.get().scm().directory(scmUrl.get().url());
-        } catch (URISyntaxException e) {
-            throw new IOException(project.scm + ": invalid scm uri", e);
-        }
-        return properties.checkouts.join(path);
+        return properties.checkouts.join(scmUrl.get().directory());
     }
 
     public Database loadDatabase() throws IOException {

@@ -22,7 +22,6 @@ import net.oneandone.sushi.launcher.Launcher;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class Git extends Scm<GitUrl> {
     public Git() {
@@ -33,25 +32,17 @@ public class Git extends Scm<GitUrl> {
         return GitUrl.create(url);
     }
 
-    public GitUrl normalize(GitUrl url) {
-        return url.withSsh(false);
-    }
-
-    public String directory(GitUrl url) throws URISyntaxException {
-        return url.getHost() + "/" + url.getPath();
-    }
-
     public boolean isCheckout(FileNode directory) {
         return directory.join(".git").isDirectory();
     }
 
     @Override
-    public ScmUrl getUrl(FileNode checkout) throws IOException {
+    public GitUrl getUrl(FileNode checkout) throws IOException {
         Launcher launcher;
 
         launcher = git(checkout, "config", "--get", "remote.origin.url");
         try {
-            return new ScmUrl(this, GitUrl.create(launcher.exec().trim()));
+            return GitUrl.create(launcher.exec().trim());
             // TODO return PROTOCOL + explicitSshProtocol(launcher.exec().trim());
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
