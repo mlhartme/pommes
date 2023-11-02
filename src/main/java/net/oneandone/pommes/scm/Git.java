@@ -37,7 +37,7 @@ public class Git extends Scm<GitUrl> {
         return url.withSsh(false);
     }
 
-    public String path(GitUrl url) throws URISyntaxException {
+    public String directory(GitUrl url) throws URISyntaxException {
         return url.getHost() + "/" + url.getPath();
     }
 

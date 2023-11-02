@@ -95,7 +95,7 @@ public class Lib {
             throw new IOException(project + ": unknown scm: " + project.scm);
         }
         try {
-            path = scmUrl.get().scm().path(scmUrl.get().url());
+            path = scmUrl.get().scm().directory(scmUrl.get().url());
         } catch (URISyntaxException e) {
             throw new IOException(project.scm + ": invalid scm uri", e);
         }

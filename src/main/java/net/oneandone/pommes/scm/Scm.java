@@ -106,7 +106,8 @@ public abstract class Scm<U> {
     public abstract U normalize(U url);
 
 
-    public abstract String path(U url) throws URISyntaxException;
+    /** directory for checkouts */
+    public abstract String directory(U url) throws URISyntaxException;
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
