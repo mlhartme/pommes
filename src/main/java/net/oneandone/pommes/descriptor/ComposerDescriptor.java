@@ -18,6 +18,7 @@ package net.oneandone.pommes.descriptor;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
 
@@ -31,8 +32,8 @@ public class ComposerDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment notUsed, String repository, String origin, String revision, String scm) {
-        return new Project(repository, origin, revision, null, artifact(origin), scm, null);
+    protected Project doLoad(Environment notUsed, String repository, String origin, String revision, ScmUrl scm) {
+        return new Project(repository, origin, revision, null, artifact(origin), scm.scmUrl(), null);
     }
 
     private static Gav artifact(String origin) {

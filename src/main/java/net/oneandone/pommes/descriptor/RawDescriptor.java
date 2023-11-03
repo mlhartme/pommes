@@ -19,6 +19,7 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -49,13 +50,13 @@ public class RawDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String origin, String revision, String foundScm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl foundScm) throws IOException {
         Gav artifact;
 
         if (!foundScm.equals(scm.getUrl(directory))) {
             throw new IllegalArgumentException(foundScm + " " + scm.getUrl(directory));
         }
-        artifact = Scm.createUrl(foundScm).defaultGav();
-        return new Project(repository, origin, revision, null, artifact, foundScm, null);
+        artifact = foundScm.defaultGav();
+        return new Project(repository, origin, revision, null, artifact, foundScm.scmUrl(), null);
     }
 }

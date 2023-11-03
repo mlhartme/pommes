@@ -19,6 +19,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
@@ -47,7 +48,7 @@ public class MavenDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String path, String revision, String scm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String path, String revision, ScmUrl scm) throws IOException {
         FileNode local;
         MavenProject project;
 
@@ -65,7 +66,7 @@ public class MavenDescriptor extends Descriptor {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
-            return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), scm, project));
+            return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), scm.scmUrl(), project));
         } finally {
             if (local != null && local != descriptor) {
                 local.deleteFile();

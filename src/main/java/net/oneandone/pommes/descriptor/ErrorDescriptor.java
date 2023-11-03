@@ -17,6 +17,7 @@ package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.ScmUrl;
 
 import java.io.IOException;
 
@@ -37,7 +38,7 @@ public class ErrorDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String origin, String revision, String scm) {
+    protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl scm) {
         throw new IllegalStateException();
     }
 }

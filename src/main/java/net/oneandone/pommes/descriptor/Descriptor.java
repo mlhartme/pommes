@@ -17,6 +17,7 @@ package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.function.BiFunction;
 public abstract class Descriptor {
     public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException()) {
         @Override
-        protected Project doLoad(Environment environment, String repository, String origin, String revision, String scm) {
+        protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl scm) {
             throw new IllegalStateException();
         }
     };
@@ -66,7 +67,7 @@ public abstract class Descriptor {
     private String repository;
     private String path;
     private String revision;
-    private String scm;
+    private ScmUrl scm;
 
     public void setRepository(String repository) {
         this.repository = repository;
@@ -92,7 +93,7 @@ public abstract class Descriptor {
         return revision;
     }
 
-    public void setScm(String scm) {
+    public void setScm(ScmUrl scm) {
         this.scm = scm;
     }
 
@@ -109,7 +110,7 @@ public abstract class Descriptor {
         return doLoad(environment, repository, path, revision, scm);
     }
 
-    protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision, String withScm) throws IOException;
+    protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws IOException;
 
     public String toString() {
         return path;

@@ -26,6 +26,7 @@ import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
@@ -214,7 +215,7 @@ public class GitlabRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
                 result.setRevision(branchRevision(project, project.default_branch())); // TODO: could be more accurate with the revision of this very file ...
-                result.setScm(Scm.GIT.protocol() + repoUrl(project));
+                result.setScm(GitUrl.create(repoUrl(project)));
                 return result;
             }
         }
@@ -222,7 +223,7 @@ public class GitlabRepository extends Repository {
         Gav gav = GitUrl.create(repoUrl(project)).defaultGav();
         result = new Descriptor() {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) {
                 return new Project(name, project.path_with_namespace(), "TODO", null, gav, Scm.GIT.protocol() + repoUrl(project), project.web_url);
             }
         };
@@ -230,7 +231,7 @@ public class GitlabRepository extends Repository {
         result.setRepository(name);
         result.setPath(project.path_with_namespace());
         result.setRevision("TODO");
-        result.setScm(Scm.GIT.protocol() + repoUrl(project));
+        result.setScm(GitUrl.create(repoUrl(project)));
         return result;
     }
 

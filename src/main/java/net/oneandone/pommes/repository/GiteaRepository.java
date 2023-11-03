@@ -26,6 +26,7 @@ import io.gitea.model.Organization;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
@@ -162,7 +163,7 @@ public class GiteaRepository extends Repository {
                             descriptor.setRepository(name);
                             descriptor.setPath(org + "/" + repo + "/" + contents.getPath());
                             descriptor.setRevision(tmp.sha());
-                            descriptor.setScm("git:ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git");
+                            descriptor.setScm(GitUrl.create("ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git"));
                             return descriptor;
                         }
                     }

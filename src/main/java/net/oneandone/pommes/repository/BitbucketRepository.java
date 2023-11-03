@@ -21,6 +21,7 @@ import com.google.gson.JsonParser;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.sushi.fs.NewInputStreamException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -94,7 +95,7 @@ public class BitbucketRepository extends Repository {
                         descriptor.setRepository(name);
                         descriptor.setPath(bbProject.toLowerCase() + "/" + repo + "/" + path);
                         descriptor.setRevision(tmp.sha());
-                        descriptor.setScm("git:ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git");
+                        descriptor.setScm(GitUrl.create("ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git"));
                         dest.put(descriptor);
                     }
                 }

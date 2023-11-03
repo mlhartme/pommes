@@ -25,6 +25,7 @@ import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
@@ -183,7 +184,7 @@ public class GithubRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(repo.full_name());
                 result.setRevision(branchRevision(repo, repo.default_branch()));
-                result.setScm(Scm.GIT.protocol() + repoUrl(repo));
+                result.setScm(GitUrl.create(repoUrl(repo)));
                 return result;
             }
         }
@@ -191,7 +192,7 @@ public class GithubRepository extends Repository {
         Gav gav = GitUrl.create(repoUrl(repo)).defaultGav();
         result = new Descriptor() {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) {
                 return new Project(name, repo.full_name(), "TODO", null, gav,
                         Scm.GIT.protocol() + repoUrl(repo), repo.url);
             }
@@ -200,7 +201,7 @@ public class GithubRepository extends Repository {
         result.setRepository(name);
         result.setPath(repo.full_name());
         result.setRevision("TODO");
-        result.setScm(Scm.GIT.protocol() + repoUrl(repo));
+        result.setScm(GitUrl.create(repoUrl(repo)));
         return result;
     }
 

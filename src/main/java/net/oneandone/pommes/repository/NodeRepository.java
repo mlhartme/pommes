@@ -21,7 +21,10 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
+import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
+import net.oneandone.pommes.scm.SubversionUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -201,7 +204,7 @@ public class NodeRepository extends Repository {
         return null;
     }
 
-    public static String nodeScm(Node descriptor) throws IOException {
+    public static ScmUrl nodeScm(Node descriptor) throws IOException {
         String path;
         SVNURL root;
 
@@ -214,16 +217,16 @@ public class NodeRepository extends Repository {
                 if (!path.startsWith("/")) {
                     throw new IllegalStateException(path);
                 }
-                return "git:ssh://git@github.com" + path + ".git";
+                return GitUrl.create("ssh://git@github.com" + path + ".git");
             } else {
-                return svn.getParent().getUri().toString();
+                return new SubversionUrl(svn.getParent().getUri().toString());
             }
         } else if (descriptor instanceof FileNode fileNode) {
             Scm scm = Scm.probeCheckout(fileNode);
             if (scm == null) {
                 return null;
             } else {
-                return scm.getUrl(fileNode).scmUrl();
+                return scm.getUrl(fileNode);
             }
         } else {
             return null;
