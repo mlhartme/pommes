@@ -48,24 +48,22 @@ public class Checkout extends Action {
             if (project.scm == null) {
                 return new Problem(directory, project.origin() + ": missing scm: " + project.scm);
             }
-            return new Checkout(project.scm.scm(), directory, project.scm.scmUrl());
+            return new Checkout(project.scm, directory);
         }
     }
 
-    private final Scm scm;
-    private final String url;
+    private final ScmUrl scm;
 
-    public Checkout(Scm scm, FileNode directory, String url) {
-        super(directory, "A " + directory + " (" + url + ")");
+    public Checkout(ScmUrl scm, FileNode directory) {
+        super(directory, "A " + directory + " (" + scm.scmUrl() + ")");
         this.scm = scm;
-        this.url = url;
     }
 
     public void run(Console console) throws MkdirException, Failure {
         Launcher launcher;
 
         directory.getParent().mkdirsOpt();
-        launcher = scm.checkout(directory, url);
+        launcher = scm.scm().checkout(directory, scm.url());
         console.info.println(launcher.toString());
         if (console.getVerbose()) {
             launcher.exec(console.verbose);
@@ -77,12 +75,12 @@ public class Checkout extends Action {
 
     public boolean equals(Object obj) {
         if (obj instanceof Checkout c) {
-            return scm.equals(c.scm) && url.equals(c.url);
+            return scm.equals(c.scm);
         }
         return false;
     }
 
     public int hashCode() {
-        return url.hashCode();
+        return scm.hashCode();
     }
 }

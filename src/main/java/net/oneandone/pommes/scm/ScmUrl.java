@@ -27,4 +27,5 @@ public abstract class ScmUrl {
     public abstract String url();
 
     public abstract Gav defaultGav();
+
 }
