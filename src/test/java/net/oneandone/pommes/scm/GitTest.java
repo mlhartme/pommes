@@ -18,16 +18,11 @@ package net.oneandone.pommes.scm;
 import net.oneandone.pommes.database.Gav;
 import org.junit.jupiter.api.Test;
 
-import java.net.URISyntaxException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitTest {
     @Test
-    public void path() throws URISyntaxException {
-        Git git;
-
-        git = new Git();
+    public void path() throws ScmUrlException {
         assertEquals("github.com/pustefix-projects/pustefix-framework", GitUrl.create("https://github.com/pustefix-projects/pustefix-framework.git").directory());
         assertEquals("github.com/mlhartme/maven-active-markdown-plugin", GitUrl.create("ssh://git@github.com/mlhartme/maven-active-markdown-plugin.git").directory());
         // TODO

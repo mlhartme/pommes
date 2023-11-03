@@ -26,7 +26,6 @@ import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 /** Represents the .pommes directory */
 public class Lib {
@@ -83,16 +82,13 @@ public class Lib {
     }
 
     public FileNode projectDirectory(Project project) throws IOException {
-        Optional<ScmUrl> scmUrl;
+        ScmUrl scmUrl;
 
         if (project.scm == null) {
             throw new IOException(project + ": missing scm");
         }
         scmUrl = Scm.createUrl(project.scm);
-        if (scmUrl.isEmpty()) {
-            throw new IOException(project + ": unknown scm: " + project.scm);
-        }
-        return properties.checkouts.join(scmUrl.get().directory());
+        return properties.checkouts.join(scmUrl.directory());
     }
 
     public Database loadDatabase() throws IOException {

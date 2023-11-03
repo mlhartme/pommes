@@ -11,7 +11,7 @@ import java.net.URI;
  * See https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories
  */
 public class GitUrl extends ScmUrl {
-    public static GitUrl create(String str) {
+    public static GitUrl create(String str) throws ScmUrlException {
         if (str.contains("://")) {
             return regular(str);
         } else {
@@ -19,27 +19,27 @@ public class GitUrl extends ScmUrl {
         }
     }
 
-    private static GitUrl scplike(String str) {
+    private static GitUrl scplike(String str) throws ScmUrlException {
         int idx;
         URI uri;
         String path;
 
         idx = str.indexOf(':');
         if (idx < 1) {
-            throw new IllegalArgumentException("invalid scp-like url: " + str);
+            throw new ScmUrlException(str, "invalid scp-like url");
         }
         uri = URI.create("ssh://" + str.substring(0, idx));
         if (!"git".equals(uri.getUserInfo())) {
-            throw new IllegalArgumentException("git user expected in scp-like url: " + str);
+            throw new ScmUrlException(str, "git user expected in scp-like url");
         }
         path = str.substring(idx + 1);
         if (path.startsWith("/")) {
-            throw new IllegalArgumentException("absolute path in scp-like url: " + str);
+            throw new ScmUrlException(str, "absolute path in scp-like url");
         }
         return new GitUrl(true, uri.getHost(), normalzeTail(path));
     }
 
-    private static GitUrl regular(String str) {
+    private static GitUrl regular(String str) throws ScmUrlException {
         URI uri;
         String sshUser;
         String scheme;
@@ -50,36 +50,36 @@ public class GitUrl extends ScmUrl {
         sshUser = uri.getUserInfo();
         if (sshUser == null) {
             if (!scheme.equals("https")) {
-                throw new IllegalStateException("https scheme expected: " + str);
+                throw new ScmUrlException(str, "https scheme expected");
             }
         } else {
             if (!sshUser.equalsIgnoreCase("git")) {
-                throw new IllegalStateException("unexpected user: " + str);
+                throw new ScmUrlException(str, "unexpected user");
             }
             if (!scheme.equals("ssh")) {
-                throw new IllegalStateException("ssh scheme expected: " + str);
+                throw new ScmUrlException(str, "ssh scheme expected");
             }
         }
         if (uri.getFragment() != null) {
-            throw new IllegalStateException("unexpected fragment: " + str);
+            throw new ScmUrlException(str, "unexpected fragment");
         }
         if (uri.getPort() != -1) {
-            throw new IllegalStateException("unexecpted port: " + str);
+            throw new ScmUrlException(str, "unexecpted port");
         }
         path = uri.getPath();
         if (!path.startsWith("/")) {
-            throw new IllegalArgumentException("absolute path expected: " + str);
+            throw new ScmUrlException(str, "absolute path expected");
         }
         path = path.substring(1);
         path = normalzeTail(path);
         return new GitUrl(sshUser != null, uri.getHost(), path);
     }
 
-    private static String normalzeTail(String path) {
+    private static String normalzeTail(String path) throws ScmUrlException {
         path = Strings.removeRightOpt(path, "/");
         path = Strings.removeRightOpt(path, ".git");
         if (path.isEmpty()) {
-            throw new IllegalArgumentException("empty path: " + path);
+            throw new ScmUrlException(path, "empty path");
         }
         return path;
     }

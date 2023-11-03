@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
-/** A place to search for descriptors */
+/** A place to search for descriptors. */
 public abstract class Repository {
     public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException {
         World world;

@@ -28,7 +28,7 @@ public class Git extends Scm<GitUrl> {
         super("git:");
     }
 
-    public GitUrl parseUrl(String url) {
+    public GitUrl parseUrl(String url) throws ScmUrlException {
         return GitUrl.create(url);
     }
 

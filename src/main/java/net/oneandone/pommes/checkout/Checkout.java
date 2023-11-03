@@ -25,12 +25,11 @@ import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class Checkout extends Action {
     public static Action createOpt(FileNode directory, Project project) throws IOException {
         Scm scm;
-        Optional<ScmUrl> url;
+        ScmUrl url;
         ScmUrl scannedScm;
 
         if (directory.exists()) {
@@ -40,7 +39,7 @@ public class Checkout extends Action {
             }
             scannedScm = scm.getUrl(directory);
 
-            if (scannedScm.same(Scm.createUrl(project.scm).get())) {
+            if (scannedScm.same(Scm.createUrl(project.scm))) {
                 return null;
             } else {
                 return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedScm);
@@ -50,11 +49,7 @@ public class Checkout extends Action {
                 return new Problem(directory, project.origin() + ": missing scm: " + project.scm);
             }
             url = Scm.createUrl(project.scm);
-            if (url.isEmpty()) {
-                return new Problem(directory, project.origin() + ": unknown scm: " + project.scm);
-            } else {
-                return new Checkout(url.get().scm(), directory, project.scm);
-            }
+            return new Checkout(url.scm(), directory, project.scm);
         }
     }
 

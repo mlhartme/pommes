@@ -29,7 +29,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class Scm<U extends ScmUrl> {
     public static final Scm GIT = new Git();
@@ -92,19 +91,18 @@ public abstract class Scm<U extends ScmUrl> {
         return null;
     }
 
-    public static Optional<ScmUrl> createUrl(String url) {
+    public static ScmUrl createUrl(String url) throws ScmUrlException {
         for (Scm scm : SCMS) {
-            // TODO: drop?
             if (url.startsWith(scm.protocol)) {
-                return Optional.of(scm.parseUrl(url.substring(scm.protocol.length())));
+                return scm.parseUrl(url.substring(scm.protocol.length()));
             }
         }
-        return Optional.empty();
+        throw new ScmUrlException(url,  "unknown scm scheme");
     }
 
     //--
 
-    public abstract U parseUrl(String url);
+    public abstract U parseUrl(String url) throws ScmUrlException;
     public abstract U getUrl(FileNode checkout) throws IOException;
 
     /** directory for checkouts */

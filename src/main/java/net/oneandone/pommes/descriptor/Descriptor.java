@@ -22,7 +22,7 @@ import net.oneandone.sushi.fs.Node;
 import java.io.IOException;
 import java.util.function.BiFunction;
 
-/** Factory for Poms */
+/** Factory for Projects */
 public abstract class Descriptor {
     public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException()) {
         @Override
