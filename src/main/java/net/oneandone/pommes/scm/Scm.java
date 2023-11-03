@@ -55,6 +55,18 @@ public abstract class Scm<U extends ScmUrl> {
         return protocol;
     }
 
+    //--
+
+    public abstract U getUrl(FileNode checkout) throws IOException;
+
+    /** directory for checkouts */
+    public abstract boolean isCheckout(FileNode directory) throws IOException;
+    public abstract boolean isAlive(FileNode checkout) throws IOException;
+    public abstract boolean isModified(FileNode checkout) throws IOException;
+    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
+
+    //--
+
     public static Map<FileNode, Scm> scanCheckouts(FileNode directory, Filter excludes) throws IOException {
         Map<FileNode, Scm> result;
 
@@ -103,14 +115,4 @@ public abstract class Scm<U extends ScmUrl> {
         }
         throw new ScmUrlException(url,  "unknown scm scheme");
     }
-
-    //--
-
-    public abstract U getUrl(FileNode checkout) throws IOException;
-
-    /** directory for checkouts */
-    public abstract boolean isCheckout(FileNode directory) throws IOException;
-    public abstract boolean isAlive(FileNode checkout) throws IOException;
-    public abstract boolean isModified(FileNode checkout) throws IOException;
-    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
 }
