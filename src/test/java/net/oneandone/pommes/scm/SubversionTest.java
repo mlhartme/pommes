@@ -31,10 +31,11 @@ public class SubversionTest {
     }
 
     @Test
-    public void dflt() throws URISyntaxException {
+    public void dflt() throws ScmUrlException {
         Subversion svn;
 
         svn = new Subversion();
-        assertEquals(new Gav("", "puppet_ciso", "1-SNAPSHOT"), svn.defaultGav("svn:https://svn.1and1.org/svn/puppet_ciso/"));
+        assertEquals(new Gav("", "puppet_ciso", "1-SNAPSHOT"),
+                new SubversionUrl("https://svn.1and1.org/svn/puppet_ciso/").defaultGav());
     }
 }

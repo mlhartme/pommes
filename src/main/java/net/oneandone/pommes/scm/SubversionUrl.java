@@ -1,5 +1,6 @@
 package net.oneandone.pommes.scm;
 
+import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.util.Strings;
 
 import java.net.URI;
@@ -46,5 +47,34 @@ public class SubversionUrl extends ScmUrl {
     @Override
     public String url() {
         return uri.toString();
+    }
+
+    @Override
+    public Gav defaultGav() {
+        String path;
+        int idx;
+        String groupId;
+        String artifactId;
+
+        path = uri.getPath();
+        path = Strings.removeRightOpt(path, "/");
+        path = Strings.removeLeftOpt(path, "/svn");
+        path = Strings.removeLeftOpt(path, "/");
+        idx = path.indexOf("/trunk");
+        if (idx == -1) {
+            idx = path.indexOf("/branches");
+        }
+        if (idx != -1) {
+            path = path.substring(0, idx);
+        }
+        idx = path.lastIndexOf('/');
+        if (idx == -1) {
+            groupId = "";
+            artifactId = path;
+        } else {
+            groupId = path.substring(0, idx).replace('/', '.');
+            artifactId = path.substring(idx + 1);
+        }
+        return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 }

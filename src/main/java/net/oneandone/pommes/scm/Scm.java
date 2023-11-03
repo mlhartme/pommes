@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.scm;
 
-import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
@@ -23,7 +22,6 @@ import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -115,8 +113,4 @@ public abstract class Scm<U extends ScmUrl> {
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
     public abstract Launcher checkout(FileNode dest, String url) throws Failure;
-
-    public abstract Gav defaultGav(String url) throws Failure, URISyntaxException;
-
-
 }

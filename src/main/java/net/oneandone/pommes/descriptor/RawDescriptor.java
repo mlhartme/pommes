@@ -22,7 +22,6 @@ import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 /** descriptor without meta information like form poms, only the scm url is known */
 public class RawDescriptor extends Descriptor {
@@ -56,11 +55,7 @@ public class RawDescriptor extends Descriptor {
         if (!foundScm.equals(scm.getUrl(directory))) {
             throw new IllegalArgumentException(foundScm + " " + scm.getUrl(directory));
         }
-        try {
-            artifact = scm.defaultGav(foundScm);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
+        artifact = Scm.createUrl(foundScm).defaultGav();
         return new Project(repository, origin, revision, null, artifact, foundScm, null);
     }
 }

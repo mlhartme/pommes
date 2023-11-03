@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.scm;
 
-import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
@@ -23,8 +22,6 @@ import net.oneandone.sushi.util.Separator;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /** urls are normalized by removing the tailing slash. */
 public class Subversion extends Scm<SubversionUrl> {
@@ -34,35 +31,6 @@ public class Subversion extends Scm<SubversionUrl> {
 
     public boolean isCheckout(FileNode directory) {
         return directory.join(".svn").isDirectory();
-    }
-
-    @Override
-    public Gav defaultGav(String urlstr) throws URISyntaxException {
-        String path;
-        int idx;
-        String groupId;
-        String artifactId;
-
-        path = new URI(Strings.removeLeft(urlstr, protocol())).getPath();
-        path = Strings.removeRightOpt(path, "/");
-        path = Strings.removeLeftOpt(path, "/svn");
-        path = Strings.removeLeftOpt(path, "/");
-        idx = path.indexOf("/trunk");
-        if (idx == -1) {
-            idx = path.indexOf("/branches");
-        }
-        if (idx != -1) {
-            path = path.substring(0, idx);
-        }
-        idx = path.lastIndexOf('/');
-        if (idx == -1) {
-            groupId = "";
-            artifactId = path;
-        } else {
-            groupId = path.substring(0, idx).replace('/', '.');
-            artifactId = path.substring(idx + 1);
-        }
-        return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 
     @Override

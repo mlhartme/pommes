@@ -31,10 +31,8 @@ public class GitTest {
     }
 
     @Test
-    public void dflt() {
-        Git git;
-
-        git = new Git();
-        assertEquals(new Gav("cisoops", "clm", "1-SNAPSHOT"), git.defaultGav("ssh://git@bitbucket.1and1.org/cisoops/clm.git"));
+    public void dflt() throws ScmUrlException {
+        assertEquals(new Gav("cisoops", "clm", "1-SNAPSHOT"),
+                GitUrl.create("ssh://git@bitbucket.1and1.org/cisoops/clm.git").defaultGav());
     }
 }

@@ -1,5 +1,7 @@
 package net.oneandone.pommes.scm;
 
+import net.oneandone.pommes.database.Gav;
+
 public abstract class ScmUrl {
     private final Scm scm;
 
@@ -24,4 +26,5 @@ public abstract class ScmUrl {
 
     public abstract String url();
 
+    public abstract Gav defaultGav();
 }

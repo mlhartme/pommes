@@ -24,6 +24,7 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -218,12 +219,7 @@ public class GitlabRepository extends Repository {
             }
         }
 
-        Gav gav;
-        try {
-            gav = Scm.GIT.defaultGav(repoUrl(project));
-        } catch (URISyntaxException e) {
-            throw new IOException("invalid url", e);
-        }
+        Gav gav = GitUrl.create(repoUrl(project)).defaultGav();
         result = new Descriptor() {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, String withScm) {

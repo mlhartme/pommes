@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.scm;
 
-import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
@@ -43,29 +42,6 @@ public class Git extends Scm<GitUrl> {
         } catch (Failure e) {
             throw new IOException(launcher + " failed: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public Gav defaultGav(String url) {
-        String artifactId;
-        String groupId;
-        int idx;
-
-        idx = url.lastIndexOf('/');
-        if (idx == -1) {
-            throw new IllegalArgumentException(url);
-        }
-        groupId = url.substring(0, idx);
-        artifactId = url.substring(idx + 1);
-        idx = artifactId.lastIndexOf('.');
-        if (idx != -1) {
-            artifactId = artifactId.substring(0, idx);
-        }
-        idx = Math.max(groupId.lastIndexOf(':'), groupId.lastIndexOf('/'));
-        if (idx != -1) {
-            groupId = groupId.substring(idx + 1);
-        }
-        return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 
     @Override

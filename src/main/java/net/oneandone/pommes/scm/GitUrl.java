@@ -1,5 +1,6 @@
 package net.oneandone.pommes.scm;
 
+import net.oneandone.pommes.database.Gav;
 import net.oneandone.sushi.util.Strings;
 
 import java.net.URI;
@@ -138,5 +139,29 @@ public class GitUrl extends ScmUrl {
 
     public String toString() {
         return url();
+    }
+
+    @Override
+    public Gav defaultGav() {
+        String url = url();
+        String artifactId;
+        String groupId;
+        int idx;
+
+        idx = url.lastIndexOf('/');
+        if (idx == -1) {
+            throw new IllegalArgumentException(url);
+        }
+        groupId = url.substring(0, idx);
+        artifactId = url.substring(idx + 1);
+        idx = artifactId.lastIndexOf('.');
+        if (idx != -1) {
+            artifactId = artifactId.substring(0, idx);
+        }
+        idx = Math.max(groupId.lastIndexOf(':'), groupId.lastIndexOf('/'));
+        if (idx != -1) {
+            groupId = groupId.substring(idx + 1);
+        }
+        return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
 }
