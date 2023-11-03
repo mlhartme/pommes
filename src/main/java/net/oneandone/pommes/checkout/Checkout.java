@@ -39,7 +39,7 @@ public class Checkout extends Action {
             }
             scannedScm = scm.getUrl(directory);
 
-            if (scannedScm.same(Scm.createUrl(project.scm))) {
+            if (scannedScm.same(project.scm)) {
                 return null;
             } else {
                 return new Problem(directory, directory + ": checkout conflict: " + project.scm + " vs " + scannedScm);
@@ -48,8 +48,7 @@ public class Checkout extends Action {
             if (project.scm == null) {
                 return new Problem(directory, project.origin() + ": missing scm: " + project.scm);
             }
-            url = Scm.createUrl(project.scm);
-            return new Checkout(url.scm(), directory, project.scm);
+            return new Checkout(project.scm.scm(), directory, project.scm.scmUrl());
         }
     }
 

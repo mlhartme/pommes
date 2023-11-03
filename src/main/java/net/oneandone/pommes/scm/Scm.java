@@ -115,4 +115,11 @@ public abstract class Scm<U extends ScmUrl> {
         }
         throw new ScmUrlException(url,  "unknown scm scheme");
     }
+    public static ScmUrl createValidUrl(String url) {
+        try {
+            return createUrl(url);
+        } catch (ScmUrlException e) {
+            throw new IllegalStateException(url, e);
+        }
+    }
 }

@@ -22,6 +22,7 @@ import net.oneandone.maven.summon.api.Maven;
 import net.oneandone.pommes.database.PommesQuery;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.MavenDescriptor;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.http.HttpNode;
 import org.apache.maven.project.MavenProject;
@@ -110,7 +111,7 @@ public class CentralSearch {
             System.out.println("TODO: no scm: " + artifact);
             return null;
         }
-        return MavenDescriptor.mavenToPommesProject(p, "central", p.getFile().getPath(), p.getVersion(), scm);
+        return MavenDescriptor.mavenToPommesProject(p, "central", p.getFile().getPath(), p.getVersion(), Scm.createUrl(scm));
     }
 
     private static String getString(JsonObject obj, String member) throws IOException {

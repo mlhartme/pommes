@@ -15,6 +15,7 @@
  */
 package net.oneandone.pommes.database;
 
+import net.oneandone.pommes.scm.Scm;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
@@ -150,7 +151,7 @@ public enum Field {
         for (Gav dep : project.dependencies) {
             DEP.add(doc, dep.toGavString());
         }
-        SCM.addOpt(doc, project.scm);
+        SCM.addOpt(doc, project.scm.scmUrl());
         URL.addOpt(doc, project.url);
         return doc;
     }
@@ -169,7 +170,7 @@ public enum Field {
         }
         result = new Project(origin.substring(0, idx), origin.substring(idx + 1), REVISION.get(document),
                 parent == null ? null : Gav.forGav(parent), Gav.forGav(ARTIFACT.get(document)),
-                SCM.get(document), URL.get(document));
+                Scm.createValidUrl(SCM.get(document)), URL.get(document));
         for (String dep : DEP.getList(document)) {
             result.dependencies.add(Gav.forGav(dep));
         }

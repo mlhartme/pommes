@@ -34,7 +34,7 @@ public class ProjectTest {
                 "    \"revision\": \"32\",\n" +
                 "    \"parent\": \"net.oneandone.maven.poms:lazy-foss-parent:1.0.1\",\n" +
                 "    \"artifact\": \"net.oneandone:pommes:3.0.2-SNAPSHOT\",\n" +
-                "    \"scm\": \"git:ssh://git@github.com/mlhartme/pommes.git\",\n" +
+                "    \"scm\": \"git:ssh://git@github.com/mlhartme/pommes\",\n" +
                 "    \"url\": \"https://github.com/mlhartme/pommes\",\n" +
                 "    \"dependencies\": [\n" +
                 "        \"net.oneandone:sushi:3.1.1\"\n" +

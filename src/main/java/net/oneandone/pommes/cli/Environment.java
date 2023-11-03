@@ -96,7 +96,7 @@ public class Environment implements Variables {
     public String lookup(String name) throws IOException {
         switch (name) {
             case "scm":
-                return currentPom().scm;
+                return currentPom().scm.scmUrl();
             case "gav":
                 return currentPom().artifact.toGavString();
             case "ga":

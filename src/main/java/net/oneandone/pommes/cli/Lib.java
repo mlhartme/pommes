@@ -18,8 +18,6 @@ package net.oneandone.pommes.cli;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
-import net.oneandone.pommes.scm.Scm;
-import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
@@ -82,13 +80,10 @@ public class Lib {
     }
 
     public FileNode projectDirectory(Project project) throws IOException {
-        ScmUrl scmUrl;
-
         if (project.scm == null) {
             throw new IOException(project + ": missing scm");
         }
-        scmUrl = Scm.createUrl(project.scm);
-        return properties.checkouts.join(scmUrl.directory());
+        return properties.checkouts.join(project.scm.directory());
     }
 
     public Database loadDatabase() throws IOException {

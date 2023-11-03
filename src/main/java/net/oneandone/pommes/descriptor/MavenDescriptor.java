@@ -19,6 +19,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
@@ -66,7 +67,7 @@ public class MavenDescriptor extends Descriptor {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
-            return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), scm.scmUrl(), project));
+            return mavenToPommesProject(project, repository, path, revision, Scm.createUrl(scm(environment.console(), scm.scmUrl(), project)));
         } finally {
             if (local != null && local != descriptor) {
                 local.deleteFile();
@@ -74,7 +75,7 @@ public class MavenDescriptor extends Descriptor {
         }
     }
 
-    public static Project mavenToPommesProject(MavenProject project, String repository, String path, String revision, String scm) {
+    public static Project mavenToPommesProject(MavenProject project, String repository, String path, String revision, ScmUrl scm) {
         Artifact pa;
         Gav paGav;
         Project pommesProject;

@@ -25,8 +25,8 @@ import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
-import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
+import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
@@ -223,8 +223,8 @@ public class GitlabRepository extends Repository {
         Gav gav = GitUrl.create(repoUrl(project)).defaultGav();
         result = new Descriptor() {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) {
-                return new Project(name, project.path_with_namespace(), "TODO", null, gav, Scm.GIT.protocol() + repoUrl(project), project.web_url);
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
+                return new Project(name, project.path_with_namespace(), "TODO", null, gav, GitUrl.create(repoUrl(project)), project.web_url);
             }
         };
         // TODO: kind of duplication ...

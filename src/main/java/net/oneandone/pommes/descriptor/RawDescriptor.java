@@ -57,6 +57,6 @@ public class RawDescriptor extends Descriptor {
             throw new IllegalArgumentException(foundScm + " " + scm.getUrl(directory));
         }
         artifact = foundScm.defaultGav();
-        return new Project(repository, origin, revision, null, artifact, foundScm.scmUrl(), null);
+        return new Project(repository, origin, revision, null, artifact, foundScm, null);
     }
 }

@@ -19,6 +19,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.oneandone.pommes.scm.Scm;
+import net.oneandone.pommes.scm.ScmUrl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class Project {
                 string(object, "revision"),
                 Gav.forGavOpt(stringOpt(object, "parent")),
                 Gav.forGav(string(object, "artifact")),
-                string(object, "scm"),
+                Scm.createValidUrl(string(object, "scm")),
                 stringOpt(object, "url"));
         array = object.get("dependencies");
         if (array != null) {
@@ -80,20 +82,20 @@ public class Project {
     public final Gav parent;
     public final Gav artifact;
     /** may be null */
-    public final String scm;
+    public final ScmUrl scm;
     /** may be null */
     public final String url;
 
     public final List<Gav> dependencies;
 
-    public Project(String repository, String path, String revision, Gav parent, Gav artifact, String scm, String url) {
+    public Project(String repository, String path, String revision, Gav parent, Gav artifact, ScmUrl scm, String url) {
         if (repository == null || repository.contains(":")) {
             throw new IllegalArgumentException("repository: " + repository);
         }
         if (path == null) {
             throw new IllegalArgumentException("path: " + path);
         }
-        if (scm == null || scm.endsWith("/")) { // forbid tailing / to normalize svn urls - some end with / and some not
+        if (scm == null) {
             throw new IllegalArgumentException("scm: " + scm);
         }
         this.repository = repository;
@@ -135,7 +137,7 @@ public class Project {
             obj.add("parent", new JsonPrimitive(parent.toGavString()));
         }
         obj.add("artifact", new JsonPrimitive(artifact.toGavString()));
-        obj.add("scm", new JsonPrimitive(scm));
+        obj.add("scm", new JsonPrimitive(scm.scmUrl()));
         if (url != null) {
             obj.add("url", new JsonPrimitive(url));
         }

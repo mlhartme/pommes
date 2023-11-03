@@ -52,7 +52,7 @@ public class JsonDescriptor extends Descriptor {
     protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl scm) {
         Project project;
 
-        project = new Project(repository, origin, revision, orig.parent, orig.artifact, scm != null ? scm.scmUrl() : orig.scm, orig.url);
+        project = new Project(repository, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
         project.dependencies.addAll(orig.dependencies);
         return project;
     }

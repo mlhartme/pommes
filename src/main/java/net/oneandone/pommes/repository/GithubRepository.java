@@ -24,8 +24,8 @@ import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
-import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
+import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
@@ -192,9 +192,9 @@ public class GithubRepository extends Repository {
         Gav gav = GitUrl.create(repoUrl(repo)).defaultGav();
         result = new Descriptor() {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) {
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
                 return new Project(name, repo.full_name(), "TODO", null, gav,
-                        Scm.GIT.protocol() + repoUrl(repo), repo.url);
+                        GitUrl.create(repoUrl(repo)), repo.url);
             }
         };
         // TODO: kind of duplication ...
