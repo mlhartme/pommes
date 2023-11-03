@@ -29,20 +29,11 @@ import java.net.URISyntaxException;
 /** urls are normalized by removing the tailing slash. */
 public class Subversion extends Scm<SubversionUrl> {
     public Subversion() {
-        super("svn:");
+        super("svn:", SubversionUrl::new);
     }
 
     public boolean isCheckout(FileNode directory) {
         return directory.join(".svn").isDirectory();
-    }
-
-    @Override
-    public SubversionUrl parseUrl(String url) {
-        try {
-            return new SubversionUrl(url);
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(url, e);
-        }
     }
 
     @Override
@@ -75,7 +66,7 @@ public class Subversion extends Scm<SubversionUrl> {
     }
 
     @Override
-    public SubversionUrl getUrl(FileNode checkout) throws Failure {
+    public SubversionUrl getUrl(FileNode checkout) throws Failure, ScmUrlException {
         String url;
         int idx;
         String str;
@@ -83,11 +74,7 @@ public class Subversion extends Scm<SubversionUrl> {
         url = checkout.launcher("svn", "info").exec();
         idx = url.indexOf("URL: ") + 5;
         str = (Strings.removeRightOpt(url.substring(idx, url.indexOf("\n", idx)), "/"));
-        try {
-            return new SubversionUrl(str);
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException(str, e);
-        }
+        return new SubversionUrl(str);
     }
 
     @Override

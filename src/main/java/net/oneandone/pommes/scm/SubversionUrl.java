@@ -7,9 +7,13 @@ import java.net.URISyntaxException;
 
 public class SubversionUrl extends ScmUrl {
     private final URI uri;
-    public SubversionUrl(String url) throws URISyntaxException {
+    public SubversionUrl(String url) throws ScmUrlException {
         super(Scm.SUBVERSION);
-        this.uri = new URI(Strings.removeRightOpt(url, "/"));
+        try {
+            this.uri = new URI(Strings.removeRightOpt(url, "/"));
+        } catch (URISyntaxException e) {
+            throw new ScmUrlException(e.getInput(), e.getReason());
+        }
     }
 
     @Override

@@ -39,12 +39,18 @@ public abstract class Scm<U extends ScmUrl> {
     //--
 
     private final String protocol;
+    private final UrlParser<U> parser;
+    @FunctionalInterface
+    public interface UrlParser<U> {
+        U parse(String url) throws ScmUrlException;
+    }
 
-    protected Scm(String protocol) {
+    protected Scm(String protocol, UrlParser<U> parser) {
         if (!protocol.endsWith(":")) {
             throw new IllegalArgumentException(protocol);
         }
         this.protocol = protocol;
+        this.parser = parser;
     }
 
     public String protocol() {
@@ -92,9 +98,9 @@ public abstract class Scm<U extends ScmUrl> {
     }
 
     public static ScmUrl createUrl(String url) throws ScmUrlException {
-        for (Scm scm : SCMS) {
+        for (Scm<?> scm : SCMS) {
             if (url.startsWith(scm.protocol)) {
-                return scm.parseUrl(url.substring(scm.protocol.length()));
+                return scm.parser.parse(url.substring(scm.protocol.length()));
             }
         }
         throw new ScmUrlException(url,  "unknown scm scheme");
@@ -102,7 +108,6 @@ public abstract class Scm<U extends ScmUrl> {
 
     //--
 
-    public abstract U parseUrl(String url) throws ScmUrlException;
     public abstract U getUrl(FileNode checkout) throws IOException;
 
     /** directory for checkouts */

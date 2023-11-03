@@ -25,11 +25,7 @@ import java.io.IOException;
 
 public class Git extends Scm<GitUrl> {
     public Git() {
-        super("git:");
-    }
-
-    public GitUrl parseUrl(String url) throws ScmUrlException {
-        return GitUrl.create(url);
+        super("git:", GitUrl::create);
     }
 
     public boolean isCheckout(FileNode directory) {

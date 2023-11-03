@@ -15,7 +15,7 @@ public abstract class ScmUrl {
     public abstract String directory();
 
     public boolean same(ScmUrl other) {
-        return scm == other.scm &&  normalize().equals(other.normalize());
+        return scm == other.scm && normalize().equals(other.normalize());
     }
 
     public String scmUrl() {
