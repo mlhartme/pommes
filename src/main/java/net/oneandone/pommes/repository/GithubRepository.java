@@ -184,30 +184,29 @@ public class GithubRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(repo.full_name());
                 result.setRevision(branchRevision(repo, repo.default_branch()));
-                result.setScm(GitUrl.create(repoUrl(repo)));
+                result.setScm(repoUrl(repo));
                 return result;
             }
         }
 
-        Gav gav = GitUrl.create(repoUrl(repo)).defaultGav();
+        Gav gav = repoUrl(repo).defaultGav();
         result = new Descriptor() {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
-                return new Project(name, repo.full_name(), "TODO", null, gav,
-                        GitUrl.create(repoUrl(repo)), repo.url);
+                return new Project(name, repo.full_name(), "TODO", null, gav, repoUrl(repo), repo.url);
             }
         };
         // TODO: kind of duplication ...
         result.setRepository(name);
         result.setPath(repo.full_name());
         result.setRevision("TODO");
-        result.setScm(GitUrl.create(repoUrl(repo)));
+        result.setScm(repoUrl(repo));
         return result;
     }
 
 
-    private String repoUrl(GithubRepo repo) {
-        return repo.clone_url;
+    private GitUrl repoUrl(GithubRepo repo) throws ScmUrlException {
+        return GitUrl.create(repo.clone_url);
     }
     public record GithubRepo(int id, String name, String full_name, String url, String clone_url, String git_url, String default_branch) {
     }

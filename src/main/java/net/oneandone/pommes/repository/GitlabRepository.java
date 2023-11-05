@@ -194,8 +194,8 @@ public class GitlabRepository extends Repository {
         }
     }
 
-    private String repoUrl(GitlabProject project) {
-        return project.http_url_to_repo(); // TODO: configurable
+    private GitUrl repoUrl(GitlabProject project) throws ScmUrlException {
+        return GitUrl.create(project.http_url_to_repo()); // TODO: configurable
     }
 
     public Descriptor scanOpt(GitlabProject project) throws IOException {
@@ -215,23 +215,23 @@ public class GitlabRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
                 result.setRevision(branchRevision(project, project.default_branch())); // TODO: could be more accurate with the revision of this very file ...
-                result.setScm(GitUrl.create(repoUrl(project)));
+                result.setScm(repoUrl(project));
                 return result;
             }
         }
 
-        Gav gav = GitUrl.create(repoUrl(project)).defaultGav();
+        Gav gav = repoUrl(project).defaultGav();
         result = new Descriptor() {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
-                return new Project(name, project.path_with_namespace(), "TODO", null, gav, GitUrl.create(repoUrl(project)), project.web_url);
+                return new Project(name, project.path_with_namespace(), "TODO", null, gav, repoUrl(project), project.web_url);
             }
         };
         // TODO: kind of duplication ...
         result.setRepository(name);
         result.setPath(project.path_with_namespace());
         result.setRevision("TODO");
-        result.setScm(GitUrl.create(repoUrl(project)));
+        result.setScm(repoUrl(project));
         return result;
     }
 
