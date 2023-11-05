@@ -110,6 +110,11 @@ public class MavenDescriptor extends Descriptor {
         String pomScm;
 
         if (project.getScm() != null) {
+            pomScm = project.getScm().getDeveloperConnection();
+            if (pomScm != null) {
+                // removeOpt because I've seen projects that omit the prefix ...
+                return Strings.removeLeftOpt(pomScm, "scm:");
+            }
             pomScm = project.getScm().getConnection();
             if (pomScm != null) {
                 // removeOpt because I've seen projects that omit the prefix ...
