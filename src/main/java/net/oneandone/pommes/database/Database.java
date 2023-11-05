@@ -163,9 +163,10 @@ public class Database implements AutoCloseable {
     }
 
     public List<Project> projectsByScm(ScmUrl scmUrl) throws IOException {
+        ScmUrl normalized = scmUrl.normalize();
         List<Document> poms;
 
-        poms = query(PommesQuery.parse("s:" + scmUrl.normalize().scmUrl()));
-        return poms.stream().map(pom -> Field.project(pom)).toList();
+        poms = query(PommesQuery.parse("s:" + normalized.scmUrl()));
+        return poms.stream().map(pom -> Field.project(pom)).filter(p -> normalized.equals(p.scm)).toList();
     }
 }
