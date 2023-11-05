@@ -28,4 +28,7 @@ public abstract class ScmUrl {
 
     public abstract Gav defaultGav();
 
+    public abstract int hashCode();
+    public abstract boolean equals(Object obj);
+
 }

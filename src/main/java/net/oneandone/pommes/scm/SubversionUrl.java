@@ -77,4 +77,17 @@ public class SubversionUrl extends ScmUrl {
         }
         return new Gav(groupId, artifactId, "1-SNAPSHOT");
     }
+
+    @Override
+    public int hashCode() {
+        return uri.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SubversionUrl other) {
+            return uri.equals(other.uri);
+        }
+        return false;
+    }
 }
