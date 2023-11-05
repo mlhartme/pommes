@@ -171,7 +171,7 @@ public class Status extends Base {
             Relocation relocation;
 
             scmUrl = scm.getUrl(found);
-            foundProjects = database.projectsByScm(scmUrl.scmUrl());
+            foundProjects = database.projectsByScm(scmUrl);
             if (foundProjects.isEmpty()) {
                 probed = NodeRepository.probe(environment, "unused", found);
                 if (probed == null) {

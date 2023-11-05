@@ -67,7 +67,7 @@ public class MavenDescriptor extends Descriptor {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
-            return mavenToPommesProject(project, repository, path, revision, Scm.createUrl(scm(environment.console(), scm.scmUrl(), project)));
+            return mavenToPommesProject(project, repository, path, revision, Scm.createUrl(scm(environment.console(), scm == null ? null : scm.scmUrl(), project)));
         } finally {
             if (local != null && local != descriptor) {
                 local.deleteFile();
@@ -82,7 +82,8 @@ public class MavenDescriptor extends Descriptor {
 
         pa = project.getParentArtifact();
         paGav = pa != null ? Gav.forArtifact(pa) : null;
-        pommesProject = new Project(repository, path, revision, paGav, Gav.forArtifact(project.getArtifact()), scm, project.getUrl());
+        pommesProject = new Project(repository, path, revision, paGav, Gav.forArtifact(project.getArtifact()),
+                scm == null ? null : scm.normalize(), project.getUrl());
         for (Dependency dependency : project.getDependencies()) {
             pommesProject.dependencies.add(Gav.forDependency(dependency));
         }

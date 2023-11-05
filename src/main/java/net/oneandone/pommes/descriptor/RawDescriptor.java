@@ -53,8 +53,8 @@ public class RawDescriptor extends Descriptor {
     protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl foundScm) throws IOException {
         Gav artifact;
 
-        if (!foundScm.equals(scm.getUrl(directory))) {
-            throw new IllegalArgumentException(foundScm + " " + scm.getUrl(directory));
+        if (!foundScm.same(scm.getUrl(directory))) {
+            throw new IllegalArgumentException(foundScm + " vs " + scm.getUrl(directory));
         }
         artifact = foundScm.defaultGav();
         return new Project(repository, origin, revision, null, artifact, foundScm, null);

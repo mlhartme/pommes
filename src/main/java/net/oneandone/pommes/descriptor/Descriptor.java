@@ -107,7 +107,7 @@ public abstract class Descriptor {
         if (revision == null) {
             throw new IllegalStateException();
         }
-        return doLoad(environment, repository, path, revision, scm);
+        return doLoad(environment, repository, path, revision, scm == null ? null : scm.normalize());
     }
 
     protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws IOException;

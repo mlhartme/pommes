@@ -15,8 +15,8 @@
  */
 package net.oneandone.pommes.database;
 
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.util.Strings;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -162,12 +162,10 @@ public class Database implements AutoCloseable {
         return pq.find(searcher);
     }
 
-    public List<Project> projectsByScm(String scmUrl) throws IOException {
+    public List<Project> projectsByScm(ScmUrl scmUrl) throws IOException {
         List<Document> poms;
 
-        // TODO: to normalize urls
-        scmUrl = Strings.removeRightOpt(scmUrl, "/");
-        poms = query(PommesQuery.parse("s:" + scmUrl));
+        poms = query(PommesQuery.parse("s:" + scmUrl.normalize().scmUrl()));
         return poms.stream().map(pom -> Field.project(pom)).toList();
     }
 }
