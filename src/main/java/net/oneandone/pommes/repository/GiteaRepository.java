@@ -163,7 +163,7 @@ public class GiteaRepository extends Repository {
                             descriptor.setRepository(name);
                             descriptor.setPath(org + "/" + repo + "/" + contents.getPath());
                             descriptor.setRevision(tmp.sha());
-                            descriptor.setScm(GitUrl.create("ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git"));
+                            descriptor.setRepositoryScm(GitUrl.create("ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git"));
                             return descriptor;
                         }
                     }

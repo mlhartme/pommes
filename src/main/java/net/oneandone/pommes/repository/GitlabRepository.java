@@ -215,7 +215,7 @@ public class GitlabRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(project.path_with_namespace() + "/" + name);
                 result.setRevision(branchRevision(project, project.default_branch())); // TODO: could be more accurate with the revision of this very file ...
-                result.setScm(repoUrl(project));
+                result.setRepositoryScm(repoUrl(project));
                 return result;
             }
         }
@@ -231,7 +231,7 @@ public class GitlabRepository extends Repository {
         result.setRepository(name);
         result.setPath(project.path_with_namespace());
         result.setRevision("TODO");
-        result.setScm(repoUrl(project));
+        result.setRepositoryScm(repoUrl(project));
         return result;
     }
 

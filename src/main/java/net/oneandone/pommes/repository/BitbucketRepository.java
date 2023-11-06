@@ -95,7 +95,7 @@ public class BitbucketRepository extends Repository {
                         descriptor.setRepository(name);
                         descriptor.setPath(bbProject.toLowerCase() + "/" + repo + "/" + path);
                         descriptor.setRevision(tmp.sha());
-                        descriptor.setScm(GitUrl.create("ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git"));
+                        descriptor.setRepositoryScm(GitUrl.create("ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git"));
                         dest.put(descriptor);
                     }
                 }

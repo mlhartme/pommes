@@ -22,7 +22,6 @@ import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.database.Variables;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.Scm;
-import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.filter.Filter;
@@ -120,13 +119,13 @@ public class Environment implements Variables {
 
         scm = Scm.probeCheckout(directory);
         if (scm != null) {
-            for (Node child : directory.list()) {
+            for (FileNode child : directory.list()) {
                 descriptor = Descriptor.probe(this, child);
                 if (descriptor != null) {
                     descriptor.setRepository("unused");
                     descriptor.setPath(child.getPath());
                     descriptor.setRevision(child.sha());
-                    descriptor.setScm(scm.getUrl(directory));
+                    descriptor.setRepositoryScm(scm.getUrl(directory));
                     return descriptor.load(this);
                 }
             }

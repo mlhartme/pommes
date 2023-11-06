@@ -67,7 +67,7 @@ public abstract class Descriptor {
     private String repository;
     private String path;
     private String revision;
-    private ScmUrl scm;
+    private ScmUrl repositoryScm;
 
     public void setRepository(String repository) {
         this.repository = repository;
@@ -93,8 +93,8 @@ public abstract class Descriptor {
         return revision;
     }
 
-    public void setScm(ScmUrl scm) {
-        this.scm = scm;
+    public void setRepositoryScm(ScmUrl repositoryScm) {
+        this.repositoryScm = repositoryScm;
     }
 
     public Project load(Environment environment) throws IOException {
@@ -107,10 +107,11 @@ public abstract class Descriptor {
         if (revision == null) {
             throw new IllegalStateException();
         }
-        return doLoad(environment, repository, path, revision, scm == null ? null : scm.normalize());
+        return doLoad(environment, repository, path, revision, repositoryScm == null ? null : repositoryScm.normalize());
     }
 
-    protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws IOException;
+    protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision,
+                                      ScmUrl withRepositoryScm) throws IOException;
 
     public String toString() {
         return path;

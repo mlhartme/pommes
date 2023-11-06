@@ -184,7 +184,7 @@ public class GithubRepository extends Repository {
                 result.setRepository(this.name);
                 result.setPath(repo.full_name());
                 result.setRevision(branchRevision(repo, repo.default_branch()));
-                result.setScm(repoUrl(repo));
+                result.setRepositoryScm(repoUrl(repo));
                 return result;
             }
         }
@@ -200,7 +200,7 @@ public class GithubRepository extends Repository {
         result.setRepository(name);
         result.setPath(repo.full_name());
         result.setRevision("TODO");
-        result.setScm(repoUrl(repo));
+        result.setRepositoryScm(repoUrl(repo));
         return result;
     }
 
