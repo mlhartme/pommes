@@ -32,6 +32,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import java.io.IOException;
 
 public class MavenDescriptor extends Descriptor {
+    /** pom file */
     protected final Node descriptor;
 
     public static boolean matches(String name) {

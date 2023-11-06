@@ -50,7 +50,7 @@ public abstract class Descriptor {
         return m != null ? m.apply(environment, node) : null;
     }
 
-    /** @return null if no descriptor matches */
+    /** @return create method for matching descriptor or null if no descriptor matches */
     public static BiFunction<Environment, Node<?>, Descriptor> match(String name) throws IOException {
         if (MavenDescriptor.matches(name)) {
             return MavenDescriptor::create;
