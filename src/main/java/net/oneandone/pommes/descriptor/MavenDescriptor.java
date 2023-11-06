@@ -50,7 +50,7 @@ public class MavenDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String path, String revision, ScmUrl scm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String path, String revision, ScmUrl repositoryScm) throws IOException {
         FileNode local;
         MavenProject project;
 
@@ -68,7 +68,7 @@ public class MavenDescriptor extends Descriptor {
                 throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
             }
 
-            return mavenToPommesProject(project, repository, path, revision, Scm.createUrl(scm(environment.console(), scm == null ? null : scm.scmUrl(), project)));
+            return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), repositoryScm, project));
         } finally {
             if (local != null && local != descriptor) {
                 local.deleteFile();
@@ -91,7 +91,7 @@ public class MavenDescriptor extends Descriptor {
         return pommesProject;
 
     }
-    private String scm(Console console, String repositoryScm, MavenProject project) throws IOException {
+    private ScmUrl scm(Console console, ScmUrl repositoryScm, MavenProject project) throws IOException {
         String pomScm;
 
         pomScm = scmOpt(project);
@@ -104,7 +104,7 @@ public class MavenDescriptor extends Descriptor {
         if (pomScm == null) {
             throw new IOException("missing scm in pom.xml: " + project.getFile());
         }
-        return pomScm;
+        return Scm.createUrl(pomScm);
     }
 
     public static String scmOpt(MavenProject project) {
