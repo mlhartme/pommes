@@ -21,6 +21,7 @@ import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
+import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Strings;
@@ -92,11 +93,11 @@ public class MavenDescriptor extends Descriptor {
 
     }
     private ScmUrl scm(Console console, ScmUrl repositoryScm, MavenProject project) throws IOException {
-        String pomScm;
+        ScmUrl pomScm;
 
         pomScm = scmOpt(project);
         if (repositoryScm != null) {
-            if (pomScm != null && !pomScm.equals(repositoryScm)) {
+            if (pomScm != null && !pomScm.same(repositoryScm)) {
                 console.error.println("overriding pom scm " + pomScm + " with " + repositoryScm);
             }
             return repositoryScm;
@@ -104,22 +105,21 @@ public class MavenDescriptor extends Descriptor {
         if (pomScm == null) {
             throw new IOException("missing scm in pom.xml: " + project.getFile());
         }
-        return Scm.createUrl(pomScm);
+        return pomScm;
     }
 
-    public static String scmOpt(MavenProject project) {
+    public static ScmUrl scmOpt(MavenProject project) throws ScmUrlException {
         String pomScm;
 
         if (project.getScm() != null) {
+            // my impression is that developer connections are better maintained, so they get predecence
             pomScm = project.getScm().getDeveloperConnection();
-            if (pomScm != null) {
-                // removeOpt because I've seen projects that omit the prefix ...
-                return Strings.removeLeftOpt(pomScm, "scm:");
+            if (pomScm == null) {
+                pomScm = project.getScm().getConnection();
             }
-            pomScm = project.getScm().getConnection();
             if (pomScm != null) {
                 // removeOpt because I've seen projects that omit the prefix ...
-                return Strings.removeLeftOpt(pomScm, "scm:");
+                return Scm.createUrl(Strings.removeLeftOpt(pomScm, "scm:"));
             }
         }
         return null;

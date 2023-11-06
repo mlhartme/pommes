@@ -14,6 +14,8 @@
   * update svnkit 1.9.0 to 1.10.11
   * added logback 1.4.11
 * normalize git urls to avoid conflicting checkout problems
+* fixed repository scm for file repositories
+* fixed RawDescriptor to properly set repositoryScm
 * pom loading: use developer connection instead of connection, because it's usually better maintained
 * ls:
   * renamed it to `st`

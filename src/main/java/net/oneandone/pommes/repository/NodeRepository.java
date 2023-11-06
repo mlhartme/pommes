@@ -222,11 +222,12 @@ public class NodeRepository extends Repository {
                 return new SubversionUrl(svn.getParent().getUri().toString());
             }
         } else if (descriptor instanceof FileNode fileNode) {
-            Scm scm = Scm.probeCheckout(fileNode);
+            FileNode directory = fileNode.getParent();
+            Scm scm = Scm.probeCheckout(directory);
             if (scm == null) {
                 return null;
             } else {
-                return scm.getUrl(fileNode);
+                return scm.getUrl(directory);
             }
         } else {
             return null;

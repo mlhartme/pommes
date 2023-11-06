@@ -28,6 +28,7 @@ import java.io.IOException;
 public class RawDescriptor extends Descriptor {
     public static RawDescriptor createOpt(FileNode node) throws IOException {
         Scm scm;
+        RawDescriptor result;
 
         if (!node.isDirectory()) {
             return null;
@@ -36,7 +37,9 @@ public class RawDescriptor extends Descriptor {
         if (scm == null) {
             return null;
         }
-        return new RawDescriptor(scm, node);
+        result = new RawDescriptor(scm, node);
+        result.setRepositoryScm(scm.getUrl(node));
+        return result;
     }
 
     private final Scm scm;
@@ -50,13 +53,13 @@ public class RawDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl foundScm) throws IOException {
+    protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl repositoryScm) throws IOException {
         Gav artifact;
 
-        if (!foundScm.same(scm.getUrl(directory))) {
-            throw new IllegalArgumentException(foundScm + " vs " + scm.getUrl(directory));
+        if (repositoryScm == null || !repositoryScm.same(scm.getUrl(directory))) {
+            throw new IllegalArgumentException(repositoryScm + " vs " + scm.getUrl(directory));
         }
-        artifact = foundScm.defaultGav();
-        return new Project(repository, origin, revision, null, artifact, foundScm, null);
+        artifact = repositoryScm.defaultGav();
+        return new Project(repository, origin, revision, null, artifact, repositoryScm, null);
     }
 }
