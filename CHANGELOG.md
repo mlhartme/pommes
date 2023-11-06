@@ -2,6 +2,14 @@
 
 ### 3.5.0 (pending)
 
+* ls:
+  * renamed it to `st`
+* tweaks and fixes
+  * normalize git urls to avoid conflicting checkout problems
+  * fixed repository scm for file repositories
+  * fixed RawDescriptor to properly set repositoryScm
+  * pom loading: use developer connection instead of connection, because it's usually better maintained
+  * do not abort on pom loading errors, just report them
 * build
   * update parent 1.6.1 to 1.6.3
   * update lucene 9.2.0 to 9.8.0
@@ -13,13 +21,6 @@
   * update java-gitea-api 1.14.0 to 1.18.0
   * update svnkit 1.9.0 to 1.10.11
   * added logback 1.4.11
-* normalize git urls to avoid conflicting checkout problems
-* fixed repository scm for file repositories
-* fixed RawDescriptor to properly set repositoryScm
-* pom loading: use developer connection instead of connection, because it's usually better maintained
-* ls:
-  * renamed it to `st`
-  * do not abort on pom loading errors, just report them
 
 
 ### 3.4.0 (2022-12-19)
