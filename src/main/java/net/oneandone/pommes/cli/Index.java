@@ -162,6 +162,7 @@ public class Index extends Base {
                 } catch (Exception e2) {
                     e.addSuppressed(e2);
                 }
+                exception.printStackTrace();
             }
         }
 

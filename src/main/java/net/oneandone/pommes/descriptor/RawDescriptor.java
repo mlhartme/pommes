@@ -26,7 +26,7 @@ import java.io.IOException;
 
 /** descriptor without meta information like form poms, only the scm url is known */
 public class RawDescriptor extends Descriptor {
-    public static RawDescriptor createOpt(FileNode node) throws IOException {
+    public static RawDescriptor createOpt(String repository, FileNode node) throws IOException {
         Scm scm;
         RawDescriptor result;
 
@@ -38,6 +38,9 @@ public class RawDescriptor extends Descriptor {
             return null;
         }
         result = new RawDescriptor(scm, node);
+        result.setRepository(repository);
+        result.setPath(node.getPath());
+        result.setRevision(Long.toString(node.getLastModified()));
         result.setRepositoryScm(scm.getUrl(node));
         return result;
     }

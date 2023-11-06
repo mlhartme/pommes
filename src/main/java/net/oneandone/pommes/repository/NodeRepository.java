@@ -137,7 +137,7 @@ public class NodeRepository extends Repository {
             }
         }
         if (directory instanceof FileNode fileNode) {
-            if (addOpt(dest, name, RawDescriptor.createOpt(fileNode), directory)) {
+            if (addOpt(dest, RawDescriptor.createOpt(name, fileNode))) {
                 return;
             }
         }
@@ -193,6 +193,15 @@ public class NodeRepository extends Repository {
         descriptor.setRepositoryScm(nodeScm(node));
         dest.put(descriptor);
         return true;
+    }
+
+    private static boolean addOpt(BlockingQueue<Descriptor> dest, Descriptor descriptor) throws InterruptedException {
+        if (descriptor == null) {
+            return false;
+        } else {
+            dest.put(descriptor);
+            return true;
+        }
     }
 
     private static Node child(List<? extends Node> childen, String name) {
