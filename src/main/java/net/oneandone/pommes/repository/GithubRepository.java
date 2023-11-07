@@ -37,7 +37,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiFunction;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
 public class GithubRepository extends Repository {
@@ -170,7 +169,7 @@ public class GithubRepository extends Repository {
     }
 
     public Descriptor scanOpt(GithubRepo repo) throws IOException {
-        BiFunction<Environment, Node<?>, Descriptor> m;
+        Descriptor.Creator m;
         Node<?> node;
         Descriptor result;
 
@@ -180,27 +179,17 @@ public class GithubRepository extends Repository {
                 // TODO: when to delete node?
                 node = environment.world().getTemp().createTempFile();
                 fileNode(repo, name).copyFile(node);
-                result = m.apply(environment, node);
-                result.setRepository(this.name);
-                result.setPath(repo.full_name());
-                result.setRevision(branchRevision(repo, repo.default_branch()));
-                result.setRepositoryScm(repoUrl(repo));
-                return result;
+                return m.create(environment, node, this.name, repo.full_name(), branchRevision(repo, repo.default_branch()), repoUrl(repo));
             }
         }
 
         Gav gav = repoUrl(repo).defaultGav();
-        result = new Descriptor() {
+        result = new Descriptor(name, repo.full_name(), "TODO", repoUrl(repo)) {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
                 return new Project(name, repo.full_name(), "TODO", null, gav, repoUrl(repo), repo.url);
             }
         };
-        // TODO: kind of duplication ...
-        result.setRepository(name);
-        result.setPath(repo.full_name());
-        result.setRevision("TODO");
-        result.setRepositoryScm(repoUrl(repo));
         return result;
     }
 

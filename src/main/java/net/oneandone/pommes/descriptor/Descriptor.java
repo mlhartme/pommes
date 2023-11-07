@@ -21,37 +21,22 @@ import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
-import java.util.function.BiFunction;
 
 /** Factory for Projects */
 public abstract class Descriptor {
-    public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException()) {
+    @FunctionalInterface
+    public interface Creator {
+        Descriptor create(Environment env, Node<?> node, String repository, String path, String revision, ScmUrl scmUrl);
+    }
+    public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException(), "end-of-queue", "path", "revision", null) {
         @Override
         protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl scm) {
             throw new IllegalStateException();
         }
     };
 
-    public static Descriptor probeChecked(Environment environment, Node<?> node) {
-        BiFunction<Environment, Node<?>, Descriptor> m;
-
-        try {
-            m = match(node.getName());
-            return m != null ? m.apply(environment, node) : null;
-        } catch (IOException | RuntimeException e) {
-            return new ErrorDescriptor(e);
-        }
-    }
-
-    public static Descriptor probe(Environment environment, Node<?> node) throws IOException {
-        BiFunction<Environment, Node<?>, Descriptor> m;
-
-        m = match(node.getName());
-        return m != null ? m.apply(environment, node) : null;
-    }
-
     /** @return create method for matching descriptor or null if no descriptor matches */
-    public static BiFunction<Environment, Node<?>, Descriptor> match(String name) throws IOException {
+    public static Creator match(String name) {
         if (MavenDescriptor.matches(name)) {
             return MavenDescriptor::create;
         }
@@ -64,37 +49,28 @@ public abstract class Descriptor {
         return null;
     }
 
-    private String repository;
-    private String path;
-    private String revision;
-    private ScmUrl repositoryScm;
+    protected final String repository;
+    protected final String path;
+    protected final String revision;
+    protected final ScmUrl repositoryScm;
 
-    public void setRepository(String repository) {
+    public Descriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
         this.repository = repository;
+        this.path = path;
+        this.revision = revision;
+        this.repositoryScm = repositoryScm;
     }
 
     public String getRepository() {
         return repository;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getPath() {
         return path;
     }
 
-    public void setRevision(String revision) {
-        this.revision = revision;
-    }
-
     public String getRevision() {
         return revision;
-    }
-
-    public void setRepositoryScm(ScmUrl repositoryScm) {
-        this.repositoryScm = repositoryScm;
     }
 
     public Project load(Environment environment) throws IOException {

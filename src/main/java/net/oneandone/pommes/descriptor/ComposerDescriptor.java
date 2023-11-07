@@ -23,12 +23,17 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
 
 public class ComposerDescriptor extends Descriptor {
+    public ComposerDescriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
+        super(repository, path, revision, repositoryScm);
+    }
+
     public static boolean matches(String name) {
         return name.equals("composer.json");
     }
 
-    public static ComposerDescriptor create(Environment environmentNotUsed, Node descriptorCurrentlyNotUsed) {
-        return new ComposerDescriptor();
+    public static ComposerDescriptor create(Environment environmentNotUsed, Node descriptorCurrentlyNotUsed,
+                                            String repository, String path, String revision, ScmUrl repositoryScm) {
+        return new ComposerDescriptor(repository, path, revision, repositoryScm);
     }
 
     @Override

@@ -29,12 +29,12 @@ public class JsonDescriptor extends Descriptor {
         return name.equals(".pommes.json") || name.equals("pommes.json");
     }
 
-    public static JsonDescriptor create(Environment notUsed, Node node) {
+    public static JsonDescriptor create(Environment notUsed, Node node, String repository, String path, String revision, ScmUrl repositoryScm) {
         JsonObject json;
 
         try {
             json = JsonParser.parseString(node.readString()).getAsJsonObject();
-            return new JsonDescriptor(Project.fromJson(json));
+            return new JsonDescriptor(Project.fromJson(json), repository, path, revision, repositoryScm);
         } catch (IOException e) {
             throw new RuntimeException(node.getUri().toString() + ": cannot create json descriptor", e);
         }
@@ -44,7 +44,8 @@ public class JsonDescriptor extends Descriptor {
 
     private final Project orig;
 
-    public JsonDescriptor(Project orig) {
+    public JsonDescriptor(Project orig, String repository, String path, String revision, ScmUrl repositoryScm) {
+        super(repository, path, revision, repositoryScm);
         this.orig = orig;
     }
 

@@ -24,7 +24,8 @@ import java.io.IOException;
 public class ErrorDescriptor extends Descriptor {
     private final Exception exception;
 
-    public ErrorDescriptor(Exception exception) {
+    public ErrorDescriptor(Exception exception, String repository, String path, String revision, ScmUrl repositoryScm) {
+        super(repository, path, revision, repositoryScm);
         this.exception = exception;
     }
 

@@ -67,14 +67,9 @@ public class JsonRepository extends Repository {
             for (JsonElement entry : array) {
                 try {
                     project = Project.fromJson(entry.getAsJsonObject());
-                    descriptor = new JsonDescriptor(project);
-                    descriptor.setRepository(name);
-                    descriptor.setPath(project.getPath());
-                    descriptor.setRevision(node.getWorld().memoryNode(project.toJson().toString()).sha());
+                    descriptor = new JsonDescriptor(project, name, project.getPath(), node.getWorld().memoryNode(project.toJson().toString()).sha(), null);
                 } catch (Exception e) {
-                    descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e));
-                    descriptor.setRepository(name);
-                    descriptor.setPath(node.getPath());
+                    descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e), this.name, node.getPath(), "TODO", null);
                 }
                 dest.put(descriptor);
             }

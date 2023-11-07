@@ -120,12 +120,9 @@ public class Environment implements Variables {
         scm = Scm.probeCheckout(directory);
         if (scm != null) {
             for (FileNode child : directory.list()) {
-                descriptor = Descriptor.probe(this, child);
-                if (descriptor != null) {
-                    descriptor.setRepository("unused");
-                    descriptor.setPath(child.getPath());
-                    descriptor.setRevision(child.sha());
-                    descriptor.setRepositoryScm(scm.getUrl(directory));
+                Descriptor.Creator m = Descriptor.match(child.getName());
+                if (m != null) {
+                    descriptor = m.create(this, child, "unused", child.getPath(), child.sha(), scm.getUrl(directory));
                     return descriptor.load(this);
                 }
             }

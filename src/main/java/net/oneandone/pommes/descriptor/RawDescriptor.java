@@ -28,7 +28,6 @@ import java.io.IOException;
 public class RawDescriptor extends Descriptor {
     public static RawDescriptor createOpt(String repository, FileNode node) throws IOException {
         Scm scm;
-        RawDescriptor result;
 
         if (!node.isDirectory()) {
             return null;
@@ -37,18 +36,14 @@ public class RawDescriptor extends Descriptor {
         if (scm == null) {
             return null;
         }
-        result = new RawDescriptor(scm, node);
-        result.setRepository(repository);
-        result.setPath(node.getPath());
-        result.setRevision(Long.toString(node.getLastModified()));
-        result.setRepositoryScm(scm.getUrl(node));
-        return result;
+        return new RawDescriptor(scm, node, repository, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node));
     }
 
     private final Scm scm;
     private final FileNode directory;
 
-    public RawDescriptor(Scm scm, FileNode directory) {
+    public RawDescriptor(Scm scm, FileNode directory, String repository, String path, String revision, ScmUrl repositoryScm) {
+        super(repository, path, revision, repositoryScm);
         this.scm = scm;
         this.directory = directory;
     }

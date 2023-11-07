@@ -34,18 +34,19 @@ import java.io.IOException;
 
 public class MavenDescriptor extends Descriptor {
     /** pom file */
-    protected final Node descriptor;
+    protected final Node pom;
 
     public static boolean matches(String name) {
         return name.equals("pom.xml") || name.endsWith(".pom");
     }
 
-    public static MavenDescriptor create(Environment notUsed, Node<?> node) {
-        return new MavenDescriptor(node);
+    public static MavenDescriptor create(Environment notUsed, Node<?> node, String repository, String path, String revision, ScmUrl repositoryScm) {
+        return new MavenDescriptor(node, repository, path, revision, repositoryScm);
     }
 
-    public MavenDescriptor(Node<?> descriptor) {
-        this.descriptor = descriptor;
+    public MavenDescriptor(Node<?> pom, String repository, String path, String revision, ScmUrl repositoryScm) {
+        super(repository, path, revision, repositoryScm);
+        this.pom = pom;
     }
 
     //--
@@ -57,21 +58,21 @@ public class MavenDescriptor extends Descriptor {
 
         local = null;
         try {
-            if (descriptor instanceof FileNode) {
-                local = (FileNode) descriptor;
+            if (pom instanceof FileNode) {
+                local = (FileNode) pom;
             } else {
                 local = environment.world().getTemp().createTempFile();
-                descriptor.copyFile(local);
+                pom.copyFile(local);
             }
             try {
                 project = environment.maven().loadPom(local.toPath().toFile());
             } catch (ProjectBuildingException e) {
-                throw new IOException(descriptor + ": cannot load maven project: " + e.getMessage(), e);
+                throw new IOException(pom + ": cannot load maven project: " + e.getMessage(), e);
             }
 
             return mavenToPommesProject(project, repository, path, revision, scm(environment.console(), repositoryScm, project));
         } finally {
-            if (local != null && local != descriptor) {
+            if (local != null && local != pom) {
                 local.deleteFile();
             }
         }

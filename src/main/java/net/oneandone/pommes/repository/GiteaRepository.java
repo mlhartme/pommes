@@ -27,7 +27,6 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
-import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.memory.MemoryNode;
@@ -46,7 +45,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiFunction;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class GiteaRepository extends Repository {
@@ -148,7 +146,7 @@ public class GiteaRepository extends Repository {
             lst = repositoryApi.repoGetContentsList(org, repo, ref);
             for (ContentsResponse contents : lst) {
                 if ("file".equals(contents.getType())) {
-                    BiFunction<Environment, Node<?>, Descriptor> m = Descriptor.match(contents.getName());
+                    Descriptor.Creator m = Descriptor.match(contents.getName());
                     if (m != null) {
                         contents = repositoryApi.repoGetContents(org, repo, contents.getPath(), ref);
                         String str = contents.getContent();
@@ -158,14 +156,8 @@ public class GiteaRepository extends Repository {
                             throw new IllegalStateException(contents.getEncoding());
                         }
                         MemoryNode tmp = environment.world().memoryNode(str);
-                        Descriptor descriptor = m.apply(environment, tmp);
-                        if (descriptor != null) {
-                            descriptor.setRepository(name);
-                            descriptor.setPath(org + "/" + repo + "/" + contents.getPath());
-                            descriptor.setRevision(tmp.sha());
-                            descriptor.setRepositoryScm(GitUrl.create("ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git"));
-                            return descriptor;
-                        }
+                        return m.create(environment, tmp, repo, org + "/" + repo + "/" + contents.getPath(), tmp.sha(),
+                                GitUrl.create("ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git"));
                     }
                 }
             }

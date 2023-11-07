@@ -37,7 +37,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiFunction;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class BitbucketRepository extends Repository {
@@ -74,7 +73,7 @@ public class BitbucketRepository extends Repository {
         Bitbucket bb;
         String bbProject;
         Descriptor descriptor;
-        BiFunction<Environment, Node<?>, Descriptor> m;
+        Descriptor.Creator m;
         byte[] bytes;
         List<String> lst;
         Node tmp;
@@ -89,15 +88,9 @@ public class BitbucketRepository extends Repository {
                 if (m != null) {
                     bytes = bb.readBytes(bbProject, repo, path);
                     tmp = environment.world().memoryNode(bytes);
-                    descriptor = m.apply(environment, tmp);
-                    if (descriptor != null) {
-                        hostname = bitbucket.getRoot().getHostname();
-                        descriptor.setRepository(name);
-                        descriptor.setPath(bbProject.toLowerCase() + "/" + repo + "/" + path);
-                        descriptor.setRevision(tmp.sha());
-                        descriptor.setRepositoryScm(GitUrl.create("ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git"));
-                        dest.put(descriptor);
-                    }
+                    hostname = bitbucket.getRoot().getHostname();
+                    dest.put(m.create(environment, tmp, this.name, bbProject.toLowerCase() + "/" + repo + "/" + path, tmp.sha(),
+                            GitUrl.create("ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git")));
                 }
             }
         }

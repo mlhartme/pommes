@@ -135,12 +135,9 @@ public class ArtifactoryRepository extends Repository {
                     parser.eatKeyValueFalse("folder");
                     sha1 = parser.eatKeyValueString("sha1");
                     node = root.join(Strings.removeLeft(uri, "/"));
-                    descriptor = Descriptor.probeChecked(environment, node);
-                    if (descriptor != null) {
-                        descriptor.setRepository(repository);
-                        descriptor.setPath("artifactory:" + node.getPath());
-                        descriptor.setRevision(sha1);
-                        dest.put(descriptor);
+                    Descriptor.Creator m = Descriptor.match(((Node<?>) node).getName());
+                    if (m != null) {
+                        dest.put(m.create(environment, node, repository, "artifactory:" + node.getPath(), sha1, null));
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

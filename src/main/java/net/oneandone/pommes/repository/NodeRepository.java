@@ -132,12 +132,16 @@ public class NodeRepository extends Repository {
         }
         log.println("scan " + directory.getPath());
         for (Node<?> child : children) {
-            if (addOpt(dest, name, Descriptor.probeChecked(environment, child), child)) {
+            Descriptor.Creator m = Descriptor.match(child.getName());
+            if (m != null) {
+                dest.put(m.create(environment, child, this.name, child.getPath(), Long.toString(child.getLastModified()), nodeScm(child)));
                 return;
             }
         }
         if (directory instanceof FileNode fileNode) {
-            if (addOpt(dest, RawDescriptor.createOpt(name, fileNode))) {
+            Descriptor descriptor = RawDescriptor.createOpt(name, fileNode);
+            if (descriptor != null) {
+                dest.put(descriptor);
                 return;
             }
         }
@@ -180,27 +184,6 @@ public class NodeRepository extends Repository {
             for (Node child : children) {
                 scan(child, true, dest);
             }
-        }
-    }
-
-    private static boolean addOpt(BlockingQueue<Descriptor> dest, String name, Descriptor descriptor, Node node) throws IOException, InterruptedException {
-        if (descriptor == null) {
-            return false;
-        }
-        descriptor.setRepository(name);
-        descriptor.setPath(node.getPath());
-        descriptor.setRevision(Long.toString(node.getLastModified()));
-        descriptor.setRepositoryScm(nodeScm(node));
-        dest.put(descriptor);
-        return true;
-    }
-
-    private static boolean addOpt(BlockingQueue<Descriptor> dest, Descriptor descriptor) throws InterruptedException {
-        if (descriptor == null) {
-            return false;
-        } else {
-            dest.put(descriptor);
-            return true;
         }
     }
 

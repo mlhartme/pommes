@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiFunction;
 
 public class GitlabRepository extends Repository {
     private static final String PROTOCOL = "gitlab:";
@@ -199,7 +198,7 @@ public class GitlabRepository extends Repository {
     }
 
     public Descriptor scanOpt(GitlabProject project) throws IOException {
-        BiFunction<Environment, Node<?>, Descriptor> m;
+        Descriptor.Creator m;
         Node<?> node;
         Descriptor result;
 
@@ -211,27 +210,19 @@ public class GitlabRepository extends Repository {
                 HttpNode url = root.join("projects", Long.toString(project.id()), "repository/files", name, "raw");
                 url = url.withParameter("ref", project.default_branch());
                 url.copyFile(node);
-                result = m.apply(environment, node);
-                result.setRepository(this.name);
-                result.setPath(project.path_with_namespace() + "/" + name);
-                result.setRevision(branchRevision(project, project.default_branch())); // TODO: could be more accurate with the revision of this very file ...
-                result.setRepositoryScm(repoUrl(project));
-                return result;
+                return m.create(environment, node, this.name, project.path_with_namespace() + "/" + name,
+                        branchRevision(project, project.default_branch()),  // TODO: could be more accurate with the revision of this very file ...
+                        repoUrl(project));
             }
         }
 
         Gav gav = repoUrl(project).defaultGav();
-        result = new Descriptor() {
+        result = new Descriptor(name, project.path_with_namespace(), "TODO", repoUrl(project)) {
             @Override
             protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
                 return new Project(name, project.path_with_namespace(), "TODO", null, gav, repoUrl(project), project.web_url);
             }
         };
-        // TODO: kind of duplication ...
-        result.setRepository(name);
-        result.setPath(project.path_with_namespace());
-        result.setRevision("TODO");
-        result.setRepositoryScm(repoUrl(project));
         return result;
     }
 
