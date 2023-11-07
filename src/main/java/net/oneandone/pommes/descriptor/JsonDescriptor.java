@@ -50,10 +50,10 @@ public class JsonDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl scm) {
+    public Project load(Environment environment) {
         Project project;
 
-        project = new Project(repository, origin, revision, orig.parent, orig.artifact, scm != null ? scm : orig.scm, orig.url);
+        project = new Project(repository, path, revision, orig.parent, orig.artifact, repositoryScm != null ? repositoryScm : orig.scm, orig.url);
         project.dependencies.addAll(orig.dependencies);
         return project;
     }

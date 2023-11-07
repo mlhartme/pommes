@@ -51,13 +51,13 @@ public class RawDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl repositoryScm) throws IOException {
+    public Project load(Environment environment) throws IOException {
         Gav artifact;
 
         if (repositoryScm == null || !repositoryScm.same(scm.getUrl(directory))) {
             throw new IllegalArgumentException(repositoryScm + " vs " + scm.getUrl(directory));
         }
         artifact = repositoryScm.defaultGav();
-        return new Project(repository, origin, revision, null, artifact, repositoryScm, null);
+        return new Project(repository, path, revision, null, artifact, repositoryScm, null);
     }
 }

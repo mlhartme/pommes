@@ -25,7 +25,6 @@ import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
-import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -219,8 +218,8 @@ public class GitlabRepository extends Repository {
         Gav gav = repoUrl(project).defaultGav();
         result = new Descriptor(name, project.path_with_namespace(), "TODO", repoUrl(project)) {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withPath, String withRevision, ScmUrl withScm) throws ScmUrlException {
-                return new Project(name, withPath, withRevision, null, gav, withScm, project.web_url);
+            public Project load(Environment environmentNotUsed) {
+                return new Project(name, path, revision, null, gav, repositoryScm, project.web_url);
             }
         };
         return result;

@@ -30,7 +30,7 @@ public abstract class Descriptor {
     }
     public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException(), "end-of-queue", "path", "revision", null) {
         @Override
-        protected Project doLoad(Environment environment, String repository, String origin, String revision, ScmUrl scm) {
+        public Project load(Environment environment) {
             throw new IllegalStateException();
         }
     };
@@ -69,7 +69,7 @@ public abstract class Descriptor {
         this.repository = repository;
         this.path = path;
         this.revision = revision;
-        this.repositoryScm = repositoryScm;
+        this.repositoryScm = repositoryScm == null ? null : repositoryScm.normalize();
     }
 
     public String getRepository() {
@@ -84,12 +84,7 @@ public abstract class Descriptor {
         return revision;
     }
 
-    public Project load(Environment environment) throws IOException {
-        return doLoad(environment, repository, path, revision, repositoryScm == null ? null : repositoryScm.normalize());
-    }
-
-    protected abstract Project doLoad(Environment environment, String withRepository, String withOrigin, String withRevision,
-                                      ScmUrl withRepositoryScm) throws IOException;
+    public abstract Project load(Environment environment) throws IOException;
 
     public String toString() {
         return path;

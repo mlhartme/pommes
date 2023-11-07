@@ -52,7 +52,7 @@ public class MavenDescriptor extends Descriptor {
     //--
 
     @Override
-    protected Project doLoad(Environment environment, String repository, String path, String revision, ScmUrl repositoryScm) throws IOException {
+    public Project load(Environment environment) throws IOException {
         FileNode local;
         MavenProject project;
 
