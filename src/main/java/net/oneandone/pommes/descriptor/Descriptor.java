@@ -49,12 +49,23 @@ public abstract class Descriptor {
         return null;
     }
 
+    //--
+
     protected final String repository;
     protected final String path;
     protected final String revision;
     protected final ScmUrl repositoryScm;
 
     public Descriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
+        if (repository == null) {
+            throw new IllegalArgumentException();
+        }
+        if (path == null) {
+            throw new IllegalArgumentException();
+        }
+        if (revision == null) {
+            throw new IllegalArgumentException();
+        }
         this.repository = repository;
         this.path = path;
         this.revision = revision;
@@ -74,15 +85,6 @@ public abstract class Descriptor {
     }
 
     public Project load(Environment environment) throws IOException {
-        if (repository == null) {
-            throw new IllegalStateException();
-        }
-        if (path == null) {
-            throw new IllegalStateException();
-        }
-        if (revision == null) {
-            throw new IllegalStateException();
-        }
         return doLoad(environment, repository, path, revision, repositoryScm == null ? null : repositoryScm.normalize());
     }
 

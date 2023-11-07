@@ -219,8 +219,8 @@ public class GitlabRepository extends Repository {
         Gav gav = repoUrl(project).defaultGav();
         result = new Descriptor(name, project.path_with_namespace(), "TODO", repoUrl(project)) {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
-                return new Project(name, project.path_with_namespace(), "TODO", null, gav, repoUrl(project), project.web_url);
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withPath, String withRevision, ScmUrl withScm) throws ScmUrlException {
+                return new Project(name, withPath, withRevision, null, gav, withScm, project.web_url);
             }
         };
         return result;

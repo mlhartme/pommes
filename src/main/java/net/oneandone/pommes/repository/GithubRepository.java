@@ -186,8 +186,8 @@ public class GithubRepository extends Repository {
         Gav gav = repoUrl(repo).defaultGav();
         result = new Descriptor(name, repo.full_name(), "TODO", repoUrl(repo)) {
             @Override
-            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withOrigin, String withRevision, ScmUrl withScm) throws ScmUrlException {
-                return new Project(name, repo.full_name(), "TODO", null, gav, repoUrl(repo), repo.url);
+            protected Project doLoad(Environment environmentNotUsed, String withRepository, String withPath, String withRevision, ScmUrl withScm) throws ScmUrlException {
+                return new Project(name, withPath, withRevision, null, gav, withScm, repo.url);
             }
         };
         return result;

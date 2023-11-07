@@ -37,8 +37,8 @@ public class ComposerDescriptor extends Descriptor {
     }
 
     @Override
-    protected Project doLoad(Environment notUsed, String repository, String origin, String revision, ScmUrl scm) {
-        return new Project(repository, origin, revision, null, artifact(origin), scm, null);
+    protected Project doLoad(Environment notUsed, String repository, String path, String revision, ScmUrl scm) {
+        return new Project(repository, path, revision, null, artifact(path), scm, null);
     }
 
     private static Gav artifact(String origin) {
