@@ -22,7 +22,9 @@ import net.oneandone.sushi.fs.Node;
 
 import java.io.IOException;
 
-/** Factory for Projects */
+/**
+ * Base class for various kinds of project descriptors, e.g. Maven pom files. Factory for Projects.
+ * Has itself a creator method to detect the suitable Descritor class. */
 public abstract class Descriptor {
     @FunctionalInterface
     public interface Creator {

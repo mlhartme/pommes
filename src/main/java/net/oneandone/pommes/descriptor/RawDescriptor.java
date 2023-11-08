@@ -16,7 +16,6 @@
 package net.oneandone.pommes.descriptor;
 
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
@@ -24,7 +23,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
 
-/** descriptor without meta information like form poms, only the scm url is known */
+/** descriptor without meta information like from poms, only the scm url is known */
 public class RawDescriptor extends Descriptor {
     public static RawDescriptor createOpt(String repository, FileNode node) throws IOException {
         Scm scm;
@@ -36,28 +35,17 @@ public class RawDescriptor extends Descriptor {
         if (scm == null) {
             return null;
         }
-        return new RawDescriptor(scm, node, repository, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node));
+        return new RawDescriptor(repository, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node));
     }
 
-    private final Scm scm;
-    private final FileNode directory;
-
-    public RawDescriptor(Scm scm, FileNode directory, String repository, String path, String revision, ScmUrl repositoryScm) {
+    public RawDescriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
         super(repository, path, revision, repositoryScm);
-        this.scm = scm;
-        this.directory = directory;
     }
 
     //--
 
     @Override
     public Project load(Environment environment) throws IOException {
-        Gav artifact;
-
-        if (repositoryScm == null || !repositoryScm.same(scm.getUrl(directory))) {
-            throw new IllegalArgumentException(repositoryScm + " vs " + scm.getUrl(directory));
-        }
-        artifact = repositoryScm.defaultGav();
-        return new Project(repository, path, revision, null, artifact, repositoryScm, null);
+        return new Project(repository, path, revision, null, repositoryScm.defaultGav(), repositoryScm, null);
     }
 }
