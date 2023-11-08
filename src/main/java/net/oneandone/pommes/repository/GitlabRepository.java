@@ -21,9 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.database.Gav;
-import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.descriptor.RawDescriptor;
 import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
@@ -215,14 +214,7 @@ public class GitlabRepository extends Repository {
             }
         }
 
-        Gav gav = repoUrl(project).defaultGav();
-        result = new Descriptor(name, project.path_with_namespace(), "TODO", repoUrl(project)) {
-            @Override
-            public Project load(Environment environmentNotUsed) {
-                return new Project(name, path, revision, null, gav, repositoryScm, project.web_url);
-            }
-        };
-        return result;
+        return new RawDescriptor(name, project.path_with_namespace(), "TODO", repoUrl(project), project.web_url);
     }
 
     //--

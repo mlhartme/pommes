@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.database.Gav;
-import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
 import net.oneandone.pommes.scm.GitUrl;
@@ -171,7 +169,6 @@ public class GithubRepository extends Repository {
     public Descriptor scanOpt(GithubRepo repo) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
-        Descriptor result;
 
         for (String name : files(repo)) {
             m = Descriptor.match(name);
@@ -183,7 +180,6 @@ public class GithubRepository extends Repository {
             }
         }
 
-        Gav gav = repoUrl(repo).defaultGav();
         return new RawDescriptor(name, repo.full_name(), "TODO", repoUrl(repo), repo.url);
     }
 
