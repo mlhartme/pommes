@@ -30,12 +30,6 @@ public abstract class Descriptor {
     public interface Creator {
         Descriptor create(Environment env, Node<?> node, String repository, String path, String revision, ScmUrl scmUrl);
     }
-    public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IOException(), "end-of-queue", "path", "revision", null) {
-        @Override
-        public Project load(Environment environment) {
-            throw new IllegalStateException();
-        }
-    };
 
     /** @return create method for matching descriptor or null if no descriptor matches */
     public static Creator match(String name) {

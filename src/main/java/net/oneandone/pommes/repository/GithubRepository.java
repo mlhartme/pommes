@@ -23,6 +23,7 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Gav;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.descriptor.RawDescriptor;
 import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
@@ -183,13 +184,7 @@ public class GithubRepository extends Repository {
         }
 
         Gav gav = repoUrl(repo).defaultGav();
-        result = new Descriptor(name, repo.full_name(), "TODO", repoUrl(repo)) {
-            @Override
-            public Project load(Environment environmentNotUsed) {
-                return new Project(name, path, revision, null, gav, repositoryScm, repo.url);
-            }
-        };
-        return result;
+        return new RawDescriptor(name, repo.full_name(), "TODO", repoUrl(repo), repo.url);
     }
 
 

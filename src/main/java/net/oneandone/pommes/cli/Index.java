@@ -21,6 +21,7 @@ import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.descriptor.ErrorDescriptor;
 import net.oneandone.pommes.repository.Repository;
 import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
@@ -84,7 +85,7 @@ public class Index extends Base {
                 try {
                     repository.scan(indexer.src, environment.console());
                 } finally {
-                    indexer.src.put(Descriptor.END_OF_QUEUE);
+                    indexer.src.put(ErrorDescriptor.END_OF_QUEUE);
                     indexer.join();
                 }
                 if (indexer.exception != null) {
@@ -196,7 +197,7 @@ public class Index extends Base {
                 } catch (InterruptedException e) {
                     continue; // TODO: ok so?
                 }
-                if (descriptor == Descriptor.END_OF_QUEUE) {
+                if (descriptor == ErrorDescriptor.END_OF_QUEUE) {
                     return null;
                 }
                 count++;

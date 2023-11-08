@@ -35,17 +35,20 @@ public class RawDescriptor extends Descriptor {
         if (scm == null) {
             return null;
         }
-        return new RawDescriptor(repository, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node));
+        return new RawDescriptor(repository, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node), null);
     }
 
-    public RawDescriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
+    private final String url;
+
+    public RawDescriptor(String repository, String path, String revision, ScmUrl repositoryScm, String url) {
         super(repository, path, revision, repositoryScm);
+        this.url = url;
     }
 
     //--
 
     @Override
     public Project load(Environment environment) throws IOException {
-        return new Project(repository, path, revision, null, repositoryScm.defaultGav(), repositoryScm, null);
+        return new Project(repository, path, revision, null, repositoryScm.defaultGav(), repositoryScm, url);
     }
 }

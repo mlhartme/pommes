@@ -22,6 +22,9 @@ import net.oneandone.pommes.scm.ScmUrl;
 import java.io.IOException;
 
 public class ErrorDescriptor extends Descriptor {
+    public static final Descriptor END_OF_QUEUE = new ErrorDescriptor(new IllegalStateException(),
+            "end-of-queue", "path", "revision", null);
+
     private final Exception exception;
 
     public ErrorDescriptor(Exception exception, String repository, String path, String revision, ScmUrl repositoryScm) {
