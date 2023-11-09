@@ -1,4 +1,6 @@
 if [ -z "${POMMES_AUTO_CD}" ] ; then
+  # TODO: untested
+  export POMMES_ROOT="${BASH_SOURCE[0]}/../../../"
   export POMMES_OLD_PROMPT_COMMAND=$PROMPT_COMMAND
 
   doPommes() {

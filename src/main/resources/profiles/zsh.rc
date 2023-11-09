@@ -1,5 +1,6 @@
 if [ -z "${POMMES_AUTO_CD}" ] ; then
   export POMMES_AUTO_CD=/tmp/pommes-$$
+  export POMMES_ROOT="${${(%):-%x}:A:h}/../../"
   pommes_precmd() {
     # wrap in eval to avoid bash syntax error
     eval "files=(${POMMES_AUTO_CD}-*(N))"

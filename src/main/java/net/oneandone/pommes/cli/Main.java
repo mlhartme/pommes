@@ -84,7 +84,7 @@ public class Main {
                 + "  {scm}     = scm location for current directory\n"
                 + "\n"
                 + "environment:\n"
-                + "  POMMES_ROOT     directory for manged checkouts and '.pommes'\n"
+                + "  POMMES_ROOT     directory for managed checkouts; also holds Pommes configuration directory '.pommes'\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
