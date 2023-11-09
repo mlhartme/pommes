@@ -82,6 +82,15 @@ public class Properties {
         return new Properties(checkouts, giteaKey, queries, formats, repositories);
     }
 
+    public boolean addLocalRepository(FileNode projects) {
+        if (repositories.containsKey("local")) {
+            return false;
+        } else {
+            repositories.put("local", projects.getAbsolute());
+            return true;
+        }
+    }
+
     //--
 
     public final FileNode checkouts;

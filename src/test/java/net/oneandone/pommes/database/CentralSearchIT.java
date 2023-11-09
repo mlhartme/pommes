@@ -39,7 +39,7 @@ public class CentralSearchIT {
 
     @Test
     public void test() throws IOException {
-        check("de.schmizzolin:yogi:1.4.0", "yogi", "yogi");
+        check("de.schmizzolin:yogi:1.4.0", "yogi", "/", "yogi");
         // TODO check("net.sf.beezle.sushi:sushi:2.7.0", "sushi AND beezle", "sushi+beezle");
         // TODO check("de.schmizzolin:yogi:1.4.0", "yogi AND -beezle", "yogi+!beezle");
     }

@@ -20,7 +20,6 @@ import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
-import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.util.Map;
@@ -71,11 +70,11 @@ public class Lib {
     public Lib(FileNode home) throws IOException {
         this.home = home;
         this.properties = Properties.load(configFile(home));
+        this.properties.addLocalRepository(home.getParent());
     }
 
-    public String tokenOpt(String repositoryName, String protocol) throws IOException {
-        var file = home.join(Strings.removeRight(protocol.toLowerCase(), ":")
-                + "-" + repositoryName + ".token");
+    public String tokenOpt(String repositoryName) throws IOException {
+        var file = home.join(".pommes-" + repositoryName + ".token");
         return file.exists() ? file.readString().trim() : null;
     }
 

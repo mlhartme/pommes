@@ -50,22 +50,35 @@ public class PommesQuery {
         Or orBuilder;
         And andBuilder;
         List<String> terms;
+        String repo;
 
         queryIndex = -1;
-        or = initialOr;
-        if (initialOr.size() > 0) {
+        or = new ArrayList<>(initialOr);
+        if (or.size() > 0) {
             try {
                 queryIndex = Integer.parseInt(initialOr.get(initialOr.size() - 1));
                 queryIndex--;
-                or = new ArrayList<>(initialOr);
                 or.remove(initialOr.size() - 1);
             } catch (NumberFormatException e) {
                 // fall-through - not and index
             }
         }
+        if (or.size() > 0 && or.get(0).startsWith("/")) {
+            repo = or.remove(0);
+            if (repo.length() == 1) {
+                repo = null;
+            } else {
+                repo = repo.substring(1);
+            }
+        } else {
+            repo = "local";
+        }
         orBuilder = new Or();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
             andBuilder = new And();
+            if (repo != null) {
+                andBuilder.add(new Atom(false, Arrays.asList(Field.ORIGIN), Match.PREFIX, repo + ":"));
+            }
             terms = PLUS.split(variables.substitute(and));
             for (String termWithNot : terms) {
                 andBuilder.add(Atom.parse(termWithNot, variables));

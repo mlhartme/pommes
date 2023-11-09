@@ -42,7 +42,7 @@ public class GitlabRepository extends Repository {
     public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
         if (url.startsWith(PROTOCOL)) {
             return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()),
-                    environment.lib.tokenOpt(repository, PROTOCOL));
+                    environment.lib.tokenOpt(repository));
         } else {
             return null;
         }

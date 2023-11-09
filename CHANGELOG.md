@@ -2,6 +2,11 @@
 
 ### 3.5.0 (pending)
 
+* local handling
+  * local repo is no implicitly
+  * extended queries: to specify the repository to search by prefix the query with "/" repo;
+    default is "local"
+* simplified token file naming: $HOME/.pommes-<repo>.token
 * ls:
   * renamed it to `st`
 * tweaks and fixes

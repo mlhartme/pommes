@@ -18,18 +18,22 @@ package net.oneandone.pommes.database;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserTest {
     @Test
     public void test() throws IOException {
-        check("as:someString", "someString");
-        check("-a:someString", "!a:someString");
-        check("as:x+as:y", "x+y");
+        check("as:someString", "/", "someString");
+        check("-a:someString", "/", "!a:someString");
+        check("as:a as:b", "/", "a", "b");
+        check("o=local:+-a:someString", "!a:someString");
+        check("o=local:+as:x+as:y", "x+y");
+        check("o=local:+as:x o=local:+as:y", "x", "y");
     }
 
-    private void check(String expected, String expr) throws IOException {
-        assertEquals(expected, PommesQuery.parse(expr).toString());
+    private void check(String expected, String... expr) throws IOException {
+        assertEquals(expected, PommesQuery.parse(Arrays.asList(expr)).toString());
     }
 }
