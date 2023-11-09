@@ -76,8 +76,8 @@ public class Setup {
         console.info.println();
         console.info.println("TODO for YOU: choose the appropriate shell file from " + directory.join("profiles"));
         console.info.println("and source it in your shell initialization. AND: reload the shell. For zsh, that looks something like this:");
-        console.info.println("   echo \"source '" + directory.join("profiles/zsh.rc").getAbsolute() + "'\" >> ~/.zprofile");
-        console.info.println("   source ~/.zprofile # or restart terminal");
+        console.info.println("   echo \"source '" + directory.join("profiles/zsh.rc").getAbsolute() + "'\" >> ~/.zshrc");
+        console.info.println("   source ~/.zshrc # or restart terminal");
         console.info.println("You might also want to adjust " + directory.join("config"));
     }
 }
