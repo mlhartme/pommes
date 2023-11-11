@@ -6,8 +6,9 @@
   * local repo is no implicitly
   * extended queries: to specify the repository to search by prefix the query with "/" repo;
     default is "local"
-* setup 
-  * determine POMMES_ROOT automatically
+* simplified setup: 
+  * root directory is an optional argument now
+  * POMMES_ROOT is automatically set by shell profile
 * simplified token file naming: $HOME/.pommes-<repo>.token
 * ls:
   * renamed it to `st`

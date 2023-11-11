@@ -31,17 +31,32 @@ public class Setup {
     private final World world;
     private final Console console;
     private final boolean batch;
+    private final FileNode root;
 
     private final Map<String, String> repositories;
 
-    public Setup(World world, Console console, boolean batch, List<String> keyValues) {
+    public Setup(World world, Console console, boolean batch, List<String> dirKeyValues) {
         this.world = world;
         this.console = console;
         this.batch = batch;
         this.repositories = new LinkedHashMap<>();
-        for (String kv : keyValues) {
+        this.root = eatRoot(dirKeyValues);
+        for (String kv : dirKeyValues) {
             add(kv);
         }
+    }
+
+
+    private FileNode eatRoot(List<String> dirKeyValues) {
+        if (!dirKeyValues.isEmpty()) {
+            String kv = dirKeyValues.get(0);
+            int idx = kv.indexOf('=');
+            if (idx == -1) {
+                dirKeyValues.remove(0);
+                return world.file(kv);
+            }
+        }
+        return world.getHome().join("Pommes");
     }
 
     private void add(String kv) {
@@ -60,24 +75,40 @@ public class Setup {
         Environment environment;
 
         // TODO: duplicate file names ...
-        directory = Lib.directory(world);
-        if (directory.exists())  {
+        directory = Lib.directoryOpt(world);
+        if (directory != null && directory.exists())  {
             throw new IOException("pommes is already set up: " + directory);
         }
         if (!batch) {
-            console.info.println("Ready to create " + directory.getAbsolute());
+            console.info.println("Ready to set up pommes in directory " + root);
+            console.info.println("Directory " + directory.getAbsolute() + " will be created.");
             console.readline("Press return to continue, ctl-c to abort: ");
         }
-        Lib lib = Lib.create(world, console, repositories);
+        Lib.create(world, root, console, repositories);
         environment = new Environment(console, world);
         console.info.println("initial indexing ...");
         new Index(environment, new ArrayList<>()).run();
         console.info.println("indexing done");
         console.info.println();
-        console.info.println("TODO for YOU: choose the appropriate shell file from " + directory.join("profiles"));
-        console.info.println("and source it in your shell initialization. AND: reload the shell. For zsh, that looks something like this:");
-        console.info.println("   echo \"source '" + directory.join("profiles/zsh.rc").getAbsolute() + "'\" >> ~/.zshrc");
-        console.info.println("   source ~/.zshrc # or restart terminal");
-        console.info.println("You might also want to adjust " + directory.join("config"));
+        console.info.println("TODO for YOU:");
+        console.info.println("1. source the appropriate profile in your shell initialization");
+        console.info.println(shellInit(directory));
+        console.info.println("2. restart terminal");
+        console.info.println("3. optionally adjust " + directory.join("config"));
+    }
+    private String shellInit(FileNode directory) {
+        String shell = getShell();
+        FileNode file;
+
+        file = directory.join("profiles", shell + ".rc");
+        if (file.exists()) {
+            return "     echo \"source '" + directory.join("profiles/zsh.rc").getAbsolute() + "'\" >> ~/." + shell + "rc";
+        }
+        return "   (choose profile from " + directory.join("profiles") + " and source it in your shell initialization";
+    }
+
+    private static String getShell() {
+        String shell = System.getenv("SHELL");
+        return shell == null ? "unknown" : shell.substring(shell.lastIndexOf('/') + 1);
     }
 }

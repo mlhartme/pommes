@@ -26,20 +26,21 @@ import java.util.Map;
 
 /** Represents the .pommes directory */
 public class Lib {
+    public static final String DIR = ".pommes";
     public static Lib load(World world) throws IOException {
         FileNode lib;
 
-        lib = directory(world);
-        if (!lib.isDirectory()) {
+        lib = directoryOpt(world);
+        if (lib == null || !lib.isDirectory()) {
             throw new IOException("pommes is not set up. Please run 'pommes setup'");
         }
         return new Lib(lib);
     }
 
-    public static Lib create(World world, Console console, Map<String, String> repositories) throws IOException {
+    public static void create(World world, FileNode root, Console console, Map<String, String> repositories) throws IOException {
         FileNode lib;
 
-        lib = directory(world);
+        lib = root.join(DIR);
         if (lib.isDirectory()) {
             throw new IOException("already set up at " + lib);
         }
@@ -48,17 +49,16 @@ public class Lib {
         lib.join("logs").mkdir();
         world.resource("profiles").copyDirectory(lib.join("profiles").mkdir());
         configFile(lib).writeLines(Properties.defaultConfig(repositories));
-        return new Lib(lib);
     }
 
     public static final String DEFAULT_ROOT = "Pommes";
 
-    /** @return .pommes directory to use */
-    public static FileNode directory(World world) {
+    /** @return .pommes directory to use or null if not defined */
+    public static FileNode directoryOpt(World world) {
         String path;
 
         path = System.getenv("POMMES_ROOT");
-        return (path != null ? world.file(path) : world.getHome().join(DEFAULT_ROOT)).join(".pommes");
+        return path != null ? world.file(path).join(DIR) : null;
     }
 
     //--
