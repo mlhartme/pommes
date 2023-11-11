@@ -80,8 +80,8 @@ public class Setup {
             throw new IOException("pommes is already set up: " + directory);
         }
         if (!batch) {
-            console.info.println("Ready to set up pommes in directory " + root);
-            console.info.println("Directory " + directory.getAbsolute() + " will be created.");
+            console.info.println("Ready to set up pommes for root directory " + root);
+            console.info.println("Directory " + directory.getAbsolute() + " will be created to store configuration and other files.");
             console.readline("Press return to continue, ctl-c to abort: ");
         }
         Lib.create(world, root, console, repositories);
@@ -93,8 +93,8 @@ public class Setup {
         console.info.println("TODO for YOU:");
         console.info.println("1. source the appropriate profile in your shell initialization");
         console.info.println(shellInit(directory));
-        console.info.println("2. restart terminal");
-        console.info.println("3. optionally adjust " + directory.join("config"));
+        console.info.println("2. restart terminal to reload shell initialization");
+        console.info.println("3. optionally adjust Pommes configuration in " + directory.join("config"));
     }
     private String shellInit(FileNode directory) {
         String shell = getShell();

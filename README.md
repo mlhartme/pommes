@@ -51,14 +51,14 @@ Install the application
         curl https://repo.maven.apache.org/maven2/net/oneandone/pommes/3.4.0/pommes-3.4.0-application.sh -o pommes
         chmod a+x pommes
     
-* run `pommes setup` and follow the instructions. Basically, the command creates a directory `~/Pommes/.pommes` containing
-  a `config` file and a database. (To create `.pommes` in a different directory, define an environment variable
-  `POMMES_ROOT` pointing to that directory before runing setup.)
+* run `pommes setup` and follow the instructions. Basically, this sets up Pommes with root directory `~/Projects`, 
+  configuration and other files will be stored in `~/Projects/.pommes`. To set up a different directory, pass it as an argument on the 
+  command line
 
 ## Managing the Database
 
 Pommes maintains a [Lucene](http://lucene.apache.org) database to store project metadata. The database is filled
-by indexing so-called repositories. The database is stored in `$POMMES_ROOT/.pommes/database`, it's save to delete this
+by indexing so-called repositories. The database is stored in `$POMMES_ROOT/.pommes/database`, it's safe to delete this
 directory to wipe the database.
 
 `.pommes/config` defines databases in the form *repository.<name> = <url> {<option>}*
