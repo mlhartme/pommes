@@ -19,8 +19,10 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.util.Separator;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +56,7 @@ public class Properties {
         String formatPrefix = "format.";
         String repoPrefix = "repository.";
         String giteaKey;
-        java.util.Properties props;
+        Map<String, String> props;
         Map<String, List<String>> queries;
         Map<String, String> formats;
         Map<String, String> repositories;
@@ -64,31 +66,40 @@ public class Properties {
         queries = new HashMap<>();
         formats = new HashMap<>();
         repositories = new HashMap<>();
-        props = file.readProperties();
+        props = readSequencedProperties(file);
         checkouts = file.getParent().getParent();
-        for (String key : props.stringPropertyNames()) {
+        for (String key : props.keySet()) {
             if (key.equals("gitea.key")) {
-                giteaKey = props.getProperty(key);
+                giteaKey = props.get(key);
             } else if (key.startsWith(queryPrefix)) {
-                queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.getProperty(key)));
+                queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.get(key)));
             } else if (key.startsWith(formatPrefix)) {
-                formats.put(key.substring(formatPrefix.length()), props.getProperty(key));
+                formats.put(key.substring(formatPrefix.length()), props.get(key));
             } else if (key.startsWith(repoPrefix)) {
-                repositories.put(key.substring(repoPrefix.length()), props.getProperty(key));
+                repositories.put(key.substring(repoPrefix.length()), props.get(key));
             } else {
                 throw new IOException("unknown property: " + key);
             }
         }
-        return new Properties(checkouts, giteaKey, queries, formats, repositories);
+        if (repositories.isEmpty()) {
+            throw new IOException("missing repositories");
+        }
+        return new Properties(checkouts, giteaKey, queries, formats, repositories, repositories.keySet().iterator().next());
     }
 
-    public boolean addLocalRepository(FileNode projects) {
-        if (repositories.containsKey("local")) {
-            return false;
-        } else {
-            repositories.put("local", projects.getAbsolute());
-            return true;
+    public static Map<String, String> readSequencedProperties(FileNode file) throws IOException {
+        Map<String, String> result = new LinkedHashMap<>();
+
+        try (Reader src = file.newReader()) {
+            java.util.Properties p = new java.util.Properties() {
+                public synchronized Object put(Object key, Object value) {
+                    result.put((String) key, (String) value);
+                    return super.put(key, value);
+                }
+            };
+            p.load(src);
         }
+        return result;
     }
 
     //--
@@ -100,14 +111,16 @@ public class Properties {
 
     /** maps names to repository urls */
     public final Map<String, String> repositories;
+    public final String defaultRepository;
 
     public Properties(FileNode checkouts, String giteaKey, Map<String, List<String>> queries,
-                      Map<String, String> formats, Map<String, String> repositories) {
+                      Map<String, String> formats, Map<String, String> repositories, String defaultRepository) {
         this.checkouts = checkouts;
         this.giteaKey = giteaKey;
         this.queries = queries;
         this.formats = formats;
         this.repositories = repositories;
+        this.defaultRepository = defaultRepository;
     }
 
     public List<String> lookupQuery(String name) {

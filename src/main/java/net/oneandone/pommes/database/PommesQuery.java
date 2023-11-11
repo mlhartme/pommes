@@ -37,14 +37,14 @@ public class PommesQuery {
     private static final Separator PLUS = Separator.on('+');
 
     public static PommesQuery parse(String str) throws IOException {
-        return parse(Collections.singletonList(str));
+        return parse(Collections.singletonList(str), null);
     }
 
-    public static PommesQuery parse(List<String> initialOr) throws IOException {
-        return parse(initialOr, EMPTY);
+    public static PommesQuery parse(List<String> initialOr, String defaultRepository) throws IOException {
+        return parse(initialOr, defaultRepository, EMPTY);
     }
 
-    public static PommesQuery parse(List<String> initialOr, Variables variables) throws IOException {
+    public static PommesQuery parse(List<String> initialOr, String defaultRepository, Variables variables) throws IOException {
         int queryIndex;
         List<String> or;
         Or orBuilder;
@@ -71,7 +71,7 @@ public class PommesQuery {
                 repo = repo.substring(1);
             }
         } else {
-            repo = "local";
+            repo = defaultRepository;
         }
         orBuilder = new Or();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {

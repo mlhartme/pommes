@@ -70,7 +70,6 @@ public class Lib {
     public Lib(FileNode home) throws IOException {
         this.home = home;
         this.properties = Properties.load(configFile(home));
-        this.properties.addLocalRepository(home.getParent());
     }
 
     public String tokenOpt(String repositoryName) throws IOException {

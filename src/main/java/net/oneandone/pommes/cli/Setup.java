@@ -39,8 +39,9 @@ public class Setup {
         this.world = world;
         this.console = console;
         this.batch = batch;
-        this.repositories = new LinkedHashMap<>();
         this.root = eatRoot(dirKeyValues);
+        this.repositories = new LinkedHashMap<>();
+        this.repositories.put("local", root.getAbsolute());
         for (String kv : dirKeyValues) {
             add(kv);
         }

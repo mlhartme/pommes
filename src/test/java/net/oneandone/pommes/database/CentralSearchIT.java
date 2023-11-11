@@ -49,7 +49,7 @@ public class CentralSearchIT {
         List<Project> projects;
         Project p;
 
-        query = PommesQuery.parse(Arrays.asList(queryStrings));
+        query = PommesQuery.parse(Arrays.asList(queryStrings), "local");
         assertEquals(Arrays.asList(expectedParsed), query.toCentral());
         projects = SEARCH.query(query);
         assertEquals(1, projects.size());

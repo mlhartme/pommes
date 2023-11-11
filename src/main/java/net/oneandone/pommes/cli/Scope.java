@@ -26,11 +26,13 @@ import java.io.IOException;
 import java.util.List;
 
 public class Scope {
+    private final String defaultRepository;
     private final Database database;
     private final CentralSearch centralSearch;
     private final Variables variables;
 
-    public Scope(Database database, Variables variables, CentralSearch centralSearch) {
+    public Scope(String defaultRepository, Database database, Variables variables, CentralSearch centralSearch) {
+        this.defaultRepository = defaultRepository;
         this.database = database;
         this.variables = variables;
         this.centralSearch = centralSearch;
@@ -43,14 +45,14 @@ public class Scope {
     public List<Project> queryDatabase(List<String> queryStrings) throws IOException {
         PommesQuery query;
 
-        query = PommesQuery.parse(queryStrings, variables);
+        query = PommesQuery.parse(queryStrings, defaultRepository, variables);
         return Field.projects(database.query(query));
     }
 
     public List<Project> queryCentral(List<String> queryStrings) throws IOException {
         PommesQuery query;
 
-        query = PommesQuery.parse(queryStrings, variables);
+        query = PommesQuery.parse(queryStrings, defaultRepository, variables);
         return centralSearch.query(query);
     }
 }

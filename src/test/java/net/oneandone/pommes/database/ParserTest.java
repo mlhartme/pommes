@@ -34,6 +34,6 @@ public class ParserTest {
     }
 
     private void check(String expected, String... expr) throws IOException {
-        assertEquals(expected, PommesQuery.parse(Arrays.asList(expr)).toString());
+        assertEquals(expected, PommesQuery.parse(Arrays.asList(expr), "local").toString());
     }
 }

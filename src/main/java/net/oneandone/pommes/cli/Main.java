@@ -70,7 +70,7 @@ public class Main {
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
                 + "  or        = repo? (and (' ' and)*)? index?\n"
-                + "  repo      = '/' STR?                  ; default repo: local\n"
+                + "  repo      = '/' STR?                  ; default is first repository defined in config\n"
                 + "  index     = NUMBER\n"
                 + "  and       = term ('+' term)*\n"
                 + "  term      = field | lucene\n"

@@ -2,10 +2,11 @@
 
 ### 3.5.0 (pending)
 
-* local handling
-  * local repo is no implicitly
-  * extended queries: to specify the repository to search by prefix the query with "/" repo;
-    default is "local"
+* default repositories
+  * the first repository defined in config is the default repository
+  * setup automatically defines default repository local = $POMMES_ROOT
+  * changed queries to only search the default repository by default;
+    prefix a query with "/" <repo> to search a different repository; prefix with "/" to search all repositories
 * simplified setup: 
   * root directory is an optional argument to `setup` now
   * default root directory changed from `Pommes` to `Projects`
