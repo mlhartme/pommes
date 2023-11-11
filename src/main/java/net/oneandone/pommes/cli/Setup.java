@@ -56,7 +56,7 @@ public class Setup {
                 return world.file(kv);
             }
         }
-        return world.getHome().join("Pommes");
+        return world.getHome().join(Lib.DEFAULT_ROOT);
     }
 
     private void add(String kv) {

@@ -27,6 +27,8 @@ import java.util.Map;
 /** Represents the .pommes directory */
 public class Lib {
     public static final String DIR = ".pommes";
+    public static final String DEFAULT_ROOT = "Projects";
+
     public static Lib load(World world) throws IOException {
         FileNode lib;
 
@@ -50,8 +52,6 @@ public class Lib {
         world.resource("profiles").copyDirectory(lib.join("profiles").mkdir());
         configFile(lib).writeLines(Properties.defaultConfig(repositories));
     }
-
-    public static final String DEFAULT_ROOT = "Pommes";
 
     /** @return .pommes directory to use or null if not defined */
     public static FileNode directoryOpt(World world) {

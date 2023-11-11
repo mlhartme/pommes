@@ -60,10 +60,9 @@ public class Main {
                 + "                        checkouts with modifications are marked in the list\n" */
                 + "  'index' {repo}        re-index the specified (default: all) repositories.\n"
                 + "  'setup' ['-batch'] root? {name'='value}\n"
-                + "                        sets up pommes in the specified directory (default: ~/Pommes)\n"
-                + "                        creates '.pommes' directory inside with initial configuration containing name/values as repositories; \n"
+                + "                        sets up pommes in the specified directory (default: ~/" + Lib.DEFAULT_ROOT + ")\n"
+                + "                        creates '" + Lib.DIR + "' directory inside with initial configuration containing name/values as repositories; \n"
                 + "                        indexes all repositories to create intial database;\n"
-                + "                        '.pommes' is created in the directory specified by $POMMES_ROOT, default is ~/" + Lib.DEFAULT_ROOT + ".\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
@@ -85,7 +84,8 @@ public class Main {
                 + "  {scm}     = scm location for current directory\n"
                 + "\n"
                 + "environment:\n"
-                + "  POMMES_ROOT     directory for managed checkouts; also holds Pommes configuration directory '.pommes'\n"
+                + "  POMMES_ROOT     directory for managed checkouts; also holds directory '" + Lib.DIR + "'\n"
+                + "                  defined during shell initialization\n"
                 + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);

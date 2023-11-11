@@ -7,8 +7,9 @@
   * extended queries: to specify the repository to search by prefix the query with "/" repo;
     default is "local"
 * simplified setup: 
-  * root directory is an optional argument now
-  * POMMES_ROOT is automatically set by shell profile
+  * root directory is an optional argument to `setup` now
+  * default root directory changed from `Pommes` to `Projects`
+  * POMMES_ROOT is now set automatically by shell profile
 * simplified token file naming: $HOME/.pommes-<repo>.token
 * ls:
   * renamed it to `st`
