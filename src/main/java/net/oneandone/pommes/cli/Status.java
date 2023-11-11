@@ -16,6 +16,7 @@
 package net.oneandone.pommes.cli;
 
 import net.oneandone.inline.ArgumentException;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -47,7 +48,7 @@ public class Status extends Base {
     @Override
     public void run(Scope scope) throws Exception {
         Map<FileNode, Scm> checkouts;
-        Map<Integer, Step> steps;
+        Map<String, Step> steps;
         int id;
         FileNode found;
         Step step;
@@ -72,8 +73,8 @@ public class Status extends Base {
                 console.info.println(step);
             } else {
                 id++;
-                steps.put(id, step);
-                console.info.println(step.toString(id));
+                steps.put(Integer.toString(id), step);
+                console.info.println(step.toString(Integer.toString(id)));
             }
         }
         for (FileNode u : unknown(directory, checkouts.keySet(), environment.excludes())) {
@@ -85,24 +86,23 @@ public class Status extends Base {
                 String input;
                 input = console.readline("What do you want to fix, ctrl-c to abort (<numbers>/all)? ");
                 if ("all".equals(input)) {
+                    List<String> done = new ArrayList<>();
                     for (var entry : steps.entrySet()) {
-                        entry.getValue().apply();
-                        console.info.println("fixed " + entry.getKey());
+                        if (entry.getValue().applyChecked(entry.getKey(), console)) {
+                            done.add(entry.getKey());
+                        }
                     }
-                    steps.clear();
+                    steps.keySet().removeAll(done);
                 } else {
                     for (String item : Separator.SPACE.split(input)) {
-                        try {
-                            step = steps.remove(Integer.parseInt(item));
-                        } catch (NumberFormatException e) {
-                            step = null;
-                        }
+                        step = steps.get(item);
                         if (step == null) {
-                            console.info.println("unknown input: " + item);
-                            break;
+                            console.info.println("not found: " + item);
+                        } else {
+                            if (step.applyChecked(item, console)) {
+                                steps.remove(item);
+                            }
                         }
-                        step.apply();
-                        console.info.println("fixed " + item);
                     }
                 }
                 if (steps.isEmpty()) {
@@ -234,12 +234,24 @@ public class Status extends Base {
             }
         }
 
-        public String toString() {
-            return toString(-1);
+        public boolean applyChecked(String name, Console console) {
+            try {
+                apply();
+                console.info.println(name + " fixed");
+                return true;
+            } catch (IOException e) {
+                console.error.println(name + " failed: " + e);
+                e.printStackTrace(console.verbose);
+                return false;
+            }
         }
 
-        public String toString(int id) {
-            String head = (id == -1 ? "    " : Strings.times(' ', id > 9 ? 0 : 1) + "[" + id + "]") + " " + marker + " ";
+        public String toString() {
+            return toString("-");
+        }
+
+        public String toString(String id) {
+            String head = (id.equals("-") ? "    " : Strings.times(' ', id.length() > 1 ? 0 : 1) + "[" + id + "]") + " " + marker + " ";
             List<String> lines;
             StringBuilder result;
 

@@ -14,6 +14,7 @@
 * simplified token file naming: $HOME/.pommes-<repo>.token
 * ls:
   * renamed it to `st`
+  * more robust: handle io exception to that user interaction can be continued
 * tweaks and fixes
   * normalize git urls to avoid conflicting checkout problems
   * fixed repository scm for file repositories
