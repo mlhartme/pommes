@@ -77,7 +77,7 @@ public class Properties {
             }
         }
         if (repositories.isEmpty()) {
-            throw new IOException("missing repositories");
+            throw new IOException("missing repositories: " + file);
         }
         return new Properties(checkouts, giteaKey, queries, formats, repositories, repositories.keySet().iterator().next());
     }
