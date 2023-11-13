@@ -18,7 +18,6 @@ package net.oneandone.pommes.scm;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
-import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 
@@ -45,11 +44,8 @@ public class Git extends Scm<GitUrl> {
     }
 
     @Override
-    public Launcher checkout(FileNode directory, String fullurl) {
-        String url;
-
-        url = Strings.removeLeft(fullurl, protocol());
-        return git(directory.getParent(), "clone", url, directory.getName());
+    public Launcher checkout(GitUrl url, FileNode directory) {
+        return git(directory.getParent(), "clone", url.url(), directory.getName());
     }
 
     @Override

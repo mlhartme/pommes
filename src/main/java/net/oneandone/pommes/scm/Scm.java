@@ -63,7 +63,7 @@ public abstract class Scm<U extends ScmUrl> {
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
-    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
+    public abstract Launcher checkout(U url, FileNode dest) throws Failure;
 
     //--
 
