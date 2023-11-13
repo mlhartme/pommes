@@ -47,6 +47,7 @@ public class Environment implements Variables {
         this.console = console;
         this.world = world;
         this.lib = Lib.load(world);
+        console.verbose.println("default repository: " + lib.properties().defaultRepository);
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyExcludes = null;

@@ -33,14 +33,9 @@ public class Properties {
         lines = new ArrayList<>();
         lines.add("# Pommes configuration file, see https://github.com/mlhartme/pommes");
         lines.add("");
-        lines.add("# repositories for indexing");
-        if (repositories.isEmpty()) {
-            lines.add("#repository.first=url1");
-            lines.add("#repository.second=url2");
-        } else {
-            for (var entry : repositories.entrySet()) {
-                lines.add("repository." + entry.getKey() + "=" + entry.getValue());
-            }
+        lines.add("# repositories");
+        for (var entry : repositories.entrySet()) {
+            lines.add("repository." + entry.getKey() + "=" + entry.getValue());
         }
         lines.add("");
         lines.add("# query macros");
@@ -65,7 +60,7 @@ public class Properties {
         giteaKey = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
-        repositories = new HashMap<>();
+        repositories = new LinkedHashMap<>();
         props = readSequencedProperties(file);
         checkouts = file.getParent().getParent();
         for (String key : props.keySet()) {
