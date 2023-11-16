@@ -77,6 +77,9 @@ public abstract class Repository {
     }
 
 
+    public void addGitCredentials() throws IOException {
+        throw new ArgumentException("git credentials not supported");
+    }
     public void addOption(String option) {
         throw new ArgumentException(name + ": unknown option: " + option);
     }

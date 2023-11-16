@@ -22,12 +22,15 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
+import net.oneandone.pommes.scm.Git;
 import net.oneandone.pommes.scm.GitUrl;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
 import net.oneandone.sushi.fs.http.model.HeaderList;
+import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,7 +47,7 @@ public class GithubRepository extends Repository {
 
     public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws IOException {
         if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(repository));
+            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
@@ -57,17 +60,20 @@ public class GithubRepository extends Repository {
 
     private final List<String> groupsOrUsers;
 
-    public GithubRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
+    public GithubRepository(Environment environment, String name, String url) throws NodeInstantiationException {
         super(name);
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         root = (HttpNode) environment.world().validNode(url);
-        if (token != null) {
-            // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
-            root.getRoot().addExtraHeader("Authorization", "Bearer " + token);
-        }
         this.groupsOrUsers = new ArrayList<>();
+    }
+
+    public void addGitCredentials() throws IOException {
+        Git.UP up = Scm.GIT.getCredentials(environment.console(),
+                root.getWorld().getWorking(), Strings.removeLeftOpt(root.getRoot().getHostname(), "api.")); //TODO
+        // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
+        root.getRoot().addExtraHeader("Authorization", "Bearer " + up.password());
     }
 
     public void addOption(String option) {

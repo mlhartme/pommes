@@ -66,7 +66,9 @@ public class Index extends Base {
             }
             repository = null;
             for (String str : Separator.SPACE.split(entry.getValue())) {
-                if (str.startsWith("-")) {
+                if (str.equals("§§")) {
+                    repo(repository, str).addGitCredentials();
+                } else if (str.startsWith("-")) {
                     repo(repository, str).addExclude(str.substring(1));
                 } else if (str.startsWith("%")) {
                     repo(repository, str).addOption(str.substring(1));
