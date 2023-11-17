@@ -51,11 +51,12 @@ public class Git extends Scm<GitUrl> {
                 var idx = line.indexOf('=');
                 if (idx < 0) {
                     console.error.println(line);
-                }
-                var key = line.substring(0, idx).trim();
-                var old = map.put(key, line.substring(idx + 1).trim());
-                if (old != null) {
-                    throw new IOException("duplicate key: " + key);
+                } else {
+                    var key = line.substring(0, idx).trim();
+                    var old = map.put(key, line.substring(idx + 1).trim());
+                    if (old != null) {
+                        throw new IOException("duplicate key: " + key);
+                    }
                 }
             }
         }

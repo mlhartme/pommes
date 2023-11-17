@@ -30,10 +30,10 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
 import net.oneandone.sushi.fs.http.model.HeaderList;
-import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,8 @@ public class GithubRepository extends Repository {
 
     private static final String PROTOCOL = "github:";
 
-    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws IOException {
+    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log)
+            throws IOException, URISyntaxException {
         if (url.startsWith(PROTOCOL)) {
             return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()));
         } else {
@@ -55,23 +56,29 @@ public class GithubRepository extends Repository {
 
 
     private final Environment environment;
+    private final String host;
     private final ObjectMapper mapper;
     private final HttpNode root;
 
     private final List<String> groupsOrUsers;
 
-    public GithubRepository(Environment environment, String name, String url) throws NodeInstantiationException {
+    public GithubRepository(Environment environment, String name, String urlstr) throws NodeInstantiationException, URISyntaxException {
         super(name);
+        // currently hard-coded, other server might need something else ...
+        String prefix = "api.";
+        URI url = new URI(urlstr);
+
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        root = (HttpNode) environment.world().validNode(url);
+        this.host = url.getHost();
+        this.root = (HttpNode) environment.world().node(new URI(url.getScheme(), url.getUserInfo(),
+                prefix + host, url.getPort(), url.getPath(), url.getQuery(), url.getFragment()));
         this.groupsOrUsers = new ArrayList<>();
     }
 
     public void addGitCredentials() throws IOException {
-        Git.UP up = Scm.GIT.getCredentials(environment.console(),
-                root.getWorld().getWorking(), Strings.removeLeftOpt(root.getRoot().getHostname(), "api.")); //TODO
+        Git.UP up = Scm.GIT.getCredentials(environment.console(), root.getWorld().getWorking(), host);
         // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
         root.getRoot().addExtraHeader("Authorization", "Bearer " + up.password());
     }

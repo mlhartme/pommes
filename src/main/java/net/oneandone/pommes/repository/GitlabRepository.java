@@ -23,7 +23,9 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
+import net.oneandone.pommes.scm.Git;
 import net.oneandone.pommes.scm.GitUrl;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -41,8 +43,7 @@ public class GitlabRepository extends Repository {
 
     public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
         if (url.startsWith(PROTOCOL)) {
-            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()),
-                    environment.lib.tokenOpt(repository));
+            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()));
         } else {
             return null;
         }
@@ -55,16 +56,12 @@ public class GitlabRepository extends Repository {
 
     private final List<String> groupsOrUsers;
 
-    public GitlabRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
+    public GitlabRepository(Environment environment, String name, String url) throws NodeInstantiationException {
         super(name);
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         root = (HttpNode) environment.world().validNode(url).join("api/v4");
-        if (token != null) {
-            // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
-            root.getRoot().addExtraHeader("PRIVATE-TOKEN", token);
-        }
         this.groupsOrUsers = new ArrayList<>();
     }
 
@@ -153,6 +150,13 @@ public class GitlabRepository extends Repository {
 
     public void addExclude(String exclude) {
         throw new ArgumentException("excludes not supported: " + exclude);
+    }
+
+    public void addGitCredentials() throws IOException {
+        Git.UP up = Scm.GIT.getCredentials(environment.console(), root.getWorld().getWorking(), root.getRoot().getHostname());
+        // https://docs.gitlab.com/ee/api/rest/#oauth-20-tokens
+        // https://docs.gitlab.com/ee/api/rest/#personalprojectgroup-access-tokens
+        root.getRoot().addExtraHeader("Authorization", "Bearer " + up.password());
     }
 
     @Override

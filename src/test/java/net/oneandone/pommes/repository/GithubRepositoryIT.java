@@ -34,7 +34,11 @@ public class GithubRepositoryIT {
         GithubRepository hub;
 
         environment = new Environment(Console.create(), World.create());
-        hub = GithubRepository.createOpt(environment, "name", "github:https://api.github.com", null);
+        try {
+            hub = GithubRepository.createOpt(environment, "name", "github:https://api.github.com", null);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         return hub;
     }
 
