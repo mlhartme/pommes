@@ -19,7 +19,6 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
@@ -31,11 +30,7 @@ import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors. */
 public abstract class Repository {
-    @FunctionalInterface
-    public interface RepositoryConstructor {
-        Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException;
-    }
-    private static Map<String, RepositoryConstructor> types;
+    private static Map<String, Constructor> types;
     static {
         types = new HashMap<>();
         types.put("artifactory", ArtifactoryRepository::create);
@@ -50,10 +45,9 @@ public abstract class Repository {
     }
 
     public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException {
-        World world;
         int idx;
         FileNode file;
-        RepositoryConstructor constructor;
+        Constructor constructor;
 
         idx = url.indexOf(':');
         if (idx >= 0) {
