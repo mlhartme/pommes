@@ -70,9 +70,15 @@ public abstract class Repository {
     }
 
 
-    public void addGitCredentials() throws IOException {
-        throw new ArgumentException("git credentials not supported");
+    // override to return a host name if repository can handle token
+    public String getTokenHost() {
+        return null;
     }
+    // override if getTokenHost is overridden
+    public void setToken(String token) {
+        throw new IllegalStateException("token not supported");
+    }
+
     public void addOption(String option) {
         throw new ArgumentException(name + ": unknown option: " + option);
     }

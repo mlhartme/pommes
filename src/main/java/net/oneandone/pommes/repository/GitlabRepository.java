@@ -23,9 +23,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
-import net.oneandone.pommes.scm.Git;
 import net.oneandone.pommes.scm.GitUrl;
-import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
@@ -147,11 +145,14 @@ public class GitlabRepository extends Repository {
         throw new ArgumentException("excludes not supported: " + exclude);
     }
 
-    public void addGitCredentials() throws IOException {
-        Git.UP up = Scm.GIT.getCredentials(environment.console(), root.getWorld().getWorking(), root.getRoot().getHostname());
+    public String getTokenHost() {
+        return root.getRoot().getHostname();
+    }
+
+    public void setToken(String token) {
         // https://docs.gitlab.com/ee/api/rest/#oauth-20-tokens
         // https://docs.gitlab.com/ee/api/rest/#personalprojectgroup-access-tokens
-        root.getRoot().addExtraHeader("Authorization", "Bearer " + up.password());
+        root.getRoot().addExtraHeader("Authorization", "Bearer " + token);
     }
 
     @Override
