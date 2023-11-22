@@ -32,6 +32,7 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +40,8 @@ import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 public class GitlabRepository extends Repository {
-    private static final String PROTOCOL = "gitlab:";
-
-    public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
-        if (url.startsWith(PROTOCOL)) {
-            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()));
-        } else {
-            return null;
-        }
+    public static GitlabRepository create(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
+        return new GitlabRepository(environment, repository, url);
     }
 
 

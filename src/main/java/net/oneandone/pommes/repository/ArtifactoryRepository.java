@@ -27,6 +27,7 @@ import javax.json.Json;
 import javax.json.stream.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,14 +35,8 @@ import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 
 public class ArtifactoryRepository extends Repository {
-    private static final String PROTOCOL = "artifactory:";
-
-    public static ArtifactoryRepository createOpt(Environment environment, String name, String url) {
-        if (url.startsWith(PROTOCOL)) {
-            return new ArtifactoryRepository(environment, name, url.substring(PROTOCOL.length()));
-        } else {
-            return null;
-        }
+    public static ArtifactoryRepository create(Environment environment, String name, String url, PrintWriter log) {
+        return new ArtifactoryRepository(environment, name, url);
     }
 
     private final String url;

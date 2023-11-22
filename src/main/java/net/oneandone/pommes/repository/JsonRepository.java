@@ -19,6 +19,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.oneandone.inline.Console;
+import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.ErrorDescriptor;
@@ -26,27 +27,22 @@ import net.oneandone.pommes.descriptor.JsonDescriptor;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
-import net.oneandone.sushi.fs.World;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.GZIPInputStream;
 
 public class JsonRepository extends Repository {
-    private static final String JSON = "json:";
-    private static final String INLINE = "inline:";
+    public static JsonRepository createJson(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+        return new JsonRepository(name, Find.fileOrNode(environment.world(), url));
+    }
 
-    public static JsonRepository createOpt(World world, String name, String url) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(JSON)) {
-            return new JsonRepository(name, Find.fileOrNode(world, url.substring(JSON.length())));
-        }
-        if (url.startsWith(INLINE)) {
-            return new JsonRepository(name, world.memoryNode("[ " + url.substring(INLINE.length()) + " ]"));
-        }
-        return null;
+    public static JsonRepository createInline(Environment environment, String name, String url, PrintWriter log) {
+        return new JsonRepository(name, environment.world().memoryNode("[ " + url + " ]"));
     }
 
     private final Node node;

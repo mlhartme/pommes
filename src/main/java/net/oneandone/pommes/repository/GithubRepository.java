@@ -43,15 +43,9 @@ import java.util.concurrent.BlockingQueue;
 public class GithubRepository extends Repository {
     private static final int PAGE_SIZE = 30;
 
-    private static final String PROTOCOL = "github:";
-
-    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log)
+    public static GithubRepository create(Environment environment, String name, String url, PrintWriter log)
             throws IOException, URISyntaxException {
-        if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()));
-        } else {
-            return null;
-        }
+        return new GithubRepository(environment, name, url);
     }
 
 

@@ -25,45 +25,44 @@ import net.oneandone.sushi.fs.file.FileNode;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors. */
 public abstract class Repository {
+    @FunctionalInterface
+    public interface RepositoryConstructor {
+        Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException;
+    }
+    private static Map<String, RepositoryConstructor> types;
+    static {
+        types = new HashMap<>();
+        types.put("artifactory", ArtifactoryRepository::create);
+        types.put("file", NodeRepository::create);
+        types.put("svn", NodeRepository::create);
+        types.put("gitlab", GitlabRepository::create);
+        types.put("github", GithubRepository::create);
+        types.put("gitea", GiteaRepository::create);
+        types.put("bitbucket", BitbucketRepository::create);
+        types.put("json", JsonRepository::createJson);
+        types.put("inline", JsonRepository::createInline);
+    }
+
     public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException {
         World world;
-        Repository repository;
+        int idx;
         FileNode file;
+        RepositoryConstructor constructor;
 
-        world = environment.world();
-        repository = ArtifactoryRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
+        idx = url.indexOf(':');
+        if (idx >= 0) {
+            constructor = types.get(url.substring(0, idx));
+            if (constructor != null) {
+                return constructor.create(environment, name, url.substring(idx + 1), log);
+            }
         }
-        repository = NodeRepository.createOpt(environment, name, url, log);
-        if (repository != null) {
-            return repository;
-        }
-        repository = GithubRepository.createOpt(environment, name, url, log);
-        if (repository != null) {
-            return repository;
-        }
-        repository = BitbucketRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        repository = GiteaRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        repository = GitlabRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        repository = JsonRepository.createOpt(world, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        file = world.file(url);
+        file = environment.world().file(url);
         if (file.exists()) {
             return new NodeRepository(environment, name, file, log);
         }

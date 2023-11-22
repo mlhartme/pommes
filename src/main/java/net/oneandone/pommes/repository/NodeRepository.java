@@ -58,15 +58,8 @@ public class NodeRepository extends Repository {
         }
     }
 
-    private static final String FILE = "file:";
-    private static final String SVN = "svn:";
-
-    public static NodeRepository createOpt(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeRepository(environment, name, Find.fileOrNode(environment.world(), url), log);
-        } else {
-            return null;
-        }
+    public static NodeRepository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+        return new NodeRepository(environment, name, Find.fileOrNode(environment.world(), url), log);
     }
 
     //--

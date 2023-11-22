@@ -27,12 +27,12 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
-import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.memory.MemoryNode;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -48,14 +48,12 @@ import java.util.concurrent.BlockingQueue;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
 public class GiteaRepository extends Repository {
-    private static final String PROTOCOL = "gitea:";
-
     public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
         Environment env;
         GiteaRepository gitea;
 
         env = new Environment(Console.create(), World.create());
-        gitea = GiteaRepository.create(env, "reponame", "https://git.ionos.org/CPOPS");
+        gitea = GiteaRepository.create(env, "reponame", "https://git.ionos.org/CPOPS", null);
         BlockingQueue<Descriptor> result = new ArrayBlockingQueue<>(1000);
         gitea.scan(result, env.console());
         for (var d : result) {
@@ -63,15 +61,8 @@ public class GiteaRepository extends Repository {
         }
     }
 
-    public static GiteaRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(PROTOCOL)) {
-            return create(environment, repository, url.substring(PROTOCOL.length()));
-        } else {
-            return null;
-        }
-    }
-
-    public static GiteaRepository create(Environment environment, String repository, String uriStr) throws URISyntaxException {
+    public static GiteaRepository create(Environment environment, String repository, String uriStr, PrintWriter log)
+            throws URISyntaxException {
         ApiClient gitea;
         URI uri;
         String path;

@@ -49,14 +49,8 @@ public class BitbucketRepository extends Repository {
         System.out.println("rev: " + new String(bb.readBytes("CISOOPS", "puc", "pom.xml")));
     }
 
-    private static final String PROTOCOL = "bitbucket:";
-
-    public static BitbucketRepository createOpt(Environment environment, String name, String url) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(PROTOCOL)) {
-            return new BitbucketRepository(environment, name, (HttpNode) environment.world().node(url.substring(PROTOCOL.length())));
-        } else {
-            return null;
-        }
+    public static BitbucketRepository create(Environment environment, String name, String url) throws URISyntaxException, NodeInstantiationException {
+        return new BitbucketRepository(environment, name, (HttpNode) environment.world().node(url));
     }
 
     private final Environment environment;
