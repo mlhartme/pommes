@@ -66,7 +66,6 @@ public class BitbucketRepository extends Repository {
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
         Bitbucket bb;
         String bbProject;
-        Descriptor descriptor;
         Descriptor.Creator m;
         byte[] bytes;
         List<String> lst;

@@ -21,23 +21,18 @@ import io.gitea.Configuration;
 import io.gitea.api.OrganizationApi;
 import io.gitea.api.RepositoryApi;
 import io.gitea.auth.ApiKeyAuth;
-import io.gitea.model.ContentsResponse;
 import io.gitea.model.Organization;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.pommes.scm.GitUrl;
 import net.oneandone.sushi.fs.World;
-import net.oneandone.sushi.fs.memory.MemoryNode;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +42,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class GiteaRepository extends Repository {
+public class GiteaRepository extends NextRepository<GiteaProject> {
     public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
         Environment env;
         GiteaRepository gitea;
@@ -107,7 +102,7 @@ public class GiteaRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
+    public List<GiteaProject> doScan() throws IOException {
         List<String> orgs;
         orgs = listCurrentUserOrgs();
         orgs.addAll(listOrganizations());
@@ -119,42 +114,22 @@ public class GiteaRepository extends Repository {
         } else {
             orgs = Collections.singletonList(selectedOrganization);
         }
+        List<GiteaProject> result = new ArrayList<>();
         for (String org : orgs) {
             for (var r : listRepos(org)) {
-                var descriptor = scanOrganizationOpt(org, r.getName(), r.getDefaultBranch());
-                if (descriptor != null) {
-                    dest.put(descriptor);
-                }
+                result.add(new GiteaProject(org, r.getName(), r.getDefaultBranch()));
             }
         }
+        return result;
     }
 
-    private Descriptor scanOrganizationOpt(String org, String repo, String ref) throws IOException {
-        List<ContentsResponse> lst;
-
+    @Override
+    public Descriptor scanOpt(GiteaProject project) throws IOException {
         try {
-            lst = repositoryApi.repoGetContentsList(org, repo, ref);
-            for (ContentsResponse contents : lst) {
-                if ("file".equals(contents.getType())) {
-                    Descriptor.Creator m = Descriptor.match(contents.getName());
-                    if (m != null) {
-                        contents = repositoryApi.repoGetContents(org, repo, contents.getPath(), ref);
-                        String str = contents.getContent();
-                        if ("base64".equals(contents.getEncoding())) {
-                            str = new String(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
-                        } else if (contents.getEncoding() != null) {
-                            throw new IllegalStateException(contents.getEncoding());
-                        }
-                        MemoryNode tmp = environment.world().memoryNode(str);
-                        return m.create(environment, tmp, repo, org + "/" + repo + "/" + contents.getPath(), tmp.sha(),
-                                GitUrl.create("ssh://gitea@" + hostname + "/" + org + "/" + repo + ".git"));
-                    }
-                }
-            }
+            return project.scanOpt(environment, hostname, repositoryApi);
         } catch (ApiException e) {
             throw new IOException(e);
         }
-        return null;
     }
 
     public List<io.gitea.model.Repository> listRepos(String org) throws IOException {
