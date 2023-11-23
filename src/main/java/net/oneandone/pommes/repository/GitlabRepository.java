@@ -19,7 +19,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
@@ -35,9 +34,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
 
-public class GitlabRepository extends Repository {
+public class GitlabRepository extends NextRepository<GitlabRepository.GitlabProject> {
     public static GitlabRepository create(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
         return new GitlabRepository(environment, repository, url);
     }
@@ -156,49 +154,29 @@ public class GitlabRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
-        List<GitlabProject> all;
+    public List<GitlabProject> doScan() throws IOException {
+        List<GitlabProject> result;
 
         if (groupsOrUsers.isEmpty()) {
-            console.info.println("collecting projects ...");
-            all = listAllProjects();
-            console.info.println("scan " + all.size() + " projects");
-            for (GitlabProject project : all) {
-                scan(project, dest, console);
-            }
+            result = listAllProjects();
         } else {
+            result = new ArrayList<>();
             for (String groupOrUser : groupsOrUsers) {
-                for (GitlabProject project : listGroupOrUserProjects(groupOrUser)) {
-                    scan(project, dest, console);
-                }
+                result.addAll(listGroupOrUserProjects(groupOrUser));
             }
         }
+        return result.stream().filter(p -> !Boolean.TRUE.equals(p.archived)).toList();
     }
 
-    private void scan(GitlabProject project, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
-        if (Boolean.TRUE.equals(project.archived)) {
-            console.verbose.println("skip archived: " + project.path_with_namespace);
-            return;
-        }
-        try {
-            var descriptor = scanOpt(project);
-            if (descriptor != null) {
-                dest.put(descriptor);
-            }
-        } catch (IOException e) {
-            console.error.println("cannot load " + project.path_with_namespace + " (id=" + project.id + "): " + e.getMessage());
-            e.printStackTrace(console.verbose);
-        }
-    }
 
     private GitUrl repoUrl(GitlabProject project) throws ScmUrlException {
         return GitUrl.create(project.http_url_to_repo()); // TODO: configurable
     }
 
+    @Override
     public Descriptor scanOpt(GitlabProject project) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
-        Descriptor result;
 
         for (String name : files(project)) {
             m = Descriptor.match(name);
