@@ -109,7 +109,6 @@ public class GiteaRepository extends Repository {
     @Override
     public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
         List<String> orgs;
-        Descriptor descriptor;
         orgs = listCurrentUserOrgs();
         orgs.addAll(listOrganizations());
 
@@ -122,7 +121,7 @@ public class GiteaRepository extends Repository {
         }
         for (String org : orgs) {
             for (var r : listRepos(org)) {
-                descriptor = scanOrganizationOpt(org, r.getName(), r.getDefaultBranch());
+                var descriptor = scanOrganizationOpt(org, r.getName(), r.getDefaultBranch());
                 if (descriptor != null) {
                     dest.put(descriptor);
                 }
@@ -222,7 +221,4 @@ public class GiteaRepository extends Repository {
         }
         return result;
     }
-
-
-
 }
