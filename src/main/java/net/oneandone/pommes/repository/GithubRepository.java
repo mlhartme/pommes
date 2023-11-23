@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
@@ -35,10 +34,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
-public class GithubRepository extends Repository {
+public class GithubRepository extends NextRepository<GithubRepository.GithubRepo> {
     private static final int PAGE_SIZE = 30;
 
     public static GithubRepository create(Environment environment, String name, String url, PrintWriter log)
@@ -142,29 +140,17 @@ public class GithubRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
+    public List<GithubRepo> doScan() throws IOException {
         if (groupsOrUsers.isEmpty()) {
             throw new IOException("cannot collect all repos ...");
-        } else {
-            for (String groupOrUser : groupsOrUsers) {
-                for (GithubRepo repo : listOrganizationOrUserRepos(groupOrUser)) {
-                    scan(repo, dest, console);
-                }
-            }
         }
+        List<GithubRepo> result = new ArrayList<>();
+        for (String groupOrUser : groupsOrUsers) {
+            result.addAll(listOrganizationOrUserRepos(groupOrUser));
+        }
+        return result;
     }
 
-    private void scan(GithubRepo repo, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
-        try {
-            var descriptor = scanOpt(repo);
-            if (descriptor != null) {
-                dest.put(descriptor);
-            }
-        } catch (IOException e) {
-            console.error.println("cannot load " + repo.full_name + " (id=" + repo.id + "): " + e.getMessage());
-            e.printStackTrace(console.verbose);
-        }
-    }
 
     public HttpNode fileNode(GithubRepo repo, String path) {
         HttpNode url = root.join("repos", repo.full_name, "contents", path);
@@ -173,6 +159,7 @@ public class GithubRepository extends Repository {
         return url;
     }
 
+    @Override
     public Descriptor scanOpt(GithubRepo repo) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
