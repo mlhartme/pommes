@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
-public class GithubRepository extends NextRepository<GithubRepository.GithubRepo> {
+public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
     private static final int PAGE_SIZE = 30;
 
     public static GithubRepository create(Environment environment, String name, String url, PrintWriter log)

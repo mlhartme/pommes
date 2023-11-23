@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-public class JsonRepository extends NextRepository<Descriptor> {
+public class JsonRepository extends Repository<Descriptor> {
     public static JsonRepository createJson(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         return new JsonRepository(name, Find.fileOrNode(environment.world(), url));
     }

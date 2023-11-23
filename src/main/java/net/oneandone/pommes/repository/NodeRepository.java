@@ -38,17 +38,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** To search files system and subversion */
-public class NodeRepository extends NextRepository<Descriptor> {
+public class NodeRepository extends Repository<NodeRepository.NodeProject> {
+    public interface NodeProject {
+        Descriptor descriptor() throws IOException;
+    }
+
     public static Descriptor probe(Environment environment, String repository, FileNode checkout) throws IOException {
         NodeRepository repo;
-        List<Descriptor> dest;
+        List<NodeProject> dest;
 
         repo = new NodeRepository(environment, repository, checkout, environment.console().verbose);
         dest = new ArrayList<>(2);
         repo.scan(checkout, false, dest);
         return switch (dest.size()) {
             case 0 -> null;
-            case 1 -> dest.get(0);
+            case 1 -> dest.get(0).descriptor();
             default -> throw new IOException("amibugous: " + dest.toString());
         };
     }
@@ -100,19 +104,18 @@ public class NodeRepository extends NextRepository<Descriptor> {
     }
 
     @Override
-    public List<Descriptor> doScan() throws IOException {
-        List<Descriptor> result = new ArrayList<>();
+    public List<NodeProject> doScan() throws IOException {
+        List<NodeProject> result = new ArrayList<>();
         scan(root, true, result);
         return result;
     }
 
     @Override
-    public Descriptor scanOpt(Descriptor descriptor) {
-        // TODO: currently all computation done in scan method
-        return descriptor;
+    public Descriptor scanOpt(NodeProject project) throws IOException {
+        return project.descriptor();
     }
 
-    public void scan(Node<?> directory, boolean recurse, List<Descriptor> dest) throws IOException {
+    public void scan(Node<?> directory, boolean recurse, List<NodeProject> dest) throws IOException {
         List<? extends Node> children;
         Node<?> trunkNode;
         Node<?> branchesNode;
@@ -130,14 +133,14 @@ public class NodeRepository extends NextRepository<Descriptor> {
         for (Node<?> child : children) {
             Descriptor.Creator m = Descriptor.match(child.getName());
             if (m != null) {
-                dest.add(m.create(environment, child, this.name, child.getPath(), Long.toString(child.getLastModified()), nodeScm(child)));
+                dest.add(() -> m.create(environment, child, this.name, child.getPath(), Long.toString(child.getLastModified()), nodeScm(child)));
                 return;
             }
         }
         if (directory instanceof FileNode fileNode) {
             Descriptor descriptor = RawDescriptor.createOpt(name, fileNode);
             if (descriptor != null) {
-                dest.add(descriptor);
+                dest.add(() -> descriptor);
                 return;
             }
         }

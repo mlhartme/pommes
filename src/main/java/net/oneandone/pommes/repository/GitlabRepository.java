@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class GitlabRepository extends NextRepository<GitlabRepository.GitlabProject> {
+public class GitlabRepository extends Repository<GitlabRepository.GitlabProject> {
     public static GitlabRepository create(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
         return new GitlabRepository(environment, repository, url);
     }

@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class BitbucketRepository extends NextRepository<Descriptor> {
+public class BitbucketRepository extends Repository<Descriptor> {
     public static void main(String[] args) throws IOException {
         World world;
         Bitbucket bb;

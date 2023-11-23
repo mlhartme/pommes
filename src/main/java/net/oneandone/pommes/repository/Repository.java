@@ -25,11 +25,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors. */
-public abstract class Repository {
+public abstract class Repository<T> {
     private static Map<String, Constructor> types;
     static {
         types = new HashMap<>();
@@ -86,5 +87,23 @@ public abstract class Repository {
     public void addExclude(String exclude) {
         throw new ArgumentException(name + ": excludes not supported: " + exclude);
     }
-    public abstract void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException, URISyntaxException;
+    public final void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
+        console.info.println("collecting projects ...");
+        List<T> projects = doScan();
+        console.info.println("collected " + projects.size());
+        for (T project : projects) {
+            try {
+                var descriptor = scanOpt(project);
+                if (descriptor != null) {
+                    dest.put(descriptor);
+                }
+            } catch (IOException e) {
+                console.error.println("cannot load " + project + ": " + e.getMessage());
+                e.printStackTrace(console.verbose);
+            }
+        }
+    }
+
+    public abstract List<T> doScan() throws IOException;
+    public abstract Descriptor scanOpt(T project) throws IOException;
 }

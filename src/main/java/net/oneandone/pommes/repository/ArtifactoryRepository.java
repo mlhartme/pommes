@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ArtifactoryRepository extends NextRepository<Descriptor> {
+public class ArtifactoryRepository extends Repository<Descriptor> {
     public static ArtifactoryRepository create(Environment environment, String name, String url, PrintWriter log)
             throws NodeInstantiationException, URISyntaxException {
         return new ArtifactoryRepository(environment, name, url);

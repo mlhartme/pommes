@@ -42,7 +42,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class GiteaRepository extends NextRepository<GiteaProject> {
+public class GiteaRepository extends Repository<GiteaProject> {
     public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
         Environment env;
         GiteaRepository gitea;
