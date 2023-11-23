@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.scm.GitUrl;
@@ -36,10 +35,9 @@ import java.io.Reader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class BitbucketRepository extends Repository {
+public class BitbucketRepository extends NextRepository<Descriptor> {
     public static void main(String[] args) throws IOException {
         World world;
         Bitbucket bb;
@@ -63,7 +61,8 @@ public class BitbucketRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
+    public List<Descriptor> doScan() throws IOException {
+        List<Descriptor> result = new ArrayList<>();
         Bitbucket bb;
         String bbProject;
         Descriptor.Creator m;
@@ -82,11 +81,18 @@ public class BitbucketRepository extends Repository {
                     bytes = bb.readBytes(bbProject, repo, path);
                     tmp = environment.world().memoryNode(bytes);
                     hostname = bitbucket.getRoot().getHostname();
-                    dest.put(m.create(environment, tmp, this.name, bbProject.toLowerCase() + "/" + repo + "/" + path, tmp.sha(),
+                    result.add(m.create(environment, tmp, this.name, bbProject.toLowerCase() + "/" + repo + "/" + path, tmp.sha(),
                             GitUrl.create("ssh://git@" + hostname + "/" + bbProject.toLowerCase() + "/" + repo + ".git")));
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public Descriptor scanOpt(Descriptor descriptor) throws IOException {
+        // TODO
+        return descriptor;
     }
 
     private static class Bitbucket {
