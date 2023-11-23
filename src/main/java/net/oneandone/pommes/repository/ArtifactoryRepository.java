@@ -16,7 +16,6 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
@@ -35,7 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 public class ArtifactoryRepository extends NextRepository<Descriptor> {
     public static ArtifactoryRepository create(Environment environment, String name, String url, PrintWriter log)
@@ -71,10 +69,6 @@ public class ArtifactoryRepository extends NextRepository<Descriptor> {
             }
         }
         throw new ArgumentException(url + ": unknown option: " + option);
-    }
-
-    @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException {
     }
 
     @Override

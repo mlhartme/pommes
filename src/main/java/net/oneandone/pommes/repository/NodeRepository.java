@@ -16,7 +16,6 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -37,7 +36,6 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /** To search files system and subversion */
 public class NodeRepository extends NextRepository<Descriptor> {
@@ -99,11 +97,6 @@ public class NodeRepository extends NextRepository<Descriptor> {
             throw new ArgumentException("do not use '/' before or after excludes: " + str);
         }
         exclude.include("**/" + str);
-    }
-
-    @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
-
     }
 
     @Override

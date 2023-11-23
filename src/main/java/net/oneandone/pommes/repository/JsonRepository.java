@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.database.Project;
@@ -33,10 +32,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-public class JsonRepository extends Repository {
+public class JsonRepository extends NextRepository<Descriptor> {
     public static JsonRepository createJson(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
         return new JsonRepository(name, Find.fileOrNode(environment.world(), url));
     }
@@ -53,7 +53,8 @@ public class JsonRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
+    public List<Descriptor> doScan() throws IOException {
+        List<Descriptor> result = new ArrayList<>();
         JsonArray array;
         Descriptor descriptor;
         Project project;
@@ -67,8 +68,14 @@ public class JsonRepository extends Repository {
                 } catch (Exception e) {
                     descriptor = new ErrorDescriptor(new IOException("json error: " + e.getMessage(), e), this.name, node.getPath(), "TODO", null);
                 }
-                dest.put(descriptor);
+                result.add(descriptor);
             }
         }
+        return result;
+    }
+
+    @Override
+    public Descriptor scanOpt(Descriptor descriptor) throws IOException {
+        return descriptor; // TODO
     }
 }
