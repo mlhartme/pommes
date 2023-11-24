@@ -57,7 +57,7 @@ public class GitlabRepositoryIT {
         System.out.println("" + gitlab.files(project));
         System.out.println("default branch: " + project.default_branch());
         System.out.println("branch revision: " + gitlab.branchRevision(project, project.default_branch()));
-        descriptor = gitlab.scanOpt(project);
+        descriptor = gitlab.load(project);
         var pommes = descriptor.load(environment);
         System.out.println("project: " + project);
         assertEquals("ru.t1.sochilenkov.tm", pommes.artifact.groupId);

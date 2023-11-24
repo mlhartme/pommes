@@ -17,13 +17,11 @@ package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
-import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.World;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,7 +49,7 @@ public class GithubRepositoryIT {
         var pom = hub.fileNode(repo, "pom.xml").readString();
         assertTrue(hub.files(repo).contains("pom.xml"));
         assertTrue(pom.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"), pom);
-        var descriptor = hub.scanOpt(repo);
+        var descriptor = hub.load(repo);
         var project = descriptor.load(new Environment(Console.create(), World.create()));
         System.out.println("" + project.revision);
         assertEquals("net.oneandone:pommes", project.artifact.toGaString());

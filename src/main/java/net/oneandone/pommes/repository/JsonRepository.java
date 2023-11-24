@@ -53,7 +53,7 @@ public class JsonRepository extends Repository<Descriptor> {
     }
 
     @Override
-    public List<Descriptor> doScan() throws IOException {
+    public List<Descriptor> list() throws IOException {
         List<Descriptor> result = new ArrayList<>();
         JsonArray array;
         Descriptor descriptor;
@@ -75,7 +75,7 @@ public class JsonRepository extends Repository<Descriptor> {
     }
 
     @Override
-    public Descriptor scanOpt(Descriptor descriptor) throws IOException {
+    public Descriptor load(Descriptor descriptor) throws IOException {
         return descriptor; // TODO
     }
 }

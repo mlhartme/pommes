@@ -140,7 +140,7 @@ public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
     }
 
     @Override
-    public List<GithubRepo> doScan() throws IOException {
+    public List<GithubRepo> list() throws IOException {
         if (groupsOrUsers.isEmpty()) {
             throw new IOException("cannot collect all repos ...");
         }
@@ -160,7 +160,7 @@ public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
     }
 
     @Override
-    public Descriptor scanOpt(GithubRepo repo) throws IOException {
+    public Descriptor load(GithubRepo repo) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
 

@@ -72,7 +72,7 @@ public class ArtifactoryRepository extends Repository<Descriptor> {
     }
 
     @Override
-    public List<Descriptor> doScan() throws IOException {
+    public List<Descriptor> list() throws IOException {
         List<Descriptor> result = new ArrayList<>();
         Node<?> listing = world.validNode(artifactory() + "api/storage/" + repositoryAndPath() + "?list&deep=1&mdTimestamps=0");
         try {
@@ -86,7 +86,7 @@ public class ArtifactoryRepository extends Repository<Descriptor> {
     }
 
     @Override
-    public Descriptor scanOpt(Descriptor descriptor) {
+    public Descriptor load(Descriptor descriptor) {
         // TODO: currently all processing done by parser
         return descriptor;
     }

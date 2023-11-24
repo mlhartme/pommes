@@ -154,7 +154,7 @@ public class GitlabRepository extends Repository<GitlabRepository.GitlabProject>
     }
 
     @Override
-    public List<GitlabProject> doScan() throws IOException {
+    public List<GitlabProject> list() throws IOException {
         List<GitlabProject> result;
 
         if (groupsOrUsers.isEmpty()) {
@@ -174,7 +174,7 @@ public class GitlabRepository extends Repository<GitlabRepository.GitlabProject>
     }
 
     @Override
-    public Descriptor scanOpt(GitlabProject project) throws IOException {
+    public Descriptor load(GitlabProject project) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
 

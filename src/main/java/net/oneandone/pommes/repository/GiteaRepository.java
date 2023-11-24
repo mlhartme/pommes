@@ -102,7 +102,7 @@ public class GiteaRepository extends Repository<GiteaProject> {
     }
 
     @Override
-    public List<GiteaProject> doScan() throws IOException {
+    public List<GiteaProject> list() throws IOException {
         List<String> orgs;
         orgs = listCurrentUserOrgs();
         orgs.addAll(listOrganizations());
@@ -124,7 +124,7 @@ public class GiteaRepository extends Repository<GiteaProject> {
     }
 
     @Override
-    public Descriptor scanOpt(GiteaProject project) throws IOException {
+    public Descriptor load(GiteaProject project) throws IOException {
         try {
             return project.scanOpt(environment, hostname, repositoryApi);
         } catch (ApiException e) {

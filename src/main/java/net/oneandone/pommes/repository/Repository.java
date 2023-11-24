@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors. */
-public abstract class Repository<T> {
+public abstract class Repository<E> {
     private static Map<String, Constructor> types;
     static {
         types = new HashMap<>();
@@ -88,22 +88,26 @@ public abstract class Repository<T> {
         throw new ArgumentException(name + ": excludes not supported: " + exclude);
     }
     public final void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
-        console.info.println("collecting projects ...");
-        List<T> projects = doScan();
-        console.info.println("collected " + projects.size());
-        for (T project : projects) {
+        console.info.print("collecting entries ...");
+        console.info.flush();
+        List<E> entries = list();
+        console.info.println(" done: " + entries.size());
+        for (E entry : entries) {
             try {
-                var descriptor = scanOpt(project);
+                var descriptor = load(entry);
                 if (descriptor != null) {
                     dest.put(descriptor);
                 }
             } catch (IOException e) {
-                console.error.println("cannot load " + project + ": " + e.getMessage());
+                console.error.println("cannot load " + entry + ": " + e.getMessage());
                 e.printStackTrace(console.verbose);
             }
         }
     }
 
-    public abstract List<T> doScan() throws IOException;
-    public abstract Descriptor scanOpt(T project) throws IOException;
+    /** List entries in the repository */
+    public abstract List<E> list() throws IOException;
+
+    /** Load an entry, i.e. return the respective descriptor */
+    public abstract Descriptor load(E entry) throws IOException;
 }

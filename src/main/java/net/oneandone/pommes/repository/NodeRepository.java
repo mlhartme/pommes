@@ -104,14 +104,14 @@ public class NodeRepository extends Repository<NodeRepository.NodeProject> {
     }
 
     @Override
-    public List<NodeProject> doScan() throws IOException {
+    public List<NodeProject> list() throws IOException {
         List<NodeProject> result = new ArrayList<>();
         scan(root, true, result);
         return result;
     }
 
     @Override
-    public Descriptor scanOpt(NodeProject project) throws IOException {
+    public Descriptor load(NodeProject project) throws IOException {
         return project.descriptor();
     }
 

@@ -61,7 +61,7 @@ public class BitbucketRepository extends Repository<Descriptor> {
     }
 
     @Override
-    public List<Descriptor> doScan() throws IOException {
+    public List<Descriptor> list() throws IOException {
         List<Descriptor> result = new ArrayList<>();
         Bitbucket bb;
         String bbProject;
@@ -90,7 +90,7 @@ public class BitbucketRepository extends Repository<Descriptor> {
     }
 
     @Override
-    public Descriptor scanOpt(Descriptor descriptor) throws IOException {
+    public Descriptor load(Descriptor descriptor) throws IOException {
         // TODO
         return descriptor;
     }
