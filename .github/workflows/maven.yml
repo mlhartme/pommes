@@ -7,6 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
+  setings:
+
   build:
 
     runs-on: ubuntu-latest
@@ -19,5 +21,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v4
+      with:
+        repositories: '[{ "id": "oss-sonatype-snapshot", "name": "oss-sonatype-snapshot", "url": "https://repo.mamdev.server.lan/artifactory/oss-sonatype-org-snapshot", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" } }]'
     - name: Build with Maven
       run: mvn -B clean package
