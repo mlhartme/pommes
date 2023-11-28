@@ -20,6 +20,6 @@ jobs:
     - name: maven-settings-xml-action
       uses: whelk-io/maven-settings-xml-action@v4
       with:
-        repositories: '[{ "id": "oss-sonatype-snapshot", "name": "oss-sonatype-snapshot", "url": "https://oss.sonatype.org/content/repositories/snapshots/" }]'
+        repositories: '[{ "id": "oss-sonatype-snapshot", "name": "oss-sonatype-snapshot", "url": "https://oss.sonatype.org/content/repositories/snapshots/", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" } }]'
     - name: Build with Maven
       run: mvn -B -U clean package
