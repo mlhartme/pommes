@@ -22,7 +22,7 @@
   * pom loading: use developer connection instead of connection, because it's usually better maintained
   * do not abort on pom loading errors, just report them
 * build
-  * update parent 1.6.1 to 1.6.3
+  * update parent 1.6.1 to 1.6.4
   * update lucene 9.2.0 to 9.8.0
   * update gson 2.9.0 to 2.10.1
   * update application plugin 1.7.0 to 1.8.0
