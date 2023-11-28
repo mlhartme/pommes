@@ -46,11 +46,8 @@ public class Subversion extends Scm<SubversionUrl> {
     }
 
     @Override
-    public Launcher checkout(FileNode directory, String fullurl) throws Failure {
-        String url;
-
-        url = Strings.removeLeft(fullurl, protocol());
-        return Subversion.svn(directory.getParent(), "co", url, directory.getName());
+    public Launcher checkout(SubversionUrl url, FileNode directory) throws Failure {
+        return Subversion.svn(directory.getParent(), "co", url.url(), directory.getName());
     }
 
     @Override

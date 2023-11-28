@@ -23,6 +23,8 @@ import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.ErrorDescriptor;
 import net.oneandone.pommes.repository.Repository;
+import net.oneandone.pommes.scm.Git;
+import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
 
@@ -66,7 +68,13 @@ public class Index extends Base {
             }
             repository = null;
             for (String str : Separator.SPACE.split(entry.getValue())) {
-                if (str.startsWith("-")) {
+                if (str.equals("§§")) {
+                    String host = repo(repository, str).getTokenHost();
+                    if (host != null) {
+                        Git.UP up = Scm.GIT.getCredentials(environment.console(), environment.world().getWorking(), host);
+                        repo(repository, str).setToken(up.password());
+                    }
+                } else if (str.startsWith("-")) {
                     repo(repository, str).addExclude(str.substring(1));
                 } else if (str.startsWith("%")) {
                     repo(repository, str).addOption(str.substring(1));

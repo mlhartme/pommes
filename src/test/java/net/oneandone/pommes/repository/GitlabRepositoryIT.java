@@ -31,7 +31,7 @@ public class GitlabRepositoryIT {
         GitlabRepository gitlab;
 
         environment = new Environment(Console.create(), World.create());
-        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", null);
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
         return gitlab;
     }
 
@@ -52,12 +52,12 @@ public class GitlabRepositoryIT {
         Descriptor descriptor;
 
         environment = new Environment(Console.create(), World.create());
-        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com", null);
+        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
         var project = gitlab.getProject(41573530);
         System.out.println("" + gitlab.files(project));
         System.out.println("default branch: " + project.default_branch());
         System.out.println("branch revision: " + gitlab.branchRevision(project, project.default_branch()));
-        descriptor = gitlab.scanOpt(project);
+        descriptor = gitlab.load(project);
         var pommes = descriptor.load(environment);
         System.out.println("project: " + project);
         assertEquals("ru.t1.sochilenkov.tm", pommes.artifact.groupId);

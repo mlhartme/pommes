@@ -16,10 +16,10 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.sushi.fs.Node;
+import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.util.Strings;
 
@@ -27,33 +27,32 @@ import javax.json.Json;
 import javax.json.stream.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.BlockingQueue;
+import java.util.List;
 
-public class ArtifactoryRepository extends Repository {
-    private static final String PROTOCOL = "artifactory:";
-
-    public static ArtifactoryRepository createOpt(Environment environment, String name, String url) {
-        if (url.startsWith(PROTOCOL)) {
-            return new ArtifactoryRepository(environment, name, url.substring(PROTOCOL.length()));
-        } else {
-            return null;
-        }
+public class ArtifactoryRepository extends Repository<Descriptor> {
+    public static ArtifactoryRepository create(Environment environment, String name, String url, PrintWriter log)
+            throws NodeInstantiationException, URISyntaxException {
+        return new ArtifactoryRepository(environment, name, url);
     }
 
     private final String url;
+    private final Node<?> root;
     private final Environment environment;
     private final World world;
     private String contextPath;
 
-    public ArtifactoryRepository(Environment environment, String name, String url) {
+    public ArtifactoryRepository(Environment environment, String name, String url) throws NodeInstantiationException, URISyntaxException {
         super(name);
         this.environment = environment;
         this.world = environment.world();
         this.url = url;
+        this.root = world.node(url);
         this.contextPath = "/artifactory/";
         if (!url.contains(contextPath)) {
             this.contextPath = "/";
@@ -73,19 +72,23 @@ public class ArtifactoryRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException {
-        Node listing;
-        Node root;
-
-        root = world.node(url);
-        listing = world.node(artifactory() + "api/storage/" + repositoryAndPath() + "?list&deep=1&mdTimestamps=0");
+    public List<Descriptor> list() throws IOException {
+        List<Descriptor> result = new ArrayList<>();
+        Node<?> listing = world.validNode(artifactory() + "api/storage/" + repositoryAndPath() + "?list&deep=1&mdTimestamps=0");
         try {
-            Parser.run(environment, name, listing, root, dest);
+            Parser.run(environment, name, listing, root, result);
         } catch (IOException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new IOException("scanning failed: " + e.getMessage(), e);
         }
+        return result;
+    }
+
+    @Override
+    public Descriptor load(Descriptor descriptor) {
+        // TODO: currently all processing done by parser
+        return descriptor;
     }
 
     /** @return with tailing slash */
@@ -108,14 +111,13 @@ public class ArtifactoryRepository extends Repository {
     public static class Parser implements AutoCloseable {
         private static final SimpleDateFormat FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-        public static void run(Environment environment, String repository, Node listing, Node root, BlockingQueue<Descriptor> dest) throws Exception {
+        public static void run(Environment environment, String repository, Node listing, Node root, List<Descriptor> dest) throws Exception {
             String uri;
             long size;
             Date lastModified;
             String sha1;
             int count;
             Node node;
-            Descriptor descriptor;
 
             count = 0;
             try (InputStream is = listing.newInputStream(); Parser parser = new Parser(Json.createParser(is))) {
@@ -137,7 +139,7 @@ public class ArtifactoryRepository extends Repository {
                     node = root.join(Strings.removeLeft(uri, "/"));
                     Descriptor.Creator m = Descriptor.match(((Node<?>) node).getName());
                     if (m != null) {
-                        dest.put(m.create(environment, node, repository, "artifactory:" + node.getPath(), sha1, null));
+                        dest.add(m.create(environment, node, repository, "artifactory:" + node.getPath(), sha1, null));
                     }
                     if (parser.eatTimestampsOpt() != JsonParser.Event.END_OBJECT) {
                         throw new IllegalStateException();

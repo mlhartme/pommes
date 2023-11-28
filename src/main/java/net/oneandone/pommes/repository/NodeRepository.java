@@ -16,7 +16,6 @@
 package net.oneandone.pommes.repository;
 
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.descriptor.Descriptor;
@@ -35,38 +34,31 @@ import org.tmatesoft.svn.core.SVNURL;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /** To search files system and subversion */
-public class NodeRepository extends Repository {
-    public static Descriptor probe(Environment environment, String repository, FileNode checkout) throws IOException {
-        NodeRepository repo;
-        BlockingQueue<Descriptor> dest;
-
-        repo = new NodeRepository(environment, repository, checkout, environment.console().verbose);
-        dest = new ArrayBlockingQueue<>(2);
-        try {
-            repo.scan(checkout, false, dest);
-            if (dest.size() != 1) {
-                return null;
-            }
-            return dest.take();
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
+public class NodeRepository extends Repository<NodeRepository.NodeProject> {
+    public interface NodeProject {
+        Descriptor descriptor() throws IOException;
     }
 
-    private static final String FILE = "file:";
-    private static final String SVN = "svn:";
+    public static Descriptor probe(Environment environment, String repository, FileNode checkout) throws IOException {
+        NodeRepository repo;
+        List<NodeProject> dest;
 
-    public static NodeRepository createOpt(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
-        if (url.startsWith(SVN) || url.startsWith(FILE)) {
-            return new NodeRepository(environment, name, Find.fileOrNode(environment.world(), url), log);
-        } else {
-            return null;
-        }
+        repo = new NodeRepository(environment, repository, checkout, environment.console().verbose);
+        dest = new ArrayList<>(2);
+        repo.scan(checkout, false, dest);
+        return switch (dest.size()) {
+            case 0 -> null;
+            case 1 -> dest.get(0).descriptor();
+            default -> throw new IOException("amibugous: " + dest.toString());
+        };
+    }
+
+    public static NodeRepository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
+        return new NodeRepository(environment, name, Find.fileOrNode(environment.world(), url), log);
     }
 
     //--
@@ -112,11 +104,18 @@ public class NodeRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
-        scan(root, true, dest);
+    public List<NodeProject> list() throws IOException {
+        List<NodeProject> result = new ArrayList<>();
+        scan(root, true, result);
+        return result;
     }
 
-    public void scan(Node<?> directory, boolean recurse, BlockingQueue<Descriptor> dest) throws IOException, InterruptedException {
+    @Override
+    public Descriptor load(NodeProject project) throws IOException {
+        return project.descriptor();
+    }
+
+    public void scan(Node<?> directory, boolean recurse, List<NodeProject> dest) throws IOException {
         List<? extends Node> children;
         Node<?> trunkNode;
         Node<?> branchesNode;
@@ -134,14 +133,14 @@ public class NodeRepository extends Repository {
         for (Node<?> child : children) {
             Descriptor.Creator m = Descriptor.match(child.getName());
             if (m != null) {
-                dest.put(m.create(environment, child, this.name, child.getPath(), Long.toString(child.getLastModified()), nodeScm(child)));
+                dest.add(() -> m.create(environment, child, this.name, child.getPath(), Long.toString(child.getLastModified()), nodeScm(child)));
                 return;
             }
         }
         if (directory instanceof FileNode fileNode) {
             Descriptor descriptor = RawDescriptor.createOpt(name, fileNode);
             if (descriptor != null) {
-                dest.put(descriptor);
+                dest.add(() -> descriptor);
                 return;
             }
         }

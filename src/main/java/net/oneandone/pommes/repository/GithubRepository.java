@@ -18,7 +18,6 @@ package net.oneandone.pommes.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
@@ -31,43 +30,49 @@ import net.oneandone.sushi.fs.http.model.HeaderList;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
-public class GithubRepository extends Repository {
+public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
     private static final int PAGE_SIZE = 30;
 
-    private static final String PROTOCOL = "github:";
-
-    public static GithubRepository createOpt(Environment environment, String repository, String url, PrintWriter log) throws IOException {
-        if (url.startsWith(PROTOCOL)) {
-            return new GithubRepository(environment, repository, url.substring(PROTOCOL.length()), environment.lib.tokenOpt(repository));
-        } else {
-            return null;
-        }
+    public static GithubRepository create(Environment environment, String name, String url, PrintWriter log)
+            throws IOException, URISyntaxException {
+        return new GithubRepository(environment, name, url);
     }
 
 
     private final Environment environment;
+    private final String host;
     private final ObjectMapper mapper;
     private final HttpNode root;
 
     private final List<String> groupsOrUsers;
 
-    public GithubRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
+    public GithubRepository(Environment environment, String name, String urlstr) throws NodeInstantiationException, URISyntaxException {
         super(name);
+        // currently hard-coded, other server might need something else ...
+        String prefix = "api.";
+        URI url = new URI(urlstr);
+
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        root = (HttpNode) environment.world().validNode(url);
-        if (token != null) {
-            // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
-            root.getRoot().addExtraHeader("Authorization", "Bearer " + token);
-        }
+        this.host = url.getHost();
+        this.root = (HttpNode) environment.world().node(new URI(url.getScheme(), url.getUserInfo(),
+                prefix + host, url.getPort(), url.getPath(), url.getQuery(), url.getFragment()));
         this.groupsOrUsers = new ArrayList<>();
+    }
+
+    public String getTokenHost() {
+        return host;
+    }
+    public void setToken(String token) {
+        // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
+        root.getRoot().addExtraHeader("Authorization", "Bearer " + token);
     }
 
     public void addOption(String option) {
@@ -135,29 +140,17 @@ public class GithubRepository extends Repository {
     }
 
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
+    public List<GithubRepo> list() throws IOException {
         if (groupsOrUsers.isEmpty()) {
             throw new IOException("cannot collect all repos ...");
-        } else {
-            for (String groupOrUser : groupsOrUsers) {
-                for (GithubRepo repo : listOrganizationOrUserRepos(groupOrUser)) {
-                    scan(repo, dest, console);
-                }
-            }
         }
+        List<GithubRepo> result = new ArrayList<>();
+        for (String groupOrUser : groupsOrUsers) {
+            result.addAll(listOrganizationOrUserRepos(groupOrUser));
+        }
+        return result;
     }
 
-    private void scan(GithubRepo repo, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
-        try {
-            var descriptor = scanOpt(repo);
-            if (descriptor != null) {
-                dest.put(descriptor);
-            }
-        } catch (IOException e) {
-            console.error.println("cannot load " + repo.full_name + " (id=" + repo.id + "): " + e.getMessage());
-            e.printStackTrace(console.verbose);
-        }
-    }
 
     public HttpNode fileNode(GithubRepo repo, String path) {
         HttpNode url = root.join("repos", repo.full_name, "contents", path);
@@ -166,7 +159,8 @@ public class GithubRepository extends Repository {
         return url;
     }
 
-    public Descriptor scanOpt(GithubRepo repo) throws IOException {
+    @Override
+    public Descriptor load(GithubRepo repo) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
 

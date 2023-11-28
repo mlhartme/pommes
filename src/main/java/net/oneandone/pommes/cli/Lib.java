@@ -72,9 +72,9 @@ public class Lib {
         this.properties = Properties.load(configFile(home));
     }
 
-    public String tokenOpt(String repositoryName) throws IOException {
-        var file = home.join(".pommes-" + repositoryName + ".token");
-        return file.exists() ? file.readString().trim() : null;
+    public String tokenOpt(String repositoryName) {
+        // TODO merge with git credential access
+        return System.getenv("POMMES_REPOSITORY_TOKEN_" + repositoryName.toUpperCase());
     }
 
     public FileNode projectDirectory(Project project) throws IOException {

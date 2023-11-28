@@ -19,51 +19,45 @@ import net.oneandone.inline.ArgumentException;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.sushi.fs.World;
 import net.oneandone.sushi.fs.file.FileNode;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /** A place to search for descriptors. */
-public abstract class Repository {
-    public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException {
-        World world;
-        Repository repository;
-        FileNode file;
+public abstract class Repository<E> {
+    private static Map<String, Constructor> types;
+    static {
+        types = new HashMap<>();
+        types.put("artifactory", ArtifactoryRepository::create);
+        types.put("file", NodeRepository::create);
+        types.put("svn", NodeRepository::create);
+        types.put("gitlab", GitlabRepository::create);
+        types.put("github", GithubRepository::create);
+        types.put("gitea", GiteaRepository::create);
+        types.put("bitbucket", BitbucketRepository::create);
+        types.put("json", JsonRepository::createJson);
+        types.put("inline", JsonRepository::createInline);
+    }
 
-        world = environment.world();
-        repository = ArtifactoryRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
+    public static Repository create(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, IOException {
+        int idx;
+        FileNode file;
+        Constructor constructor;
+
+        idx = url.indexOf(':');
+        if (idx >= 0) {
+            constructor = types.get(url.substring(0, idx));
+            if (constructor != null) {
+                return constructor.create(environment, name, url.substring(idx + 1), log);
+            }
         }
-        repository = NodeRepository.createOpt(environment, name, url, log);
-        if (repository != null) {
-            return repository;
-        }
-        repository = GithubRepository.createOpt(environment, name, url, log);
-        if (repository != null) {
-            return repository;
-        }
-        repository = BitbucketRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        repository = GiteaRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        repository = GitlabRepository.createOpt(environment, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        repository = JsonRepository.createOpt(world, name, url);
-        if (repository != null) {
-            return repository;
-        }
-        file = world.file(url);
+        file = environment.world().file(url);
         if (file.exists()) {
             return new NodeRepository(environment, name, file, log);
         }
@@ -77,6 +71,15 @@ public abstract class Repository {
     }
 
 
+    // override to return a host name if repository can handle token
+    public String getTokenHost() {
+        return null;
+    }
+    // override if getTokenHost is overridden
+    public void setToken(String token) {
+        throw new IllegalStateException("token not supported");
+    }
+
     public void addOption(String option) {
         throw new ArgumentException(name + ": unknown option: " + option);
     }
@@ -84,5 +87,27 @@ public abstract class Repository {
     public void addExclude(String exclude) {
         throw new ArgumentException(name + ": excludes not supported: " + exclude);
     }
-    public abstract void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException, URISyntaxException;
+    public final void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
+        console.info.print("collecting entries ...");
+        console.info.flush();
+        List<E> entries = list();
+        console.info.println(" done: " + entries.size());
+        for (E entry : entries) {
+            try {
+                var descriptor = load(entry);
+                if (descriptor != null) {
+                    dest.put(descriptor);
+                }
+            } catch (IOException e) {
+                console.error.println("cannot load " + entry + ": " + e.getMessage());
+                e.printStackTrace(console.verbose);
+            }
+        }
+    }
+
+    /** List entries in the repository */
+    public abstract List<E> list() throws IOException;
+
+    /** Load an entry, i.e. return the respective descriptor */
+    public abstract Descriptor load(E entry) throws IOException;
 }

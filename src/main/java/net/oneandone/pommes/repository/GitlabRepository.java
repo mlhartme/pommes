@@ -19,7 +19,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.oneandone.inline.ArgumentException;
-import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
@@ -30,22 +29,15 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import net.oneandone.sushi.fs.http.HttpNode;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
 
-public class GitlabRepository extends Repository {
-    private static final String PROTOCOL = "gitlab:";
-
-    public static GitlabRepository createOpt(Environment environment, String repository, String url) throws URISyntaxException, IOException {
-        if (url.startsWith(PROTOCOL)) {
-            return new GitlabRepository(environment, repository, url.substring(PROTOCOL.length()),
-                    environment.lib.tokenOpt(repository));
-        } else {
-            return null;
-        }
+public class GitlabRepository extends Repository<GitlabRepository.GitlabProject> {
+    public static GitlabRepository create(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
+        return new GitlabRepository(environment, repository, url);
     }
 
 
@@ -55,16 +47,12 @@ public class GitlabRepository extends Repository {
 
     private final List<String> groupsOrUsers;
 
-    public GitlabRepository(Environment environment, String name, String url, String token) throws NodeInstantiationException {
+    public GitlabRepository(Environment environment, String name, String url) throws NodeInstantiationException {
         super(name);
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         root = (HttpNode) environment.world().validNode(url).join("api/v4");
-        if (token != null) {
-            // https://docs.gitlab.com/ee/api/#personalprojectgroup-access-tokens
-            root.getRoot().addExtraHeader("PRIVATE-TOKEN", token);
-        }
         this.groupsOrUsers = new ArrayList<>();
     }
 
@@ -155,50 +143,40 @@ public class GitlabRepository extends Repository {
         throw new ArgumentException("excludes not supported: " + exclude);
     }
 
+    public String getTokenHost() {
+        return root.getRoot().getHostname();
+    }
+
+    public void setToken(String token) {
+        // https://docs.gitlab.com/ee/api/rest/#oauth-20-tokens
+        // https://docs.gitlab.com/ee/api/rest/#personalprojectgroup-access-tokens
+        root.getRoot().addExtraHeader("Authorization", "Bearer " + token);
+    }
+
     @Override
-    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, URISyntaxException, InterruptedException {
-        List<GitlabProject> all;
+    public List<GitlabProject> list() throws IOException {
+        List<GitlabProject> result;
 
         if (groupsOrUsers.isEmpty()) {
-            console.info.println("collecting projects ...");
-            all = listAllProjects();
-            console.info.println("scan " + all.size() + " projects");
-            for (GitlabProject project : all) {
-                scan(project, dest, console);
-            }
+            result = listAllProjects();
         } else {
+            result = new ArrayList<>();
             for (String groupOrUser : groupsOrUsers) {
-                for (GitlabProject project : listGroupOrUserProjects(groupOrUser)) {
-                    scan(project, dest, console);
-                }
+                result.addAll(listGroupOrUserProjects(groupOrUser));
             }
         }
+        return result.stream().filter(p -> !Boolean.TRUE.equals(p.archived)).toList();
     }
 
-    private void scan(GitlabProject project, BlockingQueue<Descriptor> dest, Console console) throws InterruptedException {
-        if (Boolean.TRUE.equals(project.archived)) {
-            console.verbose.println("skip archived: " + project.path_with_namespace);
-            return;
-        }
-        try {
-            var descriptor = scanOpt(project);
-            if (descriptor != null) {
-                dest.put(descriptor);
-            }
-        } catch (IOException e) {
-            console.error.println("cannot load " + project.path_with_namespace + " (id=" + project.id + "): " + e.getMessage());
-            e.printStackTrace(console.verbose);
-        }
-    }
 
     private GitUrl repoUrl(GitlabProject project) throws ScmUrlException {
         return GitUrl.create(project.http_url_to_repo()); // TODO: configurable
     }
 
-    public Descriptor scanOpt(GitlabProject project) throws IOException {
+    @Override
+    public Descriptor load(GitlabProject project) throws IOException {
         Descriptor.Creator m;
         Node<?> node;
-        Descriptor result;
 
         for (String name : files(project)) {
             m = Descriptor.match(name);

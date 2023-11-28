@@ -15,18 +15,60 @@
  */
 package net.oneandone.pommes.scm;
 
+import net.oneandone.inline.Console;
 import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 import net.oneandone.sushi.launcher.Launcher;
-import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Git extends Scm<GitUrl> {
+    public record UP(String username, String password) {
+    }
     public Git() {
         super("git:", GitUrl::create);
     }
 
+    public UP getCredentials(Console console, FileNode dir, String host) throws IOException {
+        StringWriter out = new StringWriter();
+        StringReader in = new StringReader("protocol=https\n"
+          + "host=" + host + "\n"
+          + "path=/\n\n");
+        try {
+            git(dir, "credential", "fill").exec(out, out, true, in, false);
+        } catch(Failure e) {
+            console.error.println(out);
+            throw e;
+        }
+        String[] lines = out.toString().split("\n");
+        Map<String, String> map = new HashMap<>();
+        for (String line : lines) {
+            if (!line.isBlank()) {
+                var idx = line.indexOf('=');
+                if (idx < 0) {
+                    console.error.println(line);
+                } else {
+                    var key = line.substring(0, idx).trim();
+                    var old = map.put(key, line.substring(idx + 1).trim());
+                    if (old != null) {
+                        throw new IOException("duplicate key: " + key);
+                    }
+                }
+            }
+        }
+        UP result = new UP(map.get("username"), map.get("password"));
+        if (result.username == null) {
+            throw new IOException("missing username");
+        }
+        if (result.password == null) {
+            throw new IOException("missing password");
+        }
+        return result;
+    }
     public boolean isCheckout(FileNode directory) {
         return directory.join(".git").isDirectory();
     }
@@ -45,11 +87,8 @@ public class Git extends Scm<GitUrl> {
     }
 
     @Override
-    public Launcher checkout(FileNode directory, String fullurl) {
-        String url;
-
-        url = Strings.removeLeft(fullurl, protocol());
-        return git(directory.getParent(), "clone", url, directory.getName());
+    public Launcher checkout(GitUrl url, FileNode directory) {
+        return git(directory.getParent(), "clone", url.url(), directory.getName());
     }
 
     @Override

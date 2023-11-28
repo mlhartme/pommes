@@ -2,6 +2,11 @@
 
 ### 3.5.0 (pending)
 
+* token handling
+  * load token from environment POMMES_REPOSITORY_TOKEN_<name> variable, not file
+  * github + gitlab
+    * load github token from "git credentials"
+    * explicitly declare "§§" if repository needs a token
 * default repositories
   * the first repository defined in config is the default repository
   * setup automatically defines default repository local = $POMMES_ROOT

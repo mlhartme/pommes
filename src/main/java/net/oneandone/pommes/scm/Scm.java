@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Scm<U extends ScmUrl> {
-    public static final Scm GIT = new Git();
-    public static final Scm SUBVERSION = new Subversion();
+    public static final Git GIT = new Git();
+    public static final Subversion SUBVERSION = new Subversion();
 
     private static final Scm[] SCMS = { GIT, SUBVERSION };
 
@@ -63,7 +63,7 @@ public abstract class Scm<U extends ScmUrl> {
     public abstract boolean isCheckout(FileNode directory) throws IOException;
     public abstract boolean isAlive(FileNode checkout) throws IOException;
     public abstract boolean isModified(FileNode checkout) throws IOException;
-    public abstract Launcher checkout(FileNode dest, String url) throws Failure;
+    public abstract Launcher checkout(U url, FileNode dest) throws Failure;
 
     //--
 
