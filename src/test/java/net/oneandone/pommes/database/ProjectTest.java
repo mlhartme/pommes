@@ -29,7 +29,7 @@ public class ProjectTest {
 
         obj = JsonParser.parseString(
                 "  {\n" +
-                "    \"repository\": \"r\",\n" +
+                "    \"storage\": \"r\",\n" +
                 "    \"path\": \"p\",\n" +
                 "    \"revision\": \"32\",\n" +
                 "    \"parent\": \"net.oneandone.maven.poms:lazy-foss-parent:1.0.1\",\n" +

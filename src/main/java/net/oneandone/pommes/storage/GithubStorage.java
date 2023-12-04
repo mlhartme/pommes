@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.repository;
+package net.oneandone.pommes.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -22,26 +22,26 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
 import net.oneandone.pommes.scm.GitUrl;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.http.HttpNode;
 import net.oneandone.sushi.fs.http.model.HeaderList;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 /** https://docs.github.com/de/rest/guides/getting-started-with-the-rest-api */
-public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
+public class GithubStorage extends TreeStorage<GithubStorage.GithubRepo, GithubStorage.GithubFile> {
     private static final int PAGE_SIZE = 30;
 
-    public static GithubRepository create(Environment environment, String name, String url, PrintWriter log)
-            throws IOException, URISyntaxException {
-        return new GithubRepository(environment, name, url);
+    public static GithubStorage create(Environment environment, String name, String url) throws IOException, URISyntaxException {
+        return new GithubStorage(environment, name, url);
     }
 
 
@@ -52,8 +52,8 @@ public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
 
     private final List<String> groupsOrUsers;
 
-    public GithubRepository(Environment environment, String name, String urlstr) throws NodeInstantiationException, URISyntaxException {
-        super(name);
+    public GithubStorage(Environment environment, String name, String urlstr) throws NodeInstantiationException, URISyntaxException {
+        super(environment, name);
         // currently hard-coded, other server might need something else ...
         String prefix = "api.";
         URI url = new URI(urlstr);
@@ -123,21 +123,6 @@ public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
     private HttpNode page(HttpNode url, int page) {
         return url.withParameter("page", page).withParameter("per_page", PAGE_SIZE);
     }
-    public List<String> files(GithubRepo repo) throws IOException {
-        HttpNode url;
-        String str;
-        List<GithubFile> files;
-        List<String> result;
-
-        result = new ArrayList<>();
-        url = root.join("repos", repo.full_name, "contents"); // caution: not paginated!
-        str = url.readString();
-        files = mapper.readValue(str, new TypeReference<>() {});
-        for (GithubFile file : files) {
-            result.add(file.path);
-        }
-        return result;
-    }
 
     @Override
     public List<GithubRepo> list() throws IOException {
@@ -160,20 +145,45 @@ public class GithubRepository extends Repository<GithubRepository.GithubRepo> {
     }
 
     @Override
-    public Descriptor load(GithubRepo repo) throws IOException {
-        Descriptor.Creator m;
-        Node<?> node;
+    public List<GithubFile> listRoot(GithubRepo repo) throws IOException {
+        HttpNode url;
+        String str;
 
-        for (String name : files(repo)) {
-            m = Descriptor.match(name);
-            if (m != null) {
-                // TODO: when to delete node?
-                node = environment.world().getTemp().createTempFile();
-                fileNode(repo, name).copyFile(node);
-                return m.create(environment, node, this.name, repo.full_name(), branchRevision(repo, repo.default_branch()), repoUrl(repo));
-            }
-        }
+        url = root.join("repos", repo.full_name, "contents"); // caution: not paginated!
+        str = url.readString();
+        return mapper.readValue(str, new TypeReference<>() {});
+    }
 
+    @Override
+    public String fileName(GithubFile file) {
+        return file.path();
+    }
+
+    @Override
+    public ScmUrl storageUrl(GithubRepo repository) throws IOException {
+        return repoUrl(repository);
+    }
+
+    @Override
+    public String repositoryPath(GithubRepo repository, GithubFile file) throws IOException {
+        return repository.full_name();
+    }
+
+    @Override
+    public FileNode localFile(GithubRepo repository, GithubFile file) throws IOException {
+        FileNode local = environment.world().getTemp().createTempFile();
+        fileNode(repository, file.path()).copyFile(local);
+        return local;
+    }
+
+    @Override
+    public String fileRevision(GithubRepo repository, GithubFile githubFile, Node<?> local) throws IOException {
+        // TODO: revision of this very file!?
+        return branchRevision(repository, repository.default_branch());
+    }
+
+    @Override
+    public Descriptor createDefault(GithubRepo repo) throws IOException {
         return new RawDescriptor(name, repo.full_name(), "TODO", repoUrl(repo), repo.url);
     }
 

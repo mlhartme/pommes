@@ -47,7 +47,7 @@ public class Environment implements Variables {
         this.console = console;
         this.world = world;
         this.lib = Lib.load(world);
-        console.verbose.println("default repository: " + lib.properties().defaultRepository);
+        console.verbose.println("default storage: " + lib.properties().defaultStorage);
         this.lazyMaven = null;
         this.lazyCurrentPom = null;
         this.lazyExcludes = null;
@@ -124,7 +124,7 @@ public class Environment implements Variables {
                 Descriptor.Creator m = Descriptor.match(child.getName());
                 if (m != null) {
                     descriptor = m.create(this, child, "unused", child.getPath(), child.sha(), scm.getUrl(directory));
-                    return descriptor.load(this);
+                    return descriptor.load();
                 }
             }
         }

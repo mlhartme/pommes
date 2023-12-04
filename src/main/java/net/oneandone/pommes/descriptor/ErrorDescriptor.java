@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.descriptor;
 
-import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.ScmUrl;
 
@@ -27,13 +26,13 @@ public class ErrorDescriptor extends Descriptor {
 
     private final Exception exception;
 
-    public ErrorDescriptor(Exception exception, String repository, String path, String revision, ScmUrl repositoryScm) {
-        super(repository, path, revision, repositoryScm);
+    public ErrorDescriptor(Exception exception, String storage, String path, String revision, ScmUrl storageScm) {
+        super(storage, path, revision, storageScm);
         this.exception = exception;
     }
 
     @Override
-    public Project load(Environment environment) throws IOException {
+    public Project load() throws IOException {
         if (exception instanceof RuntimeException) {
             throw (RuntimeException) exception;
         } else {

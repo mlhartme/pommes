@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.repository;
+package net.oneandone.pommes.storage;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
@@ -25,19 +25,19 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GitlabRepositoryIT {
-    private GitlabRepository repository() throws IOException {
+public class GitlabStorageIT {
+    private GitlabStorage storage() throws IOException {
         Environment environment;
-        GitlabRepository gitlab;
+        GitlabStorage gitlab;
 
         environment = new Environment(Console.create(), World.create());
-        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
+        gitlab = new GitlabStorage(environment, "name", "https://gitlab.com");
         return gitlab;
     }
 
     @Test
     public void listGroups() throws IOException {
-        var gitlab = repository();
+        var gitlab = storage();
         var lst = gitlab.listGroupOrUserProjects("jeffster");
         System.out.println("common-tools: " + lst.size());
         for (var g : lst) {
@@ -48,17 +48,17 @@ public class GitlabRepositoryIT {
     @Test
     public void scanOpt() throws IOException {
         Environment environment;
-        GitlabRepository gitlab;
+        GitlabStorage gitlab;
         Descriptor descriptor;
 
         environment = new Environment(Console.create(), World.create());
-        gitlab = new GitlabRepository(environment, "name", "https://gitlab.com");
+        gitlab = new GitlabStorage(environment, "name", "https://gitlab.com");
         var project = gitlab.getProject(41573530);
-        System.out.println("" + gitlab.files(project));
+        System.out.println("" + gitlab.listRoot(project));
         System.out.println("default branch: " + project.default_branch());
         System.out.println("branch revision: " + gitlab.branchRevision(project, project.default_branch()));
         descriptor = gitlab.load(project);
-        var pommes = descriptor.load(environment);
+        var pommes = descriptor.load();
         System.out.println("project: " + project);
         assertEquals("ru.t1.sochilenkov.tm", pommes.artifact.groupId);
         assertEquals("task-manager", pommes.artifact.artifactId);

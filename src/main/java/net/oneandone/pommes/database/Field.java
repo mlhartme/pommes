@@ -30,7 +30,7 @@ public enum Field {
      * Mandatory. The full uri used to load the project for indexing. Full means the uri pointing to the pom file, not to trunk or a branch directory.
      * Used as a unique identifier for the document.
      */
-    ORIGIN("Where this project was loaded from. Used as unique identifier. <repositoryName>:<path>"),
+    ORIGIN("Where this project was loaded from. Used as unique identifier. <storageName>:<path>"),
 
     REVISION("Last modified timestamp or content hash of this pom. Used to detect changes."),
     PARENT(true, false, "Coordinates of the parent project."),

@@ -39,7 +39,7 @@ public class Lib {
         return new Lib(lib);
     }
 
-    public static void create(World world, FileNode root, Console console, Map<String, String> repositories) throws IOException {
+    public static void create(World world, FileNode root, Console console, Map<String, String> storages) throws IOException {
         FileNode lib;
 
         lib = root.join(DIR);
@@ -50,7 +50,7 @@ public class Lib {
         lib.mkdirs();
         lib.join("logs").mkdir();
         world.resource("profiles").copyDirectory(lib.join("profiles").mkdir());
-        configFile(lib).writeLines(Properties.defaultConfig(repositories));
+        configFile(lib).writeLines(Properties.defaultConfig(storages));
     }
 
     /** @return .pommes directory to use or null if not defined */
@@ -70,11 +70,6 @@ public class Lib {
     public Lib(FileNode home) throws IOException {
         this.home = home;
         this.properties = Properties.load(configFile(home));
-    }
-
-    public String tokenOpt(String repositoryName) {
-        // TODO merge with git credential access
-        return System.getenv("POMMES_REPOSITORY_TOKEN_" + repositoryName.toUpperCase());
     }
 
     public FileNode projectDirectory(Project project) throws IOException {

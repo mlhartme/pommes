@@ -27,15 +27,15 @@ import java.util.List;
 import java.util.Map;
 
 public class Properties {
-    public static List<String> defaultConfig(Map<String, String> repositories) {
+    public static List<String> defaultConfig(Map<String, String> storages) {
         List<String> lines;
 
         lines = new ArrayList<>();
         lines.add("# Pommes configuration file, see https://github.com/mlhartme/pommes");
         lines.add("");
-        lines.add("# repositories");
-        for (var entry : repositories.entrySet()) {
-            lines.add("repository." + entry.getKey() + "=" + entry.getValue());
+        lines.add("# storages");
+        for (var entry : storages.entrySet()) {
+            lines.add("storage." + entry.getKey() + "=" + entry.getValue());
         }
         lines.add("");
         lines.add("# query macros");
@@ -49,18 +49,18 @@ public class Properties {
     public static Properties load(FileNode file) throws IOException {
         String queryPrefix = "query.";
         String formatPrefix = "format.";
-        String repoPrefix = "repository.";
+        String storagePrefix = "storage.";
         String giteaKey;
         Map<String, String> props;
         Map<String, List<String>> queries;
         Map<String, String> formats;
-        Map<String, String> repositories;
+        Map<String, String> storages;
         FileNode checkouts;
 
         giteaKey = null;
         queries = new HashMap<>();
         formats = new HashMap<>();
-        repositories = new LinkedHashMap<>();
+        storages = new LinkedHashMap<>();
         props = readSequencedProperties(file);
         checkouts = file.getParent().getParent();
         for (String key : props.keySet()) {
@@ -70,16 +70,16 @@ public class Properties {
                 queries.put(key.substring(queryPrefix.length()), Separator.SPACE.split(props.get(key)));
             } else if (key.startsWith(formatPrefix)) {
                 formats.put(key.substring(formatPrefix.length()), props.get(key));
-            } else if (key.startsWith(repoPrefix)) {
-                repositories.put(key.substring(repoPrefix.length()), props.get(key));
+            } else if (key.startsWith(storagePrefix)) {
+                storages.put(key.substring(storagePrefix.length()), props.get(key));
             } else {
                 throw new IOException("unknown property: " + key);
             }
         }
-        if (repositories.isEmpty()) {
-            throw new IOException("missing repositories: " + file);
+        if (storages.isEmpty()) {
+            throw new IOException("missing storages: " + file);
         }
-        return new Properties(checkouts, giteaKey, queries, formats, repositories, repositories.keySet().iterator().next());
+        return new Properties(checkouts, giteaKey, queries, formats, storages, storages.keySet().iterator().next());
     }
 
     public static Map<String, String> readSequencedProperties(FileNode file) throws IOException {
@@ -104,18 +104,18 @@ public class Properties {
     private Map<String, List<String>> queries;
     private Map<String, String> formats;
 
-    /** maps names to repository urls */
-    public final Map<String, String> repositories;
-    public final String defaultRepository;
+    /** maps names to storage urls */
+    public final Map<String, String> storages;
+    public final String defaultStorage;
 
     public Properties(FileNode checkouts, String giteaKey, Map<String, List<String>> queries,
-                      Map<String, String> formats, Map<String, String> repositories, String defaultRepository) {
+                      Map<String, String> formats, Map<String, String> storages, String defaultStorage) {
         this.checkouts = checkouts;
         this.giteaKey = giteaKey;
         this.queries = queries;
         this.formats = formats;
-        this.repositories = repositories;
-        this.defaultRepository = defaultRepository;
+        this.storages = storages;
+        this.defaultStorage = defaultStorage;
     }
 
     public List<String> lookupQuery(String name) {

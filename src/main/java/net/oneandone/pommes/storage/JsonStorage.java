@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.repository;
+package net.oneandone.pommes.storage;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.cli.Find;
 import net.oneandone.pommes.database.Project;
@@ -30,29 +31,34 @@ import net.oneandone.sushi.fs.NodeInstantiationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.zip.GZIPInputStream;
 
-public class JsonRepository extends Repository<Descriptor> {
-    public static JsonRepository createJson(Environment environment, String name, String url, PrintWriter log) throws URISyntaxException, NodeInstantiationException {
-        return new JsonRepository(name, Find.fileOrNode(environment.world(), url));
+public class JsonStorage extends Storage {
+    public static JsonStorage createJson(Environment environment, String name, String url) throws URISyntaxException, NodeInstantiationException {
+        return new JsonStorage(name, Find.fileOrNode(environment.world(), url));
     }
 
-    public static JsonRepository createInline(Environment environment, String name, String url, PrintWriter log) {
-        return new JsonRepository(name, environment.world().memoryNode("[ " + url + " ]"));
+    public static JsonStorage createInline(Environment environment, String name, String url) {
+        return new JsonStorage(name, environment.world().memoryNode("[ " + url + " ]"));
     }
 
-    private final Node node;
+    private final Node<?> node;
 
-    public JsonRepository(String name, Node node) {
+    public JsonStorage(String name, Node<?> node) {
         super(name);
         this.node = node;
     }
 
-    @Override
+    public void scan(BlockingQueue<Descriptor> dest, Console console) throws IOException, InterruptedException {
+        for (Descriptor descriptor : list()) {
+            dest.put(descriptor);
+        }
+    }
+
     public List<Descriptor> list() throws IOException {
         List<Descriptor> result = new ArrayList<>();
         JsonArray array;
@@ -72,10 +78,5 @@ public class JsonRepository extends Repository<Descriptor> {
             }
         }
         return result;
-    }
-
-    @Override
-    public Descriptor load(Descriptor descriptor) throws IOException {
-        return descriptor; // TODO
     }
 }

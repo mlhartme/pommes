@@ -33,15 +33,15 @@ public class Setup {
     private final boolean batch;
     private final FileNode root;
 
-    private final Map<String, String> repositories;
+    private final Map<String, String> storages;
 
     public Setup(World world, Console console, boolean batch, List<String> dirKeyValues) {
         this.world = world;
         this.console = console;
         this.batch = batch;
         this.root = eatRoot(dirKeyValues);
-        this.repositories = new LinkedHashMap<>();
-        this.repositories.put("local", root.getAbsolute());
+        this.storages = new LinkedHashMap<>();
+        this.storages.put("local", root.getAbsolute());
         for (String kv : dirKeyValues) {
             add(kv);
         }
@@ -66,7 +66,7 @@ public class Setup {
             throw new ArgumentException("delimiter '=' not found: " + kv);
         }
         String key = kv.substring(0, idx).trim();
-        if (repositories.put(key, kv.substring(idx +1).trim()) != null) {
+        if (storages.put(key, kv.substring(idx +1).trim()) != null) {
             throw new ArgumentException("duplicate key: " + key);
         }
     }
@@ -85,7 +85,7 @@ public class Setup {
             console.info.println("Directory " + directory.getAbsolute() + " will be created to store configuration and other files.");
             console.readline("Press return to continue, ctl-c to abort: ");
         }
-        Lib.create(world, root, console, repositories);
+        Lib.create(world, root, console, storages);
         environment = new Environment(console, world);
         console.info.println("initial indexing ...");
         new Index(environment, new ArrayList<>()).run();

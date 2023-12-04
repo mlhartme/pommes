@@ -28,7 +28,7 @@ import java.io.IOException;
 public abstract class Descriptor {
     @FunctionalInterface
     public interface Creator {
-        Descriptor create(Environment env, Node<?> node, String repository, String path, String revision, ScmUrl scmUrl);
+        Descriptor create(Environment environment, Node<?> node, String storage, String path, String revision, ScmUrl scmUrl);
     }
 
     /** @return create method for matching descriptor or null if no descriptor matches */
@@ -47,13 +47,13 @@ public abstract class Descriptor {
 
     //--
 
-    protected final String repository;
+    protected final String storage;
     protected final String path;
     protected final String revision;
-    protected final ScmUrl repositoryScm;
+    protected final ScmUrl storageScm;
 
-    public Descriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
-        if (repository == null) {
+    public Descriptor(String storage, String path, String revision, ScmUrl storageScm) {
+        if (storage == null) {
             throw new IllegalArgumentException();
         }
         if (path == null) {
@@ -62,14 +62,14 @@ public abstract class Descriptor {
         if (revision == null) {
             throw new IllegalArgumentException();
         }
-        this.repository = repository;
+        this.storage = storage;
         this.path = path;
         this.revision = revision;
-        this.repositoryScm = repositoryScm == null ? null : repositoryScm.normalize();
+        this.storageScm = storageScm == null ? null : storageScm.normalize();
     }
 
-    public String getRepository() {
-        return repository;
+    public String getStorage() {
+        return storage;
     }
 
     public String getPath() {
@@ -80,7 +80,7 @@ public abstract class Descriptor {
         return revision;
     }
 
-    public abstract Project load(Environment environment) throws IOException;
+    public abstract Project load() throws IOException;
 
     public String toString() {
         return path;

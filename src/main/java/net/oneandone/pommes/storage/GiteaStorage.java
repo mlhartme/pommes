@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.repository;
+package net.oneandone.pommes.storage;
 
 import io.gitea.ApiClient;
 import io.gitea.ApiException;
@@ -21,15 +21,19 @@ import io.gitea.Configuration;
 import io.gitea.api.OrganizationApi;
 import io.gitea.api.RepositoryApi;
 import io.gitea.auth.ApiKeyAuth;
+import io.gitea.model.ContentsResponse;
 import io.gitea.model.Organization;
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
+import net.oneandone.pommes.scm.GitUrl;
+import net.oneandone.pommes.scm.ScmUrl;
+import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.World;
+import net.oneandone.sushi.fs.memory.MemoryNode;
 import net.oneandone.sushi.util.Strings;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -42,22 +46,21 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /** https://developer.atlassian.com/static/rest/bitbucket-server/4.6.2/bitbucket-rest.html */
-public class GiteaRepository extends Repository<GiteaProject> {
+public class GiteaStorage extends TreeStorage<GiteaProject, ContentsResponse> {
     public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
         Environment env;
-        GiteaRepository gitea;
+        GiteaStorage gitea;
 
         env = new Environment(Console.create(), World.create());
-        gitea = GiteaRepository.create(env, "reponame", "https://git.ionos.org/CPOPS", null);
+        gitea = GiteaStorage.create(env, "storagename", "https://git.ionos.org/CPOPS");
         BlockingQueue<Descriptor> result = new ArrayBlockingQueue<>(1000);
         gitea.scan(result, env.console());
         for (var d : result) {
-            System.out.println(" " + d.load(env));
+            System.out.println(" " + d.load());
         }
     }
 
-    public static GiteaRepository create(Environment environment, String repository, String uriStr, PrintWriter log)
-            throws URISyntaxException {
+    public static GiteaStorage create(Environment environment, String storage, String uriStr) throws URISyntaxException {
         ApiClient gitea;
         URI uri;
         String path;
@@ -81,7 +84,7 @@ public class GiteaRepository extends Repository<GiteaProject> {
         ApiKeyAuth accessToken = (ApiKeyAuth) gitea.getAuthentication("AccessToken");
         accessToken.setApiKey(environment.lib.properties().giteaKey);
 
-        return new GiteaRepository(environment, repository, uri.getHost(), gitea, selectedOrganization);
+        return new GiteaStorage(environment, storage, uri.getHost(), gitea, selectedOrganization);
     }
 
     private final Environment environment;
@@ -91,8 +94,8 @@ public class GiteaRepository extends Repository<GiteaProject> {
     private final OrganizationApi organizationApi;
     private final RepositoryApi repositoryApi;
 
-    public GiteaRepository(Environment environment, String repository, String hostname, ApiClient gitea, String selectedOrganization) {
-        super(repository);
+    public GiteaStorage(Environment environment, String storage, String hostname, ApiClient gitea, String selectedOrganization) {
+        super(environment, storage);
         this.environment = environment;
         this.hostname = hostname;
         this.gitea = gitea;
@@ -124,12 +127,46 @@ public class GiteaRepository extends Repository<GiteaProject> {
     }
 
     @Override
-    public Descriptor load(GiteaProject project) throws IOException {
+    public List<ContentsResponse> listRoot(GiteaProject entry) throws IOException {
         try {
-            return project.scanOpt(environment, hostname, repositoryApi);
+            return entry.list(repositoryApi);
         } catch (ApiException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public String fileName(ContentsResponse file) {
+        return file.getName();
+    }
+
+    @Override
+    public ScmUrl storageUrl(GiteaProject repository) throws IOException {
+        return GitUrl.create("ssh://gitea@" + hostname + "/" + repository.org() + "/" + repository + ".git");
+    }
+
+    @Override
+    public String repositoryPath(GiteaProject repository, ContentsResponse file) throws IOException {
+        return repository.org() + "/" + repository.repo() + "/" + file.getPath();
+    }
+
+    @Override
+    public MemoryNode localFile(GiteaProject repository, ContentsResponse file) throws IOException {
+        try {
+            return repository.localFile(file, environment, repositoryApi);
+        } catch (ApiException e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String fileRevision(GiteaProject repository, ContentsResponse contentsResponse, Node<?> local) throws IOException {
+        return local.sha();
+    }
+
+    @Override
+    public Descriptor createDefault(GiteaProject entry) throws IOException {
+        return null; // TODO
     }
 
     public List<io.gitea.model.Repository> listRepos(String org) throws IOException {

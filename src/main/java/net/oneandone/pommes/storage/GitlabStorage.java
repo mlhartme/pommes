@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.repository;
+package net.oneandone.pommes.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -23,21 +23,21 @@ import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.RawDescriptor;
 import net.oneandone.pommes.scm.GitUrl;
+import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.pommes.scm.ScmUrlException;
 import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.fs.NodeInstantiationException;
+import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.fs.http.HttpNode;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public class GitlabRepository extends Repository<GitlabRepository.GitlabProject> {
-    public static GitlabRepository create(Environment environment, String repository, String url, PrintWriter log) throws URISyntaxException, IOException {
-        return new GitlabRepository(environment, repository, url);
+public class GitlabStorage extends TreeStorage<GitlabStorage.GitlabProject, GitlabStorage.TreeItem> {
+    public static GitlabStorage create(Environment environment, String storage, String url) throws URISyntaxException, IOException {
+        return new GitlabStorage(environment, storage, url);
     }
 
 
@@ -47,8 +47,8 @@ public class GitlabRepository extends Repository<GitlabRepository.GitlabProject>
 
     private final List<String> groupsOrUsers;
 
-    public GitlabRepository(Environment environment, String name, String url) throws NodeInstantiationException {
-        super(name);
+    public GitlabStorage(Environment environment, String name, String url) throws NodeInstantiationException {
+        super(environment, name);
         this.environment = environment;
         this.mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -124,17 +124,6 @@ public class GitlabRepository extends Repository<GitlabRepository.GitlabProject>
         return mapper.readValue(url.readString(), GitlabProject.class);
     }
 
-    public List<String> files(GitlabProject project) throws IOException {
-        HttpNode url;
-        List<TreeItem> items;
-
-        url = root.join("projects", Long.toString(project.id()), "repository/tree");
-        url.withParameter("per_page", 100);
-        url.withParameter("ref", or(project.default_branch(), "main"));
-        items = mapper.readValue(url.readString(), new TypeReference<>() {});
-        return items.stream().map((item) -> "blob".equals(item.type()) ? item.name() : null).filter(Objects::nonNull).toList();
-    }
-
     private static String or(String left, String right) {
         return left != null ? left : right;
     }
@@ -174,24 +163,51 @@ public class GitlabRepository extends Repository<GitlabRepository.GitlabProject>
     }
 
     @Override
-    public Descriptor load(GitlabProject project) throws IOException {
-        Descriptor.Creator m;
-        Node<?> node;
+    public List<GitlabStorage.TreeItem> listRoot(GitlabProject project) throws IOException {
+        HttpNode url;
+        List<TreeItem> items;
 
-        for (String name : files(project)) {
-            m = Descriptor.match(name);
-            if (m != null) {
-                // TODO: when to delete node?
-                node = environment.world().getTemp().createTempFile();
-                HttpNode url = root.join("projects", Long.toString(project.id()), "repository/files", name, "raw");
-                url = url.withParameter("ref", project.default_branch());
-                url.copyFile(node);
-                return m.create(environment, node, this.name, project.path_with_namespace() + "/" + name,
-                        branchRevision(project, project.default_branch()),  // TODO: could be more accurate with the revision of this very file ...
-                        repoUrl(project));
-            }
-        }
+        url = root.join("projects", Long.toString(project.id()), "repository/tree");
+        url.withParameter("per_page", 100);
+        url.withParameter("ref", or(project.default_branch(), "main"));
+        items = mapper.readValue(url.readString(), new TypeReference<>() {});
+        return items.stream().filter((item) -> "blob".equals(item.type())).toList();
+    }
 
+    @Override
+    public String fileName(GitlabStorage.TreeItem file) {
+        return file.name();
+    }
+
+    @Override
+    public ScmUrl storageUrl(GitlabProject repository) throws IOException {
+        return repoUrl(repository);
+    }
+
+    @Override
+    public String repositoryPath(GitlabProject repository, GitlabStorage.TreeItem file) throws IOException {
+        return repository.path_with_namespace() + "/" + file.name();
+    }
+
+    @Override
+    public FileNode localFile(GitlabProject repository, TreeItem file) throws IOException {
+        FileNode local;
+
+        local = environment.world().getTemp().createTempFile();
+        HttpNode url = root.join("projects", Long.toString(repository.id()), "repository/files", file.name(), "raw");
+        url = url.withParameter("ref", repository.default_branch());
+        url.copyFile(local);
+        return local;
+    }
+
+    @Override
+    public String fileRevision(GitlabProject repository, TreeItem treeItem, Node<?> local) throws IOException {
+        // TODO: could be more accurate with the revision of this very file ...
+        return branchRevision(repository, repository.default_branch());
+    }
+
+    @Override
+    public Descriptor createDefault(GitlabProject project) throws IOException {
         return new RawDescriptor(name, project.path_with_namespace(), "TODO", repoUrl(project), project.web_url);
     }
 

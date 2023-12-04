@@ -16,7 +16,7 @@ This command searches the database for `lavender` projects and lets you choose b
 simply cd into the already existing checkout, choosing `2` also creates the checkout. 
 
 Technically, Pommes is a command line tool that maintains a database with project metadata. Pommes can:
-* index repositories (e.g. github or github) to populate the database
+* index storages (e.g. github or github) to populate the database
 * search the database by coordinates, dependencies, scm location, etc. 
 * perform (bulk-) checkouts for all projects that match a query.
 
@@ -58,25 +58,25 @@ Install the application
 ## Managing the Database
 
 Pommes maintains a [Lucene](http://lucene.apache.org) database to store project metadata. The database is filled
-by indexing so-called repositories. The database is stored in `$POMMES_ROOT/.pommes/database`, it's safe to delete this
+by indexing so-called storages. The database is stored in `$POMMES_ROOT/.pommes/database`, it's safe to delete this
 directory to wipe the database.
 
-`.pommes/config` defines databases in the form *repository.<name> = <url> {<option>}*
+`.pommes/config` defines databases in the form *storage.<name> = <url> {<option>}*
 * name is an arbitrary name
-* url is the primary definition of the repository, the protocol distinishes the repository type
+* url is the primary definition of the storage, the protocol distinishes the storage type
   * github:<url-of-github-api>
   * gitlab:<url-of-gitlab-server>
   * json:<url-pointing-to-json-file>
   * file:///path-to-local-directory-with checkouts
-* options depend on the repository type
+* options depend on the storage type
 
 Example urls
 
-       repository.mlhartme=github:https://api.github.com %~mlhartme
-       repository.company=gitlab:https://gitlab.company.com 
+       storage.mlhartme=github:https://api.github.com %~mlhartme
+       storage.company=gitlab:https://gitlab.company.com 
 
 You can configure access token for github and gitlab by storing them in a file $POMMES_ROOT/.pommes/<reponame>-<protocol>.token.
-For example, a token in file $POMMES_ROOT/.pommes/github-mlhartme.token will be used to index the above mlhartme repository.
+For example, a token in file $POMMES_ROOT/.pommes/github-mlhartme.token will be used to index the above mlhartme storage.
 
 ## Find Command
 
@@ -151,7 +151,7 @@ Descriptor: references a project, various implementation to load Maven, Json, et
 
 Project: holds project metadata: gav, parent, dependencies, scm, url
 
-Repository: can be scanned for descriptors
+Storage: can be scanned for descriptors
 
 Database: stores projects (in Lucene)
 
@@ -181,14 +181,14 @@ commands
                         '?' - checkout is not in database
                         '!' - checkout in wrong directory
                         '#' - error checking this checkout
-  'index' {repo}        re-index the specified (default: all) repositories.
+  'index' {storage}     re-index the specified (default: all) storages.
   'setup' ['-batch'] {name'='value}
-                        creates '.pommes' directory with initial configuration containing name/values as repositories; 
-                        indexes all repositories to create intial database;
+                        creates '.pommes' directory with initial configuration containing name/values as storages; 
+                        indexes all storages to create initial database;
                         '.pommes' is created in the directory specified by $POMMES_ROOT, default is ~/Pommes.
 
 fields in the database: (field id is the first letter of the field name.)
-  origin      Where this project was loaded from. Used as unique identifier. <repositoryName>:<path>
+  origin      Where this project was loaded from. Used as unique identifier. <storageName>:<path>
   revision    Last modified timestamp or content hash of this pom. Used to detect changes.
   parent      Coordinates of the parent project.
   artifact    Coordinates of this project.

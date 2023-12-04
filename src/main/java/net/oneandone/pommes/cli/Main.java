@@ -58,19 +58,19 @@ public class Main {
                 + "  'remove' root?        remove checkouts under the specified root directory;\n"
                 + "                        offers selection before changing anything on disk;\n"
                 + "                        checkouts with modifications are marked in the list\n" */
-                + "  'index' {repo}        re-index the specified (default: all) repositories.\n"
+                + "  'index' {storage}     re-index the specified storages (default: all).\n"
                 + "  'setup' ['-batch'] root? {name'='value}\n"
                 + "                        sets up pommes in the specified directory (default: ~/" + Lib.DEFAULT_ROOT + ")\n"
-                + "                        creates '" + Lib.DIR + "' directory inside with initial configuration containing name/values as repositories; \n"
-                + "                        indexes all repositories to create intial database;\n"
+                + "                        creates '" + Lib.DIR + "' directory inside with initial configuration containing name/values as storages; \n"
+                + "                        indexes all storages to create initial database;\n"
                 + "\n"
                 + "fields in the database: (field id is the first letter of the field name.)\n"
                 + fieldList()
                 + "\n"
                 + "query syntax\n"
                 + "  query     = '@' MACRO | or\n"
-                + "  or        = repo? (and (' ' and)*)? index?\n"
-                + "  repo      = '/' STR?                  ; default is first repository defined in config\n"
+                + "  or        = storage? (and (' ' and)*)? index?\n"
+                + "  storage   = '/' STR?                  ; default is first storage defined in config\n"
                 + "  index     = NUMBER\n"
                 + "  and       = term ('+' term)*\n"
                 + "  term      = field | lucene\n"
@@ -96,7 +96,7 @@ public class Main {
             cli.add(Remove.class, "remove root?=.");
             cli.add(Status.class, "st root?=.");
             cli.add(Goto.class, "goto -x=false query*");
-            cli.add(Index.class, "index repo*");
+            cli.add(Index.class, "index storage*");
             cli.add(Find.class, "find -output=null -fold queryOrFormat* { arg*(queryOrFormat)}");
 
         System.exit(cli.run(args));

@@ -32,7 +32,7 @@ public class Project {
         Project result;
 
         result = new Project(
-                string(object, "repository"),
+                string(object, "storage"),
                 string(object, "path"),
                 string(object, "revision"),
                 Gav.forGavOpt(stringOpt(object, "parent")),
@@ -74,7 +74,7 @@ public class Project {
 
     //--
 
-    public final String repository;
+    public final String storage;
     public final String path;
     public final String revision;
 
@@ -88,9 +88,9 @@ public class Project {
 
     public final List<Gav> dependencies;
 
-    public Project(String repository, String path, String revision, Gav parent, Gav artifact, ScmUrl scm, String url) {
-        if (repository == null || repository.contains(":")) {
-            throw new IllegalArgumentException("repository: " + repository);
+    public Project(String storage, String path, String revision, Gav parent, Gav artifact, ScmUrl scm, String url) {
+        if (storage == null || storage.contains(":")) {
+            throw new IllegalArgumentException("storage: " + storage);
         }
         if (path == null) {
             throw new IllegalArgumentException("path: " + path);
@@ -98,7 +98,7 @@ public class Project {
         if (scm == null) {
             throw new IllegalArgumentException("scm: " + scm);
         }
-        this.repository = repository;
+        this.storage = storage;
         this.path = path;
         this.revision = revision;
         this.parent = parent;
@@ -109,7 +109,7 @@ public class Project {
     }
 
     public String origin() {
-        return repository + Field.ORIGIN_DELIMITER + path;
+        return storage + Field.ORIGIN_DELIMITER + path;
     }
 
     public String toLine() {
@@ -130,7 +130,7 @@ public class Project {
         JsonArray array;
 
         obj = new JsonObject();
-        obj.add("repository", new JsonPrimitive(repository));
+        obj.add("storage", new JsonPrimitive(storage));
         obj.add("path", new JsonPrimitive(path));
         obj.add("revision", new JsonPrimitive(revision));
         if (parent != null) {

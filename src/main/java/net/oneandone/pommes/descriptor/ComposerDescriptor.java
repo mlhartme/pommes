@@ -23,8 +23,8 @@ import net.oneandone.sushi.fs.Node;
 import net.oneandone.sushi.util.Strings;
 
 public class ComposerDescriptor extends Descriptor {
-    public ComposerDescriptor(String repository, String path, String revision, ScmUrl repositoryScm) {
-        super(repository, path, revision, repositoryScm);
+    public ComposerDescriptor(String storage, String path, String revision, ScmUrl storageScm) {
+        super(storage, path, revision, storageScm);
     }
 
     public static boolean matches(String name) {
@@ -32,13 +32,13 @@ public class ComposerDescriptor extends Descriptor {
     }
 
     public static ComposerDescriptor create(Environment environmentNotUsed, Node descriptorCurrentlyNotUsed,
-                                            String repository, String path, String revision, ScmUrl repositoryScm) {
-        return new ComposerDescriptor(repository, path, revision, repositoryScm);
+                                            String storage, String path, String revision, ScmUrl storageScm) {
+        return new ComposerDescriptor(storage, path, revision, storageScm);
     }
 
     @Override
-    public Project load(Environment notUsed) {
-        return new Project(repository, path, revision, null, artifact(path), repositoryScm, null);
+    public Project load() {
+        return new Project(storage, path, revision, null, artifact(path), storageScm, null);
     }
 
     private static Gav artifact(String origin) {

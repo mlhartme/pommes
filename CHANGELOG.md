@@ -2,16 +2,18 @@
 
 ### 3.5.0 (pending)
 
+* node storage now only handles checkouts -- local maven repository or svn no longer supported
 * token handling
   * load token from environment POMMES_REPOSITORY_TOKEN_<name> variable, not file
   * github + gitlab
     * load github token from "git credentials"
-    * explicitly declare "§§" if repository needs a token
-* default repositories
-  * the first repository defined in config is the default repository
-  * setup automatically defines default repository local = $POMMES_ROOT
-  * changed queries to only search the default repository by default;
-    prefix a query with "/" <repo> to search a different repository; prefix with "/" to search all repositories
+    * explicitly declare "§§" if storage needs a token
+* major repository cleanup, they are now called storage. The config file changed accordingly
+* default storage
+  * the first storage defined in config is the default storage
+  * setup automatically defines default storage local = $POMMES_ROOT
+  * changed queries to only search the default storage by default;
+    prefix a query with "/" <repo> to search a different storage; prefix with "/" to search all storages
 * simplified setup: 
   * root directory is an optional argument to `setup` now
   * default root directory changed from `Pommes` to `Projects`
@@ -22,8 +24,8 @@
   * more robust: handle io exception to that user interaction can be continued
 * tweaks and fixes
   * normalize git urls to avoid conflicting checkout problems
-  * fixed repository scm for file repositories
-  * fixed RawDescriptor to properly set repositoryScm
+  * fixed file storage scm
+  * fixed RawDescriptor to properly set storageScm
   * pom loading: use developer connection instead of connection, because it's usually better maintained
   * do not abort on pom loading errors, just report them
 * build
@@ -52,9 +54,9 @@
     the former POMMES_HOME (i.e `.pommes`); default is 'Pommes'
   * renamed pommes.properties to config
   * property `checkouts` is gone, it's now configured via `POMMES_ROOT`
-  * renamed import to repository
+  * renamed import to storage
 * tailing `.git` in git scm url is now optional
-* renamed zone to repository
+* renamed zone to storage
 * fixed NodeRepository to detect raw descriptors in none-root directories
 * fixed NodeRepository to check for trunk/branches/tags only for svn nodes (because ~/Projects/branches confused it)
 * updates
@@ -169,7 +171,7 @@
   (and pushed for git projects) now, and it prints an 'X' status if the project is unknwon but in scm.
 * Improved action selection: return quits without actions now, a applies all actions.
 * Dumped -svnuser and -svnpassword options. Specify credentials in the url instead.
-  (I've removed them because I don't want special handling for Subversion repository authentication.)
+  (I've removed them because I don't want special handling for Subversion storage authentication.)
 * Improved find argument: use can use query and format macros; the format is appended now; you can merge duplicate lines '-fold'.
   Merged database-export into find. Find now has an optional output argument (which also accepts files now) and -json and -dump
   formats to print pretty-printed or raw json.

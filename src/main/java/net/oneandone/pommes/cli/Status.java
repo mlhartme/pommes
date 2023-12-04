@@ -20,7 +20,7 @@ import net.oneandone.inline.Console;
 import net.oneandone.pommes.database.Database;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
-import net.oneandone.pommes.repository.NodeRepository;
+import net.oneandone.pommes.storage.FileStorage;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
 import net.oneandone.sushi.fs.DirectoryNotFoundException;
@@ -173,11 +173,11 @@ public class Status extends Base {
             scmUrl = scm.getUrl(found);
             foundProjects = database.projectsByScm(scmUrl);
             if (foundProjects.isEmpty()) {
-                probed = NodeRepository.probe(environment, "unused", found);
+                probed = FileStorage.probe(environment, "unused", found);
                 if (probed == null) {
                     throw new IllegalStateException();
                 }
-                newPom = probed.load(environment);
+                newPom = probed.load();
                 try {
                     expected = environment.lib.projectDirectory(newPom);
                 } catch (IOException e) {

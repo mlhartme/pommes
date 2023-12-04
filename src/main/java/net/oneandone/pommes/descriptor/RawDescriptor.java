@@ -15,7 +15,6 @@
  */
 package net.oneandone.pommes.descriptor;
 
-import net.oneandone.pommes.cli.Environment;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.pommes.scm.ScmUrl;
@@ -25,8 +24,8 @@ import java.io.IOException;
 
 /** descriptor without meta information like from poms, only the scm url is known */
 public class RawDescriptor extends Descriptor {
-    public static RawDescriptor createOpt(String repository, FileNode node) throws IOException {
-        Scm scm;
+    public static RawDescriptor createOpt(String storage, FileNode node) throws IOException {
+        Scm<?> scm;
 
         if (!node.isDirectory()) {
             return null;
@@ -35,20 +34,20 @@ public class RawDescriptor extends Descriptor {
         if (scm == null) {
             return null;
         }
-        return new RawDescriptor(repository, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node), null);
+        return new RawDescriptor(storage, node.getPath(), Long.toString(node.getLastModified()), scm.getUrl(node), null);
     }
 
     private final String url;
 
-    public RawDescriptor(String repository, String path, String revision, ScmUrl repositoryScm, String url) {
-        super(repository, path, revision, repositoryScm);
+    public RawDescriptor(String storage, String path, String revision, ScmUrl storageScm, String url) {
+        super(storage, path, revision, storageScm);
         this.url = url;
     }
 
     //--
 
     @Override
-    public Project load(Environment environment) throws IOException {
-        return new Project(repository, path, revision, null, repositoryScm.defaultGav(), repositoryScm, url);
+    public Project load() throws IOException {
+        return new Project(storage, path, revision, null, storageScm.defaultGav(), storageScm, url);
     }
 }

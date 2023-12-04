@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.oneandone.pommes.repository;
+package net.oneandone.pommes.storage;
 
 import net.oneandone.inline.Console;
 import net.oneandone.pommes.cli.Environment;
@@ -26,14 +26,14 @@ import java.net.URISyntaxException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GithubRepositoryIT {
-    private GithubRepository repository() throws IOException {
+public class GithubStorageIT {
+    private GithubStorage storage() throws IOException {
         Environment environment;
-        GithubRepository hub;
+        GithubStorage hub;
 
         environment = new Environment(Console.create(), World.create());
         try {
-            hub = GithubRepository.create(environment, "name", "https://api.github.com", null);
+            hub = GithubStorage.create(environment, "name", "https://github.com");
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
@@ -42,28 +42,28 @@ public class GithubRepositoryIT {
 
     @Test
     public void repo() throws IOException {
-        var hub = repository();
+        var hub = storage();
         var repo = hub.getRepo("mlhartme", "pommes");
         assertEquals("pommes", repo.name());
         assertTrue(repo.clone_url().startsWith("https://"));
         var pom = hub.fileNode(repo, "pom.xml").readString();
-        assertTrue(hub.files(repo).contains("pom.xml"));
+        assertTrue(hub.listRoot(repo).stream().map(GithubStorage.GithubFile::path).toList().contains("pom.xml"));
         assertTrue(pom.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"), pom);
         var descriptor = hub.load(repo);
-        var project = descriptor.load(new Environment(Console.create(), World.create()));
+        var project = descriptor.load();
         System.out.println("" + project.revision);
         assertEquals("net.oneandone:pommes", project.artifact.toGaString());
     }
 
     @Test
     public void orgOrgRepos() throws IOException {
-        var hub = repository();
+        var hub = storage();
         var repo = hub.listOrganizationOrUserRepos("1and1");
         assertTrue(repo.size() > 100);
     }
     @Test
     public void orgUserRepos() throws IOException {
-        var hub = repository();
+        var hub = storage();
         var repo = hub.listOrganizationOrUserRepos("~mlhartme");
         assertEquals(26, repo.size());
     }

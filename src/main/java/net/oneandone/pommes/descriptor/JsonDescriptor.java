@@ -25,16 +25,18 @@ import net.oneandone.sushi.fs.Node;
 import java.io.IOException;
 
 public class JsonDescriptor extends Descriptor {
+    public static final String NAME = "pommes.json";
+
     public static boolean matches(String name) {
-        return name.equals(".pommes.json") || name.equals("pommes.json");
+        return name.equals("." + NAME) || name.equals(NAME);
     }
 
-    public static JsonDescriptor create(Environment notUsed, Node node, String repository, String path, String revision, ScmUrl repositoryScm) {
+    public static JsonDescriptor create(Environment notUsed, Node<?> node, String storage, String path, String revision, ScmUrl storageScm) {
         JsonObject json;
 
         try {
             json = JsonParser.parseString(node.readString()).getAsJsonObject();
-            return new JsonDescriptor(Project.fromJson(json), repository, path, revision, repositoryScm);
+            return new JsonDescriptor(Project.fromJson(json), storage, path, revision, storageScm);
         } catch (IOException e) {
             throw new RuntimeException(node.getUri().toString() + ": cannot create json descriptor", e);
         }
@@ -44,16 +46,16 @@ public class JsonDescriptor extends Descriptor {
 
     private final Project orig;
 
-    public JsonDescriptor(Project orig, String repository, String path, String revision, ScmUrl repositoryScm) {
-        super(repository, path, revision, repositoryScm);
+    public JsonDescriptor(Project orig, String storage, String path, String revision, ScmUrl storageScm) {
+        super(storage, path, revision, storageScm);
         this.orig = orig;
     }
 
     @Override
-    public Project load(Environment environment) {
+    public Project load() {
         Project project;
 
-        project = new Project(repository, path, revision, orig.parent, orig.artifact, repositoryScm != null ? repositoryScm : orig.scm, orig.url);
+        project = new Project(storage, path, revision, orig.parent, orig.artifact, storageScm != null ? storageScm : orig.scm, orig.url);
         project.dependencies.addAll(orig.dependencies);
         return project;
     }

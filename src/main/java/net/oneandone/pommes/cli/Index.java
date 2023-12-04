@@ -22,14 +22,13 @@ import net.oneandone.pommes.database.Field;
 import net.oneandone.pommes.database.Project;
 import net.oneandone.pommes.descriptor.Descriptor;
 import net.oneandone.pommes.descriptor.ErrorDescriptor;
-import net.oneandone.pommes.repository.Repository;
+import net.oneandone.pommes.storage.Storage;
 import net.oneandone.pommes.scm.Git;
 import net.oneandone.pommes.scm.Scm;
 import net.oneandone.sushi.util.Separator;
 import org.apache.lucene.document.Document;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,76 +39,70 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Index extends Base {
-    private final List<String> repositories;
+    private final List<String> storages;
 
-    public Index(Environment environment, List<String> repositories) {
+    public Index(Environment environment, List<String> storages) {
         super(environment);
 
-        Set<String> available = environment.lib.properties().repositories.keySet();
-        this.repositories = repositories;
-        for (String repository : repositories) {
-            if (!available.contains(repository)) {
-                throw new ArgumentException("repository not found: " + repository);
+        Set<String> available = environment.lib.properties().storages.keySet();
+        this.storages = storages;
+        for (String storage : storages) {
+            if (!available.contains(storage)) {
+                throw new ArgumentException("storage not found: " + storage);
             }
         }
     }
 
     @Override
     public void run(Scope scope) throws Exception {
-        Repository repository;
+        Storage storage;
         Indexer indexer;
-        PrintWriter log;
 
-        log = new PrintWriter(environment.lib.logs().join("pommes.log").newWriter(), true);
-        for (Map.Entry<String, String> entry : environment.lib.properties().repositories.entrySet()) {
-            if (!repositories.isEmpty() && !repositories.contains(entry.getKey())) {
+        for (Map.Entry<String, String> entry : environment.lib.properties().storages.entrySet()) {
+            if (!storages.isEmpty() && !storages.contains(entry.getKey())) {
                 // not selected
                 continue;
             }
-            repository = null;
+            storage = null;
             for (String str : Separator.SPACE.split(entry.getValue())) {
                 if (str.equals("§§")) {
-                    String host = repo(repository, str).getTokenHost();
+                    String host = storage(storage, str).getTokenHost();
                     if (host != null) {
                         Git.UP up = Scm.GIT.getCredentials(environment.console(), environment.world().getWorking(), host);
-                        repo(repository, str).setToken(up.password());
+                        storage(storage, str).setToken(up.password());
                     }
                 } else if (str.startsWith("-")) {
-                    repo(repository, str).addExclude(str.substring(1));
+                    storage(storage, str).addExclude(str.substring(1));
                 } else if (str.startsWith("%")) {
-                    repo(repository, str).addOption(str.substring(1));
+                    storage(storage, str).addOption(str.substring(1));
                 } else {
-                    if (repository != null) {
-                        throw new ArgumentException("duplicate repository");
+                    if (storage != null) {
+                        throw new ArgumentException("duplicate storage: " + storage);
                     }
-                    repository = Repository.create(environment, entry.getKey(), str, log);
+                    storage = Storage.createStorage(environment, entry.getKey(), str);
                 }
             }
 
+            console.info.println("indexing " + entry.getKey() + ": " + entry.getValue());
+            indexer = new Indexer(environment, scope.getDatabase(), entry.getKey());
+            indexer.start();
             try {
-                console.info.println("indexing " + entry.getKey() + ": " + entry.getValue());
-                indexer = new Indexer(environment, scope.getDatabase(), entry.getKey());
-                indexer.start();
-                try {
-                    repository.scan(indexer.src, environment.console());
-                } finally {
-                    indexer.src.put(ErrorDescriptor.END_OF_QUEUE);
-                    indexer.join();
-                }
-                if (indexer.exception != null) {
-                    throw indexer.exception;
-                }
+                storage.scan(indexer.src, environment.console());
             } finally {
-                log.close();
+                indexer.src.put(ErrorDescriptor.END_OF_QUEUE);
+                indexer.join();
+            }
+            if (indexer.exception != null) {
+                throw indexer.exception;
             }
         }
     }
 
-    private Repository repo(Repository repository, String str) {
-        if (repository == null) {
+    private Storage storage(Storage storage, String str) {
+        if (storage == null) {
             throw new ArgumentException("missing url before '" + str + "'");
         }
-        return repository;
+        return storage;
     }
 
     /** Iterates modified or new documents, skips unmodified ones */
@@ -118,7 +111,7 @@ public class Index extends Base {
 
         public final BlockingQueue<Descriptor> src;
         private final Database database;
-        private final String repository;
+        private final String storage;
 
         private Exception exception;
 
@@ -128,7 +121,7 @@ public class Index extends Base {
 
         private final Map<String, String> existing;
 
-        public Indexer(Environment environment, Database database, String repository) {
+        public Indexer(Environment environment, Database database, String storage) {
             super("Indexer");
 
             this.environment = environment;
@@ -136,7 +129,7 @@ public class Index extends Base {
             this.src = new ArrayBlockingQueue<>(25);
 
             this.database = database;
-            this.repository = repository;
+            this.storage = storage;
             this.exception = null;
 
             // CAUTION: current is not defined until this thread is started (because it would block this constructor)!
@@ -151,7 +144,7 @@ public class Index extends Base {
 
             try {
                 started = System.currentTimeMillis();
-                database.list(repository, existing);
+                database.list(storage, existing);
                 environment.console().verbose.println("scanned " + existing.size() + " existing projects: "
                         + (System.currentTimeMillis() - started) + " ms");
                 current = iter();
@@ -209,13 +202,13 @@ public class Index extends Base {
                     return null;
                 }
                 count++;
-                existingRevision = existing.remove(descriptor.getRepository() + Field.ORIGIN_DELIMITER + descriptor.getPath());
+                existingRevision = existing.remove(descriptor.getStorage() + Field.ORIGIN_DELIMITER + descriptor.getPath());
                 if (descriptor.getRevision().equals(existingRevision)) {
                     console.info.println("  " + descriptor.getPath());
                     continue;
                 }
                 try {
-                    project = descriptor.load(environment);
+                    project = descriptor.load();
                 } catch (IOException e) {
                     console.error.println(e.getMessage());
                     e.printStackTrace(console.verbose);

@@ -5,7 +5,7 @@ import net.oneandone.sushi.fs.file.FileNode;
 import net.oneandone.sushi.launcher.Failure;
 
 public abstract class ScmUrl {
-    private final Scm scm;
+    private final Scm<ScmUrl> scm;
 
     public ScmUrl(Scm scm) {
         this.scm = scm;

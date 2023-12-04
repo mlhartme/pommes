@@ -40,17 +40,17 @@ public class PommesQuery {
         return parse(Collections.singletonList(str), null);
     }
 
-    public static PommesQuery parse(List<String> initialOr, String defaultRepository) throws IOException {
-        return parse(initialOr, defaultRepository, EMPTY);
+    public static PommesQuery parse(List<String> initialOr, String defaultStorage) throws IOException {
+        return parse(initialOr, defaultStorage, EMPTY);
     }
 
-    public static PommesQuery parse(List<String> initialOr, String defaultRepository, Variables variables) throws IOException {
+    public static PommesQuery parse(List<String> initialOr, String defaultStorage, Variables variables) throws IOException {
         int queryIndex;
         List<String> or;
         Or orBuilder;
         And andBuilder;
         List<String> terms;
-        String repo;
+        String storage;
 
         queryIndex = -1;
         or = new ArrayList<>(initialOr);
@@ -64,20 +64,20 @@ public class PommesQuery {
             }
         }
         if (or.size() > 0 && or.get(0).startsWith("/")) {
-            repo = or.remove(0);
-            if (repo.length() == 1) {
-                repo = null;
+            storage = or.remove(0);
+            if (storage.length() == 1) {
+                storage = null;
             } else {
-                repo = repo.substring(1);
+                storage = storage.substring(1);
             }
         } else {
-            repo = defaultRepository;
+            storage = defaultStorage;
         }
         orBuilder = new Or();
         for (String and : or.isEmpty() ? Collections.singletonList("") : or) {
             andBuilder = new And();
-            if (repo != null) {
-                andBuilder.add(new Atom(false, Arrays.asList(Field.ORIGIN), Match.PREFIX, repo + ":"));
+            if (storage != null) {
+                andBuilder.add(new Atom(false, Arrays.asList(Field.ORIGIN), Match.PREFIX, storage + ":"));
             }
             terms = PLUS.split(variables.substitute(and));
             for (String termWithNot : terms) {

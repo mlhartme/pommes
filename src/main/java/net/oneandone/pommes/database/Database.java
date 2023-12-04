@@ -124,14 +124,14 @@ public class Database implements AutoCloseable {
         writer.close();
     }
 
-    public void list(String repository, Map<String, String> result) throws IOException {
+    public void list(String storage, Map<String, String> result) throws IOException {
         TopDocs search;
         Document document;
 
         if (searcher == null) {
             searcher = new IndexSearcher(DirectoryReader.open(getIndexLuceneDirectory()));
         }
-        search = searcher.search(Field.ORIGIN.query(Match.PREFIX, repository + Field.ORIGIN_DELIMITER), Integer.MAX_VALUE);
+        search = searcher.search(Field.ORIGIN.query(Match.PREFIX, storage + Field.ORIGIN_DELIMITER), Integer.MAX_VALUE);
         for (ScoreDoc scoreDoc : search.scoreDocs) {
             document = searcher.getIndexReader().storedFields().document(scoreDoc.doc);
             result.put(Field.ORIGIN.get(document), Field.REVISION.get(document));
