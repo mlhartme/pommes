@@ -57,7 +57,7 @@ public class Lib {
     public static FileNode directoryOpt(World world) {
         String path;
 
-        path = System.getenv("POMMES_ROOT");
+        path = System.getenv("POMMES_ROOT"); // usually points to ~/Projects
         return path != null ? world.file(path).join(DIR) : null;
     }
 

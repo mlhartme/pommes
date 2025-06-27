@@ -83,10 +83,6 @@ public class Main {
                 + "  {ga}      = group and artifact of current project\n"
                 + "  {scm}     = scm location for current directory\n"
                 + "\n"
-                + "environment:\n"
-                + "  POMMES_ROOT     directory for managed checkouts; also holds directory '" + Lib.DIR + "'\n"
-                + "                  defined during shell initialization\n"
-                + "\n"
                 + "Home: https://github.com/mlhartme/pommes\n");
         cli.primitive(FileNode.class, "file name", world.getWorking(), world::file);
         cli.begin(world);

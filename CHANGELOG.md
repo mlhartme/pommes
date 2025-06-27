@@ -15,9 +15,9 @@
   * changed queries to only search the default storage by default;
     prefix a query with "/" <repo> to search a different storage; prefix with "/" to search all storages
 * simplified setup: 
-  * root directory is an optional argument to `setup` now
+  * root directory is an optional argument to `setup` now, default is $HOME/Projects
   * default root directory changed from `Pommes` to `Projects`
-  * POMMES_ROOT is now set automatically by shell profile
+  * POMMES_ROOT is now set automatically by shell profile, it's now an implementation details that the user does not have to deal with
 * simplified token file naming: $HOME/.pommes-<repo>.token
 * ls:
   * renamed it to `st`

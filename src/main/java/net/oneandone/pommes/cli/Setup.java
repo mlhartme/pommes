@@ -75,10 +75,9 @@ public class Setup {
         FileNode directory;
         Environment environment;
 
-        // TODO: duplicate file names ...
-        directory = Lib.directoryOpt(world);
-        if (directory != null && directory.exists())  {
-            throw new IOException("pommes is already set up: " + directory);
+        directory = root.join(Lib.DIR);
+        if (directory.exists())  {
+            throw new IOException("pommes is already set up at " + directory.getAbsolute());
         }
         if (!batch) {
             console.info.println("Ready to set up pommes for root directory " + root);
