@@ -44,7 +44,6 @@ public class GithubStorage extends TreeStorage<GithubStorage.GithubRepo, GithubS
         return new GithubStorage(environment, name, url);
     }
 
-
     private final Environment environment;
     private final String host;
     private final ObjectMapper mapper;
