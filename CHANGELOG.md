@@ -4,7 +4,6 @@
 
 * node storage now only handles checkouts -- local maven repository or svn no longer supported
 * token handling
-  * load token from environment POMMES_REPOSITORY_TOKEN_<name> variable, not file
   * github + gitlab
     * load github token from "git credentials"
     * explicitly declare "§§" if storage needs a token
@@ -18,7 +17,6 @@
   * root directory is an optional argument to `setup` now, default is $HOME/Projects
   * default root directory changed from `Pommes` to `Projects`
   * POMMES_ROOT is now set automatically by shell profile, it's now an implementation details that the user does not have to deal with
-* simplified token file naming: $HOME/.pommes-<repo>.token
 * ls:
   * renamed it to `st`
   * more robust: handle io exception to that user interaction can be continued

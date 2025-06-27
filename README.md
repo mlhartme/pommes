@@ -73,10 +73,9 @@ directory to wipe the database.
 Example urls
 
        storage.mlhartme=github:https://api.github.com %~mlhartme
-       storage.company=gitlab:https://gitlab.company.com 
+       storage.company=gitlab:https://gitlab.company.com %% %myTeamGroup %myPersonalGroup
 
-You can configure access token for github and gitlab by storing them in a file $POMMES_ROOT/.pommes/<reponame>-<protocol>.token.
-For example, a token in file $POMMES_ROOT/.pommes/github-mlhartme.token will be used to index the above mlhartme storage.
+Access token will be picked from git-auth-helper when the url is followed by an %% argument.
 
 ## Find Command
 
