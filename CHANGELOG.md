@@ -28,7 +28,7 @@
   * do not abort on pom loading errors, just report them
 * build
   * update parent 1.6.1 to 1.6.5
-  * update lucene 9.2.0 to 9.8.0
+  * update lucene 9.2.0 to 9.12.3
   * update gson 2.9.0 to 2.10.1
   * update application plugin 1.7.0 to 1.8.0
   * update maven-embedded 3.13 to maven-summon 4
@@ -36,7 +36,7 @@
   * update junit 5.7.1 to 5.10.0
   * update java-gitea-api 1.14.0 to 1.18.0
   * update svnkit 1.9.0 to 1.10.11
-  * added logback 1.4.11
+  * added logback 1.5.18
 
 
 ### 3.4.0 (2022-12-19)
