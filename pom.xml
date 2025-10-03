@@ -66,11 +66,6 @@
       <artifactId>api</artifactId>
       <version>4.0.1-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.tmatesoft.svnkit</groupId>
-      <artifactId>svnkit</artifactId>
-      <version>1.10.11</version>
-    </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>

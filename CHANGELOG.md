@@ -26,6 +26,7 @@
   * fixed RawDescriptor to properly set storageScm
   * pom loading: use developer connection instead of connection, because it's usually better maintained
   * do not abort on pom loading errors, just report them
+* remove support for svn: I don't use it anymore, and the respective library is no longer maintained
 * build
   * update parent 1.6.1 to 1.6.5
   * update lucene 9.2.0 to 9.12.3
@@ -35,7 +36,6 @@
   * update jackson-databind 2.13.4 to 2.19.2
   * update junit 5.7.1 to 5.12.2
   * update java-gitea-api 1.14.0 to 1.18.0
-  * update svnkit 1.9.0 to 1.10.11
   * added logback 1.5.18
 
 

@@ -30,9 +30,8 @@ import java.util.Map;
 
 public abstract class Scm<U extends ScmUrl> {
     public static final Git GIT = new Git();
-    public static final Subversion SUBVERSION = new Subversion();
 
-    private static final Scm<?>[] SCMS = { GIT, SUBVERSION };
+    private static final Scm<?>[] SCMS = { GIT };
 
     //--
 
