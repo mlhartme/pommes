@@ -5,7 +5,7 @@
   <parent>
     <groupId>de.schmizzolin.maven.poms</groupId>
     <artifactId>parent</artifactId>
-    <version>1.6.6-SNAPSHOT</version>
+    <version>1.7.0</version>
     <relativePath />
   </parent>
 
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>net.oneandone.maven.summon</groupId>
       <artifactId>api</artifactId>
-      <version>4.0.1-SNAPSHOT</version>
+      <version>4.0.1</version>
     </dependency>
 
     <dependency>
@@ -125,7 +125,7 @@
           <remove>META-INF/INDEX.LIST, META-INF/versions/9/module-info.class, module-info.class, META-INF/pominfo.properties, META-INF/wsd.properties, META-INF/LICENSE, META-INF/LICENSE.txt, META-INF/NOTICE, META-INF/NOTICE.txt, META-INF/DEPENDENCIES, about.html</remove>
           <concat>META-INF/services/org.apache.lucene.codecs.Codec, META-INF/sisu/javax.inject.Named, META-INF/services/org.apache.lucene.codecs.PostingsFormat, META-INF/services/org.apache.lucene.codecs.DocValuesFormat, META-INF/services/org.apache.lucene.analysis.TokenizerFactory</concat>
           <equal>META-INF/AL2.0, META-INF/LGPL2.1, com/jcraft/jsch/agentproxy/**/*</equal>
-          <overwrite>.cache/formatter-maven-cache.properties, javax/annotation/**/*</overwrite>
+          <overwrite>overview.html,.cache/formatter-maven-cache.properties, javax/annotation/**/*</overwrite>
         </configuration>
         <executions>
           <execution>

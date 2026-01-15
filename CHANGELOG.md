@@ -28,11 +28,11 @@
   * do not abort on pom loading errors, just report them
 * remove support for svn: I don't use it anymore, and the respective library is no longer maintained
 * build
-  * update parent 1.6.1 to 1.6.5
+  * update parent 1.6.1 to 1.7.0
   * update lucene 9.2.0 to 10.3.0
   * update gson 2.9.0 to 2.13.2
   * update application plugin 1.7.0 to 1.8.0
-  * update maven-embedded 3.13 to maven-summon 4
+  * update maven-embedded 3.13 to maven-summon 4.0.1
   * update jackson-databind 2.13.4 to 2.19.2
   * update junit 5.7.1 to 5.12.2
   * update java-gitea-api 1.14.0 to 1.18.0
