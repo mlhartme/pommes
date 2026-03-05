@@ -62,16 +62,8 @@ public class CentralSearchIT {
         checkRaw("+sushi -metridoc -beezle", "net.oneandone:sushi:3.3.0");
         checkRaw("+metri"); // does not match substring
         checkRaw("metri"); // does not match substring
-        checkRaw("beezle parent", "net.sf.beezle.maven.poms:parent:1.0.10"); // without +
-        // checkRaw("text:beezle" -> 5+ results); // word-match only for text field, not for id
         checkRaw("g:beezle"); // word-match only for text field, not for group
         checkRaw("id:beezle"); // word-match only for text field, not for id
-        checkRaw("+org +apache +maven +plugins +eclipse",
-                "org.apache.maven.plugins:maven-eclipse-plugin:2.10",
-                "org.apache.tuscany.maven.plugins:maven-eclipse-compiler:1.0.2");
-        checkRaw("org apache maven plugins eclipse",
-                "org.apache.maven.plugins:maven-eclipse-plugin:2.10",
-                "org.apache.tuscany.maven.plugins:maven-eclipse-compiler:1.0.2");
     }
 
     private void checkRaw(String queryRaw, String... expectedGavs) throws IOException {

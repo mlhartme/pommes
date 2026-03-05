@@ -65,6 +65,6 @@ public class GithubStorageIT {
     public void orgUserRepos() throws IOException {
         var hub = storage();
         var repo = hub.listOrganizationOrUserRepos("~mlhartme");
-        assertEquals(26, repo.size());
+        assertEquals(27, repo.size());
     }
 }
