@@ -29,7 +29,7 @@
 * remove support for svn: I don't use it anymore, and the respective library is no longer maintained
 * build
   * update parent 1.6.1 to 1.7.0
-  * update lucene 9.2.0 to 10.3.2
+  * update lucene 9.2.0 to 10.4.0
   * update gson 2.9.0 to 2.13.2
   * update application plugin 1.7.0 to 1.8.0
   * update maven-embedded 3.13 to maven-summon 4.0.1
